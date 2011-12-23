@@ -1,0 +1,200 @@
+#!/usr/bin/python
+#
+# run_mt -- script to assist in metadata import while we are setting
+# up CGHub in Dec 2011.
+#
+################################################################################
+# 
+# Copyright 2011 Annai Systems, Inc.   All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without modification, 
+# are permitted provided that the following conditions are met:
+# 
+#    1. Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+# 
+#    2. Redistributions in binary form must reproduce the above copyright notice, 
+#       this list of conditions and the following disclaimer in the documentation 
+#       and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY ANNAI SYSTEMS ''AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL <COPYRIGHT HOLDER> OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+# OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# The views and conclusions contained in the software and documentation are those 
+# of the authors and should not be interpreted as representing official policies, 
+# either expressed or implied, of Annai Systems, Inc.
+#
+################################################################################
+
+
+import os
+import sys
+import subprocess
+from optparse import OptionParser
+
+# Current version
+revlevel = '0.0.0.0'
+
+# The default tracker.  This can be overridden with a command line option; see usage
+default_tracker="http://example.com:21111/not-a-real-tracker"
+
+# The default make_torrent executable.  This can be overridden with a
+# command line option; see usage
+default_make_torrent="/home/howdy/make_torrent"
+
+# log()
+#
+# Emits a log message
+#
+# Inputs:
+# - msg -- the message to be logged
+#
+def log(msg):
+    print >> sys.stderr, msg
+
+
+# calculate_size()
+# Calculates the size of all the files in the "entry" directory.  This
+# is the same as the size of the files to be included in the GTO.
+#
+# Inputs:
+# - entry: the directory, presumably a UUID.  this is expected to be a subdirectory of CWD
+#
+# Outputs:
+# Returns the total size of all the files
+def calculate_size(entry):
+    size=0
+    files = os.listdir(entry)
+    for f in files:
+        size += os.path.getsize(os.path.join(entry, f))
+    return size
+
+
+# compute_piece_size()
+# Computes the piece size to use in the GTO
+#
+# Inputs:
+# - entry: the directory, presumably a UUID.  this is expected to be a subdirectory of CWD
+#
+# Outputs:
+# Returns the default piece size
+def compute_piece_size(entry):
+    gto_size = calculate_size(entry)
+    piece_size = (4*1024*1024)    # minimum piece size = 4 MB
+    while (gto_size / piece_size > 15000):
+        piece_size *= 2
+    return piece_size
+
+# Run_make_torrent()
+# Runs the make_torrent executable to create the GTO
+#
+# Inputs:
+# - entry: the directory, presumably a UUID.  this is expected to be a subdirectory of CWD
+# - params: the parameters from the cmd line
+#
+# Outputs:
+# - True on success, false otherwise
+# The GTO file is written to entry/entry.gto
+def run_make_torrent(entry, params):
+    if (not os.path.isdir(entry)):
+        log("Error: Not a directory: %s" % entry)
+        return False
+    # ensure there is at least one file in the directory
+    contents = os.listdir(entry)
+    if (len(contents) == 0):
+        log("Error: empty directory: %s" % entry)
+        return False
+
+    log("Processing %s" % entry)
+
+    piece_size = compute_piece_size(entry)
+    gto = os.path.join(entry, "%s.gto" % entry)
+    cmd = [params.make_torrent, entry, "-t", params.tracker, "-o", gto, "-s", str(piece_size)]
+
+    if (os.path.exists(gto)):
+        os.remove(gto)
+
+    if (params.inhibit_make_torrent):
+        print "RUNNING: %s" % " ".join(cmd)
+        return True
+
+    proc = subprocess.Popen(cmd, stderr=subprocess.PIPE)
+    ret =  proc.wait()
+    err_output = proc.communicate()[1].strip()
+    if (err_output != ""):
+        log("make_torrent: %s" % err_output)
+    if (ret == 0):
+        return True
+    log("make_torrent returned %d running command: %s" % (ret, " ".join(cmd)))
+    return False
+
+
+# process_input_file()
+# Opens the given file.  Runs make_torrent on each line in the file
+#
+# Inputs:
+# - filename: the input file
+# - params: the parameters from the cmd line
+#
+def process_input_file(filename, params):
+    f = open(filename, 'r')
+    for entry in f:
+        cwd=os.getcwd()
+        os.chdir(params.workdir)
+        run_make_torrent(entry.strip(), params)
+        os.chdir(cwd)
+    f.close()
+
+
+################################################################################
+# What would be main() in another language... 
+################################################################################
+
+# Check the python version for compatability.  Python 3 is not
+# backward compatible.
+if sys.version_info[0] != 2 or sys.version_info[1] < 6:
+    print("This script requires Python version 2.6")
+    sys.exit(1)
+
+# Parse the command line parameters
+parser = OptionParser(description='Create GTO files with make_torrent.', 
+                      version=("%%prog %s" % revlevel),
+                      usage="usage: %prog [options] inputfile [inputfile ...]")
+
+parser.add_option('-d', '--workdir', action='store', 
+                  default=os.getcwd(), dest='workdir',
+                  help='The workdir (default=cwd). The UUID directories listed '
+                  'in the inputfile should live under the workdir.')
+
+parser.add_option('-m', '--make_torrent', action='store', 
+                  default=default_make_torrent, dest='make_torrent',
+                  help='The full path to the make_torrent executable (default=%s)' 
+                  % default_make_torrent)
+
+parser.add_option('-t', '--tracker', action='store', 
+                  default=default_tracker, dest='tracker',
+                  help='The tracker to be inserted in the GTO file\'s '
+                  'announce field (default=%s)' % default_tracker)
+
+parser.add_option('-i', '--inhibit', action='store_true', 
+                  default=False, dest='inhibit_make_torrent',
+                  help='Don\'t actually run make_torrent; instead, print the '
+                  'make_torrent commands that would be run')
+
+(params, inputfiles) = parser.parse_args()
+
+if (len(inputfiles) == 0):
+    parser.print_help()
+    sys.exit(1)
+
+
+for inputfile in inputfiles:
+    process_input_file(inputfile, params)

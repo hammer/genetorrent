@@ -1,0 +1,553 @@
+#!/usr/bin/python
+#
+# LoadBalancer -- A server for distributing upload and download jobs
+# between GeneTorrent server instances
+#
+################################################################################
+# 
+# Copyright 2011 Annai Systems, Inc.   All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without modification, 
+# are permitted provided that the following conditions are met:
+# 
+#    1. Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+# 
+#    2. Redistributions in binary form must reproduce the above copyright notice, 
+#       this list of conditions and the following disclaimer in the documentation 
+#       and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY ANNAI SYSTEMS ''AS IS'' AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+# OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# The views and conclusions contained in the software and documentation are those 
+# of the authors and should not be interpreted as representing official policies, 
+# either expressed or implied, of Annai Systems, Inc.
+#
+# Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
+#
+################################################################################
+
+# Current version
+revlevel = '0.0.1.1'
+
+# Load a couple of useful modules
+from optparse import OptionParser
+from time import sleep
+import os
+import sys
+import ConfigParser
+import re
+import shutil
+import subprocess
+import time
+import signal
+import syslog
+import traceback
+
+# log()
+#
+# Emits a log message, given the current logging level
+#
+# Inputs:
+# - level -- the level of this log message, from LogLevel above
+# - msg -- the message to be logged
+#
+def log(level, msg):
+    syslog.syslog(level, msg)
+
+
+# compute_instance_queue_size()
+#
+# Returns the current size of the given instance queue.  
+#
+# Inputs:
+# - q_dir -- the instance queue directory
+#
+# Outputs:
+# - the size of the q_dir
+#
+# Note: at the moment, this function returns the sum of the sizes of
+# the GTO files in q_dir.  This is different from (and not as accurate
+# as) the total size of the files pointed to by the GTOs.  It's less
+# cmputationally intensive to get the size of the GTO files, and as
+# long as piece size is reasonably constant across GTOs, then the
+# sizes of the GTOs is a relatively good proxy for the size of the
+# files they contain.
+#
+def compute_instance_q_size(q_dir):
+    size=0
+    gtos = os.listdir(q_dir)
+    for gto in gtos:
+        if (re.match(".*\.(gto|GTO)$", gto) != None):
+            size += os.path.getsize(os.path.join(q_dir, gto))
+    return size
+
+
+# build_worklist()
+#
+# Based on all the instance work-queues, builds a worklist ordered by
+# least- to most-loaded.  The list is stored in the config, and is
+# structured as a set of tuples:
+#    [ (q_dir_1, size_1), (q_dir_2, size_2), ... ]
+#
+# ...where the q_dir's are the instance queues from the config, and
+# the sizes represent the aggregate size of all the GTOs currently in
+# that particular queue directory
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+#
+# Outputs:
+# - the "worklist" element in config is created or updated
+#
+def build_worklist(config):
+    log(syslog.LOG_INFO, "Rebuilding sorted list of instance queues")
+    worklist=list()
+    for q_dir in config['instance_qs']:
+        size = compute_instance_q_size(q_dir)
+        worklist.append( (q_dir, size) )
+    worklist.sort(key=lambda item: item[1])
+    config['worklist'] = worklist
+    config['worklist_refresh'] = time.time() + config['refresh_interval']
+    dump_worklist(config)
+
+
+# get_expiration()
+#
+# Returns the expiration of the supplied GTO file, in human-readable
+# form.  Useful for log messages.
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - gto -- the fully-qualified pathname to the GTO file
+#
+# Outputs:
+# - ret -- a string which represents the expiration of the GTO
+def get_expiration(config, gto):
+    cmd = [config['gtoinfo'], '--inspect=expires on', gto]
+    ret = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+    return ret.strip()
+
+
+# add_expiration()
+#
+# Adds or updates the expiration date in the GTO
+#
+# Inputs:
+# - in_q -- the input queue directory that contains the GTO file
+# - gto -- the gto file's basename.  Note the file can be found
+#          at in_q/gto_file
+# - config -- the config dict, originally read from the config file
+#
+# Outputs:
+# the GTO file is modified in-place
+#
+def add_expiration(in_q, gto, config):
+    gtofile = os.path.join(in_q, gto)
+    cmd = [config['gtoinfo'], '--expires=%d' % config['expiration'], 
+           '--no-backup', gtofile]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    ret =  proc.wait()
+    if (ret == 0):
+        return 
+    log(syslog.LOG_ALERT, "Error processing GTO file %s" % gtofile)
+    log(syslog.LOG_ALERT, "  %s" % proc.communicate()[0])
+    raise IOError("Could not modify %s" % gto)
+
+
+
+# assign_gto()
+#
+# Does the work of processing a single input GTO file.
+#
+# Inputs:
+# - in_q -- the input queue directory that contains the GTO file
+# - gto -- the gto file's basename.  Note the file can be found
+#          at in_q/gto_file
+# - factor -- the number of work queues to assign this GTO file to
+# - config -- the config dict, originally read from the config file
+#
+# On output, the GTO file has been processed: it has an expiration
+# date assigned, and it is copied to one or more instance queues
+#
+def assign_gto(in_q, gto, factor, config):
+    # get the full path and size of this GTO
+    src_gto = os.path.join(in_q, gto)
+    size = os.path.getsize(src_gto)
+
+    # for each destination queue:
+    #   - copy the GTO into place
+    #   - update the worklist with the new size
+    for i in range(factor):
+        (dest_q, dest_q_size) = config['worklist'][i]
+        dest_gto = os.path.join(dest_q, gto)
+        try:
+            if (os.path.exists(dest_gto)):
+                # Hmph. We're about to overwrite a GTO file. Print a warning.
+                old_exp = get_expiration(config, dest_gto)
+                new_exp = get_expiration(config, src_gto)
+                log(syslog.LOG_WARNING, "Warning: overwriting GTO %s (expires %s) with"
+                    " GTO that expires on %s" 
+                    % (pretty_pathname(config, dest_gto), old_exp, new_exp))
+                os.remove(dest_gto)
+
+            shutil.copy(src_gto, dest_gto)
+            dest_q_size += size
+            config['worklist'][i] = (dest_q, dest_q_size)
+            log(syslog.LOG_INFO, "Assigned GTO %s to queue %s" 
+                % (gto, pretty_pathname(config, dest_q)))
+        except:
+            log(syslog.LOG_ALERT, "Error assigning GTO %s to queue %s: %s"
+                % (gto, pretty_pathname(config, dest_q), sys.exc_info()[1]))
+
+    # finally, re-sort the worklist, and delete the src_gto
+    config['worklist'].sort(key=lambda item: item[1])
+    os.remove(src_gto)
+
+
+# dump_worklist()
+#
+# Dumps the worklist in a human-readable format to stdout
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+def dump_worklist(config):
+    log(syslog.LOG_DEBUG, "Dumping current worklist")
+    for (instance_q, instance_q_size) in config['worklist']:
+        log(syslog.LOG_DEBUG, "  %s: %d" 
+            % (pretty_pathname(config, instance_q), instance_q_size))
+
+
+# make_writable()
+#
+# If we are currently able to both read and write the specified file,
+# take no action and return.  IF we are currently able to read but not
+# write the specified file, attempt to fix this problem by (a) making
+# a copy of the file, (b) removing the original, and (c) moving the
+# copy to the name of the original.
+#
+# Inputs:
+# - path -- the path to the file
+def make_writable(path):
+    if os.access(path, os.W_OK):
+        return True
+    if not os.access(path, os.R_OK):
+        raise IOError("Cannot read file: %s" % path)
+    tmpfile="%s-copy" % path
+    shutil.copy(path, tmpfile)
+    os.rename(tmpfile, path)
+
+
+# process_input_q()
+#
+# Processes an input queue -- either upload or download
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - q_type -- one of the strings 'upload' or 'download'
+#
+# Output:
+# - assigned: True if at least one file was processed, False otherwise
+#
+def process_input_q(config, q_type):
+    q_dir = config["%s_q" % q_type]
+    factor = config["%s_factor" % q_type]
+    if (q_dir == "DISABLED"):
+        return False
+    gtos = os.listdir(q_dir)
+    assigned = False
+    for gto in gtos:
+        log(syslog.LOG_NOTICE, "New GTO %s added to %s queue." % (gto, q_type))
+        fullname=os.path.join(q_dir, gto)
+        try:
+            make_writable(fullname)
+            add_expiration(q_dir, gto, config)
+            assign_gto(q_dir, gto, factor, config)
+            assigned = True
+        except:
+            log(syslog.LOG_ALERT, "Error on GTO %s: %s" % (gto, sys.exc_info()[1]))
+            try:
+                os.remove(fullname)
+                log(syslog.LOG_ALERT, "Removed invalid file %s" % fullname)
+            except OSError:
+                log(syslog.LOG_ALERT, "Could not remove invalid file %s" % fullname)
+    return assigned
+
+
+# mainloop()
+#
+# Implements the main loop.  Note this function never returns, unless
+# a fatal error occurs or the user terminates operations with SIGINT
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+#
+def mainloop(config):
+    while True:
+        # (re)build the worklist
+        if ('worklist' not in config or config['worklist_refresh'] < time.time()):
+            build_worklist(config)
+
+        # process the two input queues
+        assigned = False
+
+        if process_input_q(config, 'upload'):
+            assigned = True
+
+        if process_input_q(config, 'download'):
+            assigned = True
+
+        if assigned:
+            dump_worklist(config)
+
+        # poll to see if we should re-read our config file
+        mtime = os.path.getmtime(config['config_file'])
+        if (mtime > config['config_file_mtime']):
+            newconfig = parse_config_file(config['config_file'])
+            if (newconfig != None):
+                log(syslog.LOG_NOTICE, "Re-read configuration file successfully")
+                config = newconfig
+            else:
+                log(syslog.LOG_ALERT, 
+                    "Because of config file errors, proceeding with previous configuration")
+
+        sleep(1)
+
+
+# subs_qr()
+#
+# substitutes the queue_root for the string %QUEUE_ROOT variable;
+# otherwise returns the input string unchanged
+#
+# Inputs:
+# - instr -- the raw string read from the config file
+# - queue_root -- the queue_root to be substituted into the input string
+#
+# Returns:
+# - the result of the substitution
+def subs_qr(instr, queue_root):
+    return re.sub('%QUEUE_ROOT', queue_root, instr)
+
+
+# pretty_pathname()
+#
+# For log readability, removes the queue_root from the input pathname
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - path -- the fully-qualified path 
+#
+# Outputs:
+# the shortened string
+def pretty_pathname(config, path):
+    return re.sub("^%s/" % config['queue_root'], ".../", path)
+
+
+# parse_config_file()
+#
+# Parses the configuration file and returns it as a config object
+#
+# Inputs:
+# - filename -- the filename to read
+#
+# Outputs:
+# - config -- the parsed contents of the configuration file.  This is
+#   a dictionary with keys that loosely correspond to the items in the
+#   config file.
+#
+# The config file structure uses Paython's ConfigParser syntax.  Here
+# is a sample config file:
+#
+#    [LoadBalancer]
+#    ; the logging level, in the range of 0-7.  More severe messages have lower
+#    ; levels.  Default=5
+#    loglevel=5
+#    
+#    ; how long GTO files should remain active, in hours. Default=72
+#    expiration=72
+#    
+#    ; how many GeneTorrent instances should be assigned to an upload GTO. 
+#    upload_factor=1
+#    
+#    ; how many GeneTorrent instances should be assigned to an download GTO
+#    download_factor=3
+#    
+#    ; the interval in seconds after which GTLoadBalancer will refresh its internal
+#    ; representation of the state of each of the instance queues. Default=1800
+#    ; (e.g., a half-hour)
+#    refresh_interval=1800
+#    
+#    ; the location to find the gtoinfo utility; default=/usr/bin/gtoinfo
+#    ;gtoinfo=/Users/howdy/Code/GeneTorrent/src/gtoinfo
+#    
+#    ; the root of the directory trees; can be referenced below as %QUEUE_ROOT
+#    queue_root=/cghub/data/workqueues
+#    
+#    ; this directory is where new GTOs for upload will be dropped.  LoadBalancer
+#    ; will pick up the GTOs from this directory and place them in the appropriate
+#    ; number of work-queues.
+#    upload_queue=%QUEUE_ROOT/dropzone-upload
+#    
+#    ; this directory is where new GTOs for download will be dropped.  LoadBalancer
+#    ; will pick up the GTOs from this directory and place them in the appropriate
+#    ; number of work-queues.
+#    download_queue=%QUEUE_ROOT/dropzone-download
+#    
+#    [Instances]
+#    ; this section defines the number of work-queues, and the queue directory for each
+#    num_instances=6
+#    queue_00=%QUEUE_ROOT/dropzone-00
+#    queue_01=%QUEUE_ROOT/dropzone-01
+#    queue_02=%QUEUE_ROOT/dropzone-02
+#    queue_03=%QUEUE_ROOT/dropzone-03
+#    queue_04=%QUEUE_ROOT/dropzone-04
+#    queue_05=%QUEUE_ROOT/dropzone-05
+#
+def parse_config_file(cfg_file):
+    try:
+        defaults = {'gtoinfo' : '/usr/bin/gtoinfo', 
+                    'loglevel' : 5,
+                    'expiration' : 72,
+                    'refresh_interval' : 1800 }
+
+        cfgparser = ConfigParser.RawConfigParser(defaults)
+        cfgparser.readfp(open(cfg_file, "r"))
+
+        config = dict()
+
+        config['config_file'] = cfg_file
+        config['config_file_mtime'] = os.path.getmtime(cfg_file)
+
+        config['loglevel'] = cfgparser.getint('LoadBalancer', 'loglevel')
+        if (config['loglevel'] < 0 or config['loglevel'] > 7):
+            raise ValueError("Illegal value %d for loglevel" % config['loglevel'])
+
+        config['expiration'] = cfgparser.getint('LoadBalancer', 'expiration')
+        if (config['expiration'] > 720 or config['expiration'] < 1):
+            raise ValueError("Illegal value %d for expiration" % config['expiration'])
+
+        config['upload_factor'] = cfgparser.getint('LoadBalancer', 'upload_factor')
+        if (config['upload_factor'] <= 0):
+            raise ValueError("Illegal upload_factor %d" % config['upload_factor'])
+
+        config['download_factor'] = cfgparser.getint('LoadBalancer', 'download_factor')
+        if (config['download_factor'] <= 0):
+            raise ValueError("Illegal download_factor %d" % config['download_factor'])
+
+        config['refresh_interval'] = cfgparser.getint('LoadBalancer', 'refresh_interval')
+        if (config['refresh_interval'] <= 10 or config['refresh_interval'] > 86400):
+            raise ValueError("Illegal refresh_interval %d" % config['refresh_interval'])
+
+        config['gtoinfo'] = cfgparser.get('LoadBalancer', 'gtoinfo')
+        if (not (os.path.isfile(config['gtoinfo']) and os.access(config['gtoinfo'],os.X_OK))):
+            raise ValueError("Cannot execute gtoinfo tool at %s" % config['gtoinfo'])
+
+        config['queue_root'] = cfgparser.get('LoadBalancer', 'queue_root')
+
+        config['upload_q'] = subs_qr(cfgparser.get('LoadBalancer', 'upload_queue'), 
+                                     config['queue_root'])
+        if (not os.path.isdir(config['upload_q'])):
+            raise ValueError("Upload queue directory %s doesn't exist" % config['upload_q'])
+
+        config['download_q'] = subs_qr(cfgparser.get('LoadBalancer', 'download_queue'), 
+                                       config['queue_root'])
+        if (not os.path.isdir(config['download_q'])):
+            raise ValueError("Download queue directory %s doesn't exist" % config['download_q'])
+
+        config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
+        if (config['num_instances'] <= 0):
+            raise ValueError("Illegal num_instances of %d" % config['num_instances'])
+
+        config['instance_qs'] = list()
+        for i in range(config['num_instances']):
+            q_dir = subs_qr(cfgparser.get('Instances', 'queue_%02d' % i), config['queue_root'])
+            if (not os.path.isdir(q_dir)):
+                raise ValueError("Instance %d queue directory %s doesn't exist" % (i, q_dir))
+            else:
+                config['instance_qs'].append(q_dir)
+
+        # some additional error checking
+        if (config['upload_factor'] > config['num_instances']):
+            raise ValueError("Upload factor %d is greater than %d configured instances"
+                             % (config['upload_factor'], config['num_instances']))
+
+        if (config['download_factor'] > config['num_instances']):
+            raise ValueError("Download factor %d is greater than %d configured instances"
+                             % (config['download_factor'], config['num_instances']))
+
+        # Log all the parameters we are returning, for debugging
+        log(syslog.LOG_DEBUG, "Read configuration file %s successfully:" % cfg_file)
+        for k,v in sorted(config.items()):
+            log(syslog.LOG_DEBUG, "  %s: %s" % (k, v))
+        
+        return config
+
+    except (ConfigParser.NoOptionError, ValueError) as e:
+        log(syslog.LOG_ALERT, "Error parsing config file %s: %s" % (cfg_file, e))
+        return None
+        
+
+# main()
+#
+# Parses the cmd line options and the config file, and then launches
+# the mainloop
+#
+# Return the exit code
+def main():
+    syslog.openlog(os.path.basename(sys.argv[0]))
+
+    # Parse the command line parameters
+    parser = OptionParser(description='Perform load balancing between multiple ' \
+                              'GeneTorrent server instances.', 
+                          version=("%%prog %s" % revlevel),
+                          usage="usage: %prog [options]")
+
+    parser.add_option('-c', '--config-file', action='store', 
+                      default="/etc/GTLoadBalancer.conf", dest='config_file',
+                      help='the location of the configuration file; default is %default')
+
+    (params, other_args) = parser.parse_args()
+
+    if (len(other_args) != 0):
+        parser.print_help()
+        return 1
+
+    config = parse_config_file(params.config_file)
+    if (config == None):
+        print >> sys.stderr, "Fatal error parsing configuration file"
+        return 1
+
+    try:
+        mainloop(config)
+    except (KeyboardInterrupt):
+        log(syslog.LOG_NOTICE, "Received keyboard interrupt; terminating")
+    except:
+        log(syslog.LOG_ALERT, "Uncaught exception: %s" % sys.exc_info()[1])
+        log(syslog.LOG_ALERT, "Backtrace: %s" % traceback.extract_tb(sys.exc_info()[2]))
+        log(syslog.LOG_ALERT, "Terminating")
+        return -1
+
+
+    return 0
+
+
+#
+# Check the python version for compatability.  Python 3 is not
+# backward compatible.
+#
+if sys.version_info[0] != 2 or sys.version_info[1] < 6:
+    print("This script requires Python version 2.6")
+    sys.exit(1)
+
+if __name__ == "__main__":
+    sys.exit(main())

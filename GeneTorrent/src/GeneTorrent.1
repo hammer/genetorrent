@@ -1,0 +1,199 @@
+.\" GeneTorrent man page
+.if !\n(.g \{\
+.	if !\w|\*(lq| \{\
+.		ds lq ``
+.		if \w'\(lq' .ds lq "\(lq
+.	\}
+.	if !\w|\*(rq| \{\
+.		ds rq ''
+.		if \w'\(rq' .ds rq "\(rq
+.	\}
+.\}
+.ie t .ds Tx \s-1T\v'.4n'\h'-.1667'E\v'-.4n'\h'-.125'X\s0
+. el  .ds Tx TeX
+.de Id
+. ds Yr \\$4
+. substring Yr 0 3
+. ds Mn \\$4
+. substring Mn 5 6
+. ds Dy \\$4
+. substring Dy 8 9
+. \" ISO 8601 date, complete format, extended representation
+. ds Dt \\*(Yr-\\*(Mn-\\*(Dy
+..
+.TH GeneTorrent 1 
+.hy 0
+.
+.SH NAME 
+GeneTorrent \- transfer genomic data reliably across a network
+.SH SYNOPSIS
+.B GeneTorrent -u
+.I manifest-file
+.B \fR[\fP -p 
+.I path
+.R ]
+.br
+.B GeneTorrent -d 
+.I \fR[\fP URI \fR|\fP UUID \fR|\fP .xml \fR|\fP .gto \fR]\fP
+.B -c 
+.I credentials
+.B \fR[\fP -p 
+.I path
+.RB ] 
+.br
+.B GeneTorrent -s
+.I path
+.B -q
+.I work-queue
+.B -c 
+.I credentials
+.B --security-api 
+.I signing-URI
+.SH DESCRIPTION
+.B GeneTorrent
+is a file transfer client application designed for the optimal
+transfer of genomic data across a computer network.  File transfers
+using GeneTorrent are designed to be authenticated, secure, reliable,
+and efficient.
+.PP
+GeneTorrent has 3 operating modes: upload, download, and server.
+Upload mode is used to send files to the repository.  Download mode is
+used to retrieve files from the repository.  Server mode is used
+within the repository to create GeneTorrent server instances that
+deliver data to download actors.
+.PP
+Depending on the operating mode of GeneTorrent the same command line
+argument may have different behaviors or meanings.  In addition there
+are several options that can be used in any operating mode.
+.SH OPTIONS
+.SS "General Command Line Arguments:"
+.TP
+.BR \-h ", " \-\^\-help
+Print a usage message briefly summarizing these command-line options, then exit.
+.TP
+.B \-\^\-version
+Print the version number of
+.B GeneTorrent
+to the standard output stream.  This version number should be included
+in all bug reports (see below).
+.TP
+.BI \-b " address" "\fR,\fP \-\^\-bindIP" " address"
+The IP address for GeneTorrent to bind.  Default is to bind all
+addresses on the system.
+.TP
+.BI \-c " credential-file" "\fR,\fP \-\^\-credentialFile" " credential-file"  
+Required for download and server modes, unless you are directly
+passing a .gto file to the -d option.  The full or relative path to
+the file containing the access credentials (security token) previously
+received from the repository.
+.TP
+.BI \-e " address" "\fR,\fP \-\^\-advertisedIP" " address"
+The IP address to advertise to the transactor.  This option is useful
+when this actor is running behind a NAT firewall and the publicly
+exposed IP address is not the same as the actual IP address.  The
+default is to advertise the IP address of the host's default route, or
+the address specified with the -b option.
+.TP
+.BI \-f " port" "\fR,\fP \-\^\-advertisedPort" " port"
+The first port to advertise to the transactor.  This option is useful
+when this actor is running behind a NAT firewall and the publicly
+exposed ports are not the same as the ports actually bound.  The range
+of advertised ports will start at the port number specified in this
+option, so for instance if 9 ports are configured, then the advertised
+ports will run from 
+.IR port " to " port "+8."
+The default is to advertise the ports that are actually used.
+.TP
+.BI \-i " startPort\fR[:\fPendPort\fR]\fP" "\fR,\fP \-\^\-internalPort" " startPort\fR[:\fPendPort\fR]\fP"
+Specifies the range of ports actually used by GeneTorrent.  By default
+these ports are also advertised externally unless the -f option is
+used.  If an endPort is not specified, 9 ports will be configured, so
+.IR endPort " = " startPort " + 8."
+The default is to use ports 20892 through 20900.
+.TP
+.BI \-C " confdir" "\fR,\fP \-\^\-confDir" " confdir"
+Specify an absolute path to the GeneTorrent configuration directory.
+This directory should contain \fBGeneTorrent.openssl.conf\fP and
+\fBdhparam.pem\fP.
+.TP
+.BR \-v ", " \-\^\-verbose
+Verbose progress reporting to stdout.  By default GeneTorrent offers
+no status information unless an error occurs.  Use multiple -v options
+to increase the reporting level, up to a maximum of 4.
+.SS "Upload Mode Command Line Arguments:"
+.TP
+.BI \-u " manifest-file" "\fR,\fP \-\^\-manifestFile" " manifest-file"  
+Required. Indicates upload mode.  The 
+.I manifest-file 
+must follow the format specified by Annai Systems; lists all the data
+files that are to be transferred to the repository.
+.TP
+.BI \-p " path" "\fR,\fP \-\^\-path" " path"
+Root path to read data files.  Note that files to be uploaded must
+always be in a subdirectory named after the analysis UUID for the
+sumission.  If the -p option is present,
+.I path
+can point to the UUID directory, or to the directory that contains the
+UUID directory.  The current directory will be used by default.
+.SS "Download Mode Command Line Arguments:"
+.TP
+.BI \-d " content-specifier" "\fR,\fP \-\^\-download" " content-specifier"
+Required. Indicates download mode.  
+.I content-specifier
+should be one of the following:
+.IP
+o  A fully-qualified URI pointing to an analysis object at the
+GeneTorrent Executive.
+.IP
+o  A UUID denoting an analysis object at the GeneTorrent Executive.  In
+this case, GeneTorrent will construct a URI based on the default
+server, currently https://cghub.ucsc.edu.  
+.IP
+o  An XML file, which will be parsed to obtain a list of URIs.
+.IP
+o A .gto file directly, which eliminates all calls to the GeneTorrent
+Executive and causes a download to begin.  In this case you do not
+need to supply access credentials using the -c option.
+.IP
+Note that multiple -d options can be specified on the same command
+line, in which case multiple analysis objects will be downloaded.
+.TP
+.BI \-p " path" "\fR,\fP \-\^\-path" " path"
+Path to save data files in the gto file(s).  UUID is part of the gto
+and will always be added to 
+.I path
+, so data files will be found at
+.I path\fR/\fPUUID\fR.\fP
+The current directory will be used by default.
+.SS "Server Mode Command Line Arguments:"
+.TP
+.BI \-s " path" "\fR,\fP \-\^\-server" " path"
+Required.  Indicates server mode.  
+.I path
+is the directory under which
+the data files being shared are to be found.  Note that UUID is always
+be added to 
+.I path\fR,\fP
+so data files will be found at 
+.I path\fR/\fPUUID\fR.\fP
+.TP
+.BI \-q " work-queue" "\fR,\fP \-\^\-queue" " work-queue"
+Required.  
+.I work-queue
+is the path where this server instance will look for .gto files to
+begin sharing content.
+.TP
+.BI \-\^\-security-api " signing-URI"
+Required.  
+.I signing-URI
+is a fully-qualified URI which will sign CSRs for this server instance.
+.SH COPYRIGHT
+Copyright \(co
+2011
+Annai Systems, Inc.
+.PP
+This is free software;
+see the source for copying conditions.
+There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
