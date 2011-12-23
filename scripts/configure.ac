@@ -29,68 +29,15 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(GeneTorrent, 0.9.0.4)
+
+#
+AC_INIT(GeneTorrentScripts, 0)
+#AC_INIT(GeneTorrentScripts)
 AM_MAINTAINER_MODE
-AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE
-PKG_PROG_PKG_CONFIG
-AC_CONFIG_SRCDIR([src/tclapOutput.cpp])
-AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_MACRO_DIR([m4])
-
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-AC_LANG_CPLUSPLUS
-
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lboost_regex':
-AC_CHECK_LIB([boost_regex], [main])
-# FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_system], [main])
-# FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_filesystem], [main])
-# FIXME: Replace `main' with a function in `-lcurl':
-AC_CHECK_LIB([curl], [main])
-# FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB([pthread], [main])
-# FIXME: Replace `main' with a function in `-lxqilla':
-AC_CHECK_LIB([xqilla], [main])
-# FIXME: Replace `main' with a function in `-lxqilla':
-AC_CHECK_LIB([log4cpp], [main])
-
-
-
-
-AC_CHECK_LIB([c], [main])
-AC_CHECK_LIB([rt], [main])
-AC_CHECK_LIB([ssl], [main])
-AC_CHECK_LIB([ssl3], [main])
-AC_CHECK_LIB([ssh2], [main])
-AC_CHECK_LIB([ldap], [main])
-AC_CHECK_LIB([idn], [main])
-AC_CHECK_LIB([icule], [main])
-
-PKG_CHECK_MODULES(torrentrasterbar, libtorrent-rasterbar)
- 
-# Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h curl/curl.h])
-AC_CHECK_HEADERS(sstream) # needed for tclap
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([getcwd mkdir pathconf strtol])
 
 AC_CONFIG_FILES([
 Makefile 
-src/Makefile 
 ])
 AC_OUTPUT
 
