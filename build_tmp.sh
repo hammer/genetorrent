@@ -39,7 +39,7 @@ function build_libtorrent
    ./autotool.sh || bailout $FUNCNAME
    ./configure --enable-callbacklogger --enable-logging=minimal --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   make -j 3 || bailout $FUNCNAME
+   make -j 64 || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
 }
 
@@ -48,7 +48,7 @@ function build_GeneTorrent
    ./autogen.sh || bailout $FUNCNAME
    ./configure --prefix=/usr CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   make -j 3 || bailout $FUNCNAME
+   make || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
 }
 
