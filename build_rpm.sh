@@ -55,6 +55,7 @@ function collectRPMS
 geneTorrentVer="`grep AC_INIT GeneTorrent/configure.ac|cut -d, -f2|tr -d ')'|awk '{print $1}'`"
 startDir="$PWD"
 
+./build_tmp.sh
 configureRPMBuild
 buildRPMS
 collectRPMS
