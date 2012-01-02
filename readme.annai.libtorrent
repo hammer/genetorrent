@@ -1,5 +1,0 @@
-
-Configure Options
-
-./configure --enable-callbacklogger --enable-logging=minimal --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2"
-
