@@ -994,7 +994,9 @@ void geneTorrent::run ()
          message.str("");
   
          time_t duration = time(NULL) - startTime;
-         message << "Downloaded " << add_suffix (totalBytes) << " in " << std::setw(2) << std::setfill('0') << duration / 3600  << ":" << std::setw(2) << std::setfill('0') << duration/60 << ":" << std::setw(2) << std::setfill('0') << duration%60 << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+
+         message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration)
+								 << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
 
          *sysLogGT << log4cpp::Priority::INFO << message.str();
 
@@ -1452,6 +1454,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       currentState = torrentHandle.status().state;
    }
 
+	 torrentSession.remove_torrent (torrentHandle);
    exit (0);
 }
 
@@ -2044,7 +2047,8 @@ void geneTorrent::runServerMode ()
 
                   if (peers.size () == 0)
                   {
-                     *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  " << mapIter->first << " with info hash: " << getInfoHash (mapIter->first);
+                     *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  " << mapIter->first 
+															 << " with info hash: " << getInfoHash (mapIter->first);
                      (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                      deleteGTOfromQueue (mapIter->first);
                      activeTorrentCollection.erase (mapIter->first);
@@ -2054,13 +2058,18 @@ void geneTorrent::runServerMode ()
                   {
                      if (!mapIter->second->overTimeAlertIssued)
                      {
-                        *sysLogGT << log4cpp::Priority::INFO << "Overtime serving (" << peers.size () << " actor(s) connected):  " << mapIter->first << " with info hash: " <<  getInfoHash (mapIter->first);
+                        *sysLogGT << log4cpp::Priority::INFO << "Overtime serving (" 
+																	<< peers.size () << " actor(s) connected):  " 
+																	<< mapIter->first << " with info hash: " 
+																	<<  getInfoHash (mapIter->first);
                         mapIter->second->overTimeAlertIssued = true;
                      }
    
                      if (_verbosityLevel > 0)
                      {  
-                        std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actor continues to download" << std::endl;
+                        std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " 
+																	<< server_state_str[torrentStatus.state] 
+																	<< "  expired, but an actor continues to download" << std::endl;
                      }
                      mapIter++;
                   }
@@ -2069,7 +2078,10 @@ void geneTorrent::runServerMode ()
                {
                   if (_verbosityLevel > 0)
                   {
-                     std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in:  " <<  mapIter->second->expires - time (NULL) << " seconds" << std::endl;
+                     std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " 
+															 << server_state_str[torrentStatus.state] << "  expires in:  " 
+															 <<  durationToStr(mapIter->second->expires - time (NULL))
+															 << " seconds" << std::endl;
                   }
                   mapIter++;
                }
@@ -2550,7 +2562,14 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
             double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
-            snprintf (str, sizeof(str), "%% Complete: %5.1f  Status:  %-13s  downloaded:  %s (%s) uploaded:  %s (%s)", (percentComplete > 100.0000000 ? 100.0 : percentComplete), upload_state_str[torrentStatus.state], add_suffix (torrentStatus.total_download).c_str (), add_suffix (torrentStatus.download_rate, "/s").c_str (), add_suffix (torrentStatus.total_upload).c_str (), add_suffix (torrentStatus.upload_rate, "/s").c_str ());
+            snprintf (str, sizeof(str), 
+								"%% Complete: %5.1f  Status:  %-13s  downloaded:  %s (%s) uploaded:  %s (%s)", 
+								(percentComplete > 100.0 ? 100.0 : percentComplete), 
+								upload_state_str[torrentStatus.state], 
+								add_suffix (torrentStatus.total_download).c_str (), 
+								add_suffix (torrentStatus.download_rate, "/s").c_str (), 
+								add_suffix (torrentStatus.total_upload).c_str (), 
+								add_suffix (torrentStatus.upload_rate, "/s").c_str ());
             std::cerr << str << std::endl;
          }
       }

@@ -25,6 +25,8 @@
 std::string add_suffix(float val, const char *suffix = 0);
 std::string to_string(int v, int width);
 std::string & to_string(float v, int width, int precision = 3);
+std::string durationToStr(time_t duration);
+
 bool file_filter (boost::filesystem::path const& filename);
 
 #endif /* GENETORRENT_UTILS_H_ */

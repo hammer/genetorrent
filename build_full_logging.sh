@@ -1,3 +1,4 @@
+#!/bin/sh
 #  Copyright (c) 2011, Annai Systems, Inc.
 #  All rights reserved.
 #  

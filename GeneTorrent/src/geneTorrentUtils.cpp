@@ -107,3 +107,21 @@ std::string& to_string (float v, int width, int precision)
    ret.resize ((std::min) (size, width));
    return ret;
 }
+
+// contributed by Cardinal Peak
+std::string durationToStr(time_t duration)
+{
+	char buffer[1024];
+	int hours;
+	int minutes;
+	int seconds;
+
+	hours = duration / (60 * 60);
+	duration -= hours * 60 * 60;
+	minutes = duration / 60;
+	duration -= minutes * 60;
+	seconds = duration;
+
+	snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
+	return std::string(buffer);
+}

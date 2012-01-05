@@ -62,8 +62,40 @@ const std::string CGHUB_WSI_BASE_URL = "https://"+ DEFAULT_CGHUB_HOSTNAME + "/cg
 const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 
 // Torrent status text for various GeneTorrent operational modes
-static char const* server_state_str[] = { "checking (q)", "checking", "dl metadata", "GTOerror", "finished", "serving", "allocating", "checking (r)" };
-static char const* download_state_str[] = { "checking (q)", "checking", "dl metadata", "downloading", "finished", "cleanup", "allocating", "checking (r)" };
-static char const* upload_state_str[] = { "checking (q)", "checking", "dl metadata", "GTOerror", "finished", "uploading", "allocating", "checking (r)" };
+//
+// these are indexed by the torrent_status::state_t enum, found in torrent_handle.hpp
+
+static char const* server_state_str[] = { 
+	"checking (q)",								//			queued_for_checking,
+	"checking",										//			checking_files,
+	"dl metadata",								//			downloading_metadata,
+	"GTOerror",										//			downloading,
+	"finished",										//			finished,
+	"serving", 										//			seeding,
+	"allocating",									//			allocating,
+	"checking (r)"								//			checking_resume_data
+};
+
+static char const* download_state_str[] = {
+	"checking (q)",								//			queued_for_checking,
+	"checking",										//			checking_files,
+	"dl metadata",								//			downloading_metadata,
+	"downloading",								//			downloading,
+	"finished",										//			finished,
+	"cleanup",										//			seeding,
+	"allocating",									//			allocating,
+	"checking (r)"								//			checking_resume_data
+};
+
+static char const* upload_state_str[] = { 
+	"checking (q)",								//			queued_for_checking,
+	"checking",										//			checking_files,
+	"dl metadata",								//			downloading_metadata,
+	"GTOerror",										//			downloading,
+	"finished",										//			finished,
+	"uploading",									//			seeding,
+	"allocating",									//			allocating,
+	"checking (r)"								//			checking_resume_data
+};
 
 #endif /* GTDEFS_H_ */
