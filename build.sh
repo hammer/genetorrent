@@ -124,7 +124,7 @@ function collectRPMS
 
 function build_common
 {
-      build_geneTorrent
+      build_GeneTorrent
       build_scripts
 }
 
