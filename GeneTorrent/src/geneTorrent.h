@@ -76,10 +76,11 @@ class geneTorrent
    {
       libtorrent::add_torrent_params torrentParams;
       libtorrent::torrent_handle torrentHandle;
-      time_t expires;
+      time_t expires;            // When the torrent expires
       time_t mtime;              // file modification time
-      std::string infoHash;
-      bool overTimeAlertIssued;
+      std::string infoHash;         
+      bool overTimeAlertIssued;     // tracks if the overtime message has been reported to syslog
+//      bool stillPresent;            // tracks if the GTO is still present in the queue directory
    } activeTorrentRec;
 
    typedef struct activeSessionRec_
@@ -165,6 +166,7 @@ class geneTorrent
       void runServerMode(); 
       void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
       //
+      void servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents);
       void buildURIsToDownloadFromUUID (vectOfStr &uuids);
       void downloadGtoFilesByURI (vectOfStr &uris);
 

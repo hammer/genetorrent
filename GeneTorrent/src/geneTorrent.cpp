@@ -996,7 +996,7 @@ void geneTorrent::run ()
          time_t duration = time(NULL) - startTime;
 
          message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration)
-								 << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+                         << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
 
          *sysLogGT << log4cpp::Priority::INFO << message.str();
 
@@ -1080,13 +1080,13 @@ void geneTorrent::bindSession (libtorrent::session *torrentSession)
    // in the case where the tracker sends back a very low interval
    settings.min_announce_interval = 2;
 
-	 // prevent keepalives from being sent.  this will cause servers to
-	 // time out peers more rapidly.  
-	 //
-	 // TODO: probably a good idea to set this in ALL modes, but for now
-	 // we don't want to risk introducing a new bug to server mode
-	 if (_operatingMode != SERVER_MODE)
-		 settings.inhibit_keepalives = true;
+    // prevent keepalives from being sent.  this will cause servers to
+    // time out peers more rapidly.  
+    //
+    // TODO: probably a good idea to set this in ALL modes, but for now
+    // we don't want to risk introducing a new bug to server mode
+    if (_operatingMode != SERVER_MODE)
+       settings.inhibit_keepalives = true;
 
    torrentSession->set_settings (settings);
 }
@@ -1463,7 +1463,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       currentState = torrentHandle.status().state;
    }
 
-	 torrentSession.remove_torrent (torrentHandle);
+    torrentSession.remove_torrent (torrentHandle);
    exit (0);
 }
 
@@ -1944,8 +1944,8 @@ void geneTorrent::checkSessions ()
 
 bool geneTorrent::generateCSR (std::string uuid)
 {
-	 // TODO: migrate this to a direct call of the OpenSSL API instead
-	 // of calling a subprocess
+    // TODO: migrate this to a direct call of the OpenSSL API instead
+    // of calling a subprocess
    std::string cmd = "openssl req -config " + _gtOpenSslConf + " -new -nodes -out " + _tmpDir + uuid + ".csr -keyout " + _tmpDir + uuid + ".key";
 
    int result = system (cmd.c_str());
@@ -1999,9 +1999,9 @@ void geneTorrent::runServerMode ()
          std::set <std::string>::iterator actTorrentIter;
          actTorrentIter = activeTorrentCollection.find (*vectIter);
 
-         if (actTorrentIter == activeTorrentCollection.end ()) // gto is not in the map of active torrents
+         if (actTorrentIter == activeTorrentCollection.end ()) // gto is not in the set of active torrents
          {
-            if (addTorrentToServingList (*vectIter))  // Successfully added to the list of active torrents
+            if (addTorrentToServingList (*vectIter))  // Successfully added to a serving session
             {
                activeTorrentCollection.insert (*vectIter);
             }
@@ -2013,85 +2013,9 @@ void geneTorrent::runServerMode ()
 
       if (nextMaintTime < timeNow)
       {
-         std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
-         while (listIter != _activeSessions.end ())
-         {
-            std::map <std::string, activeTorrentRec *>::iterator mapIter = (*listIter)->mapOfSessionTorrents.begin (); //mapOfSessionTorrents
-            while (mapIter != (*listIter)->mapOfSessionTorrents.end ())
-            {
-               libtorrent::torrent_status torrentStatus = mapIter->second->torrentHandle.status ();
-               time_t torrentModTime = 0;
-               
-               if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
-               {
-                  // TODO Handle error condition for failed stat call
-                  // for now ignore the error
-                  mapIter++;
-                  continue;
-               }
-
-               if (torrentModTime != mapIter->second->mtime)
-               {
-                  // torrent file has been updated 
-                  // TODO veriy info_hash and update mtime, expiration time, and overTimeAlertIssued (if new expires > timeNow)
-                  // log message that expiration time has been extended
-                  
-               }
-
-               if (timeNow >= mapIter->second->expires)
-               {
-                  std::vector <libtorrent::peer_info> peers;
-
-                  mapIter->second->torrentHandle.get_peer_info (peers);
-
-                  if (peers.size () == 0)
-                  {
-                     *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  " << mapIter->first 
-															 << " with info hash: " << getInfoHash (mapIter->first);
-                     (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
-                     deleteGTOfromQueue (mapIter->first);
-                     activeTorrentCollection.erase (mapIter->first);
-                     (*listIter)->mapOfSessionTorrents.erase (mapIter++);
-                  }
-                  else
-                  {
-                     if (!mapIter->second->overTimeAlertIssued)
-                     {
-                        *sysLogGT << log4cpp::Priority::INFO << "Overtime serving (" 
-																	<< peers.size () << " actor(s) connected):  " 
-																	<< mapIter->first << " with info hash: " 
-																	<<  getInfoHash (mapIter->first);
-                        mapIter->second->overTimeAlertIssued = true;
-                     }
-   
-                     if (_verbosityLevel > 0)
-                     {  
-                        std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " 
-																	<< server_state_str[torrentStatus.state] 
-																	<< "  expired, but an actor continues to download" << std::endl;
-                     }
-                     mapIter++;
-                  }
-               }
-               else
-               {
-                  if (_verbosityLevel > 0)
-                  {
-                     std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " 
-															 << server_state_str[torrentStatus.state] << "  expires in:  " 
-															 <<  durationToStr(mapIter->second->expires - time (NULL))
-															 << " seconds" << std::endl;
-                  }
-                  mapIter++;
-               }
-            }
-            listIter++;
-         }  // while (...)
-      }  // if (nextMaintTime < timeNow)
-
-      if (nextMaintTime < timeNow)
-      {
          nextMaintTime = time(NULL) + 60;  // Set the time for the next maintenance window
+
+         servedGtosMaintenance (timeNow, activeTorrentCollection);
 
          if (_verbosityLevel > 0)
          {
@@ -2103,6 +2027,78 @@ void geneTorrent::runServerMode ()
       usleep (2000000);
    }
 }
+
+void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents)
+{
+   std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
+   while (listIter != _activeSessions.end ())
+   {
+      std::map <std::string, activeTorrentRec *>::iterator mapIter = (*listIter)->mapOfSessionTorrents.begin (); //mapOfSessionTorrents
+
+      while (mapIter != (*listIter)->mapOfSessionTorrents.end ())
+      {
+         libtorrent::torrent_status torrentStatus = mapIter->second->torrentHandle.status ();
+         time_t torrentModTime = 0;
+               
+         if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
+         {
+            // The torrent has disappeared, stop serving it.
+
+
+            mapIter++;
+            continue;
+         }
+
+         if (torrentModTime != mapIter->second->mtime)
+         {
+                  // torrent file has been updated 
+                  // TODO veriy info_hash and update mtime, expiration time, and overTimeAlertIssued (if new expires > timeNow)
+                  // log message that expiration time has been extended
+                  
+         }
+
+         if (timeNow >= mapIter->second->expires)       // This GTO is expired
+         {
+            std::vector <libtorrent::peer_info> peers;
+
+            mapIter->second->torrentHandle.get_peer_info (peers);
+
+            if (peers.size () == 0)
+            {
+               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  " << mapIter->first << " with info hash: " << getInfoHash (mapIter->first);
+
+               (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
+               deleteGTOfromQueue (mapIter->first);
+               activeTorrents.erase (mapIter->first);
+               (*listIter)->mapOfSessionTorrents.erase (mapIter++);
+            }
+            else
+            {
+               if (!mapIter->second->overTimeAlertIssued)
+               {
+                  *sysLogGT << log4cpp::Priority::INFO << "Overtime serving (" << peers.size () << " actor(s) connected):  " << mapIter->first << " with info hash: " <<  getInfoHash (mapIter->first);
+                  mapIter->second->overTimeAlertIssued = true;
+               }
+   
+               if (_verbosityLevel > 0)
+               {  
+                  std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download" << std::endl;
+               }
+               mapIter++;
+            }
+         }
+         else
+         {
+            if (_verbosityLevel > 0)
+            {
+                  std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << "." << std::endl;
+            }
+            mapIter++;
+         }
+      }
+      listIter++;
+   }  
+} 
 
 time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
 {
@@ -2573,13 +2569,13 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
          {
             double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
             snprintf (str, sizeof(str), 
-								"%% Complete: %5.1f  Status:  %-13s  downloaded:  %s (%s) uploaded:  %s (%s)", 
-								(percentComplete > 100.0 ? 100.0 : percentComplete), 
-								upload_state_str[torrentStatus.state], 
-								add_suffix (torrentStatus.total_download).c_str (), 
-								add_suffix (torrentStatus.download_rate, "/s").c_str (), 
-								add_suffix (torrentStatus.total_upload).c_str (), 
-								add_suffix (torrentStatus.upload_rate, "/s").c_str ());
+                        "%% Complete: %5.1f  Status:  %-13s  downloaded:  %s (%s) uploaded:  %s (%s)", 
+                        (percentComplete > 100.0 ? 100.0 : percentComplete), 
+                        upload_state_str[torrentStatus.state], 
+                        add_suffix (torrentStatus.total_download).c_str (), 
+                        add_suffix (torrentStatus.download_rate, "/s").c_str (), 
+                        add_suffix (torrentStatus.total_upload).c_str (), 
+                        add_suffix (torrentStatus.upload_rate, "/s").c_str ());
             std::cerr << str << std::endl;
          }
       }
