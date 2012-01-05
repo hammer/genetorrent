@@ -40,6 +40,9 @@
 #
 # Authors for Annai Systems: Dan Murphy, Howdy Pierce
 #
+# Version 0.1.4.0 (5 Jan 2012) added:
+# - Much richer specifications for the --expires option
+#
 # Version 0.1.3.0 (18 Nov 2011) added:
 # - Support for the --raw-time, --get-expire, --infohash options
 # - Support for adding and modifying the ssl-cert (--ssl-cert option)
@@ -66,7 +69,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.1.3.0'
+revlevel = '0.1.4.0'
 
 # Load a couple of useful modules
 import re
@@ -474,13 +477,37 @@ def process(params, gto_filenames):
                 gtodict['announce'] = params.announce_url
                 gto_file_changed = True
 
-        if (params.expiry != 0):
-            if (params.expiry < 8760):
-                # one year or less: treat as relative offset from now, in hours
-                expiry=time.time() + (params.expiry * 3600)
-            else:
+        if (params.expiry != ''):
+            m = re.match("^([0-9]+)(.?)$", params.expiry)
+            if (not m):
+                raise SyntaxError('Invalid expiry value: %s' % params.expiry)
+            expiry_arg = int(m.group(1))
+            expiry_type = m.group(2)
+            if (expiry_arg <= 0):
+                raise SyntaxError('Invalid expiry argument %d in %s' % (expiry_arg, params.expiry))
+
+            if (expiry_type == 's'):
+                # user specified result in seconds
+                expiry = time.time() + expiry_arg
+            elif (expiry_type == 'm'):
+                # user specified result in minutes
+                expiry = time.time() + (expiry_arg * 60)
+            elif (expiry_type == 'h'):
+                # user specified result in hours
+                expiry = time.time() + (expiry_arg * 3600)
+            elif (expiry_type == 'd'):
+                # user specified result in days
+                expiry = time.time() + (expiry_arg * 3600 * 24)
+            elif (expiry_type == '' and expiry_arg < 8760):
+                # user did not specify type, and int is one year or
+                # less; treat as relative offset from now, in hours
+                expiry = time.time() + (expiry_arg * 3600)
+            elif (expiry_type == ''):
                 # treat as absolute time as Unix time stamp
-                expiry=params.expiry
+                expiry = expiry_arg
+            else:
+                raise SyntaxError('Invalid expiry type %s: %s' % (expiry_type, params.expiry))
+
             if (not ('expires_on' in gtodict and gtodict['expires_on'] == expiry)):
                 gtodict['expires on'] = int(expiry)
                 gto_file_changed = True
@@ -580,8 +607,8 @@ parser.add_option('-a', '--announce', action='store',
                   help='Add or modify the announce URL')
 
 parser.add_option('-e', '--expires', action='store', 
-                  default=0, dest='expiry', type=int,
-                  help='Add or modify the expiration date. EXPIRY either specifies the expiration time, in hours from now; or it specifies the absolute expiration time in seconds since the epoch on %s.' % time.strftime("%d %b %Y %H:%M:%S %Z", time.gmtime(0)))
+                  default="", dest='expiry', 
+                  help='Add or modify the expiration date. EXPIRY is specified in hours from now; or it specifies the absolute expiration time in seconds since the epoch on %s; or, in the form (number)[smhd], it specifies the expiration time in seconds, minutes, hours, or days from now.' % time.strftime("%d %b %Y %H:%M:%S %Z", time.gmtime(0)))
 
 parser.add_option('-s', '--ssl-cert', action='store', 
                   default="", dest='ssl_cert', 
@@ -594,7 +621,7 @@ if (len(gto_filenames) == 0):
     sys.exit(1)
 
 if (params.decode_file is False and params.total_size is False and params.inspect_key == ""
-    and params.piece_index == -1 and params.announce_url == "" and params.expiry == 0
+    and params.piece_index == -1 and params.announce_url == "" and params.expiry == ""
     and params.get_expire is False and params.infohash is False and params.ssl_cert == ""):
     params.decode_file = True
 
