@@ -50,7 +50,6 @@
 #include <boost/filesystem/v3/path.hpp>
 
 #include <log4cpp/Category.hh>
-//#include <log4cpp/FileAppender.hh>
 #include <log4cpp/PatternLayout.hh>
 #include <log4cpp/SyslogAppender.hh>
 
@@ -73,13 +72,13 @@ class geneTorrent
 
    typedef enum gtErrorType_ {ERRNO_ERROR = 101, CURL_ERROR, HTTP_ERROR, TORRENT_ERROR, DEFAULT_ERROR} gtErrorType;
 
-//   typedef std::map <std::string, vectOfStr> strVectOfStrMap;
-
    typedef struct activeTorrentRec_
    {
       libtorrent::add_torrent_params torrentParams;
       libtorrent::torrent_handle torrentHandle;
-      int expires;
+      time_t expires;
+      time_t mtime;              // file modification time
+      std::string infoHash;
       bool overTimeAlertIssued;
    } activeTorrentRec;
 
@@ -102,7 +101,7 @@ class geneTorrent
       geneTorrent (int argc, char **argv);
       virtual ~geneTorrent ();
 
-      void run (void);
+      void run ();
       bool fileFilter (std::string const filename);
       static bool file_filter (boost::filesystem::path const& filename);
 
@@ -154,16 +153,16 @@ class geneTorrent
       void bindSession(libtorrent::session &torrentSession);
       void bindSession(libtorrent::session *torrentSession);
       void performTorrentDownload(int64_t);
-      void performTorrentUpload(void);
-      void processManifestFile(void);
+      void performTorrentUpload();
+      void processManifestFile();
 
       std::string buildTorrentSymlinks(std::string UUID, std::string fileForTorrent);
       std::string makeTorrent(std::string, std::string);
-      std::string getWorkingDirectory(void);
+      std::string getWorkingDirectory();
       void performGtoUpload (std::string torrentFileName);
       bool verifyDataFilesExist (vectOfStr &);
-      void prepareDownloadList (void);
-      void runServerMode(void); 
+      void prepareDownloadList ();
+      void runServerMode(); 
       void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
       //
       void buildURIsToDownloadFromUUID (vectOfStr &uuids);
@@ -179,17 +178,20 @@ class geneTorrent
       static void loggingCallBack (std::string);
 
       int statFileOrDirectory (std::string);
-      void setPieceSize (void);
+      int statFileOrDirectory (std::string, time_t &fileMtime);
+
+      void setPieceSize ();
       std::string getHttpErrorMessage (int code);
 
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = geneTorrent::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
       void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
-      int64_t getFreeDiskSpace (void);
-      libtorrent::session *addActiveSession (void);
-      void checkSessions(void);
-      geneTorrent::activeSessionRec *findSession (void);
-      void findDataAndSetWorkingDirectory (void);
+      int64_t getFreeDiskSpace ();
+      libtorrent::session *addActiveSession ();
+      bool addTorrentToServingList (std::string);
+      void checkSessions();
+      geneTorrent::activeSessionRec *findSession ();
+      void findDataAndSetWorkingDirectory ();
 
       void deleteGTOfromQueue (std::string fileName);
       void loadCredentialsFile (bool credsSet, std::string credsFile);
