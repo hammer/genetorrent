@@ -49,6 +49,9 @@ GTdata_DATA = \
 
 GeneTorrent_CPPFLAGS = $(torrentrasterbar_CFLAGS)
 
-GeneTorrent_LDADD = /usr/lib64/libtorrent-rasterbar.a 
+GeneTorrent_LDADD = /usr/lib64/libtorrent-rasterbar.a \
+                    /usr/lib64/libboost_system-mt.a \
+                    /usr/lib64/libboost_filesystem-mt.a \
+                    /usr/lib64/libboost_regex.a
 
 man_MANS = GeneTorrent.1

@@ -211,6 +211,7 @@ class geneTorrent
       void mkTempDir ();
       void checkAlerts (libtorrent::session &torrSession);
       void setupSysLog ();
+      time_t getExpirationTime (std::string torrentPathAndFileName);
 
       libtorrent::fingerprint *_gtFingerPrint;
 

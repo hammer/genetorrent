@@ -29,7 +29,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(GeneTorrent, 0.9.0.4)
+AC_INIT(GeneTorrent, 0.9.9.0)
 AM_MAINTAINER_MODE
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE
@@ -45,11 +45,11 @@ AC_LANG_CPLUSPLUS
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lboost_regex':
-AC_CHECK_LIB([boost_regex], [main])
+# static linking AC_CHECK_LIB([boost_regex], [main])
 # FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_system], [main])
+# static linking AC_CHECK_LIB([boost_system], [main])
 # FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_filesystem], [main])
+# static linking AC_CHECK_LIB([boost_filesystem], [main])
 # FIXME: Replace `main' with a function in `-lcurl':
 AC_CHECK_LIB([curl], [main])
 # FIXME: Replace `main' with a function in `-lpthread':
@@ -58,9 +58,6 @@ AC_CHECK_LIB([pthread], [main])
 AC_CHECK_LIB([xqilla], [main])
 # FIXME: Replace `main' with a function in `-lxqilla':
 AC_CHECK_LIB([log4cpp], [main])
-
-
-
 
 AC_CHECK_LIB([c], [main])
 AC_CHECK_LIB([rt], [main])

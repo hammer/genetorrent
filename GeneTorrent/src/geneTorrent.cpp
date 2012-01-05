@@ -522,11 +522,6 @@ geneTorrent::~geneTorrent ()
 
 void geneTorrent::prepareDownloadList ()
 {
-   if (_verbosityLevel > 0)
-   {
-      std::cerr << "Welcome to GeneTorrent version " << VERSION << ", download mode." << std::endl; // prints Welcome to GeneTorrent
-   }
-
    vectOfStr urisToDownload; // This list of URIs is used to download .gto files.
 
    vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
@@ -958,6 +953,11 @@ void geneTorrent::run ()
    {
       case DOWNLOAD_MODE:
       {
+         if (_verbosityLevel > 0)
+         {
+            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", download mode." << std::endl; // prints Welcome to GeneTorrent
+         }
+
          time_t startTime = time(NULL);
 
          if (_downloadSavePath.size())
@@ -1009,11 +1009,20 @@ void geneTorrent::run ()
 
       case SERVER_MODE:
       {
+         if (_verbosityLevel > 0)
+         {
+            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", server mode." << std::endl; // prints Welcome to GeneTorrent
+         }
          runServerMode ();
       } break;
 
       default: // UPLOAD_MODE
       {
+         if (_verbosityLevel > 0)
+         {
+            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", upload mode." << std::endl; // prints Welcome to GeneTorrent
+         }
+
          performTorrentUpload ();
          chdir (saveDir.c_str ());      // shutting down, if the chdir back fails, so be it
       } break;
@@ -1480,11 +1489,6 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
 
 void geneTorrent::performTorrentUpload ()
 {
-   if (_verbosityLevel > 0)
-   {
-      std::cerr << "Welcome to GeneTorrent version " << VERSION << ", upload mode." << std::endl; // prints Welcome to GeneTorrent
-   }
-
    processManifestFile ();
 
    if (_uploadSubmissionURL.size () < 1)
@@ -1971,11 +1975,6 @@ bool geneTorrent::generateCSR (std::string uuid)
 //
 void geneTorrent::runServerMode ()
 {
-   if (_verbosityLevel > 0)
-   {
-      std::cerr << "Welcome to GeneTorrent version " << VERSION << ", server mode." << std::endl; // prints Welcome to GeneTorrent
-   }
-
    int cdRet = chdir (_serverDataPath.c_str ());
 
    if (cdRet != 0 )
@@ -2105,41 +2104,58 @@ void geneTorrent::runServerMode ()
    }
 }
 
+time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
+{
+   FILE *result = popen (("gtoinfo -x " + torrentPathAndFileName).c_str(), "r");
+
+   if (result != NULL)
+   {
+      char vBuff[15];
+
+      if (NULL != fgets (vBuff, 15, result))
+      {
+         return strtol (vBuff, NULL, 10);
+      }
+      else
+      {
+         *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << torrentPathAndFileName << " or no 'expires on' in GTO, serving using default expiration of 1/1/2037";
+      }
+      pclose (result);
+   }
+   else
+   {
+      *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << torrentPathAndFileName << ", serving using default expiration of 1/1/2037";
+   }
+
+   // An error occurred, so return the default value
+   return 2114406000;       // Default to 1/1/2037
+}
+
 bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
 {
-            checkSessions (); // start or adds sessions if unused session slots exist
+   activeSessionRec *workSession = findSession ();
 
-            activeSessionRec *workSession = findSession ();
-            activeTorrentRec *newTorrRec = new (activeTorrentRec);
+   activeTorrentRec *newTorrRec = new (activeTorrentRec);
 
-            FILE *result = popen (("gtoinfo -x " + pathAndFileName).c_str(), "r");
+   newTorrRec->expires = getExpirationTime (pathAndFileName);
+   newTorrRec->overTimeAlertIssued = false;
 
-            if (result == NULL)
-            {
-               *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << pathAndFileName << " serving using default expiration of 1/1/2037";
-               newTorrRec->expires = 2114406000;       // Default to 1/1/2037
-            }
-            else
-            {
-               char vBuff[15];
-               if (NULL != fgets (vBuff, 15, result))
-               {
-                  newTorrRec->expires = strtol (vBuff, NULL, 10);
-               }
-               else
-               {
-                  *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << pathAndFileName << " or no 'expires on' in GTO, serving using default expiration of 1/1/2037";
-                  newTorrRec->expires = 2114406000;       // Default to 1/1/2037
-               }
-               pclose (result);
-            }
+   time_t torrentModTime = 0;
+   if (statFileOrDirectory (pathAndFileName, torrentModTime) < 0)
+   {
+      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << strerror (errno) << "(" << errno << ")";
+      delete newTorrRec;
+      deleteGTOfromQueue (pathAndFileName);
+      return false;
+   }
 
-            newTorrRec->overTimeAlertIssued = false;
+   newTorrRec->mtime = torrentModTime;
+   newTorrRec->infoHash = getInfoHash (pathAndFileName);
 
-            std::string uuid = pathAndFileName;
+   std::string uuid = pathAndFileName;
 
-            uuid = uuid.substr (0, uuid.rfind ('.'));
-            uuid = getFileName (uuid); 
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
 
 // short term solution to seeder mode issue on uploads
 if (statFileOrDirectory ("./" + uuid) != 0)
@@ -2152,62 +2168,62 @@ else
    newTorrRec->torrentParams.disable_seed_hash = true;
 }
 
-            newTorrRec->torrentParams.auto_managed = false;
-            newTorrRec->torrentParams.allow_rfc1918_connections = true;
+   newTorrRec->torrentParams.auto_managed = false;
+   newTorrRec->torrentParams.allow_rfc1918_connections = true;
+   newTorrRec->torrentParams.save_path = "./";
 
-            libtorrent::error_code torrentError;
-            newTorrRec->torrentParams.ti = new libtorrent::torrent_info (pathAndFileName, torrentError);
+   libtorrent::error_code torrentError;
+   newTorrRec->torrentParams.ti = new libtorrent::torrent_info (pathAndFileName, torrentError);
 
-            if (torrentError)
-            {
-               *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
-               delete newTorrRec;
-               deleteGTOfromQueue (pathAndFileName);
-               return false;
-            }
+   if (torrentError)
+   {
+      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
+      delete newTorrRec;
+      deleteGTOfromQueue (pathAndFileName);
+      return false;
+   }
 
-            newTorrRec->torrentParams.save_path = "./";
-            newTorrRec->torrentHandle = workSession->torrentSession->add_torrent (newTorrRec->torrentParams, torrentError);
+   newTorrRec->torrentHandle = workSession->torrentSession->add_torrent (newTorrRec->torrentParams, torrentError);
 
-            if (torrentError)
-            {
-               *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
-               delete newTorrRec;
-               deleteGTOfromQueue (pathAndFileName);
-               return false;
-            }
+   if (torrentError)
+   {
+      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
+      delete newTorrRec;
+      deleteGTOfromQueue (pathAndFileName);
+      return false;
+   }
 
-            int sslCertSize = newTorrRec->torrentParams.ti->ssl_cert().size();
+   int sslCertSize = newTorrRec->torrentParams.ti->ssl_cert().size();
 
-            if (sslCertSize > 0 && _devMode == false)
-            {
-               bool status = generateSSLcertAndGetSigned(pathAndFileName, _serverModeCsrSigningUrl, uuid); 
+   if (sslCertSize > 0 && _devMode == false)
+   {
+      bool status = generateSSLcertAndGetSigned(pathAndFileName, _serverModeCsrSigningUrl, uuid); 
 
-               if (status == false)
-               {
-                  *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  unable to obtain a signed SSL Certificate.";
-                  delete newTorrRec;
-                  deleteGTOfromQueue (pathAndFileName);
-                  return false;
-               }
-            }
+      if (status == false)
+      {
+         *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  unable to obtain a signed SSL Certificate.";
+         delete newTorrRec;
+         deleteGTOfromQueue (pathAndFileName);
+         return false;
+      }
+   }
 
-            if (sslCertSize > 0)
-            {
-               std::string sslCert = _tmpDir + uuid + ".crt";
-               std::string sslKey = _tmpDir + uuid + ".key";
+   if (sslCertSize > 0)
+   {
+      std::string sslCert = _tmpDir + uuid + ".crt";
+      std::string sslKey = _tmpDir + uuid + ".key";
             
-               newTorrRec->torrentHandle.set_ssl_certificate (sslCert, sslKey, _dhParamsFile);   // no passphrase
-            }
+      newTorrRec->torrentHandle.set_ssl_certificate (sslCert, sslKey, _dhParamsFile);   // no passphrase
+   }
 
-            newTorrRec->torrentHandle.resume();
+   newTorrRec->torrentHandle.resume();
 
-            if (_verbosityLevel > 0)
-            {
-               std::cerr << "adding " << getFileName (pathAndFileName) << " to files being served" << std::endl;
-            }
+   if (_verbosityLevel > 0)
+   {
+      std::cerr << "adding " << getFileName (pathAndFileName) << " to files being served" << std::endl;
+   }
 
-            *sysLogGT << log4cpp::Priority::INFO << "Begin serving:  " << pathAndFileName << " with info hash: " << getInfoHash(pathAndFileName);
+   *sysLogGT << log4cpp::Priority::INFO << "Begin serving:  " << pathAndFileName << " with info hash: " << newTorrRec->infoHash << " expires: " << newTorrRec->expires << " mtime: " << newTorrRec->mtime;
    workSession->mapOfSessionTorrents[pathAndFileName] = newTorrRec;
 
    return true;
@@ -2215,6 +2231,8 @@ else
 
 geneTorrent::activeSessionRec *geneTorrent::findSession ()
 {
+   checkSessions (); // start or adds sessions if unused session slots exist
+
    std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
    unsigned int torrentsBeingServed = (*listIter)->mapOfSessionTorrents.size ();
    geneTorrent::activeSessionRec *workingSessionRec = *listIter;
@@ -2281,14 +2299,6 @@ std::string geneTorrent::getInfoHash (std::string torrentFile)
       }
    }
 
-/*
-   libtorrent::sha1_hash const& info_hash = torrentInfo.info_hash();
-
-   std::ostringstream infoHash;
-   infoHash << info_hash;
-
-   //return infoHash.str();
-*/
    return getInfoHash (&torrentInfo);
 }
 
