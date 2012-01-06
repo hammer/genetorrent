@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function usage
 {
@@ -7,6 +7,8 @@ Usage:  ${0##*/} <local|rpm|source|logging|debug|clean|distclean|svnclean
 
 where:
 	local:	    builds and installs a local copy of GeneTorrent
+	full:       Runs autoconf tools, builds and installs a local copy
+                    of GeneTorrent
 	rpm:	    builds a binary RPM of GeneTorrent (also does 'local')
 	source:	    builds a source tarball suitable for distribution (also
 		    does 'local' and 'distclean')
@@ -14,6 +16,8 @@ where:
 		    installs locally
 	debug:      builds a debugging and verbose logging version of 
 		    GeneTorrent and installs locally
+	make:	    perform a standard make 
+	install:    perform a standard make install
 	clean:	    perform a standard make clean
 	distclean:  prepares environment for building a source release (also
 		    does 'local')
@@ -33,12 +37,12 @@ function bailout
    exit 1;
 }
 
-
 function build_libtorrent
 {
    saveDir=${PWD}
    cd libtorrent
-   ./autotool.sh || bailout $FUNCNAME
+   [[ -e ../.fullbuild ]] && { ./autotool.sh || bailout $FUNCNAME 
+                             }
    ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
    make -j 14 || bailout $FUNCNAME
@@ -50,7 +54,8 @@ function build_GeneTorrent
 {
    saveDir=${PWD}
    cd GeneTorrent
-   ./autogen.sh || bailout $FUNCNAME
+   [[ -e ../.fullbuild ]] && { ./autogen.sh || bailout $FUNCNAME 
+                             }
    ./configure --prefix=/usr CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
    make || bailout $FUNCNAME
@@ -62,7 +67,8 @@ function build_scripts
 {
    saveDir=${PWD}
    cd scripts
-   ./autogen.sh || bailout $FUNCNAME
+   [[ -e ../.fullbuild ]] && { ./autogen.sh || bailout $FUNCNAME 
+                             }
    ./configure --prefix=/usr || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
@@ -113,7 +119,7 @@ function collectRPMS
 
    cd - > /dev/null
 
-   cp ${startDir}/release.notes.txt ~/GeneTorrent-${geneTorrentVer}/.
+   ## cp ${startDir}/release.notes.txt ~/GeneTorrent-${geneTorrentVer}/.
 
    cd
 
@@ -142,11 +148,95 @@ function build_rpm
       collectRPMS
 }
 
+function build_libtorrent_maker
+{
+   make $1 || bailout $FUNCNAME
+}
+
+function build_GeneTorrent_maker
+{
+   make $1 || bailout $FUNCNAME
+}
+
+function build_scripts_maker
+{
+   make $1 || bailout $FUNCNAME
+}
+
+function maker
+{
+   for dir in libtorrent GeneTorrent scripts
+   do
+      saveDir=${PWD}
+      cd ${dir}
+      build_${dir}_maker $1
+      cd ${saveDir}
+   done
+}
+
+function svn_clean
+{
+   cd libtorrent
+   [[ -e Makefile ]] && make maintainer-clean
+   rm -f config.log config.report configure
+   rm -f m4/libtool.m4 m4/lt~obsolete.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/ltoptions.m4 aclocal.m4 
+   rm -fr autom4te.cache build-aux
+   rm -f Makefile Makefile.in
+   rm -f src/Makefile src/Makefile.in
+   rm -f include/libtorrent/Makefile include/libtorrent/Makefile.in
+   rm -f examples/Makefile examples/Makefile.in
+   rm -f test/Makefile test/Makefile.in
+   rm -f bindings/Makefile bindings/Makefile.in
+   rm -f bindings/python/Makefile bindings/python/Makefile.in
+   chmod a-x docs/*.rst docs/*.htm* src/*.cpp include/libtorrent/*.hpp
+   cd - > /dev/null
+
+   cd GeneTorrent
+   [[ -e Makefile ]] && make maintainer-clean
+   rm -fr autom4te.cache
+   rm -f configure
+   rm -f Makefile.in
+   rm -f aclocal.m4
+   rm -f src/Makefile.in
+   rm -f src/config.h.in
+   cd - > /dev/null
+
+
+   cd scripts
+   [[ -e Makefile ]] && make maintainer-clean
+   rm -fr autom4te.cache
+   rm -f configure
+   rm -f Makefile.in
+   rm -f missing install-sh
+   rm -f aclocal.m4
+   cd - > /dev/null
+
+   cd rpmbuild/SOURCES
+   rm -fr GeneTorrent-[0-9].[0-9].[0-9].[0-9]*
+   cd - > /dev/null
+}
+
+function build_source
+{
+   cd ${bDir}
+   maker distclean
+   cd ..
+   tar czvf GeneTorrent-${geneTorrentVer}.src.tgz --exclude-vcs --exclude="\.*" $1
+}
+
 [[ $#1 -lt 1 ]] && usage
+
+bDir=${PWD}
 
 case $1 in 
    local)
       build_standard
+      ;;
+
+   full)
+      touch .fullbuild
+      build_standard
+      rm -f .fullbuild
       ;;
 
    rpm)
@@ -155,6 +245,7 @@ case $1 in
       ;;
       
    source)
+      build_source ${bDir##*/}
       ;;
 
    logging)
@@ -168,19 +259,32 @@ case $1 in
       ;;
 
    clean)
-
+      maker clean
       ;;
       
    distclean)
-
+      maker distclean
       ;;
 
    svnclean)
-
+      svn_clean
       ;;
-      
+
+   make)   # hidden option
+      maker "-j4"
+      ;;
+
+   install)   # hidden option
+      maker install
+      ;;
+
+   release)   # hidden option
+      build_standard
+      build_rpm
+      build_source ${bDir##*/}
+      ;;
+
    *)
       usage
       ;;
 esac
-
