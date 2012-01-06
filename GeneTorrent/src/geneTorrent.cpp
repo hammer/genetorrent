@@ -2064,18 +2064,38 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
          {
             // The torrent has disappeared, stop serving it.
+            *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  GTO disappeared from queue:  " << mapIter->first << " with info hash: " << mapIter->second->infoHash;
 
+            (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
+            activeTorrents.erase (mapIter->first);
+            (*listIter)->mapOfSessionTorrents.erase (mapIter++);
 
-            mapIter++;
             continue;
          }
 
-         if (torrentModTime != mapIter->second->mtime)
+         if (torrentModTime != mapIter->second->mtime)   // Has the GTO on disk changed
          {
-                  // torrent file has been updated 
-                  // TODO veriy info_hash and update mtime, expiration time, and overTimeAlertIssued (if new expires > timeNow)
-                  // log message that expiration time has been extended
-                  
+            if (getInfoHash (mapIter->first) != mapIter->second->infoHash)
+            {
+               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  GTO InfoHash Changed while serving:  " << mapIter->first << " with info hash: " << mapIter->second->infoHash << " (new GTO with infoHash " << getInfoHash (mapIter->first) << " will not be served)";
+
+               (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
+               deleteGTOfromQueue (mapIter->first);
+               activeTorrents.erase (mapIter->first);
+               (*listIter)->mapOfSessionTorrents.erase (mapIter++);
+
+               continue;
+            }
+           
+            mapIter->second->mtime = torrentModTime;
+            mapIter->second->expires = getExpirationTime (mapIter->first);
+
+            if (timeNow <  mapIter->second->expires)
+            {
+               mapIter->second->overTimeAlertIssued = false;
+            }
+
+            *sysLogGT << log4cpp::Priority::INFO << "Expiration Update:  GTO " << mapIter->first << " with info hash: " << mapIter->second->infoHash << " has a new expiration time " << mapIter->second->expires;
          }
 
          if (timeNow >= mapIter->second->expires)       // This GTO is expired
@@ -2086,7 +2106,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
 
             if (peers.size () == 0)
             {
-               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  " << mapIter->first << " with info hash: " << getInfoHash (mapIter->first);
+               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  Expiring " << mapIter->first << " with info hash: " << getInfoHash (mapIter->first);
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
@@ -2147,6 +2167,7 @@ time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
    // An error occurred, so return the default value
    return 2114406000;       // Default to 1/1/2037
 }
+
 
 bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
 {
