@@ -1033,6 +1033,8 @@ void geneTorrent::run ()
 
 void geneTorrent::cleanupTmpDir()
 {
+std::cerr << "DJN FIX THIS by removing this and the next line" << std::endl;
+return;
    if (!_devMode)
    {
       system (("rm -rf " + _tmpDir.substr(0,_tmpDir.size()-1)).c_str());
@@ -2575,11 +2577,24 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 
    int sslCertSize = torrentParams.ti->ssl_cert().size();
 
+   std::string uri = _uploadSubmissionURL;
+
    if (sslCertSize > 0 && _devMode == false)
    {
-      generateSSLcertAndGetSigned(torrentFileName, _serverModeCsrSigningUrl, uuid);
-   }
+      std::string pathToKeep = "/cghub/data/";
+  
+      std::size_t foundPos;
+ 
+      if (std::string::npos == (foundPos = uri.find (pathToKeep)))
+      {
+         gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, geneTorrent::DEFAULT_ERROR);
+      }
 
+      std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
+
+      generateSSLcertAndGetSigned(torrentFileName, certSignURL, uuid);
+   }
+      
    if (sslCertSize > 0)
    {
       std::string sslCert = _tmpDir + uuid + ".crt";
