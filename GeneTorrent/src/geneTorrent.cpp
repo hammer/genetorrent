@@ -1463,8 +1463,29 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       currentState = torrentHandle.status().state;
    }
 
-    torrentSession.remove_torrent (torrentHandle);
+   torrentSession.set_alert_mask(libtorrent::alert::storage_notification);
+   torrentSession.remove_torrent (torrentHandle);
+   waitForTorrentDeletedAlert (torrentSession);
    exit (0);
+}
+
+void geneTorrent::waitForTorrentDeletedAlert (libtorrent::session &torrSession)
+{
+   libtorrent::ptime end = libtorrent::time_now() + libtorrent::seconds(20);
+
+   std::auto_ptr<libtorrent::alert> a = torrSession.pop_alert();
+
+   while (a.get() == 0 || dynamic_cast<libtorrent::torrent_deleted_alert*>(a.get()) == 0)
+   {
+      if (torrSession.wait_for_alert(end - libtorrent::time_now()) == 0)
+      {
+         std::cerr << "wait_for_alert() expired" << std::endl;
+         break;
+      }
+      a = torrSession.pop_alert();
+      assert(a.get());
+      std::cerr << a->message() << std::endl;
+   }
 }
 
 void geneTorrent::checkAlerts (libtorrent::session &torrSession)

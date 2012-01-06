@@ -199,6 +199,7 @@ class geneTorrent
       void loadCredentialsFile (bool credsSet, std::string credsFile);
       void displayMissingFilesAndExit (vectOfStr &missingFiles);
       std::string  submitTorrentToGTExecutive (std::string torrentFileName);
+      void waitForTorrentDeletedAlert (libtorrent::session &torrSession);
 
       void sysLogMessage (std::string message);
       int downloadChild(int, int, std::string, FILE *);
