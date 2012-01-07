@@ -116,6 +116,7 @@ function collectRPMS
 
    cd ~/rpmbuild/RPMS/x86_64
    cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
+   cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/.
 
    cd - > /dev/null
 
@@ -123,9 +124,7 @@ function collectRPMS
 
    cd
 
-   tar czf GeneTorrent-${geneTorrentVer}.tgz GeneTorrent-${geneTorrentVer}
-
-   echo "All done!  GeneTorrent-${geneTorrentVer}.tgz is available in `pwd` for testing and delivery to the client."
+   echo "All done!  GeneTorrent-${geneTorrentVer} is available in ~ for testing and delivery to the client."
 }
 
 function build_common
@@ -285,7 +284,7 @@ case $1 in
       ;;
 
    release)   # hidden option
-      [[ ! -e libtorrent/configure ]] && touch .fullbuild
+      touch .fullbuild
       build_standard
       rm -f .fullbuild
       build_rpm
