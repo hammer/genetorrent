@@ -45,7 +45,7 @@ function build_libtorrent
                              }
    ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   make -j 14 || bailout $FUNCNAME
+   make -j 4 || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
