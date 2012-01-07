@@ -222,6 +222,7 @@ function build_source
    maker distclean
    cd ..
    tar czvf GeneTorrent-${geneTorrentVer}.src.tgz --exclude-vcs --exclude="\.*" $1
+   cp GeneTorrent-${geneTorrentVer}.src.tgz ~/.
    cd - >/dev/null
 }
 
