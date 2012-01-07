@@ -1344,7 +1344,8 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
 {
    setupSysLog();
 
-   libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::tracker_notification);
+   libtorrent::session torrentSession (*_gtFingerPrint, 0, 
+			 libtorrent::alert::tracker_notification | libtorrent::alert::storage_notification);
    optimizeSession (torrentSession);
    bindSession (torrentSession);
 
@@ -1463,29 +1464,32 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       currentState = torrentHandle.status().state;
    }
 
-   torrentSession.set_alert_mask(libtorrent::alert::storage_notification);
+
    torrentSession.remove_torrent (torrentHandle);
-   waitForTorrentDeletedAlert (torrentSession);
+
+	 // Note that remove_torrent does at least two things asynchronously: 1) it
+	 // sets in motion the deletion of this torrent object, and 2) it sends the
+	 // stopped event to the tracker and waits for a response.  So if we were to
+	 // exit immediately, two bad things happen.  First, the stopped event is
+	 // probably not sent.  Second, we end up doubly-deleting some objects
+	 // inside of libtorrent (because the deletion is already in progress and
+	 // then the call to exit() causes some cleanup as well), and we get nasty
+	 // complaints about malloc corruption printed to the console by glibc.
+	 //
+	 // The "proper" approached from a libtorrent perspective is to wait to
+	 // receive both the cache_flushed_alert and the tracker_reply_alert,
+	 // indicating that all is well.  However in the case of tearing down a
+	 // torrent, libtorrent appears to squelch the tracker_reply_alert so we
+	 // never get it (even though the tracker does in fact respond to the
+	 // stopped event sent to it by libtorrent).
+	 //
+	 // Therefore, ugly as it is, for the time being we will simply sleep here.
+	 // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
+	 // the two events mentioned above.
+
+	 sleep(5);
+
    exit (0);
-}
-
-void geneTorrent::waitForTorrentDeletedAlert (libtorrent::session &torrSession)
-{
-   libtorrent::ptime end = libtorrent::time_now() + libtorrent::seconds(20);
-
-   std::auto_ptr<libtorrent::alert> a = torrSession.pop_alert();
-
-   while (a.get() == 0 || dynamic_cast<libtorrent::torrent_deleted_alert*>(a.get()) == 0)
-   {
-      if (torrSession.wait_for_alert(end - libtorrent::time_now()) == 0)
-      {
-         std::cerr << "wait_for_alert() expired" << std::endl;
-         break;
-      }
-      a = torrSession.pop_alert();
-      assert(a.get());
-      std::cerr << a->message() << std::endl;
-   }
 }
 
 void geneTorrent::checkAlerts (libtorrent::session &torrSession)
