@@ -222,6 +222,7 @@ function build_source
    maker distclean
    cd ..
    tar czvf GeneTorrent-${geneTorrentVer}.src.tgz --exclude-vcs --exclude="\.*" $1
+   cd - >/dev/null
 }
 
 [[ $#1 -lt 1 ]] && usage
@@ -242,8 +243,10 @@ case $1 in
       ;;
 
    rpm)
+      [[ ! -e libtorrent/configure ]] && touch .fullbuild
       build_standard
       build_rpm
+      rm -f .fullbuild
       ;;
       
    source)
@@ -281,7 +284,9 @@ case $1 in
       ;;
 
    release)   # hidden option
+      [[ ! -e libtorrent/configure ]] && touch .fullbuild
       build_standard
+      rm -f .fullbuild
       build_rpm
       build_source ${bDir##*/}
       ;;

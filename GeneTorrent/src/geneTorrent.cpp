@@ -1033,8 +1033,6 @@ void geneTorrent::run ()
 
 void geneTorrent::cleanupTmpDir()
 {
-std::cerr << "DJN FIX THIS by removing this and the next line" << std::endl;
-return;
    if (!_devMode)
    {
       system (("rm -rf " + _tmpDir.substr(0,_tmpDir.size()-1)).c_str());
