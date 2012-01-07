@@ -230,7 +230,9 @@ bDir=${PWD}
 
 case $1 in 
    local)
+      [[ ! -e libtorrent/configure ]] && touch .fullbuild
       build_standard
+      rm -f .fullbuild
       ;;
 
    full)

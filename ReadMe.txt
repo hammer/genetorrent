@@ -32,7 +32,6 @@ build.sh            Master build script
 GeneTorrent         GeneTorrent root directory
 libtorrent          libtorrent root directory
 ReadMe.txt          This file
-release.notes.txt   Release notes specific to each release.
 rpmbuild            Files required to construct a GeneTorrent RPM
 scripts             Utility Scripts-part of GeneTorrent not the build process
 
@@ -48,4 +47,5 @@ xqilla 2.2.3
 log4cpp 1.0
 libcurl 7.19.7
 
-
+If using the source release of GeneTorrent, Boost 1.48 must be built without 
+icu support and static libraries must be provided.
