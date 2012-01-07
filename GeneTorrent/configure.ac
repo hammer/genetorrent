@@ -29,7 +29,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(GeneTorrent, 0.9.9.0)
+AC_INIT(GeneTorrent, 1.0.0.0)
 AM_MAINTAINER_MODE
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE
