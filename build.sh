@@ -45,7 +45,12 @@ function build_libtorrent
                              }
    ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   make -j 4 || bailout $FUNCNAME
+   if [[ `hostname -s` = "radon" || `hostname -s` = "xenon" ]]
+   then
+      make -j 64 || bailout $FUNCNAME
+   else
+      make -j 4 || bailout $FUNCNAME
+   fi
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
