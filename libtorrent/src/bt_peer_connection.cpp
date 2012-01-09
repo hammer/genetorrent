@@ -3191,14 +3191,24 @@ namespace libtorrent
 					// initiate connections. So, if our peer-id is greater than
 					// the others, we should close the incoming connection,
 					// if not, we should close the outgoing one.
-					if (pid < m_ses.get_peer_id() && is_local())
-					{
-						(*i)->connection->disconnect(errors::duplicate_peer_id);
-					}
-					else
-					{
-						disconnect(errors::duplicate_peer_id);
-						return;
+					if (pid < m_ses.get_peer_id()) {
+						// our peer-id is greater than the other peer's peer-id:
+						// close the connection we did NOT initiate
+						if (is_local()) {
+							(*i)->connection->disconnect(errors::duplicate_peer_id);
+						} else {
+							disconnect(errors::duplicate_peer_id);
+							return;
+						}
+					} else {
+						// the other peer-id is greater than our peer-id: close
+						// the connection we DID initiate
+						if (is_local()) {
+							disconnect(errors::duplicate_peer_id);
+							return;
+						} else {
+							(*i)->connection->disconnect(errors::duplicate_peer_id);
+						}
 					}
 				}
 			}
