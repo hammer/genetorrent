@@ -75,6 +75,8 @@ void *geneTorr; // global variable that used to point to GeneTorrent to allow
                 // initialized in geneTorrent constructor, used in the free
                 // function file_filter to call member fileFilter.
 
+static pthread_mutex_t callBackLoggerLock;
+
 geneTorrent::geneTorrent (int argc, char **argv) : 
 	_args (SHORT_DESCRIPTION, ' ', VERSION), 
 	_bindIP (""), 
@@ -107,6 +109,7 @@ geneTorrent::geneTorrent (int argc, char **argv) :
 {
    geneTorr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
+   pthread_mutex_init (&callBackLoggerLock, NULL);
    setupSysLog();
 
    std::ostringstream startUpMessage;
@@ -1180,14 +1183,16 @@ void geneTorrent::optimizeSession (libtorrent::session &torrentSession)
 
 void geneTorrent::loggingCallBack (std::string message)
 {
-   static std::ostringstream messageBuff;
+   pthread_mutex_lock (&callBackLoggerLock);
 
+   static std::ostringstream messageBuff;
    messageBuff << message;
 
    if (std::string::npos != message.find ('\n'))
    {
       std::string logMessage = messageBuff.str().substr(0, messageBuff.str().size() - 1);
       messageBuff.str("");
+      pthread_mutex_unlock (&callBackLoggerLock);
 
       boost::regex searchPattern ("[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9]");
 
@@ -1206,7 +1211,9 @@ void geneTorrent::loggingCallBack (std::string message)
          geneTorrent *myThis = (geneTorrent *) geneTorr;
          myThis->sysLogMessage (logMessage);
       }
+      return;
    }
+   pthread_mutex_unlock (&callBackLoggerLock);
 }
 
 void geneTorrent::sysLogMessage (std::string message)
