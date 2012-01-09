@@ -259,6 +259,7 @@ case $1 in
       ;;
 
    logging)
+      [[ ! -e libtorrent/configure ]] && touch .fullbuild
       build_libtorrent --enable-logging=verbose 
       build_common
       ;;
