@@ -165,6 +165,12 @@ and will always be added to
 , so data files will be found at
 .I path\fR/\fPUUID\fR.\fP
 The current directory will be used by default.
+.TP
+.BI \-\^\-maxChildren " max-children"
+The maximum number of parallel children that should be spawned to
+perform the download.  By default up to 8 children are used, but this
+number may be adjusted.  In general you should have fewer children
+than you have CPU cores on your machine.
 .SS "Server Mode Command Line Arguments:"
 .TP
 .BI \-s " path" "\fR,\fP \-\^\-server" " path"

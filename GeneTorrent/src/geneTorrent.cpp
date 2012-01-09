@@ -70,10 +70,40 @@
 #include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 
-void *geneTorr; // global variable that used to point to GeneTorrent to allow libtorrent callback for file inclusion and sys logging.
-                // initialized in geneTorrent constructor, used in the free function file_filter to call member fileFilter.
+void *geneTorr; // global variable that used to point to GeneTorrent to allow
+                // libtorrent callback for file inclusion and sys logging.
+                // initialized in geneTorrent constructor, used in the free
+                // function file_filter to call member fileFilter.
 
-geneTorrent::geneTorrent (int argc, char **argv) : _args (SHORT_DESCRIPTION, ' ', VERSION), _bindIP (""), _exposedIP (""), _portStart (20892), _portEnd (20900), _exposedPortDelta (0), _verbosityLevel (0), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _dataFilePath (""), _cliArgsDownloadList (), _downloadSavePath (""), _serverQueuePath (""), _serverDataPath (""), _authToken (""), _operatingMode (UPLOAD_MODE), _filesToUpload (), _pieceSize (4194304), _torrentListToDownload (), _activeSessions (), _tmpDir (""), _confDir (CONF_DIR_DEFAULT), _startUpComplete (false), _devMode (false), _logAppend (NULL), _layout (NULL)
+geneTorrent::geneTorrent (int argc, char **argv) : 
+	_args (SHORT_DESCRIPTION, ' ', VERSION), 
+	_bindIP (""), 
+	_exposedIP (""), 
+	_portStart (20892), 
+	_portEnd (20900), 
+	_exposedPortDelta (0), 
+	_verbosityLevel (0), 
+	_manifestFile (""), 
+	_uploadUUID (""), 
+	_uploadSubmissionURL (""), 
+	_dataFilePath (""), 
+	_cliArgsDownloadList (), 
+	_downloadSavePath (""), 
+	_maxChildren (8),
+	_serverQueuePath (""), 
+	_serverDataPath (""), 
+	_authToken (""), 
+	_operatingMode (UPLOAD_MODE), 
+	_filesToUpload (), 
+	_pieceSize (4194304), 
+	_torrentListToDownload (), 
+	_activeSessions (), 
+	_tmpDir (""), 
+	_confDir (CONF_DIR_DEFAULT), 
+	_startUpComplete (false), 
+	_devMode (false), 
+	_logAppend (NULL), 
+	_layout (NULL)
 {
    geneTorr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
@@ -133,6 +163,10 @@ geneTorrent::geneTorrent (int argc, char **argv) : _args (SHORT_DESCRIPTION, ' '
    // Credential File
    TCLAP::ValueArg <std::string> credentialFile ("c", "credentialFile", "Description Not Used", false, "", "string"); // this implies download mode
    _args.add (credentialFile);
+
+	 // Max number of children for download
+	 TCLAP::ValueArg <int> maxDownloadChildren ("", "maxChildren", "Description Not Used", false, 8, "int");
+	 _args.add (maxDownloadChildren);
 
    // download flag and repeatable argument indicating download items
    TCLAP::MultiArg <std::string> downloadList ("d", "download", "Description Not Used", false, "string"); // this implies download mode
@@ -287,6 +321,11 @@ geneTorrent::geneTorrent (int argc, char **argv) : _args (SHORT_DESCRIPTION, ' '
          {
             loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
          }
+
+				 if (maxDownloadChildren.isSet ())
+				 {
+					 _maxChildren = maxDownloadChildren.getValue();
+				 }
 
          _downloadSavePath = sanitizePath (genericPath.getValue ()); // default is ""
 
@@ -1185,7 +1224,13 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
 
    vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
 
-   int maxChildren = 8;
+	 // TODO: It would be good to use a system call to determine how
+	 // many cores this machine has.  There shouldn't be more children
+	 // than cores, so set 
+	 //    maxChildren = min(_maxChildren, number_of_cores)
+	 // Hard to do this in a portable manner however
+
+   int maxChildren = _maxChildren;
    int pipes[maxChildren+1][2];
 
    int64_t totalDataDownloaded = 0;

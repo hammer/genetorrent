@@ -126,6 +126,7 @@ class geneTorrent
 
       vectOfStr _cliArgsDownloadList;
       std::string _downloadSavePath;
+      int _maxChildren;
 
       std::string _serverQueuePath;
       std::string _serverDataPath;
