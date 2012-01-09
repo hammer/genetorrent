@@ -15,6 +15,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildRequires:  boost >= 1.48.0
 #BuildRequires:  boost-regex >= 1.48.0
 
+# This prevents binaries from being stripped of their debug bits by rpmbuild
+%define __spec_install_post /usr/lib/rpm/brp-compress
+
 %description
 GeneTorrent
 
@@ -44,28 +47,6 @@ rm -rf %{buildroot}
 %{_datadir}/GeneTorrent/*
 
 %changelog
-* Mon Sep 26 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.4.2-1
-- bump version to 0.4.2, new deployment system
+* Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1
+- Prevent binaires from being stripped
 
-* Fri Sep 21 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.4.1-1
-- bump version to 0.4.1
-- fixed path issue is server mode
-- bit more debug to UUID fetching
-- misc cleanup here and there
-
-* Fri Sep 21 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.4.0-1
-- bump version to 0.4.0
-- primitive UUID downloader added
-
-* Tue Sep 20 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.3.1-1
-- bump version to 0.3.1
-- onscreen debug code removed
-- server mode partial implemented
-- new version of libtorrent-cp
-
-* Tue Sep 20 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.3.0-1
-- bump version to 0.3.0
-- numerous new features
-
-* Wed Sep 07 2011 donavan nelson <dnelson at cardinalpeak dot com> 0.2.4-1
-- Initial creation
