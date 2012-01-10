@@ -2199,6 +2199,8 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
 
 time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
 {
+   time_t expireTime = 2114406000;     // Default to 1/1/2037
+
    FILE *result = popen (("gtoinfo -x " + torrentPathAndFileName).c_str(), "r");
 
    if (result != NULL)
@@ -2207,7 +2209,7 @@ time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
 
       if (NULL != fgets (vBuff, 15, result))
       {
-         return strtol (vBuff, NULL, 10);
+         expireTime = strtol (vBuff, NULL, 10);
       }
       else
       {
@@ -2220,10 +2222,8 @@ time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
       *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << torrentPathAndFileName << ", serving using default expiration of 1/1/2037";
    }
 
-   // An error occurred, so return the default value
-   return 2114406000;       // Default to 1/1/2037
+   return expireTime;       
 }
-
 
 bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
 {
