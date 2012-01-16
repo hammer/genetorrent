@@ -38,7 +38,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.0.1.1'
+revlevel = '0.1.0.0'
 
 # Load a couple of useful modules
 from optparse import OptionParser
@@ -53,6 +53,9 @@ import time
 import signal
 import syslog
 import traceback
+import pwd
+import grp
+import filecmp
 
 # log()
 #
@@ -217,7 +220,7 @@ def assign_gto(in_q, gto, factor, config):
 
 # dump_worklist()
 #
-# Dumps the worklist in a human-readable format to stdout
+# Dumps the worklist in a human-readable format to syslog
 #
 # Inputs:
 # - config -- the config dict, originally read from the config file
@@ -248,6 +251,43 @@ def make_writable(path):
     os.rename(tmpfile, path)
 
 
+# save_gto()
+#
+# Save the specified GTO to the directory specified in the config file
+# in the SaveUploadGTOs section
+#
+# If the destination file exists, then it must exactly match the
+# source file, in which case the function returns.  If the destination
+# file exists but does not match, an error is raised.
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - src_dir -- the source directory.  The full source file is src_dir/gto
+# - gto -- the gto file
+#
+# Output:
+# The GTO file is saved to the specified directory
+#
+def save_gto(config, src_dir, gto):
+    dst_dir=os.path.join(config['save_root_dir'], os.path.splitext(gto)[0])
+    if (not os.path.isdir(dst_dir)):
+        os.mkdir(dst_dir, config['save_uuid_dir_perms'])
+    os.chown(dst_dir, config['save_uuid_dir_owner'], config['save_uuid_dir_group'])
+
+    src=os.path.join(src_dir, gto)
+    dst=os.path.join(dst_dir, gto)
+
+    if (os.path.isfile(dst)):
+        # dest file exists; perform comparison
+        if (not filecmp.cmp(src, dst)):
+            raise ValueError("File %s exists but does not match new GTO" % dst)
+    else:
+        shutil.copyfile(src, dst)
+
+    os.chmod(dst, config['save_gto_perms'])
+    os.chown(dst, config['save_gto_owner'], config['save_gto_group'])
+
+
 # process_input_q()
 #
 # Processes an input queue -- either upload or download
@@ -270,6 +310,8 @@ def process_input_q(config, q_type):
         log(syslog.LOG_NOTICE, "New GTO %s added to %s queue." % (gto, q_type))
         fullname=os.path.join(q_dir, gto)
         try:
+            if (q_type == 'upload' and config['save_upload_gtos']):
+                save_gto(config, q_dir, gto)
             make_writable(fullname)
             add_expiration(q_dir, gto, config)
             assign_gto(q_dir, gto, factor, config)
@@ -293,6 +335,8 @@ def process_input_q(config, q_type):
 # - config -- the config dict, originally read from the config file
 #
 def mainloop(config):
+    log(syslog.LOG_NOTICE, "GTLoadBalancer started, entering main loop")
+
     while True:
         # (re)build the worklist
         if ('worklist' not in config or config['worklist_refresh'] < time.time()):
@@ -353,6 +397,42 @@ def pretty_pathname(config, path):
     return re.sub("^%s/" % config['queue_root'], ".../", path)
 
 
+# lookup_user()
+#
+# Returns the uid of the named user, or raises a ValueError if that
+# user isn't found in the password database
+#
+# Inputs:
+# - username -- the username to look up
+# - err_str -- part of the error string to print in the event of a lookup error
+#
+# Outputs:
+# the uid, as an int
+def lookup_user(username, err_str):
+    try:
+        return pwd.getpwnam(username)[2]
+    except KeyError:
+        raise ValueError("Invalid owner '%s' for %s" % (username, err_str))
+
+
+# lookup_group()
+#
+# Returns the gid of the named group, or raises a ValueError if that
+# group isn't found in the password database
+#
+# Inputs:
+# - grpname -- the username to look up
+# - err_str -- part of the error string to print in the event of a lookup error
+#
+# Outputs:
+# the gid, as an int
+def lookup_group(grpname, err_str):
+    try:
+        return grp.getgrnam(grpname)[2]
+    except KeyError:
+        raise ValueError("Invalid group '%s' for %s" % (grpname, err_str))
+
+
 # parse_config_file()
 #
 # Parses the configuration file and returns it as a config object
@@ -368,57 +448,89 @@ def pretty_pathname(config, path):
 # The config file structure uses Paython's ConfigParser syntax.  Here
 # is a sample config file:
 #
-#    [LoadBalancer]
-#    ; the logging level, in the range of 0-7.  More severe messages have lower
-#    ; levels.  Default=5
-#    loglevel=5
-#    
-#    ; how long GTO files should remain active, in hours. Default=72
-#    expiration=72
-#    
-#    ; how many GeneTorrent instances should be assigned to an upload GTO. 
-#    upload_factor=1
-#    
-#    ; how many GeneTorrent instances should be assigned to an download GTO
-#    download_factor=3
-#    
-#    ; the interval in seconds after which GTLoadBalancer will refresh its internal
-#    ; representation of the state of each of the instance queues. Default=1800
-#    ; (e.g., a half-hour)
-#    refresh_interval=1800
-#    
-#    ; the location to find the gtoinfo utility; default=/usr/bin/gtoinfo
-#    ;gtoinfo=/Users/howdy/Code/GeneTorrent/src/gtoinfo
-#    
-#    ; the root of the directory trees; can be referenced below as %QUEUE_ROOT
-#    queue_root=/cghub/data/workqueues
-#    
-#    ; this directory is where new GTOs for upload will be dropped.  LoadBalancer
-#    ; will pick up the GTOs from this directory and place them in the appropriate
-#    ; number of work-queues.
-#    upload_queue=%QUEUE_ROOT/dropzone-upload
-#    
-#    ; this directory is where new GTOs for download will be dropped.  LoadBalancer
-#    ; will pick up the GTOs from this directory and place them in the appropriate
-#    ; number of work-queues.
-#    download_queue=%QUEUE_ROOT/dropzone-download
-#    
-#    [Instances]
-#    ; this section defines the number of work-queues, and the queue directory for each
-#    num_instances=6
-#    queue_00=%QUEUE_ROOT/dropzone-00
-#    queue_01=%QUEUE_ROOT/dropzone-01
-#    queue_02=%QUEUE_ROOT/dropzone-02
-#    queue_03=%QUEUE_ROOT/dropzone-03
-#    queue_04=%QUEUE_ROOT/dropzone-04
-#    queue_05=%QUEUE_ROOT/dropzone-05
-#
+#   [LoadBalancer]
+#   ; log level; higher is more verbose
+#   loglevel=5
+#   
+#   ; how long GTO files should remain active, in hours. Default=72
+#   expiration=72
+#   
+#   ; how many GeneTorrent instances should be assigned to an upload GTO
+#   upload_factor=1
+#   
+#   ; how many GeneTorrent instances should be assigned to a download GTO
+#   download_factor=3
+#   
+#   ; the interval in seconds after which GTLoadBalancer will refresh its internal
+#   ; representation of the state of each of the instance queues. Default = 1800
+#   ; (e.g., a half-hour)
+#   refresh_interval=1800
+#   
+#   ; the location to find the gtoinfo utility. Default=/usr/bin/gtoinfo
+#   gtoinfo=/Users/howdy/Code/newGeneTorrent/scripts/gtoinfo
+#   
+#   ; the root of the directory trees; can be referenced below as %QUEUE_ROOT
+#   queue_root=/Users/howdy/tmp/Annai/queuedir
+#   
+#   ; this directory is where new GTOs for upload will be dropped.  GTLoadBalancer
+#   ; will pick up the GTOs from this directory and place them in the appropriate
+#   ; number of work-queues.
+#   upload_queue=%QUEUE_ROOT/dropzone-upload
+#   
+#   ; this directory is where new GTOs for download will be dropped.  LoadBalancer
+#   ; will pick up the GTOs from this directory and place them in the appropriate
+#   ; number of work-queues.
+#   download_queue=%QUEUE_ROOT/dropzone-download
+#   
+#   [SaveUploadGTOs]
+#   ; If true, GTLoadBalancer will save aside upload GTOs
+#   save_upload_gtos=Yes
+#   
+#   ; Root dir to save upload GTOs.  A GTO named "foo.gto" will be saved
+#   ; to {root-dir}/foo/foo.gto
+#   save_root_dir=/Users/howdy/tmp/Annai/savedir
+#   
+#   ; The permission to set the UUID directory to; default=0755
+#   save_uuid_dir_perms=0755
+#   
+#   ; The owner for the UUID directory; default=gtorrent
+#   save_uuid_dir_owner=gtorrent
+#   
+#   ; The group for the UUID directory; default=gtorrent
+#   save_uuid_dir_group=gtorrent
+#   
+#   ; The permissions for the GTO file itself; default=0644
+#   save_gto_perms=0644
+#   
+#   ; The owner for the GTO file itself; default=gtorrent
+#   save_gto_owner=gtorrent
+#   
+#   ; The group for the GTO file itself; default=gtorrent
+#   save_gto_group=gtorrent
+#   
+#   [Instances]
+#   ; this section defines the number of work-queues, and the queue directory for each
+#   num_instances=6
+#   queue_00=%QUEUE_ROOT/dropzone-00
+#   queue_01=%QUEUE_ROOT/dropzone-01
+#   queue_02=%QUEUE_ROOT/dropzone-02
+#   queue_03=%QUEUE_ROOT/dropzone-03
+#   queue_04=%QUEUE_ROOT/dropzone-04
+#   queue_05=%QUEUE_ROOT/dropzone-05
+#   
 def parse_config_file(cfg_file):
     try:
         defaults = {'gtoinfo' : '/usr/bin/gtoinfo', 
                     'loglevel' : 5,
                     'expiration' : 72,
-                    'refresh_interval' : 1800 }
+                    'refresh_interval' : 1800,
+                    'save_uuid_dir_perms' : '0755',
+                    'save_uuid_dir_owner' : 'gtorrent',
+                    'save_uuid_dir_group' : 'gtorrent',
+                    'save_gto_perms' : '0644',
+                    'save_gto_owner' : 'gtorrent',
+                    'save_gto_group' : 'gtorrent',
+                    }
 
         cfgparser = ConfigParser.RawConfigParser(defaults)
         cfgparser.readfp(open(cfg_file, "r"))
@@ -428,6 +540,7 @@ def parse_config_file(cfg_file):
         config['config_file'] = cfg_file
         config['config_file_mtime'] = os.path.getmtime(cfg_file)
 
+        # LoadBalancer section
         config['loglevel'] = cfgparser.getint('LoadBalancer', 'loglevel')
         if (config['loglevel'] < 0 or config['loglevel'] > 7):
             raise ValueError("Illegal value %d for loglevel" % config['loglevel'])
@@ -464,6 +577,37 @@ def parse_config_file(cfg_file):
         if (not os.path.isdir(config['download_q'])):
             raise ValueError("Download queue directory %s doesn't exist" % config['download_q'])
 
+        # SaveUploadGTOs section
+        config['save_upload_gtos'] = cfgparser.getboolean('SaveUploadGTOs', 'save_upload_gtos')
+
+        if (config['save_upload_gtos']):
+            config['save_root_dir'] = cfgparser.get('SaveUploadGTOs', 'save_root_dir')
+            if (not os.path.isdir(config['save_root_dir'])):
+                raise ValueError("Save root directory %s doesn't exist" % config['save_root_dir'])
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_perms')
+            config['save_uuid_dir_perms'] = int(tmp_str,8)
+            if (config['save_uuid_dir_perms'] < 0400 or config['save_uuid_dir_perms'] > 0777):
+                raise ValueError("Illegal permissions '%s' for UUID dir" % tmp_str)
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_owner')
+            config['save_uuid_dir_owner'] = lookup_user(tmp_str, "UUID dir")
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_group')
+            config['save_uuid_dir_group'] = lookup_group(tmp_str, "UUID dir")
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_perms')
+            config['save_gto_perms'] = int(tmp_str, 8)
+            if (config['save_gto_perms'] < 0400 or config['save_gto_perms'] > 0777):
+                raise ValueError("Illegal permissions '%s' for GTO permissions" % tmp_str)
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_owner')
+            config['save_gto_owner'] = lookup_user(tmp_str, "GTO files")
+
+            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_group')
+            config['save_gto_group'] = lookup_group(tmp_str, "GTO files")
+
+        # Instances section
         config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
         if (config['num_instances'] <= 0):
             raise ValueError("Illegal num_instances of %d" % config['num_instances'])
@@ -525,7 +669,7 @@ def main():
     config = parse_config_file(params.config_file)
     if (config == None):
         print >> sys.stderr, "Fatal error parsing configuration file"
-        return 1
+        return -1
 
     try:
         mainloop(config)
