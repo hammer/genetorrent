@@ -69,6 +69,29 @@
 #include "gtDefs.h"
 #include "tclapOutput.h"
 #include "geneTorrentUtils.h"
+#include "gtLog.h"
+
+// Work around to disable SSL compression on Centos 5.5
+#ifndef SSL_OP_NO_COMPRESSION
+#define SSL_OP_NO_COMPRESSION                           0x00020000L
+#endif
+
+// This Macro is to be used to display output on the user's screen (in conjunction with the -v option)
+// Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
+// send output messages to log files where users may not see them.
+// X is one or more stream manipulters
+#define screenOutput(x)                             \
+{                                                   \
+   if (_logToStdErr)                                \
+   {                                                \
+      std::cout << x << std::endl;                  \
+   }                                                \
+   else                                             \
+   {                                                \
+      std::cerr << x << std::endl;                  \
+   }                                                \
+}                            
+
 
 void *geneTorr; // global variable that used to point to GeneTorrent to allow
                 // libtorrent callback for file inclusion and sys logging.
@@ -78,39 +101,37 @@ void *geneTorr; // global variable that used to point to GeneTorrent to allow
 static pthread_mutex_t callBackLoggerLock;
 
 geneTorrent::geneTorrent (int argc, char **argv) : 
-	_args (SHORT_DESCRIPTION, ' ', VERSION), 
-	_bindIP (""), 
-	_exposedIP (""), 
-	_portStart (20892), 
-	_portEnd (20900), 
-	_exposedPortDelta (0), 
-	_verbosityLevel (0), 
-	_manifestFile (""), 
-	_uploadUUID (""), 
-	_uploadSubmissionURL (""), 
-	_dataFilePath (""), 
-	_cliArgsDownloadList (), 
-	_downloadSavePath (""), 
-	_maxChildren (8),
-	_serverQueuePath (""), 
-	_serverDataPath (""), 
-	_authToken (""), 
-	_operatingMode (UPLOAD_MODE), 
-	_filesToUpload (), 
-	_pieceSize (4194304), 
-	_torrentListToDownload (), 
-	_activeSessions (), 
-	_tmpDir (""), 
-	_confDir (CONF_DIR_DEFAULT), 
-	_startUpComplete (false), 
-	_devMode (false), 
-	_logAppend (NULL), 
-	_layout (NULL)
+   _args (SHORT_DESCRIPTION, ' ', VERSION), 
+   _bindIP (""), 
+   _exposedIP (""), 
+   _portStart (20892), 
+   _portEnd (20900), 
+   _exposedPortDelta (0), 
+   _verbosityLevel (0), 
+   _manifestFile (""), 
+   _uploadUUID (""), 
+   _uploadSubmissionURL (""), 
+   _dataFilePath (""), 
+   _cliArgsDownloadList (), 
+   _downloadSavePath (""), 
+   _maxChildren (8),
+   _serverQueuePath (""), 
+   _serverDataPath (""), 
+   _authToken (""), 
+   _operatingMode (UPLOAD_MODE), 
+   _filesToUpload (), 
+   _pieceSize (4194304), 
+   _torrentListToDownload (), 
+   _activeSessions (), 
+   _tmpDir (""), 
+   _confDir (CONF_DIR_DEFAULT), 
+   _logToStdErr (false),
+   _startUpComplete (false), 
+   _devMode (false) 
 {
    geneTorr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
    pthread_mutex_init (&callBackLoggerLock, NULL);
-   setupSysLog();
 
    std::ostringstream startUpMessage;
    startUpMessage << "Starting version " << VERSION << " with the command line: ";
@@ -131,12 +152,14 @@ geneTorrent::geneTorrent (int argc, char **argv) :
       setTempDir();
    }
 
-   *sysLogGT << log4cpp::Priority::INFO << startUpMessage.str() << " (using tmpDir = " << _tmpDir << ")";
-
    // General purpose command line arguments.
    // Bind IP address (on local machine), upload, download, cghub server
    TCLAP::ValueArg <std::string> bindIP ("b", "bindIP", "Description Not Used", false, "", "string");
    _args.add (bindIP);
+
+   // configuration directory
+   TCLAP::ValueArg <std::string> confDir ("C", "confDir", "Description Not Used", false, "", "string");
+   _args.add (confDir);
 
    // Exposed IP address (of local machine), upload, download, cghub server
    TCLAP::ValueArg <std::string> exposedIP ("e", "advertisedIP", "Description Not Used", false, "", "string");
@@ -150,13 +173,13 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    TCLAP::ValueArg <std::string> internalPort ("i", "internalPorts", "Description Not Used", false, "", "string");
    _args.add (internalPort);
 
+   // Logging option, 3 fields destination:level:mask
+   TCLAP::ValueArg <std::string> logging ("l", "log", "Description Not Used", false, "", "string");
+   _args.add (logging);
+
    // Generic path used by upload, download, cghub server
    TCLAP::ValueArg <std::string> genericPath ("p", "path", "Description Not Used", false, "", "string");
    _args.add (genericPath);
-
-   // configuration directory
-   TCLAP::ValueArg <std::string> confDir ("C", "confDir", "Description Not Used", false, "", "string");
-   _args.add (confDir);
 
    // Verbosity
    TCLAP::MultiSwitchArg verbosity ("v", "verbose", "Description Not Used", false);
@@ -167,13 +190,13 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    TCLAP::ValueArg <std::string> credentialFile ("c", "credentialFile", "Description Not Used", false, "", "string"); // this implies download mode
    _args.add (credentialFile);
 
-	 // Max number of children for download
-	 TCLAP::ValueArg <int> maxDownloadChildren ("", "maxChildren", "Description Not Used", false, 8, "int");
-	 _args.add (maxDownloadChildren);
-
    // download flag and repeatable argument indicating download items
    TCLAP::MultiArg <std::string> downloadList ("d", "download", "Description Not Used", false, "string"); // this implies download mode
    _args.add (downloadList);
+
+   // Max number of children for download
+   TCLAP::ValueArg <int> maxDownloadChildren ("", "maxChildren", "Description Not Used", false, 8, "int");
+    _args.add (maxDownloadChildren);
 
    // Upload mode 
    //
@@ -269,6 +292,25 @@ geneTorrent::geneTorrent (int argc, char **argv) :
          }
       }
 
+      if (logging.isSet())
+      {
+         strTokenize strToken (logging.getValue (), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+         std::string destination = strToken.getToken(1);
+         int level = strtol (strToken.getToken(2).c_str(),NULL, 10);
+         std::string mask= strToken.getToken (3); 
+
+         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, destination);
+std::cerr << "DJN process logging Tokens HERE" << std::endl;
+      }
+      else
+      {
+         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, "none");
+         _logLevel = LOG_NONE;
+         _logMask =0;  // set all bits to 0, even though this won't get used
+      }
+
+      Log ("%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+
       if (verbosity.isSet ())
       {
          _verbosityLevel = verbosity.getValue ();
@@ -325,10 +367,10 @@ geneTorrent::geneTorrent (int argc, char **argv) :
             loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
          }
 
-				 if (maxDownloadChildren.isSet ())
-				 {
-					 _maxChildren = maxDownloadChildren.getValue();
-				 }
+         if (maxDownloadChildren.isSet ())
+         {
+            _maxChildren = maxDownloadChildren.getValue();
+         }
 
          _downloadSavePath = sanitizePath (genericPath.getValue ()); // default is ""
 
@@ -418,27 +460,6 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), strtol (strToken.getToken (4).c_str (), NULL, 10));
 
    _startUpComplete = true;
-}
-
-void geneTorrent::setupSysLog ()
-{
-   // Configure log4cpp to use syslog
-   std::ostringstream appPid;
-   appPid << "GeneTorrent: [" << getpid() << "]";
-
-   if (_logAppend != NULL)
-   {
-      sysLogGT->removeAllAppenders();
-   }
-
-   _layout = new log4cpp::PatternLayout ();
-   _layout->setConversionPattern (log4cpp::PatternLayout::DEFAULT_CONVERSION_PATTERN);
-   _logAppend = new log4cpp::SyslogAppender ("SyslogAppender", appPid.str());
-   _logAppend->setLayout (_layout);
-   sysLogGT = &(log4cpp::Category::getInstance ("sysLogGT"));
-   sysLogGT->setAdditivity (false);
-   sysLogGT->setAppender (_logAppend);
-   sysLogGT->setPriority (log4cpp::Priority::INFO);
 }
 
 void geneTorrent::setTempDir ()
@@ -615,16 +636,17 @@ void geneTorrent::prepareDownloadList ()
 void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType errorType, long errorCode, std::string errorMessageLine2, std::string errorMessageErrorLine)
 {
    std::ostringstream sysLogMess;
+   std::ostringstream stdErrMess;
 
    if (exitValue > 0)
    {
       sysLogMess << "Error:  " << errorMessage;
-      std::cerr << "Error:  " << errorMessage << std::endl;
+      stdErrMess << "Error:  " << errorMessage << std::endl;
    }
    else if (exitValue == NO_EXIT)
    {
       sysLogMess << "Warning:  " << errorMessage;
-      std::cerr << "Warning:  " << errorMessage << std::endl;
+      stdErrMess << "Warning:  " << errorMessage << std::endl;
    }
    else  // exitValue == ERROR_NO_EXIT, the caller handles the error and this permits syslogging only
    {
@@ -638,10 +660,10 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
          if (errorMessageLine2.size () > 0)
          {
             sysLogMess << ", " << errorMessageLine2;
-            std::cerr << errorMessageLine2 << std::endl;
+            stdErrMess << errorMessageLine2 << std::endl;
          }
          sysLogMess << "  Additional Info:  " << getHttpErrorMessage (errorCode) << " (HTTP status code = " << errorCode << ").";
-         std::cerr << "Additional Info:  " << getHttpErrorMessage (errorCode) << " (HTTP status code = " << errorCode << ")." << std::endl;
+         stdErrMess << "Additional Info:  " << getHttpErrorMessage (errorCode) << " (HTTP status code = " << errorCode << ")." << std::endl;
       }
          break;
 
@@ -650,10 +672,10 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
          if (errorMessageLine2.size () > 0)
          {
             sysLogMess << ", " << errorMessageLine2;
-            std::cerr << errorMessageLine2 << std::endl;
+            stdErrMess << errorMessageLine2 << std::endl;
          }
          sysLogMess << "  Additional Info:  " << curl_easy_strerror (CURLcode (errorCode)) << " (curl code = " << errorCode << ").";
-         std::cerr << "Additional Info:  " << curl_easy_strerror (CURLcode (errorCode)) << " (curl code = " << errorCode << ")." << std::endl;
+         stdErrMess << "Additional Info:  " << curl_easy_strerror (CURLcode (errorCode)) << " (curl code = " << errorCode << ")." << std::endl;
       }
          break;
 
@@ -661,10 +683,10 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
       {
          if (errorMessageLine2.size () > 0)
          {
-            std::cerr << errorMessageLine2 << std::endl;
+            stdErrMess << errorMessageLine2 << std::endl;
          }
          sysLogMess << "  Additional Info:  " << strerror (errorCode) << " (errno = " << errorCode << ").";
-         std::cerr << "Additional Info:  " << strerror (errorCode) << " (errno = " << errorCode << ")." << std::endl;
+         stdErrMess << "Additional Info:  " << strerror (errorCode) << " (errno = " << errorCode << ")." << std::endl;
       }
          break;
 
@@ -673,10 +695,10 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
          if (errorMessageLine2.size () > 0)
          {
             sysLogMess << ", " << errorMessageLine2;
-            std::cerr << errorMessageLine2 << std::endl;
+            stdErrMess << errorMessageLine2 << std::endl;
          }
          sysLogMess << "  Additional Info:  " << errorMessageErrorLine << " (GT code = " << errorCode << ").";
-         std::cerr << "Additional Info:  " << errorMessageErrorLine << " (GT code = " << errorCode << ")." << std::endl;
+         stdErrMess << "Additional Info:  " << errorMessageErrorLine << " (GT code = " << errorCode << ")." << std::endl;
       }
          break;
 
@@ -685,23 +707,25 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
          if (errorMessageLine2.size () > 0)
          {
             sysLogMess << ", " << errorMessageLine2;
-            std::cerr << errorMessageLine2 << std::endl;
+            stdErrMess << errorMessageLine2 << std::endl;
          }
 
          if (errorMessageErrorLine.size () > 0)
          {
             sysLogMess << ", " << errorMessageErrorLine;
-            std::cerr << "Additional Info:  " << errorMessageErrorLine << std::endl;
+            stdErrMess << "Additional Info:  " << errorMessageErrorLine << std::endl;
          }
       }
          break;
    }
 
-   *sysLogGT << log4cpp::Priority::INFO << sysLogMess.str();
+   Log ("%s", sysLogMess.str().c_str());
 
    if (exitValue > 0)
    {
-      std::cerr << "Cannot continue." << std::endl;
+      stdErrMess << "Cannot continue." << std::endl;
+      screenOutput (stdErrMess.str());     
+
       if (_startUpComplete)
       {
          cleanupTmpDir();
@@ -799,7 +823,7 @@ void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
 
       if (_verbosityLevel > VERBOSE_3)
       {
-         std::cerr << "Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl << std::endl;
+         screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
       }
 
       curl_easy_cleanup (curl);
@@ -997,7 +1021,7 @@ void geneTorrent::run ()
       {
          if (_verbosityLevel > 0)
          {
-            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", download mode." << std::endl; // prints Welcome to GeneTorrent
+            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", download mode."); 
          }
 
          time_t startTime = time(NULL);
@@ -1023,11 +1047,11 @@ void geneTorrent::run ()
          std::ostringstream message;
          message << "Ready to download " << totalGtos << " GTO(s) with " << totalFiles << " file(s) comprised of " << add_suffix (totalBytes) << " of data"; 
 
-         *sysLogGT << log4cpp::Priority::INFO << message.str();
+         Log ("%s", message.str().c_str());
 
          if (_verbosityLevel > 0)
          {
-            std::cerr << message.str() << std::endl;
+            screenOutput (message.str()); 
          }
 
          performTorrentDownload (totalBytes);
@@ -1037,14 +1061,13 @@ void geneTorrent::run ()
   
          time_t duration = time(NULL) - startTime;
 
-         message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration)
-                         << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+         message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
 
-         *sysLogGT << log4cpp::Priority::INFO << message.str();
+         Log ("%s", message.str().c_str());
 
          if (_verbosityLevel > 0)
          {
-            std::cerr << message.str() << std::endl;
+            screenOutput (message.str()); 
          }
 
       } break;
@@ -1053,7 +1076,7 @@ void geneTorrent::run ()
       {
          if (_verbosityLevel > 0)
          {
-            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", server mode." << std::endl; // prints Welcome to GeneTorrent
+            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", server mode."); 
          }
          runServerMode ();
       } break;
@@ -1062,7 +1085,7 @@ void geneTorrent::run ()
       {
          if (_verbosityLevel > 0)
          {
-            std::cerr << "Welcome to GeneTorrent version " << VERSION << ", upload mode." << std::endl; // prints Welcome to GeneTorrent
+            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
          }
 
          performTorrentUpload ();
@@ -1208,17 +1231,11 @@ void geneTorrent::loggingCallBack (std::string message)
 
       if (logMessage.size() > 2)
       {
-         geneTorrent *myThis = (geneTorrent *) geneTorr;
-         myThis->sysLogMessage (logMessage);
+         Log ("%s", logMessage.c_str());
       }
       return;
    }
    pthread_mutex_unlock (&callBackLoggerLock);
-}
-
-void geneTorrent::sysLogMessage (std::string message)
-{
-   *sysLogGT << log4cpp::Priority::INFO << message;
 }
 
 void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
@@ -1231,11 +1248,11 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
 
    vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
 
-	 // TODO: It would be good to use a system call to determine how
-	 // many cores this machine has.  There shouldn't be more children
-	 // than cores, so set 
-	 //    maxChildren = min(_maxChildren, number_of_cores)
-	 // Hard to do this in a portable manner however
+    // TODO: It would be good to use a system call to determine how
+    // many cores this machine has.  There shouldn't be more children
+    // than cores, so set 
+    //    maxChildren = min(_maxChildren, number_of_cores)
+    // Hard to do this in a portable manner however
 
    int maxChildren = _maxChildren;
    int pipes[maxChildren+1][2];
@@ -1384,7 +1401,7 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
 
          if (_verbosityLevel > 0) 
          {
-            std::cerr << "Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s" << std::endl;
+            screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
          }
       }
 
@@ -1394,10 +1411,7 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
 
 int geneTorrent::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
-   setupSysLog();
-
-   libtorrent::session torrentSession (*_gtFingerPrint, 0, 
-			 libtorrent::alert::tracker_notification | libtorrent::alert::storage_notification);
+   libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (torrentSession);
    bindSession (torrentSession);
 
@@ -1456,11 +1470,6 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       torrentHandle.piece_priority (idx, 0);
    }
 
-   if (_verbosityLevel > 3)
-   {
-      *sysLogGT << log4cpp::Priority::INFO << "Child: " << childID << "  start piece:  " << myStartPiece << "  endPiece: " << myEndPiece-1;
-   }
-
    torrentHandle.set_sequential_download (true);
 
    if (torrentParams.ti->ssl_cert().size() > 0)
@@ -1510,7 +1519,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       {
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
-            std::cerr << "Child " << childID << " " << download_state_str[torrentStatus.state] << "  " << add_suffix (torrentStatus.total_wanted_done).c_str () << "  (" << add_suffix (torrentStatus.download_payload_rate, "/s").c_str () << ")" << std::endl;
+            screenOutput ("Child " << childID << " " << download_state_str[torrentStatus.state] << "  " << add_suffix (torrentStatus.total_wanted_done).c_str () << "  (" << add_suffix (torrentStatus.download_payload_rate, "/s").c_str () << ")");
          }
       }
       currentState = torrentHandle.status().state;
@@ -1519,27 +1528,27 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
 
    torrentSession.remove_torrent (torrentHandle);
 
-	 // Note that remove_torrent does at least two things asynchronously: 1) it
-	 // sets in motion the deletion of this torrent object, and 2) it sends the
-	 // stopped event to the tracker and waits for a response.  So if we were to
-	 // exit immediately, two bad things happen.  First, the stopped event is
-	 // probably not sent.  Second, we end up doubly-deleting some objects
-	 // inside of libtorrent (because the deletion is already in progress and
-	 // then the call to exit() causes some cleanup as well), and we get nasty
-	 // complaints about malloc corruption printed to the console by glibc.
-	 //
-	 // The "proper" approached from a libtorrent perspective is to wait to
-	 // receive both the cache_flushed_alert and the tracker_reply_alert,
-	 // indicating that all is well.  However in the case of tearing down a
-	 // torrent, libtorrent appears to squelch the tracker_reply_alert so we
-	 // never get it (even though the tracker does in fact respond to the
-	 // stopped event sent to it by libtorrent).
-	 //
-	 // Therefore, ugly as it is, for the time being we will simply sleep here.
-	 // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
-	 // the two events mentioned above.
+    // Note that remove_torrent does at least two things asynchronously: 1) it
+    // sets in motion the deletion of this torrent object, and 2) it sends the
+    // stopped event to the tracker and waits for a response.  So if we were to
+    // exit immediately, two bad things happen.  First, the stopped event is
+    // probably not sent.  Second, we end up doubly-deleting some objects
+    // inside of libtorrent (because the deletion is already in progress and
+    // then the call to exit() causes some cleanup as well), and we get nasty
+    // complaints about malloc corruption printed to the console by glibc.
+    //
+    // The "proper" approached from a libtorrent perspective is to wait to
+    // receive both the cache_flushed_alert and the tracker_reply_alert,
+    // indicating that all is well.  However in the case of tearing down a
+    // torrent, libtorrent appears to squelch the tracker_reply_alert so we
+    // never get it (even though the tracker does in fact respond to the
+    // stopped event sent to it by libtorrent).
+    //
+    // Therefore, ugly as it is, for the time being we will simply sleep here.
+    // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
+    // the two events mentioned above.
 
-	 sleep(5);
+    sleep(5);
 
    exit (0);
 }
@@ -1548,6 +1557,8 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
 {
    std::deque <libtorrent::alert *> alerts;
    torrSession.pop_alerts (&alerts);   
+
+std::cerr << "alerts.size() = " << alerts.size() << std::endl;
 
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {
@@ -1678,7 +1689,7 @@ std::string geneTorrent::submitTorrentToGTExecutive (std::string tmpTorrentFileN
 
    if (_verbosityLevel > VERBOSE_3)
    {
-      std::cerr << "Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl << std::endl;
+      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
    curl_easy_cleanup (curl);
@@ -1784,7 +1795,7 @@ void geneTorrent::displayMissingFilesAndExit (vectOfStr &missingFiles)
 
    while (vectIter != missingFiles.end ())
    {
-      std::cerr << "Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter << std::endl;
+      screenOutput ("Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter);
       vectIter++;
    }
    gtError ("file(s) listed above were not found (or is (are) not readable)", 82, geneTorrent::DEFAULT_ERROR);
@@ -2000,7 +2011,7 @@ void geneTorrent::checkSessions ()
       }
       else
       {
-         *sysLogGT << log4cpp::Priority::INFO << "Unable to listen on any ports between " << _portStart << " and " << _portEnd << "(system level ports).  GeneTorrent can not Serve data until at least one port is available.";
+         Log ("Unable to listen on any ports between %d and %d (system level ports).  GeneTorrent can not Serve data until at least one port is available.", _portStart, _portEnd);
          sleep (3); // give OS chance to clean up ports desired by this process
       }
    }
@@ -2088,7 +2099,7 @@ void geneTorrent::runServerMode ()
 
       time_t timeNow = time(NULL);      
 
-      if (nextMaintTime < timeNow)
+      if (nextMaintTime <= timeNow)
       {
          nextMaintTime = time(NULL) + 60;  // Set the time for the next maintenance window
 
@@ -2096,7 +2107,7 @@ void geneTorrent::runServerMode ()
 
          if (_verbosityLevel > 0)
          {
-            std::cerr << std::endl;
+            screenOutput ("");
          }
          continue;  // completed a maintenance cycle, skip the 2 second sleep cycle
       }
@@ -2120,7 +2131,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
          {
             // The torrent has disappeared, stop serving it.
-            *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  GTO disappeared from queue:  " << mapIter->first << " with info hash: " << mapIter->second->infoHash;
+            Log (" Stop serving:  GTO disappeared from queue:  %s with info hash:  %s",  mapIter->first.c_str(), mapIter->second->infoHash.c_str());
 
             (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
             activeTorrents.erase (mapIter->first);
@@ -2133,7 +2144,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          {
             if (getInfoHash (mapIter->first) != mapIter->second->infoHash)
             {
-               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  GTO InfoHash Changed while serving:  " << mapIter->first << " with info hash: " << mapIter->second->infoHash << " (new GTO with infoHash " << getInfoHash (mapIter->first) << " will not be served)";
+               Log ("Stop serving:  GTO InfoHash Changed while serving:  %s with info hash:  %s (new GTO with infoHash %s will not be served)", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), getInfoHash (mapIter->first).c_str()); 
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
@@ -2151,7 +2162,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
                mapIter->second->overTimeAlertIssued = false;
             }
 
-            *sysLogGT << log4cpp::Priority::INFO << "Expiration Update:  GTO " << mapIter->first << " with info hash: " << mapIter->second->infoHash << " has a new expiration time " << mapIter->second->expires;
+            Log ("Expiration Update:  GTO %s with info hash:  %s has a new expiration time %d", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), mapIter->second->expires);
          }
 
          if (timeNow >= mapIter->second->expires)       // This GTO is expired
@@ -2162,7 +2173,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
 
             if (peers.size () == 0)
             {
-               *sysLogGT << log4cpp::Priority::INFO << "Stop serving:  Expiring " << mapIter->first << " with info hash: " << getInfoHash (mapIter->first);
+               Log ("Stop serving:  Expiring %s with info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
@@ -2173,13 +2184,13 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
             {
                if (!mapIter->second->overTimeAlertIssued)
                {
-                  *sysLogGT << log4cpp::Priority::INFO << "Overtime serving (" << peers.size () << " actor(s) connected):  " << mapIter->first << " with info hash: " <<  getInfoHash (mapIter->first);
+                  Log ("Overtime serving:  %s with info hash:  %s (%d actor(s) connected)", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str(), peers.size());
                   mapIter->second->overTimeAlertIssued = true;
                }
    
                if (_verbosityLevel > 0)
                {  
-                  std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download" << std::endl;
+                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download");
                }
                mapIter++;
             }
@@ -2188,7 +2199,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          {
             if (_verbosityLevel > 0)
             {
-                  std::cerr << std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << "." << std::endl;
+                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".");
             }
             mapIter++;
          }
@@ -2213,13 +2224,13 @@ time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
       }
       else
       {
-         *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << torrentPathAndFileName << " or no 'expires on' in GTO, serving using default expiration of 1/1/2037";
+         Log ("Failure running gtoinfo on %s or no 'expires on' in GTO, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
       }
       pclose (result);
    }
    else
    {
-      *sysLogGT << log4cpp::Priority::INFO << "Failure running gtoinfo on " << torrentPathAndFileName << ", serving using default expiration of 1/1/2037";
+      Log ("Failure running gtoinfo on %s, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
    }
 
    return expireTime;       
@@ -2237,7 +2248,7 @@ bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
    time_t torrentModTime = 0;
    if (statFileOrDirectory (pathAndFileName, torrentModTime) < 0)
    {
-      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << strerror (errno) << "(" << errno << ")";
+      Log ("Failure adding %s to Served GTOs, GTO file removed.  Error:  %s (%d)", pathAndFileName.c_str(), strerror (errno), errno);
       delete newTorrRec;
       deleteGTOfromQueue (pathAndFileName);
       return false;
@@ -2271,7 +2282,7 @@ else
 
    if (torrentError)
    {
-      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
+      Log ("Failure adding %s to Served GTOs, GTO file removed.  Error: %s (%d)", pathAndFileName.c_str(), torrentError.message().c_str(), torrentError.value ());
       delete newTorrRec;
       deleteGTOfromQueue (pathAndFileName);
       return false;
@@ -2281,7 +2292,7 @@ else
 
    if (torrentError)
    {
-      *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  " << torrentError.message () << "(" << torrentError.value () << ")";
+      Log ("Failure adding %s to Served GTOs, GTO file removed.  Error: %s (%d)", pathAndFileName.c_str(), torrentError.message().c_str(), torrentError.value ());
       delete newTorrRec;
       deleteGTOfromQueue (pathAndFileName);
       return false;
@@ -2295,7 +2306,7 @@ else
 
       if (status == false)
       {
-         *sysLogGT << log4cpp::Priority::INFO << "Failure adding " << pathAndFileName << " to Served GTOs, GTO file removed.  Error:  unable to obtain a signed SSL Certificate.";
+         Log ("Failure adding %s to Served GTOs, GTO file removed.  Error:  unable to obtain a signed SSL Certificate.", pathAndFileName.c_str());
          delete newTorrRec;
          deleteGTOfromQueue (pathAndFileName);
          return false;
@@ -2314,10 +2325,10 @@ else
 
    if (_verbosityLevel > 0)
    {
-      std::cerr << "adding " << getFileName (pathAndFileName) << " to files being served" << std::endl;
+      screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served");
    }
 
-   *sysLogGT << log4cpp::Priority::INFO << "Begin serving:  " << pathAndFileName << " with info hash: " << newTorrRec->infoHash << " expires: " << newTorrRec->expires << " mtime: " << newTorrRec->mtime;
+   Log ("Begin serving:  %s with info hash:  %s expires:  %d", pathAndFileName.c_str(), newTorrRec->infoHash.c_str(), newTorrRec->expires);
    workSession->mapOfSessionTorrents[pathAndFileName] = newTorrRec;
 
    return true;
@@ -2556,7 +2567,7 @@ bool geneTorrent::acquireSignedCSR (std::string info_hash, std::string CSRSignUR
 
    if (_verbosityLevel > VERBOSE_3)
    {
-      std::cerr << "Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl << std::endl;
+      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
    curl_easy_cleanup (curl);
@@ -2595,7 +2606,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 {
    if (_verbosityLevel > 0)
    {
-      std::cerr << "Sending " << torrentFileName << std::endl;
+      screenOutput ("Sending " << torrentFileName); 
    }
 
    libtorrent::session torrentSession (*_gtFingerPrint, 0);
@@ -2687,7 +2698,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
                         add_suffix (torrentStatus.download_rate, "/s").c_str (), 
                         add_suffix (torrentStatus.total_upload).c_str (), 
                         add_suffix (torrentStatus.upload_rate, "/s").c_str ());
-            std::cerr << str << std::endl;
+            screenOutput (str);
          }
       }
       sleep (5);

@@ -43,7 +43,7 @@ function build_libtorrent
    cd libtorrent
    [[ -e ../.fullbuild ]] && { ./autotool.sh || bailout $FUNCNAME 
                              }
-   ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
+   ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --enable-static --disable-shared --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
    if [[ `hostname -s` = "radon" || `hostname -s` = "xenon" ]]
    then

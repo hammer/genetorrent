@@ -56,8 +56,6 @@ AC_CHECK_LIB([curl], [main])
 AC_CHECK_LIB([pthread], [main])
 # FIXME: Replace `main' with a function in `-lxqilla':
 AC_CHECK_LIB([xqilla], [main])
-# FIXME: Replace `main' with a function in `-lxqilla':
-AC_CHECK_LIB([log4cpp], [main])
 
 AC_CHECK_LIB([c], [main])
 AC_CHECK_LIB([rt], [main])

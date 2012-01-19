@@ -77,6 +77,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <sys/ioctl.h>
 #ifdef HAVE_LINUX_FIEMAP_H
+#include <linux/types.h>
 #include <linux/fiemap.h> // FIEMAP_*
 #include <linux/fs.h>  // FS_IOC_FIEMAP
 #endif

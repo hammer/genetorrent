@@ -1343,7 +1343,9 @@ ctx->set_verify_callback(verify_function, ec);
 		SSL_CTX* ssl_ctx = ctx->impl();
 		// Turn off SSL compression: our data is usually compressed already, and
 		// in testing this can get us up to 4x speed improvement on a fast network
+#ifdef SSL_OP_NO_COMPRESSION
 		SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_COMPRESSION);
+#endif
 
 		// create a new x.509 certificate store
 		X509_STORE* cert_store = X509_STORE_new();

@@ -34,24 +34,24 @@
 
 bin_PROGRAMS = GeneTorrent
 
-GeneTorrent_SOURCES = \
-	geneTorrent.cpp \
-	gtMain.cpp \
-	stringTokenizer.cpp \
-	tclapOutput.cpp \
-	geneTorrentUtils.cpp
+GeneTorrent_SOURCES = geneTorrent.cpp \
+		      gtMain.cpp \
+		      stringTokenizer.cpp \
+		      tclapOutput.cpp \
+		      gtLog.cpp \
+		      geneTorrentUtils.cpp
 
 GTdatadir = $(datadir)/GeneTorrent
 
-GTdata_DATA = \
-	dhparam.pem \
-	GeneTorrent.openssl.conf
+GTdata_DATA = dhparam.pem \
+              GeneTorrent.openssl.conf
 
 GeneTorrent_CPPFLAGS = $(torrentrasterbar_CFLAGS)
 
-GeneTorrent_LDADD = /usr/lib64/libtorrent-rasterbar.a \
-                    /usr/lib64/libboost_system-mt.a \
-                    /usr/lib64/libboost_filesystem-mt.a \
-                    /usr/lib64/libboost_regex.a
+GeneTorrent_LDADD = -L/usr/lib64 \
+                    -ltorrent-rasterbar \
+                    -lboost_system-mt \
+                    -lboost_filesystem-mt \
+                    -lboost_regex
 
 man_MANS = GeneTorrent.1

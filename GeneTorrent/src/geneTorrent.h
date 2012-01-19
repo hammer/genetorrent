@@ -61,6 +61,7 @@
 class geneTorrent
 {
    typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
+   typedef enum logLevelValue_ {LOG_NONE = 10, LOG_MINIMAL, LOG_NOMINAL, LOG_VERBOSE} logLevelValue;
    typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2, VERBOSE_3, VERBOSE_4} verboseLevels;
                             // VERBOSE_1:  Operation Progress Displayed on Screen
                             // VERBOSE_2:  low volume debugging
@@ -80,7 +81,6 @@ class geneTorrent
       time_t mtime;              // file modification time
       std::string infoHash;         
       bool overTimeAlertIssued;     // tracks if the overtime message has been reported to syslog
-//      bool stillPresent;            // tracks if the GTO is still present in the queue directory
    } activeTorrentRec;
 
    typedef struct activeSessionRec_
@@ -113,8 +113,8 @@ class geneTorrent
       std::string _bindIP;
       std::string _exposedIP;
                                       
-      int    _portStart;         // based on --internalIP
-      int    _portEnd;           // based on --internalIP
+      int _portStart;         // based on --internalIP
+      int _portEnd;           // based on --internalIP
 
       int _exposedPortDelta;
       int _verbosityLevel;
@@ -148,6 +148,10 @@ class geneTorrent
       std::string _dhParamsFile;
       std::string _gtOpenSslConf;
 
+      logLevelValue _logLevel;     // Level of logging active
+      uint32_t      _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
+      bool          _logToStdErr;  // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
+
       bool _startUpComplete;
 
       bool _devMode;  // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
@@ -166,7 +170,7 @@ class geneTorrent
       void prepareDownloadList ();
       void runServerMode(); 
       void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
-      //
+
       void servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents);
       void buildURIsToDownloadFromUUID (vectOfStr &uuids);
       void downloadGtoFilesByURI (vectOfStr &uris);
@@ -199,9 +203,8 @@ class geneTorrent
       void deleteGTOfromQueue (std::string fileName);
       void loadCredentialsFile (bool credsSet, std::string credsFile);
       void displayMissingFilesAndExit (vectOfStr &missingFiles);
-      std::string  submitTorrentToGTExecutive (std::string torrentFileName);
+      std::string submitTorrentToGTExecutive (std::string torrentFileName);
 
-      void sysLogMessage (std::string message);
       int downloadChild(int, int, std::string, FILE *);
       bool generateCSR (std::string uuid);
       bool generateSSLcertAndGetSigned (std::string torrentFile, std::string signUrl, std::string torrentUUID);
@@ -213,14 +216,9 @@ class geneTorrent
       void setTempDir ();
       void mkTempDir ();
       void checkAlerts (libtorrent::session &torrSession);
-      void setupSysLog ();
       time_t getExpirationTime (std::string torrentPathAndFileName);
 
       libtorrent::fingerprint *_gtFingerPrint;
-
-      log4cpp::Appender *_logAppend;
-      log4cpp::PatternLayout *_layout;
-      log4cpp::Category *sysLogGT;              // a member but not named with _ ...
 };
 
 #endif /* GENETORRENT_H_ */
