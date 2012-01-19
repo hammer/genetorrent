@@ -581,7 +581,8 @@ def parse_config_file(cfg_file):
         config['save_upload_gtos'] = cfgparser.getboolean('SaveUploadGTOs', 'save_upload_gtos')
 
         if (config['save_upload_gtos']):
-            config['save_root_dir'] = cfgparser.get('SaveUploadGTOs', 'save_root_dir')
+            config['save_root_dir'] = \
+                subs_qr(cfgparser.get('SaveUploadGTOs', 'save_root_dir'), config['queue_root'])
             if (not os.path.isdir(config['save_root_dir'])):
                 raise ValueError("Save root directory %s doesn't exist" % config['save_root_dir'])
 
@@ -633,7 +634,7 @@ def parse_config_file(cfg_file):
         log(syslog.LOG_DEBUG, "Read configuration file %s successfully:" % cfg_file)
         for k,v in sorted(config.items()):
             log(syslog.LOG_DEBUG, "  %s: %s" % (k, v))
-        
+
         return config
 
     except (ConfigParser.NoOptionError, ValueError) as e:
