@@ -879,86 +879,72 @@ std::string geneTorrent::getHttpErrorMessage (int code)
       case 505:
       {
          return "HTTP Version Not Supported";
-      }
-         break;
+      } break;
 
       case 504:
       {
          return "Gateway Timeout";
-      }
-         break;
+      } break;
 
       case 503:
       {
          return "Service Unavailable";
-      }
-         break;
+      } break;
 
       case 502:
       {
          return "Bad Gateway";
-      }
-         break;
+      } break;
 
       case 501:
       {
          return "Not Implemented";
-      }
-         break;
+      } break;
 
       case 500:
       {
          return "Internal Server Error";
-      }
-         break;
+      } break;
 
       case 400:
       {
          return "Bad Request";
-      }
-         break;
+      } break;
 
       case 401:
       {
          return "Unauthorized";
-      }
-         break;
+      } break;
 
       case 403:
       {
          return "Forbidden";
-      }
-         break;
+      } break;
 
       case 404:
       {
          return "Not Found";
-      }
-         break;
+      } break;
 
       case 409:
       {
          return "Request Timeout";
-      }
-         break;
+      } break;
 
       case 411:
       {
          return "Gone";
-      }
-         break;
+      } break;
 
       case 412:
       {
          return "Length Required";
-      }
-         break;
+      } break;
 
       default:
       {
          return "Unknown, research given code";
-      }
-         break;
+      } break;
    }
 
    return "Unknown, research given code";
@@ -1558,21 +1544,146 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
    std::deque <libtorrent::alert *> alerts;
    torrSession.pop_alerts (&alerts);   
 
-std::cerr << "alerts.size() = " << alerts.size() << std::endl;
+// DJN DEBUG std::cerr << "alerts.size() = " << alerts.size() << std::endl;
 
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {
+      // Leaving this code in for now -- it existed prior to using alerts for logging
       if (((*dequeIter)->category() & libtorrent::alert::tracker_notification) && ((*dequeIter)->category() & libtorrent::alert::error_notification))
       {
          libtorrent::tracker_error_alert *tea = libtorrent::alert_cast<libtorrent::tracker_error_alert> (*dequeIter);
 
-         if (tea->times_in_row > 1)
+         if (tea->times_in_row > 2)
          {
             gtError ("Failure communicating with the transactor on URL:  " + tea->url, 214, geneTorrent::DEFAULT_ERROR, 0, tea->error.message());
          }
       }
+
+      bool haveError = (*dequeIter)->category() & libtorrent::alert::error_notification;
+/*                      peer_notification = 0x2,           Want
+                        port_mapping_notification = 0x4,
+                        storage_notification = 0x8,        Want
+                        tracker_notification = 0x10,       Want
+                        debug_notification = 0x20,         Want
+                        status_notification = 0x40,        Want
+                        progress_notification = 0x80,      Want
+                        ip_block_notification = 0x100,     Want
+                        performance_warning = 0x200,       Want
+                        dht_notification = 0x400,
+                        stats_notification = 0x800,
+                        rss_notification = 0x1000,
+*/
+
+/*
+if (haveError)
+   std::cerr << "haveError!" << std::endl;
+*/
+
+//std::cerr << "(*dequeIter)->category() = " << (*dequeIter)->category() << std::endl;
+      switch ((*dequeIter)->category() & ~libtorrent::alert::error_notification)
+      {
+         case libtorrent::alert::peer_notification:
+         {
+            processPeerNotification (haveError, *dequeIter);
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::storage_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::tracker_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::debug_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::status_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::progress_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::ip_block_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+         case libtorrent::alert::performance_warning:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+
+/*
+         case libtorrent::alert::dht_notification:
+         {
+Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+*/
+         case libtorrent::alert::stats_notification:
+         {
+//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+/*
+         case libtorrent::alert::rss_notification:
+         {
+Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
+//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+         } break;
+*/
+         default:
+         {
+            Log ("Unknown alert category %08x encountered in alert processing", (*dequeIter)->category());
+         } break;
+      }   
    }
    alerts.clear();
+}
+
+void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *alrt)
+{
+std::cerr << "in geneTorrent::processPeerNotification" << std::endl;
+   if (haveError)
+   {
+std::cerr << "HAVE LOG ENTRY" << std::endl;
+      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      case libtorrent::peer_connect_alert::alert_type:
+      {
+         Log ("DJN:  %s", alrt->message().c_str());
+
+      } break;
+
+      default:
+      {
+         Log ("DJN:  unknown alert %s received", alrt->what());
+      } break;
+   }   
+   
 }
 
 void geneTorrent::performTorrentUpload ()

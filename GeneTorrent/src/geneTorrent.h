@@ -218,6 +218,8 @@ class geneTorrent
       void checkAlerts (libtorrent::session &torrSession);
       time_t getExpirationTime (std::string torrentPathAndFileName);
 
+      void processPeerNotification (bool haveError, libtorrent::alert *alrt);
+
       libtorrent::fingerprint *_gtFingerPrint;
 };
 
