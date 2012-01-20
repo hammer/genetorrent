@@ -693,7 +693,7 @@ namespace libtorrent
 			erase_peer(m_peers.begin() + erase_candidate);
 		}
 
-#if defined TORRENT_LOGGING || defined TORRENT_VERBOSE_LOGGING || defined TORRENT_MINIMAL_LOGGING
+#if defined TORRENT_LOGGING || defined TORRENT_VERBOSE_LOGGING 
 		if (candidate != -1)
 		{
 			(*m_torrent->session().m_logger) << time_now_string()

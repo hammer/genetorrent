@@ -1510,11 +1510,21 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
          }
          exit (197);
       }
-
+/*
       // sleep before reporting status to parent -- monitoring the state of the torrent every 1/2 second
       for (int i=0; i<8 && currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished; i++)
       {
          usleep(SLEEP_INTERVAL/8);
+         currentState = torrentHandle.status().state;
+      }
+*/
+
+      libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (5000000);  // 5 seconds
+
+      while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished && libtorrent::time_now() < endMonitoring)
+      {
+         usleep(5);
+         checkAlerts (torrentSession);
          currentState = torrentHandle.status().state;
       }
 
@@ -1541,7 +1551,6 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       }
       currentState = torrentHandle.status().state;
    }
-
 
    checkAlerts (torrentSession);
    torrentSession.remove_torrent (torrentHandle);
