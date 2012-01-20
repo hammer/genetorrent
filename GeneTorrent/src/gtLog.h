@@ -69,7 +69,7 @@ class CPLog
 {
    public:
    
-   static bool create_globallog (std::string, std::string);
+   static bool create_globallog (std::string, std::string, int childID = 0);
    static void delete_globallog();
 
    void __Log        (const char *file, int line, const char *string, ...);
@@ -93,8 +93,8 @@ class CPLog
       CPLogOutputFile, 
    } ;
 
-   //CPLog (int argc, char **argv, bool use_log_file);
-   CPLog (std::string progName, std::string log);
+   //CdPLog (int argc, char **argv, bool use_log_file);
+   CPLog (std::string progName, std::string log, int childID);
    ~CPLog();
 
    static int s_global_refcnt;

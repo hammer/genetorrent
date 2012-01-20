@@ -126,7 +126,7 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    _activeSessions (), 
    _tmpDir (""), 
    _confDir (CONF_DIR_DEFAULT), 
-   _logLevel (LOG_STANDARD),
+   _logDestination ("none"),     // default to no logging
    _logMask (0),                 // set all bits to 0
    _logToStdErr (false),
    _startUpComplete (false), 
@@ -299,37 +299,29 @@ geneTorrent::geneTorrent (int argc, char **argv) :
       {
          strTokenize strToken (logging.getValue (), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
 
-         std::string destination = strToken.getToken(1);
+         _logDestination = strToken.getToken(1);
 
          std::string level = strToken.getToken(2);
+
          if ("verbose" == level)
          {
-            _logLevel = LOG_VERBOSE;
             _logMask  = LOGMASK_VERBOSE;
          }
          else if ("full" == level)
          {
-            _logLevel = LOG_FULL;
             _logMask  = LOGMASK_FULL;
          }
-         else  // default to standard
+         else if ("standard" == level || level.size() == 0) // default to standard
          {
-            _logLevel = LOG_STANDARD;
             _logMask  = LOGMASK_STANDARD;
          }
-
-         std::string mask = strToken.getToken (3); 
-         if (mask.size() > 0)
+         else
          {
-            _logMask = strtoul (mask.c_str(), NULL, 0);
+            _logMask = strtoul (level.c_str(), NULL, 0);
          }
+      }
 
-         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, destination);
-      }
-      else
-      {
-         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, "none");   // other fields initialzed in ctor arguments
-      }
+      _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, _logDestination);    // 0 is the childID, in server and upload mode
 
       Log ("%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
@@ -1428,6 +1420,9 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
 
 int geneTorrent::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
+   CPLog::delete_globallog();
+   _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, _logDestination, childID);
+
    libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (torrentSession);
    bindSession (torrentSession);
@@ -1954,6 +1949,9 @@ std::cerr << "HAVE ERROR ENTRY in geneTorrent::processStatusNotification" << std
       } break;
    }   
 }
+
+// void geneTorrent::
+
 
 void geneTorrent::performTorrentUpload ()
 {

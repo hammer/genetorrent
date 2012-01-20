@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <iostream>
+#include <sstream>
 
 #include "gtLog.h" 
 
@@ -36,10 +37,10 @@ inline const char *filebase(const char *file)
    return filebase;
 }
 
-bool CPLog::create_globallog(std::string progName, std::string log) 
+bool CPLog::create_globallog(std::string progName, std::string log, int childID) 
 {
    if (GlobalLog == NULL)
-      GlobalLog = new CPLog(progName, log);
+      GlobalLog = new CPLog(progName, log, childID);
 
    s_global_refcnt++;
 
@@ -55,7 +56,7 @@ void CPLog::delete_globallog()
    }
 }
 
-CPLog::CPLog (std::string progName, std::string log) : m_mode (CPLogOutputNone), m_fd (0), m_last_timestamp (0)
+CPLog::CPLog (std::string progName, std::string log, int childID) : m_mode (CPLogOutputNone), m_fd (0), m_last_timestamp (0)
 {
    time_t clocktime;
    
@@ -82,6 +83,26 @@ CPLog::CPLog (std::string progName, std::string log) : m_mode (CPLogOutputNone),
    }
    else 
    {
+      if (childID > 0)
+      {
+         std::ostringstream outbuff;
+         std::string work=m_filename;
+         free (m_filename);
+
+         size_t pos = work.rfind ('.');
+  
+         if (std::string::npos != pos)
+         {
+            outbuff << work.substr(0,pos-1) << '.' << childID << work.substr(pos);
+         }
+         else
+         {
+            outbuff << work << '.' << childID;
+         }
+
+         m_filename = strndup (outbuff.str().c_str(), outbuff.str().size());
+      }
+
       m_fd = fopen(m_filename, "w");
       if (m_fd == NULL) 
       {
