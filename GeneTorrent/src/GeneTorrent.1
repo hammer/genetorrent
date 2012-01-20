@@ -87,6 +87,11 @@ passing a .gto file to the -d option.  The full or relative path to
 the file containing the access credentials (security token) previously
 received from the repository.
 .TP
+.BI \-C " confdir" "\fR,\fP \-\^\-confDir" " confdir"
+Specify an absolute path to the GeneTorrent configuration directory.
+This directory should contain \fBGeneTorrent.openssl.conf\fP and
+\fBdhparam.pem\fP.
+.TP
 .BI \-e " address" "\fR,\fP \-\^\-advertisedIP" " address"
 The IP address to advertise to the transactor.  This option is useful
 when this actor is running behind a NAT firewall and the publicly
@@ -111,10 +116,14 @@ used.  If an endPort is not specified, 9 ports will be configured, so
 .IR endPort " = " startPort " + 8."
 The default is to use ports 20892 through 20900.
 .TP
-.BI \-C " confdir" "\fR,\fP \-\^\-confDir" " confdir"
-Specify an absolute path to the GeneTorrent configuration directory.
-This directory should contain \fBGeneTorrent.openssl.conf\fP and
-\fBdhparam.pem\fP.
+.BI \-l " destination\fR[:\fPverbosity\fR]\fP" "\fR,\fP \-\^\-logging" " destination\fR[:\fPverbosity\fR]\fP"
+Specifies the destination of a log file and a verbosity level.
+Possible values for the destination include "none", "stdout",
+"stderr", "syslog", or a filename; the log output will be directed to
+the destination specified.  Possible values for verbosity include (in
+order of increasing volume of messages) "standard", "verbose", or
+"full"; standard is the default.  The default behavior is no logging
+if this parameter is not specified.
 .TP
 .BR \-v ", " \-\^\-verbose
 Verbose progress reporting to stdout.  By default GeneTorrent offers
