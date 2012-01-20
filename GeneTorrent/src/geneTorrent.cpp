@@ -70,6 +70,7 @@
 #include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
+#include "loggingmask.h"
 
 // Work around to disable SSL compression on Centos 5.5
 #ifndef SSL_OP_NO_COMPRESSION
@@ -125,6 +126,8 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    _activeSessions (), 
    _tmpDir (""), 
    _confDir (CONF_DIR_DEFAULT), 
+   _logLevel (LOG_STANDARD),
+   _logMask (0),                 // set all bits to 0
    _logToStdErr (false),
    _startUpComplete (false), 
    _devMode (false) 
@@ -295,18 +298,37 @@ geneTorrent::geneTorrent (int argc, char **argv) :
       if (logging.isSet())
       {
          strTokenize strToken (logging.getValue (), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+
          std::string destination = strToken.getToken(1);
-         int level = strtol (strToken.getToken(2).c_str(),NULL, 10);
-         std::string mask= strToken.getToken (3); 
+
+         std::string level = strToken.getToken(2);
+         if ("verbose" == level)
+         {
+            _logLevel = LOG_VERBOSE;
+            _logMask  = LOGMASK_VERBOSE;
+         }
+         else if ("full" == level)
+         {
+            _logLevel = LOG_FULL;
+            _logMask  = LOGMASK_FULL;
+         }
+         else  // default to standard
+         {
+            _logLevel = LOG_STANDARD;
+            _logMask  = LOGMASK_STANDARD;
+         }
+
+         std::string mask = strToken.getToken (3); 
+         if (mask.size() > 0)
+         {
+            _logMask = strtoul (mask.c_str(), NULL, 0);
+         }
 
          _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, destination);
-std::cerr << "DJN process logging Tokens HERE" << std::endl;
       }
       else
       {
-         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, "none");
-         _logLevel = LOG_NONE;
-         _logMask =0;  // set all bits to 0, even though this won't get used
+         _logToStdErr = CPLog::create_globallog (PACKAGE_NAME, "none");   // other fields initialzed in ctor arguments
       }
 
       Log ("%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
@@ -583,7 +605,7 @@ geneTorrent::~geneTorrent ()
 {
 }
 
-void geneTorrent::prepareDownloadList ()
+void geneTorrent::prepareDownloadList (std::string startDirectory)
 {
    vectOfStr urisToDownload; // This list of URIs is used to download .gto files.
 
@@ -597,20 +619,29 @@ void geneTorrent::prepareDownloadList ()
       if (inspect.size () > 4)
       {
          std::string tail = inspect.substr (inspect.size () - 4);
+
          if (tail == GTO_FILE_EXTENSION) // have an existing .gto
          {
             if (inspect[0] == '/') // presume a full path is present
             {
-               _torrentListToDownload.push_back (getWorkingDirectory () + "/" + inspect);
+               _torrentListToDownload.push_back (inspect);
             }
             else
             {
-               _torrentListToDownload.push_back (getWorkingDirectory () + "/" + inspect);
+               _torrentListToDownload.push_back (startDirectory + "/" + inspect);
             }
          }
          else if (tail == ".xml" || tail == ".XML") // Extract a list of URIs from passed XML
          {
-            extractURIsFromXML (inspect, urisToDownload);
+            if (inspect[0] == '/') // presume a full path is present
+            {
+               extractURIsFromXML (inspect, urisToDownload);
+            }
+            else
+            {
+               extractURIsFromXML (startDirectory + "/" + inspect, urisToDownload);
+            }
+            
          }
          else if (std::string::npos != inspect.find ("/")) // Have a URI, add the token later if needed.
          {
@@ -1022,7 +1053,7 @@ void geneTorrent::run ()
             }
          }
 
-         prepareDownloadList ();
+         prepareDownloadList (saveDir);
 
          uint64_t totalBytes; 
          int totalFiles;
@@ -1512,6 +1543,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
    }
 
 
+   checkAlerts (torrentSession);
    torrentSession.remove_torrent (torrentHandle);
 
     // Note that remove_torrent does at least two things asynchronously: 1) it
@@ -1534,7 +1566,8 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
     // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
     // the two events mentioned above.
 
-    sleep(5);
+   sleep(5);
+   checkAlerts (torrentSession);
 
    exit (0);
 }
@@ -1548,7 +1581,7 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
 
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {
-      // Leaving this code in for now -- it existed prior to using alerts for logging
+      // Leaving this code in for now -- it existed prior to using alerts for logging, this needs to be fixed with a dns loookup at startup to verify the tracker is resolvable.
       if (((*dequeIter)->category() & libtorrent::alert::tracker_notification) && ((*dequeIter)->category() & libtorrent::alert::error_notification))
       {
          libtorrent::tracker_error_alert *tea = libtorrent::alert_cast<libtorrent::tracker_error_alert> (*dequeIter);
@@ -1574,97 +1607,78 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
                         rss_notification = 0x1000,
 */
 
-/*
+// DJN remove
 if (haveError)
    std::cerr << "haveError!" << std::endl;
-*/
 
-//std::cerr << "(*dequeIter)->category() = " << (*dequeIter)->category() << std::endl;
       switch ((*dequeIter)->category() & ~libtorrent::alert::error_notification)
       {
          case libtorrent::alert::peer_notification:
          {
             processPeerNotification (haveError, *dequeIter);
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
          } break;
 
          case libtorrent::alert::storage_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processStorageNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::tracker_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processTrackerNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::debug_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processDebugNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::status_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processStatusNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::progress_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processProgressNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::ip_block_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processIpBlockNotification (haveError, *dequeIter);
          } break;
 
          case libtorrent::alert::performance_warning:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processPerformanceWarning (haveError, *dequeIter);
          } break;
 
-/*
-         case libtorrent::alert::dht_notification:
-         {
-Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
-         } break;
-*/
          case libtorrent::alert::stats_notification:
          {
-//Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
-//std::cerr << std::hex << (*dequeIter)->category() << std::endl;
+            processStatNotification (haveError, *dequeIter);
          } break;
-/*
-         case libtorrent::alert::rss_notification:
-         {
+
+/* DJN   {
 Log ("alert category (%08x) encountered in alert processing", (*dequeIter)->category());
 //std::cerr << std::hex << (*dequeIter)->category() << std::endl;
          } break;
 */
+         case libtorrent::alert::dht_notification:
+         case libtorrent::alert::rss_notification:
          default:
          {
-            Log ("Unknown alert category %08x encountered in alert processing", (*dequeIter)->category());
+            Log ("Unknown alert category %08x encountered in category processing (what:  %s, message:  %s)", (*dequeIter)->category(), (*dequeIter)->what(), (*dequeIter)->message().c_str());
          } break;
-      }   
+      }
    }
    alerts.clear();
 }
 
 void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *alrt)
 {
-std::cerr << "in geneTorrent::processPeerNotification" << std::endl;
    if (haveError)
    {
-std::cerr << "HAVE LOG ENTRY" << std::endl;
+std::cerr << "HAVE ERROR ENTRY" << std::endl;
       libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
       Log ("%s", pea->message().c_str()); 
       return;
@@ -1680,10 +1694,256 @@ std::cerr << "HAVE LOG ENTRY" << std::endl;
 
       default:
       {
-         Log ("DJN:  unknown alert %s received", alrt->what());
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
       } break;
    }   
    
+}
+
+void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY processDebugNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      case libtorrent::peer_connect_alert::alert_type:
+      {
+         if (!(_logMask & LOG_OUTGOING_CONNECTION))
+         {
+            break;
+         }
+
+         libtorrent::peer_connect_alert *pca =  libtorrent::alert_cast<libtorrent::peer_connect_alert> (alrt);
+
+         std::string gtoName;
+         std::string infoHash;
+         std::string peerIPport; 
+         std::string peerID;
+
+         if (pca->handle.is_valid())
+         {
+            gtoName = pca->handle.name();
+            char msg[41];
+            libtorrent::to_hex((char const*)&(pca->handle).info_hash()[0], 20, msg);
+            infoHash = msg;
+
+         }
+         else
+         {
+            gtoName = "invalid torrent handle";
+            infoHash = "invalid torrent handle";
+         }
+
+         libtorrent::error_code ec;
+
+         Log ("DJN:  connecting to %s:%d (peerID %s), gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), pca->pid.to_string().c_str(), gtoName.c_str(), infoHash.c_str());
+      } break;
+
+      case libtorrent::peer_disconnected_alert::alert_type:
+      {
+         if (!(_logMask & LOG_DISCONNECT))
+         {
+            break;
+         }
+
+         libtorrent::peer_disconnected_alert *pda =  libtorrent::alert_cast<libtorrent::peer_disconnected_alert> (alrt);
+
+         std::string gtoName;
+         std::string infoHash;
+         std::string peerIPport; 
+         std::string peerID;
+
+         if (pda->handle.is_valid())
+         {
+            gtoName = pda->handle.name();
+            char msg[41];
+            libtorrent::to_hex((char const*)&(pda->handle).info_hash()[0], 20, msg);
+            infoHash = msg;
+
+         }
+         else
+         {
+            gtoName = "invalid torrent handle";
+            infoHash = "invalid torrent handle";
+         }
+
+         libtorrent::error_code ec;
+         Log ("DJN:  disconnecting from %s:%d (peerID %s), reason: %s, gto: %s, infohash: %s", pda->ip.address().to_string(ec).c_str(), pda->ip.port(), pda->pid.to_string().c_str(), pda->error.message().c_str(), gtoName.c_str(), infoHash.c_str());
+      } break;
+
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+
+void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processStorageNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processStatNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processPerformanceWarning" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processIpBlockNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processIpBlockNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processProgressNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processProgressNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processTrackerNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processTrackerNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
+}
+
+void geneTorrent::processStatusNotification (bool haveError, libtorrent::alert *alrt)
+{
+   if (haveError)
+   {
+std::cerr << "HAVE ERROR ENTRY in geneTorrent::processStatusNotification" << std::endl;
+//      libtorrent::peer_error_alert *pea = libtorrent::alert_cast<libtorrent::peer_error_alert> (alrt);
+//      Log ("%s", pea->message().c_str()); 
+      return;
+   }
+
+   switch (alrt->type())
+   {
+      default:
+      {
+         if (_logMask & LOG_UNDEFINED)
+         {
+            Log ("Unknown alert category %08x encountered in alert processing (what:  %s, message:  %s)", alrt->category(), alrt->what(), alrt->message().c_str());
+         }
+      } break;
+   }   
 }
 
 void geneTorrent::performTorrentUpload ()

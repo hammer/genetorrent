@@ -61,7 +61,7 @@
 class geneTorrent
 {
    typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
-   typedef enum logLevelValue_ {LOG_NONE = 10, LOG_MINIMAL, LOG_NOMINAL, LOG_VERBOSE} logLevelValue;
+   typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
    typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2, VERBOSE_3, VERBOSE_4} verboseLevels;
                             // VERBOSE_1:  Operation Progress Displayed on Screen
                             // VERBOSE_2:  low volume debugging
@@ -149,7 +149,7 @@ class geneTorrent
       std::string _gtOpenSslConf;
 
       logLevelValue _logLevel;     // Level of logging active
-      uint32_t      _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
+      uint64_t      _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
       bool          _logToStdErr;  // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
 
       bool _startUpComplete;
@@ -167,7 +167,7 @@ class geneTorrent
       std::string getWorkingDirectory();
       void performGtoUpload (std::string torrentFileName);
       bool verifyDataFilesExist (vectOfStr &);
-      void prepareDownloadList ();
+      void prepareDownloadList (std::string);
       void runServerMode(); 
       void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
 
@@ -219,6 +219,14 @@ class geneTorrent
       time_t getExpirationTime (std::string torrentPathAndFileName);
 
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
+      void processDebugNotification (bool haveError, libtorrent::alert *alrt);
+      void processStorageNotification(bool, libtorrent::alert*);
+      void processStatNotification(bool, libtorrent::alert*);
+      void processPerformanceWarning(bool, libtorrent::alert*);
+      void processIpBlockNotification(bool, libtorrent::alert*);
+      void processProgressNotification(bool, libtorrent::alert*);
+      void processTrackerNotification(bool, libtorrent::alert*);
+      void processStatusNotification(bool, libtorrent::alert*);
 
       libtorrent::fingerprint *_gtFingerPrint;
 };
