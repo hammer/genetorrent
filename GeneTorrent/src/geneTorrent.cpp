@@ -669,7 +669,7 @@ void geneTorrent::gtError (std::string errorMessage, int exitValue, gtErrorType 
    }
    else  // exitValue or ERROR_NO_EXIT = -1, the caller handles the error and this permits syslogging only
    {
-      logMessage << "Error:  " << errorMessage;
+      logMessage << errorMessage;
    }
 
    if (errorMessageLine2.size () > 0)
@@ -1497,8 +1497,8 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
 
       while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished && libtorrent::time_now() < endMonitoring)
       {
-         usleep(50000);
          checkAlerts (torrentSession);
+         usleep(ALERT_CHECK_PAUSE_INTERVAL);
          currentState = torrentHandle.status().state;
       }
 
@@ -2371,7 +2371,24 @@ void geneTorrent::runServerMode ()
          continue;  // completed a maintenance cycle, skip the 2 second sleep cycle
       }
 
-      usleep (2000000);
+      processServerModeAlerts();
+   }
+}
+
+void geneTorrent::processServerModeAlerts ()
+{
+   libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (2000000);  // 2 seconds
+
+   while (libtorrent::time_now() < endMonitoring)
+   {
+      std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
+      while (listIter != _activeSessions.end ())
+      {
+         checkAlerts (*(*listIter)->torrentSession);
+         listIter++;
+      }
+
+      usleep(ALERT_CHECK_PAUSE_INTERVAL);
    }
 }
 
@@ -2625,7 +2642,7 @@ void geneTorrent::deleteGTOfromQueue (std::string fileName)
 
 libtorrent::session *geneTorrent::addActiveSession ()
 {
-   libtorrent::session *sessionNew = new libtorrent::session (*_gtFingerPrint, 0);
+   libtorrent::session *sessionNew = new libtorrent::session (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (sessionNew);
    bindSession (sessionNew);
 
@@ -2868,7 +2885,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
       screenOutput ("Sending " << torrentFileName); 
    }
 
-   libtorrent::session torrentSession (*_gtFingerPrint, 0);
+   libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (torrentSession);
    bindSession (torrentSession);
 
@@ -2960,8 +2977,16 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
             screenOutput (str);
          }
       }
-      sleep (5);
+
+      libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (5000000);  // 5 seconds
+
+      while (libtorrent::time_now() < endMonitoring)
+      {
+         checkAlerts (torrentSession);
+         usleep(ALERT_CHECK_PAUSE_INTERVAL);
+      }
    }
+   checkAlerts (torrentSession);
 }
 
 // do not include files that are not present in _filesToUpload

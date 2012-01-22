@@ -48,10 +48,11 @@ const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
 
-const long UNKNOWN_HTTP_HEADER_CODE = 987654321;        // arbitrary number
 const int NO_EXIT = 0;
 const int ERROR_NO_EXIT = -1;
-const int SLEEP_INTERVAL = 4000000;    // in usec
+const long UNKNOWN_HTTP_HEADER_CODE = 987654321;     // arbitrary number
+const int ALERT_CHECK_PAUSE_INTERVAL = 50000;        // in useconds
+// const int SLEEP_INTERVAL = 4000000;    // in usec
 
 const int64_t DISK_FREE_WARN_LEVEL = 1000 * 1000 * 1000;  // 1 GB, aka 10^9
 

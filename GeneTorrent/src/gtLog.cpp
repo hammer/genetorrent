@@ -185,10 +185,13 @@ gtLogger::~gtLogger()
 
 void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt, ...)
 {
-   va_list ap;
    if (true == priority && ( m_mode == gtLoggerOutputNone || m_mode == gtLoggerOutputSyslog || m_mode == gtLoggerOutputFile))
    {
-      __ErrMsg (std::string ("Error:  " + std::string(fmt)).c_str(), ap);
+      std::string format = "Error:  " + std::string(fmt) + "\n";
+      va_list ap;
+      va_start (ap, format.c_str());
+      vfprintf(stderr, format.c_str(), ap);
+      va_end(ap);
    }
 
    if (m_mode == gtLoggerOutputNone) 
@@ -228,6 +231,7 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
       }
    }
 
+   va_list ap;
    va_start (ap, fmt);
 
    if (m_mode != gtLoggerOutputSyslog && m_fd != NULL)
@@ -249,16 +253,16 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
    }
 }
 
-void gtLogger::__ErrMsg (const char *fmt, ...)
+/*
+void gtLogger::__ErrMsg (const char *fmt, va_list ap)
 {
    va_list ap;
 
    va_start (ap, fmt);
-   vfprintf(stderr, fmt, ap);
 
    va_end(ap);
 }
-
+*/
 
 // Save this code for future use
 

@@ -166,6 +166,7 @@ class geneTorrent
       bool verifyDataFilesExist (vectOfStr &);
       void prepareDownloadList (std::string);
       void runServerMode(); 
+      void processServerModeAlerts();
       void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
 
       void servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents);
