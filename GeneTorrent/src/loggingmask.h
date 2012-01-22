@@ -1,7 +1,7 @@
 /*                                           -*- mode: c++; tab-width: 2; -*-
  * $Id$
  *
- * Copyright (c) 2011, Annai Systems, Inc.
+ * Copyright (c) 2012, Annai Systems, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -117,16 +117,16 @@ const uint64_t LOG_DISCONNECT                 = 0x0000000000000002;
 
 // const uint64_t VARIABLE                    = 0x1000000000000000;
 // const uint64_t VARIABLE                    = 0x2000000000000000;
-// const uint64_t VARIABLE                    = 0x4000000000000000;
 
-const uint64_t LOG_UNDEFINED                  = 0x8000000000000000;          // Unknown notification types in all notification handling functions
+const uint64_t LOG_LT_CALL_BACK_LOGGER        = 0x4000000000000000;          // Messasge from the libtorrent minimal call back logger
+const uint64_t LOG_UNIMPLEMENTED_ALERTS       = 0x8000000000000000;          // Unknown notification types in all notification handling functions
 
 // These define the 3 logging levels offered via the command line.
 
 const uint64_t LOGMASK_STANDARD = LOG_OUTGOING_CONNECTION | LOG_DISCONNECT;
 
-const uint64_t LOGMASK_VERBOSE = LOGMASK_STANDARD;
+const uint64_t LOGMASK_VERBOSE = LOGMASK_STANDARD | LOG_LT_CALL_BACK_LOGGER;
 
-const uint64_t LOGMASK_FULL = LOGMASK_VERBOSE | LOG_UNDEFINED;
+const uint64_t LOGMASK_FULL = LOGMASK_VERBOSE | LOG_UNIMPLEMENTED_ALERTS;
 
 #endif

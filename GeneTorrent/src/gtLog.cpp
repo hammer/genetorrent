@@ -1,10 +1,39 @@
+/*                                           -*- mode: c++; tab-width: 2; -*-
+ * $Id$
+ *
+ * Copyright (c) 2012, Annai Systems, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE
+ *
+ * Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
+ */
+
 /*
- * A simple way to log debugging output
+ * gtLog.cpp
  *
- * Author: Howdy Pierce, howdy@cardinalpeak.com
- *
- * Copyright (c) 2002, 2004-2005, Cardinal Peak, LLC
- *   http://www.cardinalpeak.com
+ *  Created on: January 19, 2012
+ *      Author: donavan
  */
 
 #include "config.h"
@@ -23,8 +52,8 @@
 
 #include "gtLog.h" 
 
-CPLog *GlobalLog = NULL;
-int CPLog::s_global_refcnt = 0;
+gtLogger *GlobalLog = NULL;
+int gtLogger::s_global_refcnt = 0;
 
 inline const char *filebase(const char *file)
 {
@@ -37,17 +66,17 @@ inline const char *filebase(const char *file)
    return filebase;
 }
 
-bool CPLog::create_globallog(std::string progName, std::string log, int childID) 
+bool gtLogger::create_globallog(std::string progName, std::string log, int childID) 
 {
    if (GlobalLog == NULL)
-      GlobalLog = new CPLog(progName, log, childID);
+      GlobalLog = new gtLogger(progName, log, childID);
 
    s_global_refcnt++;
 
    return GlobalLog->logToStdErr();
 }
 
-void CPLog::delete_globallog()
+void gtLogger::delete_globallog()
 {
    if (--s_global_refcnt == 0) 
    {
@@ -56,34 +85,39 @@ void CPLog::delete_globallog()
    }
 }
 
-CPLog::CPLog (std::string progName, std::string log, int childID) : m_mode (CPLogOutputNone), m_fd (0), m_last_timestamp (0)
+// priority determines if messages are sent to stderr if logging to a file, syslog, or none
+gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode (gtLoggerOutputNone), m_fd (NULL), m_last_timestamp (0)
 {
    time_t clocktime;
-   
+  
+   m_progname = strdup (progName.c_str());
    m_filename = strdup (log.c_str());
 
-   // m_filename is one of "none", "syslog", "stdout", "stderr", or filename
+   // m_filename is one of "none", "syslog", "stdout", "stderr", or a filename
    if (!strcmp(m_filename, "none")) 
    {
-      m_mode = CPLogOutputNone;
+      m_mode = gtLoggerOutputNone;
    } 
    else if (!strcmp(m_filename, "stdout")) 
    {
       m_fd = stdout;
-      m_mode = CPLogOutputStdout;
+      m_mode = gtLoggerOutputStdout;
    } 
    else if (!strcmp(m_filename, "stderr")) 
    {
       m_fd = stderr;
-      m_mode = CPLogOutputStderr;
+      m_mode = gtLoggerOutputStderr;
    }
    else if (!strcmp(m_filename, "syslog")) 
    {
-      m_mode = CPLogOutputSyslog;
+      m_mode = gtLoggerOutputSyslog;
    }
    else 
    {
-      if (childID > 0)
+      // GeneTorrent Download child processes have their own log, childID is inserted after the last dot (.) in the specified filename
+      // or the childID is appended to the file name if no dot (.) is present in the filename.
+      // The parent download process sends output to filename
+      if (childID > 0)   
       {
          std::ostringstream outbuff;
          std::string work=m_filename;
@@ -93,7 +127,7 @@ CPLog::CPLog (std::string progName, std::string log, int childID) : m_mode (CPLo
   
          if (std::string::npos != pos)
          {
-            outbuff << work.substr(0,pos-1) << '.' << childID << work.substr(pos);
+            outbuff << work.substr(0,pos) << '.' << childID << work.substr(pos);
          }
          else
          {
@@ -106,18 +140,18 @@ CPLog::CPLog (std::string progName, std::string log, int childID) : m_mode (CPLo
       m_fd = fopen(m_filename, "w");
       if (m_fd == NULL) 
       {
-         m_mode = CPLogOutputNone;
+         m_mode = gtLoggerOutputNone;
          fprintf(stderr, "Error opening log file %s\n", m_filename);
          fprintf(stderr, "Error %s\n", strerror(errno));
          exit(1);
       }
 
-      m_mode = CPLogOutputFile;
+      m_mode = gtLoggerOutputFile;
    }
 
    time(&clocktime);
 
-   if (m_mode == CPLogOutputFile) 
+   if (m_mode == gtLoggerOutputFile) 
    {
       //assert(m_fd == NULL);
       // Write a log header
@@ -128,17 +162,18 @@ CPLog::CPLog (std::string progName, std::string log, int childID) : m_mode (CPLo
    }
 }
 
-CPLog::~CPLog()
+gtLogger::~gtLogger()
 {
    time_t clocktime;
 
    // Write a log footer
-   if (m_mode == CPLogOutputFile) 
+   if (m_mode == gtLoggerOutputFile) 
    {
       fputs("=============================================================\n", m_fd);
       time(&clocktime);
       fprintf(m_fd, "Log file closed normally at %s", ctime(&clocktime));
       fclose(m_fd);
+      m_fd = NULL;
    }
 
    free(m_filename);
@@ -148,15 +183,20 @@ CPLog::~CPLog()
       GlobalLog = NULL;
 }
 
-void CPLog::__Log (const char *file, int line, const char *fmt, ...)
+void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt, ...)
 {
-   if (m_mode == CPLogOutputNone) 
+   va_list ap;
+   if (true == priority && ( m_mode == gtLoggerOutputNone || m_mode == gtLoggerOutputSyslog || m_mode == gtLoggerOutputFile))
+   {
+      __ErrMsg (std::string ("Error:  " + std::string(fmt)).c_str(), ap);
+   }
+
+   if (m_mode == gtLoggerOutputNone) 
       return;
 
-   va_list ap;
    char buffer[1024];
 
-   if (m_mode != CPLogOutputSyslog) 
+   if (m_mode != gtLoggerOutputSyslog) 
    {
       char timebuf[1024];
       struct timeval now;
@@ -167,16 +207,30 @@ void CPLog::__Log (const char *file, int line, const char *fmt, ...)
       localtime_r(&nowSec, &time_tm);
       strftime(timebuf, sizeof(timebuf), "%m/%d %H:%M:%S", &time_tm);
 
-      snprintf(buffer, sizeof(buffer), "%s.%03d %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+      if (priority)
+      {
+          snprintf(buffer, sizeof(buffer), "%s.%03d Error:  %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+      }
+      else
+      {
+          snprintf(buffer, sizeof(buffer), "%s.%03d %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+      }
    }
    else
    {
-      snprintf(buffer, sizeof(buffer), "%s", fmt);
+      if (priority)
+      {
+         snprintf(buffer, sizeof(buffer), "Error:  %s", fmt);
+      }
+      else
+      {
+         snprintf(buffer, sizeof(buffer), "%s", fmt);
+      }
    }
 
    va_start (ap, fmt);
 
-   if (m_mode != CPLogOutputSyslog && m_fd > 0)
+   if (m_mode != gtLoggerOutputSyslog && m_fd != NULL)
    {
       vfprintf(m_fd, buffer, ap);
    }
@@ -189,14 +243,28 @@ void CPLog::__Log (const char *file, int line, const char *fmt, ...)
 
    va_end(ap);
 
-   if (m_mode != CPLogOutputSyslog && m_fd > 0)
+   if (m_mode != gtLoggerOutputSyslog && m_fd != NULL)
    {
       fflush(m_fd);
    }
 }
 
+void gtLogger::__ErrMsg (const char *fmt, ...)
+{
+   va_list ap;
+
+   va_start (ap, fmt);
+   vfprintf(stderr, fmt, ap);
+
+   va_end(ap);
+}
+
+
+// Save this code for future use
+
+
 /*
-void CPLog::__Fatal (const char *file, int line, const char *pretty_function, const char *fmt, ...)
+void gtLogger::__Fatal (const char *file, int line, const char *pretty_function, const char *fmt, ...)
 {
    va_list ap;
    char buffer[1024];
@@ -204,7 +272,7 @@ void CPLog::__Fatal (const char *file, int line, const char *pretty_function, co
    time_t clocktime;
    OutputType mode = m_mode;
 
-   m_mode = CPLogOutputNone;
+   m_mode = gtLoggerOutputNone;
 
    va_start (ap, fmt);
    snprintf(buffer, sizeof(buffer), "%08x %s:%d: %s", (unsigned)pthread_self(), filebase(file), line, fmt);
@@ -212,7 +280,7 @@ void CPLog::__Fatal (const char *file, int line, const char *pretty_function, co
    va_end(ap);
 
    // Log to m_fd if that makes sense
-   if (mode == CPLogOutputStdout || mode == CPLogOutputFile) 
+   if (mode == gtLoggerOutputStdout || mode == CPLogOutputFile) 
    {
       fprintf(m_fd, "==================== FATAL ERROR ====================\n");
       fprintf(m_fd, errstring);
@@ -221,7 +289,7 @@ void CPLog::__Fatal (const char *file, int line, const char *pretty_function, co
       fprintf(m_fd, "Log file closed abnormally at %s", ctime(&clocktime));
       fflush(m_fd);
 
-      if (mode == CPLogOutputFile) 
+      if (mode == gtLoggerOutputFile) 
       {
          fclose(m_fd);
          m_fd = NULL;
@@ -229,7 +297,7 @@ void CPLog::__Fatal (const char *file, int line, const char *pretty_function, co
    }
 
    // Log to stderr if that makes sense
-   if (mode == CPLogOutputNone || mode == CPLogOutputFile) 
+   if (mode == gtLoggerOutputNone || mode == CPLogOutputFile) 
    {
       fprintf(stderr, "%s: fatal error: %s\n", m_progname, errstring);
    }
@@ -239,7 +307,7 @@ void CPLog::__Fatal (const char *file, int line, const char *pretty_function, co
 */
 
 /*
-void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_function, const char *assertion, const char *fmt, ...)
+void gtLogger::__Assert (bool expr, const char *file, int line, const char *pretty_function, const char *assertion, const char *fmt, ...)
 {
    va_list ap;
    char buffer[1024];
@@ -250,7 +318,7 @@ void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_
    if (expr)
       return;
 
-   m_mode = CPLogOutputNone;
+   m_mode = gtLoggerOutputNone;
 
    va_start (ap, fmt);
    snprintf(buffer, sizeof(buffer), "%08x %s:%d: %s", (unsigned)pthread_self(), filebase(file), line, fmt);
@@ -258,7 +326,7 @@ void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_
    va_end(ap);
 
    // Log to m_fd if that makes sense
-   if (mode == CPLogOutputStdout || mode == CPLogOutputFile) 
+   if (mode == gtLoggerOutputStdout || mode == CPLogOutputFile) 
    {
       fprintf(m_fd, "================== FAILED ASSERTION ==================\n");
 
@@ -273,7 +341,7 @@ void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_
 
       fflush(m_fd);
 
-      if (mode == CPLogOutputFile) 
+      if (mode == gtLoggerOutputFile) 
       {
          fclose(m_fd);
          m_fd = NULL;
@@ -281,7 +349,7 @@ void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_
    }
 
    // Log to stderr if that makes sense
-   if (mode == CPLogOutputNone || mode == CPLogOutputFile) 
+   if (mode == gtLoggerOutputNone || mode == CPLogOutputFile) 
    {
       fprintf(stderr, "%s: failed assertion: %s\n", m_progname, assertion);
       fprintf(stderr, "%s\n", errstring);
@@ -292,12 +360,12 @@ void CPLog::__Assert (bool expr, const char *file, int line, const char *pretty_
 */
 
 /*
-void CPLog::__Backtrace(int depth, const char * file, int line)
+void gtLogger::__Backtrace(int depth, const char * file, int line)
 {
 #ifdef HAVE_BACKTRACE
 
 #define BACKTRACE_DEPTH 20
-   if (m_mode == CPLogOutputNone) 
+   if (m_mode == gtLoggerOutputNone) 
       return;
 
    depth++;  // We remove ourselves from the backtrace output
@@ -326,12 +394,12 @@ void CPLog::__Backtrace(int depth, const char * file, int line)
 */
 
 /*
-void CPLog::__Timestamp  (const char *file, int line, const char *pretty_function)
+void gtLogger::__Timestamp  (const char *file, int line, const char *pretty_function)
 {
    struct timeval tv;
    int64_t this_timestamp;
 
-   if (m_mode == CPLogOutputNone) 
+   if (m_mode == gtLoggerOutputNone) 
       return;
 
    gettimeofday(&tv, NULL);
@@ -344,17 +412,3 @@ void CPLog::__Timestamp  (const char *file, int line, const char *pretty_functio
 }
 */
 
-/*
-std::string CPLog::__ErrMsg (const char *file, int line, const char *fmt, ...)
-{
-   va_list ap;
-   char buffer[4098];
-
-   va_start (ap, fmt);
-   vsnprintf(buffer, sizeof(buffer), fmt, ap);
-
-   __Log(file, line, "ErrMsg: %s\n", buffer);
-
-   return buffer;
-}
-*/

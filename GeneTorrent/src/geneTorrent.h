@@ -1,7 +1,7 @@
 /*                                           -*- mode: c++; tab-width: 2; -*-
  * $Id$
  *
- * Copyright (c) 2011, Annai Systems, Inc.
+ * Copyright (c) 2011-2012, Annai Systems, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -48,10 +48,6 @@
 #include <vector>
 
 #include <boost/filesystem/v3/path.hpp>
-
-#include <log4cpp/Category.hh>
-#include <log4cpp/PatternLayout.hh>
-#include <log4cpp/SyslogAppender.hh>
 
 #include <tclap/CmdLine.h>
 
@@ -105,6 +101,7 @@ class geneTorrent
       void run ();
       bool fileFilter (std::string const filename);
       static bool file_filter (boost::filesystem::path const& filename);
+      uint64_t getLogMask() {return _logMask;}
 
    private:
       //  Command line argument processing and variables
@@ -218,6 +215,7 @@ class geneTorrent
       void checkAlerts (libtorrent::session &torrSession);
       time_t getExpirationTime (std::string torrentPathAndFileName);
 
+      void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);
       void processStorageNotification(bool, libtorrent::alert*);
