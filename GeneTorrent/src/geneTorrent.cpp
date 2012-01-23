@@ -191,7 +191,7 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    TCLAP::MultiSwitchArg verbosity ("v", "verbose", "Description Not Used", false);
    _args.add (verbosity);
 
-   // Download mode
+// Download mode
    // Credential File
    TCLAP::ValueArg <std::string> credentialFile ("c", "credentialFile", "Description Not Used", false, "", "string"); // this implies download mode
    _args.add (credentialFile);
@@ -204,12 +204,12 @@ geneTorrent::geneTorrent (int argc, char **argv) :
    TCLAP::ValueArg <int> maxDownloadChildren ("", "maxChildren", "Description Not Used", false, 8, "int");
     _args.add (maxDownloadChildren);
 
-   // Upload mode 
+// Upload mode 
    //
    TCLAP::ValueArg <std::string> manifestFN ("u", "manifestFile", "Description Not Used", false, "", "string"); // This implies upload mode
    _args.add (manifestFN);
 
-   // Seeder mode
+// Seeder mode
    // path to queue directory
    TCLAP::ValueArg <std::string> serverQueuePath ("q", "queue", "Description Not Used", false, "", "string");
    _args.add (serverQueuePath);
@@ -324,7 +324,7 @@ geneTorrent::geneTorrent (int argc, char **argv) :
          }
       }
 
-      _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);    // 0 is the childID, in server and upload mode
+      _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
 
       Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
@@ -1100,6 +1100,7 @@ void geneTorrent::bindSession (libtorrent::session *torrentSession)
    }
 
    libtorrent::session_settings settings = torrentSession->settings ();
+
    // update the IP we bind on.  
    //
    // TODO: the listen_on function is deprecated in libtorrent, so upgrade to the newer method of doing this
@@ -1135,9 +1136,10 @@ void geneTorrent::bindSession (libtorrent::session *torrentSession)
     //
     // TODO: probably a good idea to set this in ALL modes, but for now
     // we don't want to risk introducing a new bug to server mode
-    if (_operatingMode != SERVER_MODE)
-       settings.inhibit_keepalives = true;
-
+   if (_operatingMode != SERVER_MODE)
+   { 
+      settings.inhibit_keepalives = true;
+   }
    torrentSession->set_settings (settings);
 }
 
@@ -1484,14 +1486,6 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
          }
          exit (197);
       }
-/*
-      // sleep before reporting status to parent -- monitoring the state of the torrent every 1/2 second
-      for (int i=0; i<8 && currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished; i++)
-      {
-         usleep(SLEEP_INTERVAL/8);
-         currentState = torrentHandle.status().state;
-      }
-*/
 
       libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (5000000);  // 5 seconds
 
@@ -1574,19 +1568,6 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
       }
 
       bool haveError = (*dequeIter)->category() & libtorrent::alert::error_notification;
-/*                      peer_notification = 0x2,           Want
-                        port_mapping_notification = 0x4,
-                        storage_notification = 0x8,        Want
-                        tracker_notification = 0x10,       Want
-                        debug_notification = 0x20,         Want
-                        status_notification = 0x40,        Want
-                        progress_notification = 0x80,      Want
-                        ip_block_notification = 0x100,     Want
-                        performance_warning = 0x200,       Want
-                        dht_notification = 0x400,
-                        stats_notification = 0x800,
-                        rss_notification = 0x1000,
-*/
 
       switch ((*dequeIter)->category() & ~libtorrent::alert::error_notification)
       {
@@ -1755,7 +1736,6 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
       } break;
    }   
 }
-
 
 void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert *alrt)
 {
@@ -1979,7 +1959,7 @@ void geneTorrent::findDataAndSetWorkingDirectory ()
    }
 
    if (missingFiles.size () != _filesToUpload.size ()) // only some of the files are missing, we have the correct directory, error
-   {                                                 // if all files are missing presume wrong directory and continue
+   {                                                   // if all files are missing presume wrong directory and continue
       displayMissingFilesAndExit (missingFiles);
    }
 
@@ -2382,6 +2362,7 @@ void geneTorrent::processServerModeAlerts ()
    while (libtorrent::time_now() < endMonitoring)
    {
       std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
+
       while (listIter != _activeSessions.end ())
       {
          checkAlerts (*(*listIter)->torrentSession);

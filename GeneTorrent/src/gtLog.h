@@ -55,11 +55,6 @@
 // is set to
 #define Log(b1, s1, ...) GlobalLog->__Log((b1), __FILE__, __LINE__, (s1), ## __VA_ARGS__)
 
-// Returns a string containing the result of sprintf'ing all the
-// contents together; also logs that string to debug log
-// DJNX #define ErrMsg(s1, ...) __ErrMsg(__FILE__, __LINE__, (s1), ## __VA_ARGS__)
-
-
 //  TODO, This is out of date
 // gtLogger parses the program's command line as follows:
 //
@@ -68,7 +63,7 @@
 //   created as ~/logs/(argv[0]).(timestamp).log
 // 
 //   The user can override this behavior by specifying an argument 
-//       --log=(destination) 
+//       --log destination
 //   on the command line.  In which case the following destinations
 //   are allowed:
 //      none       No log file will be created
@@ -83,66 +78,37 @@ const bool PRIORITY_NORMAL = false;
 class gtLogger 
 {
    public:
-   
-   static bool create_globallog (std::string, std::string, int childID = 0);
-   static void delete_globallog();
+      static bool create_globallog (std::string, std::string, int childID = 0);
+      static void delete_globallog();
 
-   void __Log (bool, const char *file, int line, const char *string, ...);
+      void __Log (bool, const char *file, int line, const char *string, ...);
 
-   const char *log_file_name() { return m_filename; }
-   bool logToStdErr() { return m_mode == gtLoggerOutputStderr; }
+      const char *log_file_name() { return m_filename; }
+      bool logToStdErr() { return m_mode == gtLoggerOutputStderr; }
 
    private:
-   enum OutputType 
-   { 
-      gtLoggerOutputNone,
-      gtLoggerOutputSyslog,
-      gtLoggerOutputStdout,
-      gtLoggerOutputStderr,
-      gtLoggerOutputFile, 
-   } ;
+      enum OutputType 
+      { 
+         gtLoggerOutputNone,
+         gtLoggerOutputSyslog,
+         gtLoggerOutputStdout,
+         gtLoggerOutputStderr,
+         gtLoggerOutputFile, 
+      };
 
-   gtLogger (std::string progName, std::string log, int childID);
-   ~gtLogger();
+      gtLogger (std::string progName, std::string log, int childID);
+      ~gtLogger();
 
-   static int s_global_refcnt;
+      static int s_global_refcnt;
 
-   OutputType m_mode;
-   char *m_filename;
-   char *m_progname;
-   FILE *m_fd;
+      OutputType m_mode;
+      char *m_filename;
+      char *m_progname;
+      FILE *m_fd;
 
-   int64_t m_last_timestamp;
-
-   void __ErrMsg (const char *string, ...);
+      int64_t m_last_timestamp;
 };
 
 extern gtLogger *GlobalLog;
 
 #endif
-
-// Save these prototypes for future use
-
-// Function Fatal: Just like Log, except in addition (a) the text is
-// printed to stderr, and (b) the program is terminated with a call to
-// abort()
-// DJNX #define Fatal(s1, ...) __Fatal(__FILE__, __LINE__, __PRETTY_FUNCTION__, (s1), ## __VA_ARGS__)
-
-// Function Assert: Just like the standard system assert call, except
-// on failure the failed assertion and the text string is printed to
-// stderr and the log file
-// DJNX #define Assert(expr, s1, ...) __Assert((expr), __FILE__, __LINE__, __PRETTY_FUNCTION__, __STRING(expr), (s1), ## __VA_ARGS__)
-
-// Places a backtrace of the specified depth into the log file.  Does
-// not work on all platforms (but does work on Linux)
-// DJNX #define Backtrace(depth) __Backtrace((depth), __FILE__, __LINE__)
-
-// Places a timestamp into the log file, with a delta in milliseconds
-// from the last time the Timestamp function was called
-// DJNX #define Timestamp() __Timestamp(__FILE__, __LINE__, __PRETTY_FUNCTION__)
-
-// void __Fatal      (const char *file, int line, const char *pretty_function, const char *string, ...) __attribute__ ((noreturn));
-// void __Assert     (bool expr, const char *file, int line, const char *pretty_function, const char *assertion, const char *string, ...);
-// void __Backtrace  (int depth, const char *file, int line);
-// void __Timestamp (const char *file, int line, const char *pretty_function);
-
