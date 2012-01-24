@@ -259,6 +259,8 @@ def inspect_key(data, key, params):
     if (params.raw_time is False and (key == 'creation date' or key == 'expires on')):
         # Special handling for timestamp
         return time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime(data[key])) 
+    elif (isinstance(data[key], str)):
+        return data[key]
     else:
         return repr(data[key])
 
@@ -440,7 +442,7 @@ def infohash(data):
 # - params: the command line parameters
 def is_output(params):
     retval = False
-    if (params.decode_file or params.piece_index != -1 or params.inspect_key != ""
+    if (params.decode_file or params.piece_index != -1 or params.inspect_key != None
         or params.get_expire is True or params.infohash is True):
         retval = True
     return retval
@@ -550,8 +552,9 @@ def process(params, gto_filenames):
         if (params.decode_file):
             print format(gtodict, params)
 
-        if (params.inspect_key != ""):
-            print inspect_key(gtodict, params.inspect_key, params)
+        if (params.inspect_key != None):
+            for key in params.inspect_key:
+                print inspect_key(gtodict, key, params)
 
         if (params.get_expire):
             if (not ('expires on' in gtodict)):
@@ -600,8 +603,8 @@ parser.add_option('-t', '--total-size', action='store_true',
                   default=False, dest='total_size',
                   help='Print the total size of the files, in bytes')
 
-parser.add_option('-i', '--inspect', action='store', 
-                  default="", dest='inspect_key', 
+parser.add_option('-g', '--get-key', '--inspect', action='append', 
+                  default=None, dest='inspect_key', metavar='KEY',
                   help='Print just a particular key')
 
 parser.add_option('-p', '--piece-hash', action='store', 
@@ -639,7 +642,7 @@ parser.add_option('-s', '--ssl-cert', action='store',
                   help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
 
 parser.add_option('', '--set-key', action='store', nargs=2,
-                  default=None, dest='set_key',
+                  default=None, dest='set_key', metavar='KEY VALUE',
                   help='Add or modify the specified key, setting it to value.')
 
 (params, gto_filenames) = parser.parse_args()
@@ -648,7 +651,7 @@ if (len(gto_filenames) == 0):
     parser.print_help()
     sys.exit(1)
 
-if (params.decode_file is False and params.total_size is False and params.inspect_key == ""
+if (params.decode_file is False and params.total_size is False and params.inspect_key == None
     and params.piece_index == -1 and params.announce_url == "" and params.expiry == ""
     and params.get_expire is False and params.infohash is False and params.ssl_cert == ""
     and params.set_key == None):
