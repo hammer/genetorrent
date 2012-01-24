@@ -1,0 +1,395 @@
+#!/usr/bin/python
+#
+# stress_tracker -- a tool for hammering on a tracker
+#
+################################################################################
+# 
+# Copyright 2011 Annai Systems, Inc.   All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without modification, 
+# are permitted provided that the following conditions are met:
+# 
+#    1. Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+# 
+#    2. Redistributions in binary form must reproduce the above copyright notice, 
+#       this list of conditions and the following disclaimer in the documentation 
+#       and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY ANNAI SYSTEMS ''AS IS'' AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+# OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# The views and conclusions contained in the software and documentation are those 
+# of the authors and should not be interpreted as representing official policies, 
+# either expressed or implied, of Annai Systems, Inc.
+#
+# Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
+#
+################################################################################
+
+################################################################################
+# Testing Parameters
+################################################################################
+
+# the total number of info_hashes to simulate
+num_iter = 4
+
+# the number of iterations to have outstanding at any point in time
+num_simultaneous = 2
+
+# the number of servers and clients to simulate per info_hash
+servers_per_iter = 8
+clients_per_iter = 8
+
+# the base tracker URL -- up to but not including the ?
+tracker_base = "http://8.29.11.201:21111/tracker.php/announce"
+
+# the base info_hash. this should be 15 characters; remaining 5
+# characters will be appended as ASCII digits
+base_info_hash = "GTTrackerStress"
+
+# the peer ID.  15 characters.
+base_client_peer_id = "-GT0000-tester-"
+base_server_peer_id = "-Gt0000-tester-"
+
+# the starting port.
+base_port = 20893
+
+# remainder of the tracker request
+tracker_remainder = "uploaded=0&downloaded=0&left=0&corrupt=0&redundant=0&compact=1&numwant=200&no_peer_id=1&supportcrypto=1&ip=10.1.1.1"
+
+
+################################################################################
+# Imports
+################################################################################
+import sys
+import urllib2
+import re
+import time
+import thread
+import collections
+from threading import Thread
+
+################################################################################
+# Code.  Note the bdecoding functions were lifted from gtoinfo
+################################################################################
+
+# tokenize()
+# A generator function that actually returns a tokenizer object with an 
+# inherited next() function controlling the execution of iterations.
+#
+# Inputs:
+# - text: the block of data to be tokenized (required)
+# - match: a reference to a pattern object's match() function (optional)
+#
+# FL's tokenizer() handles the 4 atomic token types defined for bencoded data:
+# - integers (decimal digits): 
+#   formatted "i<value>e" where 
+#      <value> is a string of ASCII characters 
+# - binary strings (bstrings):  
+#   formatted "<length>:<bytes>" where 
+#      <length> is a string of ASCII characters 
+#      <bytes> is a run of <length> binary octets
+# - lists (containers): 
+#   formatted "l<item>...e" where 
+#      one or more <item> members constitute the list
+#      each <item> may be any of the four token types (including lists)
+# - dicts (containers): 
+#   formatted "d<key><value>...e" where 
+#      one or more <key><value> pairs constitute the dictionary
+#      each <key> or <value> may be any of the four token types (including dicts)
+#
+# What's the weird construct in the function definition's second "input parameter"? 
+# It compiles an implicit pattern object and keeps a reference to the match() method.
+# In theory, this function could be called with an explicit reference to a different 
+# pattern's match() method, but I wouldn't try it.  I think it cannot be moved to the
+# body of the function because of re-entrancy issues with "static" generator objects.
+#
+# The regex pattern Fredrick implemented here is in the form of three alternative clauses:
+# - "([idle])" matches a bencoded integer or container token start and end characters 
+# - "(\d+):" matches the starting "<length>:" component of a bstring (no start character)
+# - "(-?\d+)" matches one or more digits, possibly preceded by a minus sign (i.e., an int) 
+#
+# Once "match" and "i" are defined, we seem to iterates over "text" calling "match", BUT...
+#
+# Iterations are actually controlled by the caller, who gets a "tokenizer" object back on 
+# the first invocation, then calls the object's inherited next() function to get another 
+# token.  See the use of src and next in the decode() and decode_item() functions below.
+#
+# In the body of the function (really, implementing the object's next() function): 
+#   m is None or a match object from the compiled pattern object's match() function; 
+#   s is the matched substring, if any; we may throw an exception here if m is "None".
+#   i is the value of the offset where the matching should start on the next go-round. 
+#   To simplify decode_item(), a bstring token is yielded in the format: "s<substring>" 
+#   All other token types are yielded as the substring returned by the m.group() method.
+#
+def tokenize(text, match=re.compile("([idle])|(\d+):|(-?\d+)").match):
+    i = 0
+    while i < len(text):
+        m = match(text, i)
+        s = m.group(m.lastindex)
+        i = m.end()
+        # create a metatoken for bstrings
+        if m.lastindex == 2:
+            yield "s"
+            yield text[i:i+int(s)]
+            i = i + int(s)
+        else:
+            yield s
+
+# decode_item()
+# This function implements logic to decode the four basic data bencode token types
+# It recursively calls the tokenizer's next() call to parse dictionaries and lists 
+#
+# Inputs: 
+# - next: a reference to the tokenizer.next() function
+# - token: the token to be decoded (i,s,d or s).
+#
+# Recursively parses the "next" tokens for containers
+# Note the conversion of a data list into a dict(zip())
+# Special GTO semantics handling is provided elsewhere
+#
+def decode_item(next, token):
+    if token == "i":
+        # integer: "i" value "e"
+        data = int(next())
+        if next() != "e":
+            raise ValueError
+    elif token == "s":
+        # string: "s" value (virtual tokens)
+        data = next()
+    elif token == "l" or token == "d":
+        # container: "l" or "d" values "e"
+        data = []
+        tok = next()
+        while tok != "e":
+            data.append(decode_item(next, tok))
+            tok = next()
+        if token == "d":
+            data = dict(zip(data[0::2], data[1::2]))
+    else:
+        raise ValueError
+    return data
+
+# decode()
+# Top-level bencode decoder logic
+#
+# Inputs:
+# - text: bencoded text
+#
+# Outputs:
+# - data: tokenized and decoded data
+def decode(text):
+    try:
+        src = tokenize(text)
+        data = decode_item(src.next, src.next())
+        for token in src: # look for more tokens
+            raise SyntaxError("Invalid GTO file")
+    except (AttributeError, ValueError, StopIteration):
+        raise SyntaxError("Invalid GTO file")
+    return data
+
+
+# send_tracker_request()
+#
+# Sends a single request to the tracker, and times the response
+#
+# Inputs:
+# - event -- the event to report, or None for no event
+# - tpe -- either "server" or "client"; the peer_id will be modified accordingly
+# - idx -- the index of this test; used to modify the info-hash and the port
+# - child_num -- the child number; used to modify the port and peer_id
+#
+# Outputs: a tuple with the following information:
+# - interval -- the interval returned from the tracker
+# - num_peers -- the number of peers returned from the tracker
+# - res_str -- a string with human-readable info about the test result
+#
+def send_tracker_request(event, tpe, idx, child_num):
+    info_hash = "%s%05d" % (base_info_hash, idx)
+    port = base_port + child_num
+
+    if (tpe == "server"):
+        peer_id = "%s%05d" % (base_server_peer_id, child_num)
+    else: 
+        peer_id = "%s%05d" % (base_client_peer_id, child_num)
+
+    start = time.time() * 1000
+    
+    if (event != None):
+        url = "%s?info_hash=%s&peer_id=%s&port=%d&event=%s&%s" % \
+            (tracker_base, info_hash, peer_id, port, event, tracker_remainder)
+    else:
+        url = "%s?info_hash=%s&peer_id=%s&port=%d&%s" % \
+            (tracker_base, info_hash, peer_id, port, tracker_remainder)
+
+    f = urllib2.urlopen(url)
+    if (f.getcode() != 200):
+        # error
+        return (0, 0, "Error %d (url=%s)" % (f.getcode(), url))
+
+    # our tracker emits \r\n prior to the response dictionary, so consume those here
+    #  (why oh why is there no do ... while construct in python)
+    c = f.read(1)
+    while ( c.isspace() ):
+        c = f.read(1)
+
+    resp = c + f.read()
+
+    f.close()
+
+    end = time.time() * 1000
+
+    respdict = decode(resp)
+    interval = respdict['interval']
+    num_peers = len(respdict['peers']) / 6
+
+    return (interval, num_peers, 
+            "event=%s interval=%d num_peers=%d msec=%d" % (event, interval, num_peers, end - start))
+
+
+# report()
+#
+# Emit a report to this thread's output_q.
+#
+# Inputs:
+# - tpe -- either "server" or "client"; the peer_id will be modified accordingly
+# - idx -- the index of this test; used to modify the info-hash and the port
+# - child_num -- the child number; used to modify the port and peer_id
+# - res_str -- the string to emit
+# - output_q -- a deque object to post our return on
+def report(tpe, idx, child_num, res_str, output_q):
+    output_q.append("Test %3d: %s %3d: %s" % (idx, tpe, child_num, res_str))
+
+
+# simulate_peer()
+#
+# Simulate a single peer (either client or server), using the
+# following algorithm:
+#    - send event=started, repeat every interval period until we get some peers
+#    - wait 1 interval
+#    - send a regular update (no event field)
+#    - wait 3 x interval (this is bad behavior, but stress tracker)
+#    - send a regular update (no event field)
+#    - wait 1 interval
+#    - send event=stopped and stop processing
+#
+# Inputs:
+# - tpe -- either "server" or "client"; the peer_id will be modified accordingly
+# - idx -- the index of this test; used to modify the info-hash and the port
+# - child_num -- the child number; used to modify the port and peer_id
+# - output_q -- a deque object to post our return on
+#
+def simulate_peer(tpe, idx, child_num, output_q):
+
+    # event=started
+    num_peers = 0
+    while (num_peers == 0):
+        (interval, num_peers, res_str) = send_tracker_request("started", tpe, idx, child_num)
+        report(tpe, idx, child_num, res_str, output_q)
+        time.sleep(interval)
+
+    # regular report, no event
+    (interval, num_peers, res_str) = send_tracker_request(None, tpe, idx, child_num)
+    report(tpe, idx, child_num, res_str, output_q)
+    
+    # wait 3x interval
+    time.sleep(interval * 3)
+
+    # regular report, no event
+    (interval, num_peers, res_str) = send_tracker_request(None, tpe, idx, child_num)
+    report(tpe, idx, child_num, res_str, output_q)
+    
+    # wait 1x interval
+    time.sleep(interval)
+
+    # send event=stopped
+    (interval, num_peers, res_str) = send_tracker_request("stopped", tpe, idx, child_num)
+    report(tpe, idx, child_num, res_str, output_q)
+
+    output_q.append("DONE")
+
+
+
+# test_iteration()
+#
+# Run one iteration of a test.  For a given info_hash, we will hit the
+# tracker once for each server and once for each client.
+#
+# Inputs:
+# - idx -- the index of this test; used to modify the info-hash and the port
+#
+def test_iteration(idx):
+    # make a queue
+    child_q = collections.deque()
+
+    # clients first
+    for i in range(clients_per_iter):
+        thread.start_new_thread(simulate_peer, ("client", idx, i, child_q))
+
+    # now servers
+    for i in range(servers_per_iter):
+        thread.start_new_thread(simulate_peer, ("server", idx, i + clients_per_iter, child_q))
+
+    resp_outstanding = clients_per_iter + servers_per_iter
+    while (resp_outstanding > 0):
+        while (len(child_q) == 0):
+            time.sleep(0.100)
+        res_str = child_q.popleft()
+        if (res_str == "DONE"):
+            resp_outstanding -= 1
+        else:
+            print res_str
+
+## TODO: move to Thread class
+##    # make a list of threads
+##    thread_list = list()
+##
+##    # clients first
+##    for i in range(clients_per_iter):
+##        th = Thread(target=simulate_peer, args=("client", idx, i, child_q))
+##        th.start()
+##        thread_list.push_back(th)
+##
+##    # now servers
+##    for i in range(servers_per_iter):
+##        th = Thread(target=simulate_peer, args=("server", idx, i + clients_per_iter, child_q))
+##        th.start()
+##        thread_list.push_back(th)
+##
+##    while (len(thread_list) > 0):
+
+
+
+# main()
+#
+# Parses the cmd line options and the config file, and then launches
+# the mainloop
+#
+# Return the exit code
+def main():
+    for i in range(num_iter):
+        test_iteration(i)
+
+    return 0
+
+
+#
+# Check the python version for compatability.  Python 3 is not
+# backward compatible.
+#
+if sys.version_info[0] != 2 or sys.version_info[1] < 6:
+    print("This script requires Python version 2.6")
+    sys.exit(1)
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+v#!/usr/bin/python
 #
 # LoadBalancer -- A server for distributing upload and download jobs
 # between GeneTorrent server instances
@@ -38,7 +38,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.1.0.0'
+revlevel = '0.1.0.1'
 
 # Load a couple of useful modules
 from optparse import OptionParser
@@ -142,6 +142,33 @@ def get_expiration(config, gto):
     return ret.strip()
 
 
+# set_download_flag()
+#
+# Modifies the supplied GTO file, adding the 'gt_download_mode' flag
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - in_q -- the input queue directory that contains the GTO file
+# - gto -- the gto file's basename.  Note the file can be found
+#          at in_q/gto_file
+#
+# Outputs:
+# the gto file is modified in-place
+#
+# TODO: the functions set_download_flag and add_expiration should be
+# factored somehow
+def set_download_flag(in_q, gto, config):
+    gtofile = os.path.join(in_q, gto)
+    cmd = [config['gtoinfo'], '--set-key', 'gt_download_mode', '1', '--no-backup', gtofile]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    ret =  proc.wait()
+    if (ret == 0):
+        return 
+    log(syslog.LOG_ALERT, "Error processing GTO file %s" % gtofile)
+    log(syslog.LOG_ALERT, "  %s" % proc.communicate()[0])
+    raise IOError("Could not modify %s" % gto)
+
+
 # add_expiration()
 #
 # Adds or updates the expiration date in the GTO
@@ -166,7 +193,6 @@ def add_expiration(in_q, gto, config):
     log(syslog.LOG_ALERT, "Error processing GTO file %s" % gtofile)
     log(syslog.LOG_ALERT, "  %s" % proc.communicate()[0])
     raise IOError("Could not modify %s" % gto)
-
 
 
 # assign_gto()
@@ -312,6 +338,8 @@ def process_input_q(config, q_type):
         try:
             if (q_type == 'upload' and config['save_upload_gtos']):
                 save_gto(config, q_dir, gto)
+            if (q_type == 'download'):
+                set_download_flag(q_dir, gto, config)
             make_writable(fullname)
             add_expiration(q_dir, gto, config)
             assign_gto(q_dir, gto, factor, config)
@@ -449,9 +477,6 @@ def lookup_group(grpname, err_str):
 # is a sample config file:
 #
 #   [LoadBalancer]
-#   ; log level; higher is more verbose
-#   loglevel=5
-#   
 #   ; how long GTO files should remain active, in hours. Default=72
 #   expiration=72
 #   
@@ -521,7 +546,6 @@ def lookup_group(grpname, err_str):
 def parse_config_file(cfg_file):
     try:
         defaults = {'gtoinfo' : '/usr/bin/gtoinfo', 
-                    'loglevel' : 5,
                     'expiration' : 72,
                     'refresh_interval' : 1800,
                     'save_uuid_dir_perms' : '0755',
@@ -541,10 +565,6 @@ def parse_config_file(cfg_file):
         config['config_file_mtime'] = os.path.getmtime(cfg_file)
 
         # LoadBalancer section
-        config['loglevel'] = cfgparser.getint('LoadBalancer', 'loglevel')
-        if (config['loglevel'] < 0 or config['loglevel'] > 7):
-            raise ValueError("Illegal value %d for loglevel" % config['loglevel'])
-
         config['expiration'] = cfgparser.getint('LoadBalancer', 'expiration')
         if (config['expiration'] > 720 or config['expiration'] < 1):
             raise ValueError("Illegal value %d for expiration" % config['expiration'])

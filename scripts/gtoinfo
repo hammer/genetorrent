@@ -40,6 +40,9 @@
 #
 # Authors for Annai Systems: Dan Murphy, Howdy Pierce
 #
+# Version 0.1.5.0 (24 Jan 2012) added:
+# - Added the --set-key option, and factored code to use it correctly
+#
 # Version 0.1.4.0 (5 Jan 2012) added:
 # - Much richer specifications for the --expires option
 #
@@ -443,6 +446,28 @@ def is_output(params):
     return retval
 
 
+# set_key()
+#
+# Modifies gtodict, adding or modifying the specified key to the
+# specified value
+#
+# Inputs:
+# - gtodict: top-level GTO dictionary from decode()
+# - key: the key
+# - value: the value
+#
+# Outputs:
+# - the gtodict is modified
+# - returns True if the gtodict was modified, false otherwise
+def set_key(gtodict, key, value):
+    retval = False
+    if (not (key in gtodict and gtodict[key] == value)):
+        gtodict[key] = value
+        retval = True
+
+    return retval
+
+
 # process()
 #
 # Does the main work of the program
@@ -473,9 +498,7 @@ def process(params, gto_filenames):
 
         # Modify it as needed
         if (params.announce_url != ''):
-            if (not ('announce' in gtodict and gtodict['announce'] == params.announce_url)):
-                gtodict['announce'] = params.announce_url
-                gto_file_changed = True
+            gto_file_changed = set_key(gtodict, 'announce', params.announce_url)
 
         if (params.expiry != ''):
             m = re.match("^([0-9]+)(.?)$", params.expiry)
@@ -508,9 +531,7 @@ def process(params, gto_filenames):
             else:
                 raise SyntaxError('Invalid expiry type %s: %s' % (expiry_type, params.expiry))
 
-            if (not ('expires_on' in gtodict and gtodict['expires_on'] == expiry)):
-                gtodict['expires on'] = int(expiry)
-                gto_file_changed = True
+            gto_file_changed = set_key(gtodict, 'expires on', int(expiry))
 
         if (params.ssl_cert != ''):
             cert_text = open(params.ssl_cert, "rb").read()
@@ -518,6 +539,9 @@ def process(params, gto_filenames):
                 gtodict['info']['ssl-cert'] = cert_text
                 gto_file_changed = True
 
+        if (params.set_key != None):
+            (k, v) = params.set_key
+            gto_file_changed = set_key(gtodict, k, v)
 
         # Print the output requested
         if (print_gto_filenames):
@@ -614,6 +638,10 @@ parser.add_option('-s', '--ssl-cert', action='store',
                   default="", dest='ssl_cert', 
                   help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
 
+parser.add_option('', '--set-key', action='store', nargs=2,
+                  default=None, dest='set_key',
+                  help='Add or modify the specified key, setting it to value.')
+
 (params, gto_filenames) = parser.parse_args()
 
 if (len(gto_filenames) == 0):
@@ -622,7 +650,8 @@ if (len(gto_filenames) == 0):
 
 if (params.decode_file is False and params.total_size is False and params.inspect_key == ""
     and params.piece_index == -1 and params.announce_url == "" and params.expiry == ""
-    and params.get_expire is False and params.infohash is False and params.ssl_cert == ""):
+    and params.get_expire is False and params.infohash is False and params.ssl_cert == ""
+    and params.set_key == None):
     params.decode_file = True
 
 
