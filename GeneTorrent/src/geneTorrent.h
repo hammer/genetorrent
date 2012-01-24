@@ -215,6 +215,7 @@ class geneTorrent
       void mkTempDir ();
       void checkAlerts (libtorrent::session &torrSession);
       time_t getExpirationTime (std::string torrentPathAndFileName);
+      bool isDownloadModeGetFromGTO (std::string torrentPathAndFileName);
 
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);

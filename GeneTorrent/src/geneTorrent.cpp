@@ -52,6 +52,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
@@ -1487,9 +1488,9 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
          exit (197);
       }
 
-      libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (5000000);  // 5 seconds
+      libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);  // 5 seconds
 
-      while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished && libtorrent::time_now() < endMonitoring)
+      while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished && libtorrent::time_now_hires() < endMonitoring)
       {
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
@@ -2364,9 +2365,9 @@ void geneTorrent::runServerMode ()
 
 void geneTorrent::processServerModeAlerts ()
 {
-   libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (2000000);  // 2 seconds
+   libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds(2);
 
-   while (libtorrent::time_now() < endMonitoring)
+   while (libtorrent::time_now_hires() < endMonitoring)
    {
       std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
 
@@ -2375,7 +2376,6 @@ void geneTorrent::processServerModeAlerts ()
          checkAlerts (*(*listIter)->torrentSession);
          listIter++;
       }
-
       usleep(ALERT_CHECK_PAUSE_INTERVAL);
    }
 }
@@ -2500,6 +2500,46 @@ time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
    return expireTime;       
 }
 
+bool geneTorrent::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
+{
+   bool dlMode = false;
+
+   FILE *data = popen (("gtoinfo --inspect gt_download_mode " + torrentPathAndFileName).c_str(), "r");
+
+   if (data != NULL)
+   {
+      char vBuff[1024];
+
+      if (NULL != fgets (vBuff, 1024, data))
+      {
+         std::string result = vBuff;
+
+         std::size_t foundPos;
+ 
+         if (std::string::npos != (foundPos = result.find ('\n')))
+         {
+            result.erase (foundPos);
+         }
+
+         if (boost::iequals (PYTHON_TRUE, result))
+         {
+            dlMode = true;
+         }
+      }
+      else
+      {
+         Log (PRIORITY_HIGH, "Failure running gtoinfo on %s or no 'gt_download_mode' in GTO, defaulting to upload mode", torrentPathAndFileName.c_str());
+      }
+      pclose (data);
+   }
+   else
+   {
+      Log (PRIORITY_HIGH, "Failure running gtoinfo on %s, defaulting to upload mode", torrentPathAndFileName.c_str());
+   }
+
+   return dlMode;       
+}
+
 bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
 {
    activeSessionRec *workSession = findSession ();
@@ -2526,16 +2566,11 @@ bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
    uuid = uuid.substr (0, uuid.rfind ('.'));
    uuid = getFileName (uuid); 
 
-// short term solution to seeder mode issue on uploads
-if (statFileOrDirectory ("./" + uuid) != 0)
-{
-   newTorrRec->torrentParams.seed_mode = false;
-}
-else
-{
-   newTorrRec->torrentParams.seed_mode = true;
-   newTorrRec->torrentParams.disable_seed_hash = true;
-}
+   if (isDownloadModeGetFromGTO (pathAndFileName))
+   {
+      newTorrRec->torrentParams.seed_mode = true;
+      newTorrRec->torrentParams.disable_seed_hash = true;
+   }
 
    newTorrRec->torrentParams.auto_managed = false;
    newTorrRec->torrentParams.allow_rfc1918_connections = true;
@@ -2592,7 +2627,7 @@ else
       screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served");
    }
 
-   Log (PRIORITY_NORMAL, "Begin serving:  %s with info hash:  %s expires:  %d", pathAndFileName.c_str(), newTorrRec->infoHash.c_str(), newTorrRec->expires);
+   Log (PRIORITY_NORMAL, "Begin serving:  %s info hash:  %s expires:  %d (%s)", pathAndFileName.c_str(), newTorrRec->infoHash.c_str(), newTorrRec->expires, (newTorrRec->torrentParams.seed_mode == true ? "download" : "upload"));
    workSession->mapOfSessionTorrents[pathAndFileName] = newTorrRec;
 
    return true;
@@ -2940,7 +2975,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
    {
       libtorrent::session_status sessionStatus = torrentSession.status ();
       libtorrent::torrent_status torrentStatus = torrentHandle.status ();
-
+std::cerr << "num complete = " << torrentStatus.num_complete << std::endl;
       if (torrentStatus.total_payload_upload >= torrentParams.ti->total_size () && cycleTimerSet == false)
       {
          cycleTime = time (NULL) + 15;
@@ -2966,14 +3001,38 @@ std::cerr << "torrentStatus.state: " << torrentStatus.state << std::endl;
          }
       }
 
-      libtorrent::ptime endMonitoring = libtorrent::time_now() + libtorrent::time_duration (5000000);  // 5 seconds
+      libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
 
-      while (libtorrent::time_now() < endMonitoring)
+      while (libtorrent::time_now_hires() < endMonitoring)
       {
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
    }
+   checkAlerts (torrentSession);
+   torrentSession.remove_torrent (torrentHandle);
+
+    // Note that remove_torrent does at least two things asynchronously: 1) it
+    // sets in motion the deletion of this torrent object, and 2) it sends the
+    // stopped event to the tracker and waits for a response.  So if we were to
+    // exit immediately, two bad things happen.  First, the stopped event is
+    // probably not sent.  Second, we end up doubly-deleting some objects
+    // inside of libtorrent (because the deletion is already in progress and
+    // then the call to exit() causes some cleanup as well), and we get nasty
+    // complaints about malloc corruption printed to the console by glibc.
+    //
+    // The "proper" approached from a libtorrent perspective is to wait to
+    // receive both the cache_flushed_alert and the tracker_reply_alert,
+    // indicating that all is well.  However in the case of tearing down a
+    // torrent, libtorrent appears to squelch the tracker_reply_alert so we
+    // never get it (even though the tracker does in fact respond to the
+    // stopped event sent to it by libtorrent).
+    //
+    // Therefore, ugly as it is, for the time being we will simply sleep here.
+    // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
+    // the two events mentioned above.
+
+   sleep(5);
    checkAlerts (torrentSession);
 }
 

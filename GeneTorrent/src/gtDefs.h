@@ -47,6 +47,7 @@ const std::string GTO_FILE_EXTENSION = ".gto";
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
+const std::string PYTHON_TRUE = "'TRUE'";
 
 const int NO_EXIT = 0;
 const int ERROR_NO_EXIT = -1;
@@ -91,7 +92,7 @@ static char const* upload_state_str[] = {
 	"checking (q)",								//			queued_for_checking,
 	"checking",										//			checking_files,
 	"dl metadata",								//			downloading_metadata,
-	"GTOerror",										//			downloading,
+	"starting",										//			downloading,
 	"finished",										//			finished,
 	"uploading",									//			seeding,
 	"allocating",									//			allocating,
