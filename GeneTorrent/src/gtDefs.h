@@ -70,7 +70,7 @@ static char const* server_state_str[] = {
 	"checking (q)",								//			queued_for_checking,
 	"checking",										//			checking_files,
 	"dl metadata",								//			downloading_metadata,
-	"GTOerror",										//			downloading,
+	"receiving",										//			downloading,
 	"finished",										//			finished,
 	"serving", 										//			seeding,
 	"allocating",									//			allocating,

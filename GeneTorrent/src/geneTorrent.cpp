@@ -2395,7 +2395,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
          {
             // The torrent has disappeared, stop serving it.
-            Log (PRIORITY_NORMAL, " Stop serving:  GTO disappeared from queue:  %s with info hash:  %s",  mapIter->first.c_str(), mapIter->second->infoHash.c_str());
+            Log (PRIORITY_NORMAL, " Stop serving:  GTO disappeared from queue:  %s info hash:  %s",  mapIter->first.c_str(), mapIter->second->infoHash.c_str());
 
             (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
             activeTorrents.erase (mapIter->first);
@@ -2408,7 +2408,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          {
             if (getInfoHash (mapIter->first) != mapIter->second->infoHash)
             {
-               Log (PRIORITY_HIGH, "Stop serving:  GTO InfoHash Changed while serving:  %s with info hash:  %s (new GTO with infoHash %s will not be served)", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), getInfoHash (mapIter->first).c_str()); 
+               Log (PRIORITY_HIGH, "Stop serving:  GTO InfoHash Changed while serving:  %s info hash:  %s (new GTO infoHash %s will not be served)", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), getInfoHash (mapIter->first).c_str()); 
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
@@ -2426,7 +2426,30 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
                mapIter->second->overTimeAlertIssued = false;
             }
 
-            Log (PRIORITY_NORMAL, "Expiration Update:  GTO %s with info hash:  %s has a new expiration time %d", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), mapIter->second->expires);
+            Log (PRIORITY_NORMAL, "Expiration Update:  GTO %s info hash:  %s has a new expiration time %d", mapIter->first.c_str(), mapIter->second->infoHash.c_str(), mapIter->second->expires);
+         }
+
+         // if an upload torrent and the current state is seeding, set the overtime flag to true on the first obversation of this stats
+         // on the 2nd observation of this state, the gto will removed from the upload queue and removed from seeding
+         // This gives the upload plenty of time to recognize that the upload has completed (I.E., the upload client recognizes
+         // two seeders are present due to tracker scraping
+         if (mapIter->second->downloadGTO == false && mapIter->second->torrentHandle.status().state == libtorrent::torrent_status::seeding)
+         {
+            if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
+            {
+               mapIter->second->overTimeAlertIssued = true;
+            }
+            else                                         // second pass, remove the torrent from serviing
+            {
+               Log (PRIORITY_NORMAL, "Stop serving:  upload complete %s info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
+
+               (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
+               deleteGTOfromQueue (mapIter->first);
+               activeTorrents.erase (mapIter->first);
+               (*listIter)->mapOfSessionTorrents.erase (mapIter++);
+            }
+
+            continue;
          }
 
          if (timeNow >= mapIter->second->expires)       // This GTO is expired
@@ -2437,7 +2460,7 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
 
             if (peers.size () == 0)
             {
-               Log (PRIORITY_NORMAL, "Stop serving:  Expiring %s with info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
+               Log (PRIORITY_NORMAL, "Stop serving:  Expiring %s info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
@@ -2448,12 +2471,12 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
             {
                if (!mapIter->second->overTimeAlertIssued)
                {
-                  Log (PRIORITY_NORMAL, "Overtime serving:  %s with info hash:  %s (%d actor(s) connected)", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str(), peers.size());
+                  Log (PRIORITY_NORMAL, "Overtime serving:  %s info hash:  %s (%d actor(s) connected)", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str(), peers.size());
                   mapIter->second->overTimeAlertIssued = true;
                }
    
                if (_verbosityLevel > 0)
-               {  
+               {
                   screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download");
                }
                mapIter++;
@@ -2469,8 +2492,8 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          }
       }
       listIter++;
-   }  
-} 
+   }
+}
 
 time_t geneTorrent::getExpirationTime (std::string torrentPathAndFileName)
 {
@@ -2570,6 +2593,10 @@ bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
    {
       newTorrRec->torrentParams.seed_mode = true;
       newTorrRec->torrentParams.disable_seed_hash = true;
+      newTorrRec->downloadGTO = true;
+   }
+   {
+      newTorrRec->downloadGTO = false;
    }
 
    newTorrRec->torrentParams.auto_managed = false;

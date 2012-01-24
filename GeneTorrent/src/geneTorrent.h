@@ -77,6 +77,7 @@ class geneTorrent
       time_t mtime;              // file modification time
       std::string infoHash;         
       bool overTimeAlertIssued;     // tracks if the overtime message has been reported to syslog
+      bool downloadGTO;
    } activeTorrentRec;
 
    typedef struct activeSessionRec_
