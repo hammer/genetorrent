@@ -512,7 +512,7 @@ void geneTorrent::loadCredentialsFile (bool credsSet, std::string credsFile)
 {
    if (!credsSet)
    {
-      TCLAP::ArgException argError ("Must include a credential file when attempting to download", "-c  (--credentialFile)");
+      TCLAP::ArgException argError ("Must include a credential file when attempting to communicate with CGHub", "-c  (--credentialFile)");
       throw(argError);
    }
 
@@ -1833,12 +1833,19 @@ void geneTorrent::performTorrentUpload ()
       gtError ("No files found in manifest file:  " + _manifestFile, 214, geneTorrent::DEFAULT_ERROR);
    }
 
-   findDataAndSetWorkingDirectory ();
-   setPieceSize ();
+   std::string torrentFileName;
+   if (_devMode == false)
+   {
+      findDataAndSetWorkingDirectory ();
+      setPieceSize ();
 
-   std::string torrentFileName = makeTorrent (_uploadUUID, _uploadUUID + GTO_FILE_EXTENSION);
-
-   torrentFileName = submitTorrentToGTExecutive (torrentFileName);
+      torrentFileName = makeTorrent (_uploadUUID, _uploadUUID + GTO_FILE_EXTENSION);
+      torrentFileName = submitTorrentToGTExecutive (torrentFileName);
+   }
+   else
+   {
+      torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
+   }
 
    performGtoUpload (torrentFileName);
 }
@@ -2943,7 +2950,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
       if (_verbosityLevel > 0)
       {
          char str[500];
-
+std::cerr << "torrentStatus.state: " << torrentStatus.state << std::endl;
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
             double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
