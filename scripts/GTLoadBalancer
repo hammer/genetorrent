@@ -159,7 +159,7 @@ def get_expiration(config, gto):
 # factored somehow
 def set_download_flag(in_q, gto, config):
     gtofile = os.path.join(in_q, gto)
-    cmd = [config['gtoinfo'], '--set-key', 'gt_download_mode', '1', '--no-backup', gtofile]
+    cmd = [config['gtoinfo'], '--set-key', 'gt_download_mode', 'true', '--no-backup', gtofile]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     ret =  proc.wait()
     if (ret == 0):
