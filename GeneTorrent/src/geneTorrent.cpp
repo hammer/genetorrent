@@ -2969,46 +2969,56 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 
    torrentHandle.resume();
 
-   time_t cycleTime = 2147483647;
-   bool cycleTimerSet = false;
-   while (time (NULL) < cycleTime)
+//   time_t cycleTime = 2147483647;
+//   bool cycleTimerSet = false;
+
+   libtorrent::session_status sessionStatus = torrentSession.status ();
+   libtorrent::torrent_status torrentStatus = torrentHandle.status ();
+
+   while (torrentStatus.num_complete < 2)
    {
-      libtorrent::session_status sessionStatus = torrentSession.status ();
-      libtorrent::torrent_status torrentStatus = torrentHandle.status ();
-std::cerr << "num complete = " << torrentStatus.num_complete << std::endl;
+      torrentHandle.scrape_tracker();
+      sessionStatus = torrentSession.status();
+      torrentStatus = torrentHandle.status();
+
+/*
       if (torrentStatus.total_payload_upload >= torrentParams.ti->total_size () && cycleTimerSet == false)
       {
          cycleTime = time (NULL) + 15;
          cycleTimerSet = true;
       }
+*/
+      libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
+
+      while (torrentStatus.num_complete < 2 && libtorrent::time_now_hires() < endMonitoring)
+      {
+         torrentHandle.scrape_tracker();
+         libtorrent::ptime endInnerMonitor = libtorrent::time_now_hires() + libtorrent::seconds (1);
+
+         while (torrentStatus.num_complete < 2 && libtorrent::time_now_hires() < endInnerMonitor)
+         {
+            checkAlerts (torrentSession);
+            usleep(ALERT_CHECK_PAUSE_INTERVAL);
+         }
+      }
 
       if (_verbosityLevel > 0)
       {
          char str[500];
-std::cerr << "torrentStatus.state: " << torrentStatus.state << std::endl;
+
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
             double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
-            snprintf (str, sizeof(str), 
-                        "%% Complete: %5.1f  Status:  %-13s  downloaded:  %s (%s) uploaded:  %s (%s)", 
+            snprintf (str, sizeof(str), "%% Complete: %5.1f  Status:  %-13s  uploaded:  %s (%s)", 
                         (percentComplete > 100.0 ? 100.0 : percentComplete), 
                         upload_state_str[torrentStatus.state], 
-                        add_suffix (torrentStatus.total_download).c_str (), 
-                        add_suffix (torrentStatus.download_rate, "/s").c_str (), 
                         add_suffix (torrentStatus.total_upload).c_str (), 
                         add_suffix (torrentStatus.upload_rate, "/s").c_str ());
             screenOutput (str);
          }
       }
-
-      libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
-
-      while (libtorrent::time_now_hires() < endMonitoring)
-      {
-         checkAlerts (torrentSession);
-         usleep(ALERT_CHECK_PAUSE_INTERVAL);
-      }
    }
+
    checkAlerts (torrentSession);
    torrentSession.remove_torrent (torrentHandle);
 
