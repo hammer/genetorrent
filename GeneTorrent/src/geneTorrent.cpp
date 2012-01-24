@@ -231,6 +231,14 @@ geneTorrent::geneTorrent (int argc, char **argv) :
 
       _args.parse (argc, argv); // Parse the command line
 
+      // serverDataPath -> server mode, manifestFN -> upload mode, downloadList -> download mode
+      // Verify only one mode is selected on the CLI
+      if ((serverDataPath.isSet() && manifestFN.isSet()) || (serverDataPath.isSet() && downloadList.isSet()) || (manifestFN.isSet() && downloadList.isSet()))
+      {
+         TCLAP::ArgException argError ("Command line may only specifiy one of -d, -s, or -u", "");
+         throw(argError);
+      }
+
       // Process the General Args
       if (bindIP.isSet ())
       {
