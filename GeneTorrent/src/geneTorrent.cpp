@@ -3004,6 +3004,8 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 
    torrentHandle.resume();
 
+   bool displayed100Percent = false;
+
    libtorrent::session_status sessionStatus = torrentSession.status ();
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
@@ -3021,22 +3023,20 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
 
-      if (_verbosityLevel > 0)
+      if (_verbosityLevel > 0 && !displayed100Percent)
       {
-         char str[500];
-
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
             double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
-            snprintf (str, sizeof(str), "%% Complete: %5.1f  Status:  %-13s  uploaded:  %s (%s)", 
-                        (percentComplete > 100.0 ? 100.0 : percentComplete), 
-                        upload_state_str[torrentStatus.state], 
-                        add_suffix (torrentStatus.total_upload).c_str (), 
-                        add_suffix (torrentStatus.upload_rate, "/s").c_str ());
-            screenOutput (str);
-            screenOutput ("Status:"  << std::setw(8) << (torrentStatus.total_payload_upload > 0 ? add_suffix(torrentStatus.total_payload_upload).c_str() : "0 bytes") 
-                                     <<  " uploaded (" << std::fixed << std::setprecision(3) << 100.0 * torrentStatus.total_payload_upload / torrentParams.ti->total_size()
-                                     << "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
+
+            if (percentComplete > 99.999999999)
+            {
+               percentComplete = 100.000000;
+               displayed100Percent = true;
+            }
+            screenOutput ("Status:"  << std::setw(8) << (torrentStatus.total_payload_upload > 0 ? add_suffix(torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
+                                     " uploaded (" << std::fixed << std::setprecision(3) << percentComplete <<
+                                     "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
          }
       }
    }
