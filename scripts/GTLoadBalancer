@@ -38,7 +38,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.1.0.1'
+revlevel = '0.1.0.2'
 
 # Load a couple of useful modules
 from optparse import OptionParser
@@ -440,13 +440,17 @@ def mainloop(config):
         # poll to see if we should re-read our config file
         mtime = os.path.getmtime(config['config_file'])
         if (mtime > config['config_file_mtime']):
-            newconfig = parse_config_file(config['config_file'])
-            if (newconfig != None):
-                log(syslog.LOG_NOTICE, "Re-read configuration file successfully")
+            try:
+                newconfig = parse_config_file(config['config_file'])
                 config = newconfig
-            else:
+                log(syslog.LOG_NOTICE, "Re-read configuration file successfully")
+            except Exception as e:
+                log(syslog.LOG_ALERT, "Error reading config file: %s" % e)
                 log(syslog.LOG_ALERT, 
                     "Because of config file errors, proceeding with previous configuration")
+                # still update the mtime; otherwise we'll get this
+                # error every time thru the loop
+                config['config_file_mtime'] = os.path.getmtime(config['config_file'])
 
         sleep(1)
 
@@ -608,128 +612,122 @@ def lookup_group(grpname, err_str):
 #   queue_05=%QUEUE_ROOT/dropzone-05
 #   
 def parse_config_file(cfg_file):
-    try:
-        defaults = {'gtoinfo' : '/usr/bin/gtoinfo', 
-                    'expiration' : 72,
-                    'refresh_interval' : 1800,
-                    'save_uuid_dir_perms' : '0755',
-                    'save_uuid_dir_owner' : 'gtorrent',
-                    'save_uuid_dir_group' : 'gtorrent',
-                    'save_gto_perms' : '0644',
-                    'save_gto_owner' : 'gtorrent',
-                    'save_gto_group' : 'gtorrent',
-                    }
+    defaults = {'gtoinfo' : '/usr/bin/gtoinfo', 
+                'expiration' : 72,
+                'refresh_interval' : 1800,
+                'save_uuid_dir_perms' : '0755',
+                'save_uuid_dir_owner' : 'gtorrent',
+                'save_uuid_dir_group' : 'gtorrent',
+                'save_gto_perms' : '0644',
+                'save_gto_owner' : 'gtorrent',
+                'save_gto_group' : 'gtorrent',
+                }
 
-        cfgparser = ConfigParser.RawConfigParser(defaults)
-        cfgparser.readfp(open(cfg_file, "r"))
+    cfgparser = ConfigParser.RawConfigParser(defaults)
+    cfgparser.readfp(open(cfg_file, "r"))
 
-        config = dict()
+    config = dict()
 
-        config['config_file'] = cfg_file
-        config['config_file_mtime'] = os.path.getmtime(cfg_file)
+    config['config_file'] = cfg_file
+    config['config_file_mtime'] = os.path.getmtime(cfg_file)
 
-        # LoadBalancer section
-        config['expiration'] = cfgparser.getint('LoadBalancer', 'expiration')
-        if (config['expiration'] > 720 or config['expiration'] < 1):
-            raise ValueError("Illegal value %d for expiration" % config['expiration'])
+    # LoadBalancer section
+    config['expiration'] = cfgparser.getint('LoadBalancer', 'expiration')
+    if (config['expiration'] > 720 or config['expiration'] < 1):
+        raise ValueError("Illegal value %d for expiration" % config['expiration'])
 
-        config['upload_factor'] = cfgparser.getint('LoadBalancer', 'upload_factor')
-        if (config['upload_factor'] <= 0):
-            raise ValueError("Illegal upload_factor %d" % config['upload_factor'])
+    config['upload_factor'] = cfgparser.getint('LoadBalancer', 'upload_factor')
+    if (config['upload_factor'] <= 0):
+        raise ValueError("Illegal upload_factor %d" % config['upload_factor'])
 
-        config['download_factor'] = cfgparser.getint('LoadBalancer', 'download_factor')
-        if (config['download_factor'] <= 0):
-            raise ValueError("Illegal download_factor %d" % config['download_factor'])
+    config['download_factor'] = cfgparser.getint('LoadBalancer', 'download_factor')
+    if (config['download_factor'] <= 0):
+        raise ValueError("Illegal download_factor %d" % config['download_factor'])
 
-        config['refresh_interval'] = cfgparser.getint('LoadBalancer', 'refresh_interval')
-        if (config['refresh_interval'] <= 10 or config['refresh_interval'] > 86400):
-            raise ValueError("Illegal refresh_interval %d" % config['refresh_interval'])
+    config['refresh_interval'] = cfgparser.getint('LoadBalancer', 'refresh_interval')
+    if (config['refresh_interval'] <= 10 or config['refresh_interval'] > 86400):
+        raise ValueError("Illegal refresh_interval %d" % config['refresh_interval'])
 
-        config['gtoinfo'] = cfgparser.get('LoadBalancer', 'gtoinfo')
-        if (not (os.path.isfile(config['gtoinfo']) and os.access(config['gtoinfo'],os.X_OK))):
-            raise ValueError("Cannot execute gtoinfo tool at %s" % config['gtoinfo'])
+    config['gtoinfo'] = cfgparser.get('LoadBalancer', 'gtoinfo')
+    if (not (os.path.isfile(config['gtoinfo']) and os.access(config['gtoinfo'],os.X_OK))):
+        raise ValueError("Cannot execute gtoinfo tool at %s" % config['gtoinfo'])
 
-        config['queue_root'] = cfgparser.get('LoadBalancer', 'queue_root')
+    config['queue_root'] = cfgparser.get('LoadBalancer', 'queue_root')
 
-        config['upload_q'] = subs_qr(cfgparser.get('LoadBalancer', 'upload_queue'), 
-                                     config['queue_root'])
-        if (not os.path.isdir(config['upload_q'])):
-            raise ValueError("Upload queue directory %s doesn't exist" % config['upload_q'])
+    config['upload_q'] = subs_qr(cfgparser.get('LoadBalancer', 'upload_queue'), 
+                                 config['queue_root'])
+    if (not os.path.isdir(config['upload_q'])):
+        raise ValueError("Upload queue directory %s doesn't exist" % config['upload_q'])
 
-        config['download_q'] = subs_qr(cfgparser.get('LoadBalancer', 'download_queue'), 
-                                       config['queue_root'])
-        if (not os.path.isdir(config['download_q'])):
-            raise ValueError("Download queue directory %s doesn't exist" % config['download_q'])
+    config['download_q'] = subs_qr(cfgparser.get('LoadBalancer', 'download_queue'), 
+                                   config['queue_root'])
+    if (not os.path.isdir(config['download_q'])):
+        raise ValueError("Download queue directory %s doesn't exist" % config['download_q'])
 
-        # ValidateDownloadGTOs section
-        config['validate_download_gtos'] \
-            = cfgparser.getboolean('ValidateDownloadGTOs', 'validate_download_gtos')
+    # SaveUploadGTOs section
+    config['save_upload_gtos'] = cfgparser.getboolean('SaveUploadGTOs', 'save_upload_gtos')
 
-        # SaveUploadGTOs section
-        config['save_upload_gtos'] = cfgparser.getboolean('SaveUploadGTOs', 'save_upload_gtos')
+    if (config['save_upload_gtos']):
+        config['save_root_dir'] = \
+            subs_qr(cfgparser.get('SaveUploadGTOs', 'save_root_dir'), config['queue_root'])
+        if (not os.path.isdir(config['save_root_dir'])):
+            raise ValueError("Save root directory %s doesn't exist" % config['save_root_dir'])
 
-        if (config['save_upload_gtos'] or config['validate_download_gtos']):
-            config['save_root_dir'] = \
-                subs_qr(cfgparser.get('SaveUploadGTOs', 'save_root_dir'), config['queue_root'])
-            if (not os.path.isdir(config['save_root_dir'])):
-                raise ValueError("Save root directory %s doesn't exist" % config['save_root_dir'])
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_perms')
+        config['save_uuid_dir_perms'] = int(tmp_str,8)
+        if (config['save_uuid_dir_perms'] < 0400 or config['save_uuid_dir_perms'] > 0777):
+            raise ValueError("Illegal permissions '%s' for UUID dir" % tmp_str)
 
-        if (config['save_upload_gtos']):
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_perms')
-            config['save_uuid_dir_perms'] = int(tmp_str,8)
-            if (config['save_uuid_dir_perms'] < 0400 or config['save_uuid_dir_perms'] > 0777):
-                raise ValueError("Illegal permissions '%s' for UUID dir" % tmp_str)
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_owner')
+        config['save_uuid_dir_owner'] = lookup_user(tmp_str, "UUID dir")
 
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_owner')
-            config['save_uuid_dir_owner'] = lookup_user(tmp_str, "UUID dir")
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_group')
+        config['save_uuid_dir_group'] = lookup_group(tmp_str, "UUID dir")
 
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_group')
-            config['save_uuid_dir_group'] = lookup_group(tmp_str, "UUID dir")
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_perms')
+        config['save_gto_perms'] = int(tmp_str, 8)
+        if (config['save_gto_perms'] < 0400 or config['save_gto_perms'] > 0777):
+            raise ValueError("Illegal permissions '%s' for GTO permissions" % tmp_str)
 
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_perms')
-            config['save_gto_perms'] = int(tmp_str, 8)
-            if (config['save_gto_perms'] < 0400 or config['save_gto_perms'] > 0777):
-                raise ValueError("Illegal permissions '%s' for GTO permissions" % tmp_str)
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_owner')
+        config['save_gto_owner'] = lookup_user(tmp_str, "GTO files")
 
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_owner')
-            config['save_gto_owner'] = lookup_user(tmp_str, "GTO files")
+        tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_group')
+        config['save_gto_group'] = lookup_group(tmp_str, "GTO files")
 
-            tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_group')
-            config['save_gto_group'] = lookup_group(tmp_str, "GTO files")
+    # ValidateDownloadGTOs section
+    config['validate_download_gtos'] \
+        = cfgparser.getboolean('ValidateDownloadGTOs', 'validate_download_gtos')
 
-        # Instances section
-        config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
-        if (config['num_instances'] <= 0):
-            raise ValueError("Illegal num_instances of %d" % config['num_instances'])
+    # Instances section
+    config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
+    if (config['num_instances'] <= 0):
+        raise ValueError("Illegal num_instances of %d" % config['num_instances'])
 
-        config['instance_qs'] = list()
-        for i in range(config['num_instances']):
-            q_dir = subs_qr(cfgparser.get('Instances', 'queue_%02d' % i), config['queue_root'])
-            if (not os.path.isdir(q_dir)):
-                raise ValueError("Instance %d queue directory %s doesn't exist" % (i, q_dir))
-            else:
-                config['instance_qs'].append(q_dir)
+    config['instance_qs'] = list()
+    for i in range(config['num_instances']):
+        q_dir = subs_qr(cfgparser.get('Instances', 'queue_%02d' % i), config['queue_root'])
+        if (not os.path.isdir(q_dir)):
+            raise ValueError("Instance %d queue directory %s doesn't exist" % (i, q_dir))
+        else:
+            config['instance_qs'].append(q_dir)
 
-        # some additional error checking
-        if (config['upload_factor'] > config['num_instances']):
-            raise ValueError("Upload factor %d is greater than %d configured instances"
-                             % (config['upload_factor'], config['num_instances']))
+    # some additional error checking
+    if (config['upload_factor'] > config['num_instances']):
+        raise ValueError("Upload factor %d is greater than %d configured instances"
+                         % (config['upload_factor'], config['num_instances']))
 
-        if (config['download_factor'] > config['num_instances']):
-            raise ValueError("Download factor %d is greater than %d configured instances"
-                             % (config['download_factor'], config['num_instances']))
+    if (config['download_factor'] > config['num_instances']):
+        raise ValueError("Download factor %d is greater than %d configured instances"
+                         % (config['download_factor'], config['num_instances']))
 
-        # Log all the parameters we are returning, for debugging
-        log(syslog.LOG_DEBUG, "Read configuration file %s successfully:" % cfg_file)
-        for k,v in sorted(config.items()):
-            log(syslog.LOG_DEBUG, "  %s: %s" % (k, v))
+    # Log all the parameters we are returning, for debugging
+    log(syslog.LOG_DEBUG, "Read configuration file %s successfully:" % cfg_file)
+    for k,v in sorted(config.items()):
+        log(syslog.LOG_DEBUG, "  %s: %s" % (k, v))
 
-        return config
+    return config
 
-    except (ConfigParser.NoOptionError, ValueError) as e:
-        log(syslog.LOG_ALERT, "Error parsing config file %s: %s" % (cfg_file, e))
-        return None
-        
 
 # main()
 #
@@ -756,9 +754,12 @@ def main():
         parser.print_help()
         return 1
 
-    config = parse_config_file(params.config_file)
-    if (config == None):
-        print >> sys.stderr, "Fatal error parsing configuration file"
+    try:
+        config = parse_config_file(params.config_file)
+    except Exception as e:
+        msg = "Fatal error reading config file: %s" % e
+        log(syslog.LOG_ALERT, msg)
+        print >> sys.stderr, msg
         return -1
 
     try:
