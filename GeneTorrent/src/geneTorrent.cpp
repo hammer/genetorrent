@@ -2535,7 +2535,7 @@ bool geneTorrent::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
 {
    bool dlMode = false;
 
-   FILE *data = popen (("gtoinfo --inspect gt_download_mode " + torrentPathAndFileName).c_str(), "r");
+   FILE *data = popen (("gtoinfo --get-key gt_download_mode " + torrentPathAndFileName).c_str(), "r");
 
    if (data != NULL)
    {
@@ -3004,9 +3004,6 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 
    torrentHandle.resume();
 
-//   time_t cycleTime = 2147483647;
-//   bool cycleTimerSet = false;
-
    libtorrent::session_status sessionStatus = torrentSession.status ();
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
@@ -3016,25 +3013,12 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
       sessionStatus = torrentSession.status();
       torrentStatus = torrentHandle.status();
 
-/*
-      if (torrentStatus.total_payload_upload >= torrentParams.ti->total_size () && cycleTimerSet == false)
-      {
-         cycleTime = time (NULL) + 15;
-         cycleTimerSet = true;
-      }
-*/
       libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
 
       while (torrentStatus.num_complete < 2 && libtorrent::time_now_hires() < endMonitoring)
       {
-         torrentHandle.scrape_tracker();
-         libtorrent::ptime endInnerMonitor = libtorrent::time_now_hires() + libtorrent::seconds (1);
-
-         while (torrentStatus.num_complete < 2 && libtorrent::time_now_hires() < endInnerMonitor)
-         {
-            checkAlerts (torrentSession);
-            usleep(ALERT_CHECK_PAUSE_INTERVAL);
-         }
+         checkAlerts (torrentSession);
+         usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
 
       if (_verbosityLevel > 0)
@@ -3050,6 +3034,9 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
                         add_suffix (torrentStatus.total_upload).c_str (), 
                         add_suffix (torrentStatus.upload_rate, "/s").c_str ());
             screenOutput (str);
+            screenOutput ("Status:"  << std::setw(8) << (torrentStatus.total_payload_upload > 0 ? add_suffix(torrentStatus.total_payload_upload).c_str() : "0 bytes") 
+                                     <<  " uploaded (" << std::fixed << std::setprecision(3) << 100.0 * torrentStatus.total_payload_upload / torrentParams.ti->total_size()
+                                     << "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
          }
       }
    }

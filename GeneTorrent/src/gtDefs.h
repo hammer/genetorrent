@@ -47,7 +47,7 @@ const std::string GTO_FILE_EXTENSION = ".gto";
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
-const std::string PYTHON_TRUE = "'TRUE'";
+const std::string PYTHON_TRUE = "TRUE";
 
 const int NO_EXIT = 0;
 const int ERROR_NO_EXIT = -1;
