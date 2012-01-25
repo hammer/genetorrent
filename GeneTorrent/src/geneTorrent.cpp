@@ -2443,9 +2443,15 @@ void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> 
          // two seeders are present due to tracker scraping
          if (mapIter->second->downloadGTO == false && mapIter->second->torrentHandle.status().state == libtorrent::torrent_status::seeding)
          {
+std::cerr << "inside with time = " << time(NULL) << std::endl;
             if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
             {
                mapIter->second->overTimeAlertIssued = true;
+               if (_verbosityLevel > 0)
+               {
+                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  00:01:00.");
+               }
+               mapIter++;
             }
             else                                         // second pass, remove the torrent from serviing
             {
@@ -2603,6 +2609,7 @@ bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
       newTorrRec->torrentParams.disable_seed_hash = true;
       newTorrRec->downloadGTO = true;
    }
+   else
    {
       newTorrRec->downloadGTO = false;
    }
