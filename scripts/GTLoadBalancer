@@ -1,4 +1,4 @@
-v#!/usr/bin/python
+#!/usr/bin/python
 #
 # LoadBalancer -- A server for distributing upload and download jobs
 # between GeneTorrent server instances
@@ -137,9 +137,33 @@ def build_worklist(config):
 # Outputs:
 # - ret -- a string which represents the expiration of the GTO
 def get_expiration(config, gto):
-    cmd = [config['gtoinfo'], '--inspect=expires on', gto]
+    cmd = [config['gtoinfo'], '--get-key=expires on', gto]
     ret = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
     return ret.strip()
+
+
+# get_file_list()
+#
+# Returns the list of files from the supplied GTO file
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - gto -- the fully-qualified pathname to the GTO file
+#
+# Outputs: 
+# - ret -- the files in the gto, in the form of a list of dicts.  Each
+#     list element will be a dict with the elements 'filename' and
+#     'length'
+def get_file_list(config, gto):
+    filelist = list()
+    cmd = [config['gtoinfo'], '--list-files', gto]
+    data_stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    for line in data_stream.stdout:
+        m = re.match("^(.+) ([0-9]+)$", line)
+        if (not m):
+            raise SyntaxError('Invalid file output: %s' % line)
+        filelist.append({'filename' : m.group(1), 'length' : int(m.group(2))})
+    return filelist
 
 
 # set_download_flag()
@@ -147,10 +171,10 @@ def get_expiration(config, gto):
 # Modifies the supplied GTO file, adding the 'gt_download_mode' flag
 #
 # Inputs:
-# - config -- the config dict, originally read from the config file
 # - in_q -- the input queue directory that contains the GTO file
 # - gto -- the gto file's basename.  Note the file can be found
 #          at in_q/gto_file
+# - config -- the config dict, originally read from the config file
 #
 # Outputs:
 # the gto file is modified in-place
@@ -277,6 +301,36 @@ def make_writable(path):
     os.rename(tmpfile, path)
 
 
+# validate_gto()
+#
+# For download mode, this function performs an efficient heuristic
+# intended to catch some forms of possible corruption within CGHub.
+# For a given GTO, the function verifies that all files listed in the
+# GTO are present, and that they have the expected sizes.  Note that
+# this function does NOT run SHA-1 sums on the files, because that
+# would be expensive.
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - gto -- the fully-qualified pathname to the GTO file
+#
+# Output: None.  If an error is encountered, error info is logged to
+# syslog and an exception is raised
+#
+def validate_gto(config, gto):
+    if not config['validate_download_gtos']:
+        return
+    filelist = get_file_list(config, gto)
+    for f in filelist:
+        path = os.path.join(config['save_root_dir'], f['filename'])
+        if not os.access(path, os.R_OK):
+            raise IOError("Detected potential corruption: missing file %s" % path)
+        if (os.path.getsize(path) != f['length']):
+            raise IOError("Detected potential corruption on file %s: GTO expects length %d, "\
+                              "but filesystem length is %d" 
+                          % (path, f['length'], os.path.getsize(path)))
+        
+
 # save_gto()
 #
 # Save the specified GTO to the directory specified in the config file
@@ -340,6 +394,7 @@ def process_input_q(config, q_type):
                 save_gto(config, q_dir, gto)
             if (q_type == 'download'):
                 set_download_flag(q_dir, gto, config)
+                validate_gto(config, fullname)
             make_writable(fullname)
             add_expiration(q_dir, gto, config)
             assign_gto(q_dir, gto, factor, config)
@@ -533,6 +588,15 @@ def lookup_group(grpname, err_str):
 #   ; The group for the GTO file itself; default=gtorrent
 #   save_gto_group=gtorrent
 #   
+#   [ValidateDownloadGTOs]
+#   ; If true, GTLoadBalancer will validate download GTOs, by ensuring
+#   ; that all the files listed in them exist and have the expected file
+#   ; lengths.  (This is a reasonably low-cost test of CGHub consistency.)
+#   ;
+#   ; Note that the variable save_root_dir must be set in the section
+#   ; above, because it is used by the validation process.
+#   validate_download_gtos=Yes
+#   
 #   [Instances]
 #   ; this section defines the number of work-queues, and the queue directory for each
 #   num_instances=6
@@ -627,6 +691,10 @@ def parse_config_file(cfg_file):
 
             tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_group')
             config['save_gto_group'] = lookup_group(tmp_str, "GTO files")
+
+        # ValidateDownloadGTOs section
+        config['validate_download_gtos'] \
+            = cfgparser.getboolean('ValidateDownloadGTOs', 'validate_download_gtos')
 
         # Instances section
         config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
