@@ -323,7 +323,7 @@ def validate_gto(config, gto):
     filelist = get_file_list(config, gto)
     for f in filelist:
         path = os.path.join(config['save_root_dir'], f['filename'])
-        if not os.access(path, os.R_OK):
+        if not os.path.isfile(path):
             raise IOError("Detected potential corruption: missing file %s" % path)
         if (os.path.getsize(path) != f['length']):
             raise IOError("Detected potential corruption on file %s: GTO expects length %d, "\
@@ -661,15 +661,20 @@ def parse_config_file(cfg_file):
         if (not os.path.isdir(config['download_q'])):
             raise ValueError("Download queue directory %s doesn't exist" % config['download_q'])
 
+        # ValidateDownloadGTOs section
+        config['validate_download_gtos'] \
+            = cfgparser.getboolean('ValidateDownloadGTOs', 'validate_download_gtos')
+
         # SaveUploadGTOs section
         config['save_upload_gtos'] = cfgparser.getboolean('SaveUploadGTOs', 'save_upload_gtos')
 
-        if (config['save_upload_gtos']):
+        if (config['save_upload_gtos'] or config['validate_download_gtos']):
             config['save_root_dir'] = \
                 subs_qr(cfgparser.get('SaveUploadGTOs', 'save_root_dir'), config['queue_root'])
             if (not os.path.isdir(config['save_root_dir'])):
                 raise ValueError("Save root directory %s doesn't exist" % config['save_root_dir'])
 
+        if (config['save_upload_gtos']):
             tmp_str = cfgparser.get('SaveUploadGTOs', 'save_uuid_dir_perms')
             config['save_uuid_dir_perms'] = int(tmp_str,8)
             if (config['save_uuid_dir_perms'] < 0400 or config['save_uuid_dir_perms'] > 0777):
@@ -691,10 +696,6 @@ def parse_config_file(cfg_file):
 
             tmp_str = cfgparser.get('SaveUploadGTOs', 'save_gto_group')
             config['save_gto_group'] = lookup_group(tmp_str, "GTO files")
-
-        # ValidateDownloadGTOs section
-        config['validate_download_gtos'] \
-            = cfgparser.getboolean('ValidateDownloadGTOs', 'validate_download_gtos')
 
         # Instances section
         config['num_instances'] = cfgparser.getint('Instances', 'num_instances')
