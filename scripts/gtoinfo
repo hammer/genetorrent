@@ -42,6 +42,11 @@
 #
 # Version 0.1.5.0 (24 Jan 2012) added:
 # - Added the --set-key option, and factored code to use it correctly
+# - Renamed the --inspect option to --get-key for consistency (we'll
+#     keep --inspect for compatibility for now though)
+# - Made it so that multiple --get-key arguments can be specified on a
+#     single command line
+# - Added the --list-files option
 #
 # Version 0.1.4.0 (5 Jan 2012) added:
 # - Much richer specifications for the --expires option
@@ -433,6 +438,26 @@ def infohash(data):
     return hashlib.sha1(inf).hexdigest()
 
 
+# list_files()
+# Returns the files contained within this GTO file, with their sizes
+#
+# Inputs:
+# - data: top-level GTO dictionary from decode()
+#
+# Outputs: 
+# - ASCII file listing
+#
+def list_files(data):
+    try:
+        file_list = list()
+        dirname = data['info']['name']
+        for f in data['info']['files']:
+            file_list.append("%s/%s %d" % (dirname, "/".join(f['path']), f['length']))
+        return "\n".join(file_list)
+    except (KeyError):
+        raise ValueError('Bad GTO structure')
+
+
 # is_output()
 #
 # Returns True if the cmd line options cause output to be emitted to
@@ -443,7 +468,7 @@ def infohash(data):
 def is_output(params):
     retval = False
     if (params.decode_file or params.piece_index != -1 or params.inspect_key != None
-        or params.get_expire is True or params.infohash is True):
+        or params.get_expire is True or params.infohash is True or params.list_files is True):
         retval = True
     return retval
 
@@ -572,6 +597,9 @@ def process(params, gto_filenames):
         if (params.infohash):
             print infohash(gtodict)
 
+        if (params.list_files):
+            print list_files(gtodict)
+
         if (gto_file_changed):
             emit_gto(gtodict, gto_filename, (not params.no_backup))
 
@@ -599,13 +627,17 @@ parser.add_option('-d', '--decode', action='store_true',
                   default=False, dest='decode_file',
                   help='Pretty-print the contents of the GTO files, without hashes')
 
-parser.add_option('-t', '--total-size', action='store_true', 
-                  default=False, dest='total_size',
-                  help='Print the total size of the files, in bytes')
-
 parser.add_option('-g', '--get-key', '--inspect', action='append', 
                   default=None, dest='inspect_key', metavar='KEY',
                   help='Print just a particular key')
+
+parser.add_option('--infohash', action='store_true', 
+                  default=False, dest='infohash', 
+                  help='Show the infohash for this GTO file')
+
+parser.add_option('--list-files', action='store_true', 
+                  default=False, dest='list_files', 
+                  help='List the files contained in this GTO file, with their sizes')
 
 parser.add_option('-p', '--piece-hash', action='store', 
                   default=-1, dest='piece_index', type=int,
@@ -615,13 +647,13 @@ parser.add_option('-r', '--raw-time', action='store_true',
                   default=False, dest='raw_time',
                   help='Print all time/date values seconds-since-Unix-epoch')
 
+parser.add_option('-t', '--total-size', action='store_true', 
+                  default=False, dest='total_size',
+                  help='Print the total size of the files, in bytes')
+
 parser.add_option('-x', '--get-expire', action='store_true', 
                   default=False, dest='get_expire', 
                   help='Extract GTO "expires on" time as time since epoch')
-
-parser.add_option('--infohash', action='store_true', 
-                  default=False, dest='infohash', 
-                  help='Show the infohash for this GTO file')
 
 # arguments that cause the file to be modified
 
@@ -653,8 +685,8 @@ if (len(gto_filenames) == 0):
 
 if (params.decode_file is False and params.total_size is False and params.inspect_key == None
     and params.piece_index == -1 and params.announce_url == "" and params.expiry == ""
-    and params.get_expire is False and params.infohash is False and params.ssl_cert == ""
-    and params.set_key == None):
+    and params.get_expire is False and params.infohash is False and params.list_files is False
+    and params.ssl_cert == "" and params.set_key == None):
     params.decode_file = True
 
 
@@ -669,6 +701,7 @@ if (params.decode_file is False and params.total_size is False and params.inspec
 # print 'raw_time        =', params.raw_time
 # print 'get_expire      =', params.get_expire
 # print 'infohash        =', params.infohash
+# print 'list_files      =', params.list_files
 # print 'no_backup       =', params.no_backup
 # print 'announce_url    =', params.announce_url
 # print 'expiry          =', params.expiry
