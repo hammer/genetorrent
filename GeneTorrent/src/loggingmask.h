@@ -39,94 +39,75 @@
 #ifndef LOGGINGMASKS_H_
 #define LOGGINGMASKS_H_
 
-const uint64_t LOG_OUTGOING_CONNECTION        = 0x0000000000000001;
-const uint64_t LOG_DISCONNECT                 = 0x0000000000000002;
+const uint32_t LOG_DEBUG_NOTIFICATION         = 0x00000001;       // S [alert::debug_notification]  peer_connect_alert: peer_disconnected_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000000004;
-// const uint64_t VARIABLE                    = 0x0000000000000008;
+const uint32_t LOG_PEER_NOTIFICATION          = 0x00000002;       // S [alert::peer_notification]  url_seed_alert: incoming_connection_alert: 
+                                                                  // lsd_peer_alert: peer_error_alert: invalid_request_alert: peer_ban_alert: 
+                                                                  // peer_snubbed_alert: peer_unsnubbed_alert: unwanted_block_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000000010;
-// const uint64_t VARIABLE                    = 0x0000000000000020;
-// const uint64_t VARIABLE                    = 0x0000000000000040;
-// const uint64_t VARIABLE                    = 0x0000000000000080;
+const uint32_t LOG_IP_BLOCK_NOTIFICATION      = 0x00000004;       // V [alert::ip_block_notification] peer_blocked_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000000100;
-// const uint64_t VARIABLE                    = 0x0000000000000200;
-// const uint64_t VARIABLE                    = 0x0000000000000400;
-// const uint64_t VARIABLE                    = 0x0000000000000800;
+const uint32_t LOG_PERFORMANCE_WARNING        = 0x00000008;       // V [alert::performance_warning] performance_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000001000;
-// const uint64_t VARIABLE                    = 0x0000000000002000;
-// const uint64_t VARIABLE                    = 0x0000000000004000;
-// const uint64_t VARIABLE                    = 0x0000000000008000;
+const uint32_t LOG_PROGRESS_NOTIFICATION      = 0x00000010;       // F [alert::status_notification] fastresume_rejected_alert: file_error_alert:
+                                                                  // listen_failed_alert: add_torrent_alert: external_ip_alert: hash_failed_alert:
+                                                                  // listen_succeeded_alert: metadata_received_alert: state_changed_alert:
+                                                                  // torrent_added_alert: torrent_checked_alert: torrent_error_alert:
+                                                                  // torrent_finished_alert: torrent_need_cert_alert: torrent_paused_alert:
+                                                                  // torrent_removed_alert: torrent_resumed_alert: trackerid_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000010000;
-// const uint64_t VARIABLE                    = 0x0000000000020000;
-// const uint64_t VARIABLE                    = 0x0000000000040000;
-// const uint64_t VARIABLE                    = 0x0000000000080000;
+const uint32_t LOG_STATS_NOTIFICATION         = 0x00000020;       // F [alert::stats_notification] stats_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000000100000;
-// const uint64_t VARIABLE                    = 0x0000000000200000;
-// const uint64_t VARIABLE                    = 0x0000000000400000;
-// const uint64_t VARIABLE                    = 0x0000000000800000;
+const uint32_t LOG_STORAGE_NOTIFICATION       = 0x00000040;       // V [alert::storage_notification] save_resume_data_failed_alert:
+                                                                  // torrent_delete_failed_alert: cache_flushed_alert: file_rename_failed_alert:
+                                                                  // file_renamed_alert: read_piece_alert: save_resume_data_alert:
+                                                                  // storage_moved_alert: storage_moved_failed_alert: torrent_deleted_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000001000000;
-// const uint64_t VARIABLE                    = 0x0000000002000000;
-// const uint64_t VARIABLE                    = 0x0000000004000000;
-// const uint64_t VARIABLE                    = 0x0000000008000000;
+const uint32_t LOG_TRACKER_NOTIFICATION       = 0x00000080;       // S [alert::tracker_notification] scrape_failed_alert: tracker_error_alert:
+                                                                  // tracker_warning_alert: dht_reply_alert: scrape_reply_alert:
+                                                                  // tracker_announce_alert: tracker_reply_alert:
 
-// const uint64_t VARIABLE                    = 0x0000000010000000;
-// const uint64_t VARIABLE                    = 0x0000000020000000;
-// const uint64_t VARIABLE                    = 0x0000000040000000;
-// const uint64_t VARIABLE                    = 0x0000000080000000;
+const uint32_t LOG_LT_CALL_BACK_LOGGER        = 0x40000000;       // S Messasge from the libtorrent minimal call back logger
+const uint32_t LOG_UNIMPLEMENTED_ALERTS       = 0x80000000;       // F Unknown notification types in all notification handling functions:  
+                                                                  // [alert::dht_notification] dht_announce_alert: dht_bootstrap_alert: dht_get_peers_alert,
+                                                                  // [alert::port_mapping_notification] portmap_error_alert: portmap_alert: portmap_log_alert, 
+                                                                  // [alert::rss_notification] rss_alert:,
+                                                                  // [alert::error_notification] anonymous_mode_alert: metadata_failed_alert: udp_error_alert:,
 
-// const uint64_t VARIABLE                    = 0x0000000100000000;
-// const uint64_t VARIABLE                    = 0x0000000200000000;
-// const uint64_t VARIABLE                    = 0x0000000400000000;
-// const uint64_t VARIABLE                    = 0x0000000800000000;
+// const uint32_t UNUSED                      = 0x00000100;
+// const uint32_t UNUSED                      = 0x00000200;
+// const uint32_t UNUSED                      = 0x00000400;
+// const uint32_t UNUSED                      = 0x00000800;
 
-// const uint64_t VARIABLE                    = 0x0000001000000000;
-// const uint64_t VARIABLE                    = 0x0000002000000000;
-// const uint64_t VARIABLE                    = 0x0000004000000000;
-// const uint64_t VARIABLE                    = 0x0000008000000000;
+// const uint32_t UNUSED                      = 0x00001000;
+// const uint32_t UNUSED                      = 0x00002000;
+// const uint32_t UNUSED                      = 0x00004000;
+// const uint32_t UNUSED                      = 0x00008000;
 
-// const uint64_t VARIABLE                    = 0x0000010000000000;
-// const uint64_t VARIABLE                    = 0x0000020000000000;
-// const uint64_t VARIABLE                    = 0x0000040000000000;
-// const uint64_t VARIABLE                    = 0x0000080000000000;
+// const uint32_t UNUSED                      = 0x00010000;
+// const uint32_t UNUSED                      = 0x00020000;
+// const uint32_t UNUSED                      = 0x00040000;
+// const uint32_t UNUSED                      = 0x00080000;
 
-// const uint64_t VARIABLE                    = 0x0000100000000000;
-// const uint64_t VARIABLE                    = 0x0000200000000000;
-// const uint64_t VARIABLE                    = 0x0000400000000000;
-// const uint64_t VARIABLE                    = 0x0000800000000000;
+// const uint32_t UNUSED                      = 0x00100000;
+// const uint32_t UNUSED                      = 0x00200000;
+// const uint32_t UNUSED                      = 0x00400000;
+// const uint32_t UNUSED                      = 0x00800000;
 
-// const uint64_t VARIABLE                    = 0x0001000000000000;
-// const uint64_t VARIABLE                    = 0x0002000000000000;
-// const uint64_t VARIABLE                    = 0x0004000000000000;
-// const uint64_t VARIABLE                    = 0x0008000000000000;
+// const uint32_t UNUSED                      = 0x01000000;
+// const uint32_t UNUSED                      = 0x02000000;
+// const uint32_t UNUSED                      = 0x04000000;
+// const uint32_t UNUSED                      = 0x08000000;
 
-// const uint64_t VARIABLE                    = 0x0010000000000000;
-// const uint64_t VARIABLE                    = 0x0020000000000000;
-// const uint64_t VARIABLE                    = 0x0040000000000000;
-// const uint64_t VARIABLE                    = 0x0080000000000000;
-
-// const uint64_t VARIABLE                    = 0x0100000000000000;
-// const uint64_t VARIABLE                    = 0x0200000000000000;
-// const uint64_t VARIABLE                    = 0x0400000000000000;
-// const uint64_t VARIABLE                    = 0x0800000000000000;
-
-// const uint64_t VARIABLE                    = 0x1000000000000000;
-// const uint64_t VARIABLE                    = 0x2000000000000000;
-
-const uint64_t LOG_LT_CALL_BACK_LOGGER        = 0x4000000000000000;          // Messasge from the libtorrent minimal call back logger
-const uint64_t LOG_UNIMPLEMENTED_ALERTS       = 0x8000000000000000;          // Unknown notification types in all notification handling functions
+// const uint32_t UNUSED                      = 0x10000000;
+// const uint32_t UNUSED                      = 0x20000000;
 
 // These define the 3 logging levels offered via the command line.
 
-const uint64_t LOGMASK_STANDARD = LOG_OUTGOING_CONNECTION | LOG_DISCONNECT;
+const uint32_t LOGMASK_STANDARD = LOG_DEBUG_NOTIFICATION | LOG_PEER_NOTIFICATION | LOG_TRACKER_NOTIFICATION;
 
-const uint64_t LOGMASK_VERBOSE = LOGMASK_STANDARD | LOG_LT_CALL_BACK_LOGGER;
+const uint32_t LOGMASK_VERBOSE = LOGMASK_STANDARD | LOG_IP_BLOCK_NOTIFICATION | LOG_PERFORMANCE_WARNING | LOG_STORAGE_NOTIFICATION | LOG_LT_CALL_BACK_LOGGER;
 
-const uint64_t LOGMASK_FULL = LOGMASK_VERBOSE | LOG_UNIMPLEMENTED_ALERTS;
+const uint32_t LOGMASK_FULL = LOGMASK_VERBOSE | LOG_PROGRESS_NOTIFICATION | LOG_STATS_NOTIFICATION | LOG_UNIMPLEMENTED_ALERTS;
 
 #endif
