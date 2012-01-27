@@ -1,7 +1,7 @@
 /*                                           -*- mode: c++; tab-width: 2; -*-
  * $Id$
  *
- * Copyright (c) 2011-2012, Annai Systems, Inc.
+ * Copyright (c) 2012, Annai Systems, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 /*
  * gtAlerts.cpp
  *
- *  Created on: Aug 15, 2011
+ *  Created on: Jan 23, 2012
  *      Author: donavan
  */
 
@@ -40,20 +40,6 @@
 
 #include <config.h>
 /*
-#include <sys/statvfs.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <cstdio>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
-
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
 #include "libtorrent/create_torrent.hpp"
@@ -63,20 +49,8 @@
 
 #include "libtorrent/alert_types.hpp"
 
-/*
-#include <xqilla/xqilla-simple.hpp>
-
-#include <curl/curl.h>
-*/
-
 #include "geneTorrent.h"
 
-/*
-#include "stringTokenizer.h"
-#include "gtDefs.h"
-#include "tclapOutput.h"
-#include "geneTorrentUtils.h"
-*/
 #include "gtLog.h"
 #include "loggingmask.h"
 
@@ -159,7 +133,7 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
    alerts.clear();
 }
 
-void geneTorrent::setGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash)
+void geneTorrent::getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash)
 {
    if (alert->handle.is_valid())
    {
@@ -207,12 +181,9 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
          libtorrent::peer_connect_alert *pca =  libtorrent::alert_cast<libtorrent::peer_connect_alert> (alrt);
 
-         //std::string peerIPport; 
-         //std::string peerID;
-
          std::string gtoName;
          std::string infoHash;
-         setGtoNameAndInfoHash (pca, gtoName, infoHash);
+         getGtoNameAndInfoHash (pca, gtoName, infoHash);
 
          libtorrent::error_code ec;     // unused, but the conversion routine needs an argument
 
@@ -237,21 +208,7 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
          std::string gtoName;
          std::string infoHash;
-         //std::string peerIPport; 
-         //std::string peerID;
-
-         if (pda->handle.is_valid())
-         {
-            gtoName = pda->handle.name();
-            char msg[41];
-            libtorrent::to_hex((char const*)&(pda->handle).info_hash()[0], 20, msg);
-            infoHash = msg;
-         }
-         else
-         {
-            gtoName = "unknown";
-            infoHash = "unknown";
-         }
+         getGtoNameAndInfoHash (pda, gtoName, infoHash);
 
          libtorrent::error_code ec;      // unused, but the conversion routine needs an argument
 
@@ -298,12 +255,9 @@ void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *al
 
          std::string gtoName;
          std::string infoHash;
-
-         setGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
+         getGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
          Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
-         //Log (haveError, "connecting to %s:%d gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), gtoName.c_str(), infoHash.c_str());
-
       } break;
 
       default:
@@ -317,6 +271,21 @@ void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *
 {
    switch (alrt->type())
    {
+      case libtorrent::performance_alert::alert_type:
+      {
+         if (!(_logMask & LOG_PERFORMANCE_WARNING))
+         {
+            break;
+         }
+
+         libtorrent::performance_alert *perfAlert =  libtorrent::alert_cast<libtorrent::performance_alert> (alrt);
+
+         std::string gtoName;
+         std::string infoHash;
+         getGtoNameAndInfoHash (perfAlert, gtoName, infoHash);
+
+         Log (haveError, "%s, gto:  %s, infohash:  %s", perfAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
+      } break;
       default:
       {
          processUnimplementedAlert (haveError, alrt);

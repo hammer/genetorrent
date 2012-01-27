@@ -219,7 +219,7 @@ class geneTorrent
       time_t getExpirationTime (std::string torrentPathAndFileName);
       bool isDownloadModeGetFromGTO (std::string torrentPathAndFileName);
 
-      void setGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
+      void getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);
