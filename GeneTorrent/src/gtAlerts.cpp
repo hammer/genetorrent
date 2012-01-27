@@ -301,7 +301,7 @@ void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *al
 
          setGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName, infoHash );
+         Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
          //Log (haveError, "connecting to %s:%d gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), gtoName.c_str(), infoHash.c_str());
 
       } break;
