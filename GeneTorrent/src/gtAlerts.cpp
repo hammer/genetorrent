@@ -159,6 +159,22 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
    alerts.clear();
 }
 
+void geneTorrent::setGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash)
+{
+   if (alert->handle.is_valid())
+   {
+      gtoName = alert->handle.name();
+      char msg[41];
+      libtorrent::to_hex((char const*)&(alert->handle).info_hash()[0], 20, msg);
+      infoHash = msg;
+   }
+   else
+   {
+      gtoName = "unknown";
+      infoHash = "unknown";
+   }
+}
+
 void geneTorrent::processUnimplementedAlert (bool haveError, libtorrent::alert *alrt)
 {
    if (_logMask & LOG_UNIMPLEMENTED_ALERTS)
@@ -191,24 +207,12 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
          libtorrent::peer_connect_alert *pca =  libtorrent::alert_cast<libtorrent::peer_connect_alert> (alrt);
 
-         std::string gtoName;
-         std::string infoHash;
-         std::string peerIPport; 
+         //std::string peerIPport; 
          //std::string peerID;
 
-         if (pca->handle.is_valid())
-         {
-            gtoName = pca->handle.name();
-            char msg[41];
-            libtorrent::to_hex((char const*)&(pca->handle).info_hash()[0], 20, msg);
-            infoHash = msg;
-
-         }
-         else
-         {
-            gtoName = "unknown";
-            infoHash = "unknown";
-         }
+         std::string gtoName;
+         std::string infoHash;
+         setGtoNameAndInfoHash (pca, gtoName, infoHash);
 
          libtorrent::error_code ec;     // unused, but the conversion routine needs an argument
 
@@ -233,7 +237,7 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
          std::string gtoName;
          std::string infoHash;
-         std::string peerIPport; 
+         //std::string peerIPport; 
          //std::string peerID;
 
          if (pda->handle.is_valid())
@@ -292,7 +296,12 @@ void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *al
 
          libtorrent::stats_alert *statsAlert =  libtorrent::alert_cast<libtorrent::stats_alert> (alrt);
 
-         Log (haveError, "%s", statsAlert->message().c_str());
+         std::string gtoName;
+         std::string infoHash;
+
+         setGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
+
+         Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName, infoHash );
          //Log (haveError, "connecting to %s:%d gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), gtoName.c_str(), infoHash.c_str());
 
       } break;

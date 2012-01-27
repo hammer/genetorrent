@@ -53,6 +53,7 @@
 
 #include "libtorrent/session.hpp"
 #include "libtorrent/fingerprint.hpp"
+#include "libtorrent/alert_types.hpp"
 
 class geneTorrent
 {
@@ -218,6 +219,7 @@ class geneTorrent
       time_t getExpirationTime (std::string torrentPathAndFileName);
       bool isDownloadModeGetFromGTO (std::string torrentPathAndFileName);
 
+      void setGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);
