@@ -29,7 +29,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(GeneTorrent, 1.0.0.7)
+AC_INIT(GeneTorrent, 1.d.e.f)       # Donavan testing the build process
 AM_MAINTAINER_MODE
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE
