@@ -35,6 +35,9 @@
 bin_PROGRAMS = GeneTorrent
 
 GeneTorrent_SOURCES = geneTorrent.cpp \
+                      gtServer.cpp \
+                      gtUpload.cpp \
+                      gtDownload.cpp \
 		      gtMain.cpp \
 		      stringTokenizer.cpp \
 		      tclapOutput.cpp \

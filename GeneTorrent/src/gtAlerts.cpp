@@ -159,6 +159,14 @@ void geneTorrent::processUnimplementedAlert (bool haveError, libtorrent::alert *
 
 void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_PEER_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:
@@ -170,22 +178,22 @@ void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *al
 
 void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_DEBUG_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+   libtorrent::error_code ec;     // unused, but the conversion routine needs an argument
+
    switch (alrt->type())
    {
       case libtorrent::peer_connect_alert::alert_type:
       {
-         if (!(_logMask & LOG_DEBUG_NOTIFICATION))
-         {
-            break;
-         }
-
          libtorrent::peer_connect_alert *pca =  libtorrent::alert_cast<libtorrent::peer_connect_alert> (alrt);
 
-         std::string gtoName;
-         std::string infoHash;
          getGtoNameAndInfoHash (pca, gtoName, infoHash);
-
-         libtorrent::error_code ec;     // unused, but the conversion routine needs an argument
 
          if (pca->pid[0] != '\0')       // pid is a typedef from a big_number class as a string of 20 nulls if not assigned a proper pid, thus size() functions fail to report an empty string.
          {
@@ -199,18 +207,9 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
       case libtorrent::peer_disconnected_alert::alert_type:
       {
-         if (!(_logMask & LOG_DEBUG_NOTIFICATION))
-         {
-            break;
-         }
-
          libtorrent::peer_disconnected_alert *pda =  libtorrent::alert_cast<libtorrent::peer_disconnected_alert> (alrt);
 
-         std::string gtoName;
-         std::string infoHash;
          getGtoNameAndInfoHash (pda, gtoName, infoHash);
-
-         libtorrent::error_code ec;      // unused, but the conversion routine needs an argument
 
          if (pda->pid[0] != '\0')        // pid is a typedef from a big_number class as a string of 20 nulls if not assigned a proper pid, thus size() functions fail to report an empty string.
          {
@@ -231,6 +230,14 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
 
 void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_STORAGE_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:
@@ -242,19 +249,20 @@ void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert 
 
 void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_STATS_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       case libtorrent::stats_alert::alert_type:
       {
-         if (!(_logMask & LOG_STATS_NOTIFICATION))
-         {
-            break;
-         }
-
          libtorrent::stats_alert *statsAlert =  libtorrent::alert_cast<libtorrent::stats_alert> (alrt);
 
-         std::string gtoName;
-         std::string infoHash;
          getGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
          Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
@@ -269,19 +277,20 @@ void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *al
 
 void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_PERFORMANCE_WARNING))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       case libtorrent::performance_alert::alert_type:
       {
-         if (!(_logMask & LOG_PERFORMANCE_WARNING))
-         {
-            break;
-         }
-
          libtorrent::performance_alert *perfAlert =  libtorrent::alert_cast<libtorrent::performance_alert> (alrt);
 
-         std::string gtoName;
-         std::string infoHash;
          getGtoNameAndInfoHash (perfAlert, gtoName, infoHash);
 
          Log (haveError, "%s, gto:  %s, infohash:  %s", perfAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
@@ -295,6 +304,14 @@ void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *
 
 void geneTorrent::processIpBlockNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_IP_BLOCK_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:
@@ -306,6 +323,14 @@ void geneTorrent::processIpBlockNotification (bool haveError, libtorrent::alert 
 
 void geneTorrent::processProgressNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_PROGRESS_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:
@@ -317,6 +342,14 @@ void geneTorrent::processProgressNotification (bool haveError, libtorrent::alert
 
 void geneTorrent::processTrackerNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_TRACKER_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:
@@ -328,6 +361,14 @@ void geneTorrent::processTrackerNotification (bool haveError, libtorrent::alert 
 
 void geneTorrent::processStatusNotification (bool haveError, libtorrent::alert *alrt)
 {
+   if (!(_logMask & LOG_STATUS_NOTIFICATION))
+   {
+      return;
+   }
+
+   std::string gtoName;
+   std::string infoHash;
+
    switch (alrt->type())
    {
       default:

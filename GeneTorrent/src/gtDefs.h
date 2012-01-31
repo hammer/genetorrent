@@ -62,10 +62,30 @@ const std::string DEFAULT_CGHUB_HOSTNAME = "cghub.ucsc.edu";
 const std::string CGHUB_WSI_BASE_URL = "https://"+ DEFAULT_CGHUB_HOSTNAME + "/cghub/data/analysis/";
 const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 
+// Work around to disable SSL compression on Centos 5.5
+#ifndef SSL_OP_NO_COMPRESSION
+#define SSL_OP_NO_COMPRESSION	0x00020000L
+#endif
+
+// This Macro is to be used to display output on the user's screen (in conjunction with the -v option)
+// Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
+// send output messages to log files where users may not see them.
+// X is one or more stream manipulters
+#define screenOutput(x)               \
+{                                     \
+   if (_logToStdErr)                  \
+   {                                  \
+      std::cout << x << std::endl;    \
+   }                                  \
+   else                               \
+   {                                  \
+      std::cerr << x << std::endl;    \
+   }                                  \
+}                            
+
 // Torrent status text for various GeneTorrent operational modes
 //
 // these are indexed by the torrent_status::state_t enum, found in torrent_handle.hpp
-
 static char const* server_state_str[] = { 
 	"checking (q)",								//			queued_for_checking,
 	"checking",										//			checking_files,
