@@ -392,10 +392,10 @@ def process_input_q(config, q_type):
         try:
             if (q_type == 'upload' and config['save_upload_gtos']):
                 save_gto(config, q_dir, gto)
+            make_writable(fullname)
             if (q_type == 'download'):
                 set_download_flag(q_dir, gto, config)
                 validate_gto(config, fullname)
-            make_writable(fullname)
             add_expiration(q_dir, gto, config)
             assign_gto(q_dir, gto, factor, config)
             assigned = True
