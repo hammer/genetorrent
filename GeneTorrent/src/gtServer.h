@@ -30,11 +30,14 @@
  */
 
 /*
- * gtUplaod.h
+ * gtServer.h
  *
  *  Created on: feb 5, 2012
  *      Author: donavan
  */
+
+#ifndef GT_SERVER_H_
+#define GT_SERVER_H_
 
 #include "gtBase.h"
 
@@ -67,3 +70,5 @@ class gtServer : public gtBase
       libtorrent::session *addActiveSession ();
       time_t getExpirationTime (std::string torrentPathAndFileName);
 };
+
+#endif

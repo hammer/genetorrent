@@ -79,7 +79,7 @@ class gtBase
          time_t expires;            // When the torrent expires
          time_t mtime;              // file modification time
          std::string infoHash;         
-         bool overTimeAlertIssued;     // tracks if the overtime message has been reported to syslog
+         bool overTimeAlertIssued;  // tracks if the overtime message has been reported to syslog
          bool downloadGTO;
       } activeTorrentRec;
 
@@ -98,21 +98,19 @@ class gtBase
 
       typedef std::vector <std::string> vectOfStr;
 
-      gtBase (boost::program_options::variables_map &vm);
+      gtBase (boost::program_options::variables_map &vm, opMode mode);
       virtual ~gtBase ();
 
       virtual void run () = 0;
-      uint64_t getLogMask() {return _logMask;}
+      uint32_t getLogMask() {return _logMask;}
 
    protected:
-
       int  _verbosityLevel;
-      bool _logToStdErr;  // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
+      bool _logToStdErr;         // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
       std::string _authToken;
-      bool _devMode;  // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
+      bool _devMode;             // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
       std::string _tmpDir;
       std::string   _logDestination;
-
       std::string _dhParamsFile;
 
       int _portStart;         // based on --internalIP
@@ -124,7 +122,6 @@ class gtBase
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
       void getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
-
 
       void bindSession(libtorrent::session &torrentSession);
       void bindSession(libtorrent::session *torrentSession);
@@ -144,78 +141,32 @@ class gtBase
       std::string getInfoHash (std::string torrentFile);
 
    private:
-      //  Command line argument processing and variables
-//      TCLAP::CmdLine _args;
-
       std::string _bindIP;
       std::string _exposedIP;
-                                      
-
-/*
-      std::string _manifestFile;
-      std::string _uploadUUID;
-      std::string _uploadSubmissionURL;
-
-      std::string _dataFilePath;
-*/
-/*
-      std::string _serverQueuePath;
-      std::string _serverDataPath;
-      std::string _serverModeCsrSigningUrl;
-*/
-//      opMode _operatingMode;
-/*
-      vectOfStr  _filesToUpload;
-      int _pieceSize;
-*/
-/*
-      std::list <activeSessionRec *> _activeSessions;
-      unsigned int _maxActiveSessions;
-*/
-
+      opMode _operatingMode;
       std::string _confDir;
       std::string _gtOpenSslConf;
 
       uint32_t _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
 
+// DJN still needed?
       bool _startUpComplete;
 
-      void performTorrentDownload(int64_t);
-
-//      std::string buildTorrentSymlinks(std::string UUID, std::string fileForTorrent);
-//
-
-/*
-      void prepareDownloadList (std::string);
-      void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
-
-      void buildURIsToDownloadFromUUID (vectOfStr &uuids);
-      void downloadGtoFilesByURI (vectOfStr &uris);
-*/
       std::string sanitizePath (std::string inPath);
-
       static void loggingCallBack (std::string);
-
 
       std::string getHttpErrorMessage (int code);
 
-      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
-      int64_t getFreeDiskSpace ();
-
       void loadCredentialsFile (bool credsSet, std::string credsFile);
 
-      int downloadChild(int, int, std::string, FILE *);
       bool generateCSR (std::string uuid);
       bool acquireSignedCSR (std::string info_hash, std::string CSRsigningURL, std::string uuid);
       std::string loadCSRfile (std::string csrFileName);
       std::string getInfoHash (libtorrent::torrent_info *torrentInfo);
+
       void cleanupTmpDir();
       void setTempDir ();
       void mkTempDir ();
-
-//      time_t getExpirationTime (std::string torrentPathAndFileName);
-
-//      void runDownloadMode(std::string);
 
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
@@ -229,4 +180,50 @@ class gtBase
       void processStatusNotification(bool, libtorrent::alert*);
 };
 
-#endif /* GENETORRENT_H_ */
+#endif /* GT_BASE_H_ */
+
+
+
+
+//      time_t getExpirationTime (std::string torrentPathAndFileName);
+//      void runDownloadMode(std::string);
+
+//      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
+//      int64_t getFreeDiskSpace ();
+
+//      void performTorrentDownload(int64_t);
+
+//      std::string buildTorrentSymlinks(std::string UUID, std::string fileForTorrent);
+//
+
+/*
+      void prepareDownloadList (std::string);
+      void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
+
+      void buildURIsToDownloadFromUUID (vectOfStr &uuids);
+      void downloadGtoFilesByURI (vectOfStr &uris);
+*/
+      //  Command line argument processing and variables
+//      TCLAP::CmdLine _args;
+
+
+/*
+      std::string _manifestFile;
+      std::string _uploadUUID;
+      std::string _uploadSubmissionURL;
+
+      std::string _dataFilePath;
+*/
+/*
+      std::string _serverQueuePath;
+      std::string _serverDataPath;
+      std::string _serverModeCsrSigningUrl;
+*/
+/*
+      vectOfStr  _filesToUpload;
+      int _pieceSize;
+*/
+/*
+      std::list <activeSessionRec *> _activeSessions;
+      unsigned int _maxActiveSessions;
+*/

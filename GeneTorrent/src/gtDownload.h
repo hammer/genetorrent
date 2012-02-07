@@ -35,6 +35,8 @@
  *  Created on: feb 5, 2012
  *      Author: donavan
  */
+#ifndef GT_DOWNLOAD_H_
+#define GT_DOWNLOAD_H_
 
 #include "gtBase.h"
 
@@ -61,3 +63,5 @@ class gtDownload : public gtBase
       int64_t getFreeDiskSpace ();
       void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
 };
+
+#endif

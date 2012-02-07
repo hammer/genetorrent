@@ -75,13 +75,11 @@
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""),    _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""),    _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
 {
 
 }
 
-
-//DJN upload
 void gtUpload::run ()
 {
    processManifestFile ();

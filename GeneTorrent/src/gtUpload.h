@@ -36,6 +36,9 @@
  *      Author: donavan
  */
 
+#ifndef GT_UPLOAD_H_
+#define GT_UPLOAD_H_
+
 #include "gtBase.h"
 
 class gtUpload : public gtBase
@@ -66,3 +69,5 @@ class gtUpload : public gtBase
       void performGtoUpload (std::string torrentFileName);
       void performTorrentUpload();
 };
+
+#endif

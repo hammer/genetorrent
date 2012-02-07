@@ -76,7 +76,7 @@
 
 extern void *geneTorrCallBackPtr; 
 
-gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm), _torrentListToDownload (), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8)
+gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload ()
 {
 
 }

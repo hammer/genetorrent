@@ -78,7 +78,7 @@ extern void *geneTorrCallBackPtr;
 
 
 
-gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm), _serverQueuePath (""), _serverDataPath (""),    _activeSessions ()
+gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SERVER_MODE), _serverQueuePath (""), _serverDataPath (""),    _activeSessions ()
 {
 
 

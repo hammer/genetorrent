@@ -83,15 +83,28 @@ void *geneTorrCallBackPtr;
 // at the saem time another thread is trying to add to a buffer
 static pthread_mutex_t callBackLoggerLock;
 
-gtBase::gtBase (boost::program_options::variables_map &commandLine) : 
-  // _args (SHORT_DESCRIPTION, ' ', VERSION), 
-   _bindIP (""), 
-   _exposedIP (""), 
+gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode) : 
+   _verbosityLevel (0), 
+   _logToStdErr (false),
+   _authToken (""), 
+   _devMode (false),
+   _tmpDir (""), 
+   _logDestination ("none"),     // default to no logging
+
    _portStart (20892), 
    _portEnd (20900), 
    _exposedPortDelta (0), 
-   _verbosityLevel (0), 
+   
+   _bindIP (""), 
+   _exposedIP (""), 
 
+   _operatingMode (mode), 
+
+   _confDir (CONF_DIR_DEFAULT), 
+   _logMask (0),                 // set all bits to 0
+   _startUpComplete (false)
+
+  // _args (SHORT_DESCRIPTION, ' ', VERSION), 
 /*
    _manifestFile (""), 
    _uploadUUID (""), 
@@ -107,8 +120,6 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
    _serverQueuePath (""), 
    _serverDataPath (""), 
 */
-   _authToken (""), 
-   _operatingMode (UPLOAD_MODE), 
 
 /*
    _filesToUpload (), 
@@ -116,13 +127,6 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
    _torrentListToDownload (), 
    _activeSessions (), 
 */
-   _tmpDir (""), 
-   _confDir (CONF_DIR_DEFAULT), 
-   _logDestination ("none"),     // default to no logging
-   _logMask (0),                 // set all bits to 0
-   _logToStdErr (false),
-   _startUpComplete (false), 
-   _devMode (false) 
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
@@ -152,6 +156,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
       setTempDir();
    }
 
+/*
    // General purpose command line arguments.
    // Bind IP address (on local machine), upload, download, cghub server
    TCLAP::ValueArg <std::string> bindIP ("b", "bindIP", "Description Not Used", false, "", "string");
@@ -337,7 +342,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
 
       if (manifestFN.isSet ()) // upload mode
       {
-/*
+
          _manifestFile = manifestFN.getValue ();
 
          if (statFileOrDirectory (_manifestFile) != 0)
@@ -356,11 +361,9 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
          }
          loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
          _operatingMode = UPLOAD_MODE;
-*/
       }
       else if (downloadList.isSet ()) // download mode
       {
-/*
          _cliArgsDownloadList = downloadList.getValue ();
 
          vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
@@ -404,11 +407,9 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
             }
          }
          _operatingMode = DOWNLOAD_MODE;
-*/
       }
       else if (serverDataPath.isSet ()) // server  mode
       {
-/*
          _serverDataPath = sanitizePath (serverDataPath.getValue ());
 
          if (statFileOrDirectory (_serverDataPath) != 0)
@@ -439,7 +440,6 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
 
          loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
          _operatingMode = SERVER_MODE;
-*/
       }
       else
       {
@@ -451,6 +451,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine) :
    {
       outputOverride.failure (_args, e);
    }
+
+*/
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    _gtOpenSslConf = _confDir + "/" + GT_OPENSSL_CONF;
