@@ -65,18 +65,26 @@
 
 #include <curl/curl.h>
 
-#include "geneTorrent.h"
+#include "gtBase.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
 #include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
+#include "gtDownload.h"
 
 extern void *geneTorrCallBackPtr; 
 
-void geneTorrent::runDownloadMode (std::string startupDir)
+gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm), _torrentListToDownload (), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8)
 {
+
+}
+
+void gtDownload::run ()
+{
+   std::string saveDir = getWorkingDirectory ();
+
          time_t startTime = time(NULL);
 
          if (_downloadSavePath.size())
@@ -89,7 +97,7 @@ void geneTorrent::runDownloadMode (std::string startupDir)
             }
          }
 
-         prepareDownloadList (startupDir);
+         prepareDownloadList (saveDir);
 
          uint64_t totalBytes; 
          int totalFiles;
@@ -121,9 +129,10 @@ void geneTorrent::runDownloadMode (std::string startupDir)
          {
             screenOutput (message.str()); 
          }
+   chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }
-//DJN Download
-void geneTorrent::prepareDownloadList (std::string startDirectory)
+
+void gtDownload::prepareDownloadList (std::string startDirectory)
 {
    vectOfStr urisToDownload; // This list of URIs is used to download .gto files.
 
@@ -182,8 +191,7 @@ void geneTorrent::prepareDownloadList (std::string startDirectory)
    downloadGtoFilesByURI (urisToDownload);
 }
 
-//DJN Download
-void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
+void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 {
    vectOfStr::iterator vectIter = uris.begin ();
 
@@ -252,7 +260,7 @@ void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
       if (res != CURLE_OK)
       {
          curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 203, geneTorrent::CURL_ERROR, res, "URL:  " + uri);
+         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 203, gtBase::CURL_ERROR, res, "URL:  " + uri);
       }
 
       long code;
@@ -261,13 +269,13 @@ void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
       if (res != CURLE_OK)
       {
          curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 204, geneTorrent::DEFAULT_ERROR, 0, "URL:  " + uri);
+         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + uri);
       }
 
       if (code != 200)
       {
          curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 205, geneTorrent::HTTP_ERROR, code, "URL:  " + uri);
+         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 205, gtBase::HTTP_ERROR, code, "URL:  " + uri);
       }
 
       if (_verbosityLevel > VERBOSE_3)
@@ -299,7 +307,7 @@ void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
  
          if (std::string::npos == (foundPos = uri.find (pathToKeep)))
          {
-            gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, geneTorrent::DEFAULT_ERROR);
+            gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
          }
 
          std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
@@ -310,8 +318,7 @@ void geneTorrent::downloadGtoFilesByURI (vectOfStr &uris)
    }
 }
 
-//DJN Download
-void geneTorrent::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload)
+void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload)
 {
    XQilla xqilla;
    AutoDelete <XQQuery> query (xqilla.parse (X("//ResultSet/Result/analysis_data_uri/text()")));
@@ -344,13 +351,13 @@ void geneTorrent::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisTo
    }
 }
 
-//DJN Download
-void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
+void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
 {
    int64_t freeSpace = getFreeDiskSpace();
+
    if (totalSizeOfDownload > freeSpace) 
    {
-      gtError ("The system does not have enough free disk space to complete this transfer (transfer total size is " + add_suffix (totalSizeOfDownload) + "; free space is " + add_suffix (freeSpace), 97, geneTorrent::DEFAULT_ERROR, 0);
+      gtError ("The system does not have enough free disk space to complete this transfer (transfer total size is " + add_suffix (totalSizeOfDownload) + "); free space is " + add_suffix (freeSpace), 97, gtBase::DEFAULT_ERROR, 0);
    }
 
    vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
@@ -498,11 +505,11 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
          {
             if (freeSpace > DISK_FREE_WARN_LEVEL)
             {
-               gtError ("The system *might* run out of disk space before all downloads are complete", NO_EXIT, geneTorrent::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
+               gtError ("The system *might* run out of disk space before all downloads are complete", NO_EXIT, gtBase::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
             }
             else
             {
-                   gtError ("The system is running low on disk space.  Closing download client", 97, geneTorrent::DEFAULT_ERROR, 0);
+                   gtError ("The system is running low on disk space.  Closing download client", 97, gtBase::DEFAULT_ERROR, 0);
             }
          }
 
@@ -516,8 +523,7 @@ void geneTorrent::performTorrentDownload (int64_t totalSizeOfDownload)
    }
 }
 
-//DJN Download
-int geneTorrent::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
+int gtDownload::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
    gtLogger::delete_globallog();
    _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination, childID);
@@ -600,7 +606,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
       {
          if (childID == 1)   // Only alert that download children are dying in 1 child
          {
-            gtError ("download parent process has died, all download children are exiting", 197, geneTorrent::DEFAULT_ERROR);
+            gtError ("download parent process has died, all download children are exiting", 197, gtBase::DEFAULT_ERROR);
          }
          exit (197);
       }
@@ -667,7 +673,7 @@ int geneTorrent::downloadChild(int childID, int totalChildren, std::string torre
    exit (0);
 }
 
-int64_t geneTorrent::getFreeDiskSpace ()
+int64_t gtDownload::getFreeDiskSpace ()
 {
    struct statvfs buf;
 
@@ -683,7 +689,7 @@ int64_t geneTorrent::getFreeDiskSpace ()
    }
 }
 
-void geneTorrent::validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos)
+void gtDownload::validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos)
 {
    vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
 

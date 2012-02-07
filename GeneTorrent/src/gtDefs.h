@@ -67,6 +67,57 @@ const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 #define SSL_OP_NO_COMPRESSION	0x00020000L
 #endif
 
+// Command Line Option defines
+const char SPACE = ' ';
+
+// information options
+const std::string HELP_CLI_OPT = "help";
+const std::string VERSION_CLI_OPT = "version";
+
+// general options, shared by all modes
+const std::string CONFIG_FILE_CLI_OPT = "config-file";             // NO short option
+
+const std::string BIND_IP_CLI_OPT = "bind-ip";                     // -b short option
+const std::string BIND_IP_CLI_OPT_LEGACY = "bindIP";
+
+const std::string CRED_FILE_CLI_OPT = "credential-file";           // -c short option
+const std::string CRED_FILE_CLI_OPT_LEGACY = "credentialFile";
+
+const std::string CONF_DIR_CLI_OPT = "conf-dir";                   // -C short option ( capital C )
+const std::string CONF_DIR_CLI_OPT_LEGACY = "confDir";
+
+const std::string ADVERT_IP_CLI_OPT = "advertised-ip";             // -e short option
+const std::string ADVERT_IP_CLI_OPT_LEGACY = "advertisedIP";
+
+const std::string ADVERT_PORT_CLI_OPT = "advertised-port";         // -f short option
+const std::string ADVERT_PORT_CLI_OPT_LEGACY = "advertisedPort";
+
+const std::string INTERNAL_PORT_CLI_OPT = "internal-port";         // -i short option
+const std::string INTERNAL_PORT_CLI_OPT_LEGACY = "internalPort";
+
+const std::string LOGGING_CLI_OPT = "logging";                     // -l short option
+
+// download and upload mode options
+const std::string PATH_CLI_OPT = "path";                           // -p short option     
+
+// Upload Mode
+const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short option
+const std::string UPLOAD_FILE_CLI_OPT_LEGACY = "manifestFile";
+
+// Download Mode
+const std::string DOWNLOAD_CLI_OPT = "download";                   // -d short option
+
+const std::string MAX_CHILDREN_CLI_OPT = "max-children";           // NO short option
+const std::string MAX_CHILDREN_CLI_OPT_LEGACY = "maxChildren";
+
+// Server Mode
+const std::string SERVER_CLI_OPT = "server";                       // -s short option
+
+const std::string QUEUE_CLI_OPT = "queue";                         // -q short option
+
+const std::string SECURITY_API_CLI_OPT = "security-api";           // NO short option
+
+
 // This Macro is to be used to display output on the user's screen (in conjunction with the -v option)
 // Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
 // send output messages to log files where users may not see them.

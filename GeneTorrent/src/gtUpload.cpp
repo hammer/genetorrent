@@ -65,7 +65,7 @@
 
 #include <curl/curl.h>
 
-#include "geneTorrent.h"
+#include "gtUpload.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
 #include "tclapOutput.h"
@@ -75,24 +75,30 @@
 
 extern void *geneTorrCallBackPtr; 
 
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""),    _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+{
+
+}
+
+
 //DJN upload
-void geneTorrent::performTorrentUpload ()
+void gtUpload::run ()
 {
    processManifestFile ();
 
    if (_uploadSubmissionURL.size () < 1)
    {
-      gtError ("No Submission URL found in manifest file:  " + _manifestFile, 214, geneTorrent::DEFAULT_ERROR);
+      gtError ("No Submission URL found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
    }
 
    if (_uploadUUID.size () < 1)
    {
-      gtError ("No server_path (UUID) found in manifest file:  " + _manifestFile, 214, geneTorrent::DEFAULT_ERROR);
+      gtError ("No server_path (UUID) found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
    }
 
    if (_filesToUpload.size () < 1)
    {
-      gtError ("No files found in manifest file:  " + _manifestFile, 214, geneTorrent::DEFAULT_ERROR);
+      gtError ("No files found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
    }
 
    std::string torrentFileName;
@@ -113,7 +119,7 @@ void geneTorrent::performTorrentUpload ()
 }
 
 //DJN upload
-std::string geneTorrent::submitTorrentToGTExecutive (std::string tmpTorrentFileName)
+std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName)
 {
    std::string realTorrentFileName = tmpTorrentFileName.substr (0, tmpTorrentFileName.size () - 1); // drop the ~ from uuid.gto~
 
@@ -178,7 +184,7 @@ std::string geneTorrent::submitTorrentToGTExecutive (std::string tmpTorrentFileN
    if (res != CURLE_OK)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 203, geneTorrent::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 203, gtUpload::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
    }
 
    long code;
@@ -187,13 +193,13 @@ std::string geneTorrent::submitTorrentToGTExecutive (std::string tmpTorrentFileN
    if (res != CURLE_OK)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 204, geneTorrent::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 204, gtUpload::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
    }
 
    if (code != 200)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 205, geneTorrent::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL);
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL);
    }
 
    if (_verbosityLevel > VERBOSE_3)
@@ -208,7 +214,7 @@ std::string geneTorrent::submitTorrentToGTExecutive (std::string tmpTorrentFileN
    return realTorrentFileName;
 }
 
-void geneTorrent::findDataAndSetWorkingDirectory ()
+void gtUpload::findDataAndSetWorkingDirectory ()
 {
    vectOfStr missingFiles;
 
@@ -254,7 +260,7 @@ void geneTorrent::findDataAndSetWorkingDirectory ()
 // directory named with the UUID in the manifest.
 // the caller must be in the correct system directory when calling this function
 // error check is the responsibility of the caller
-bool geneTorrent::verifyDataFilesExist (vectOfStr &missingFileList)
+bool gtUpload::verifyDataFilesExist (vectOfStr &missingFileList)
 {
    bool missingFiles = false;
    std::string workingDataPath = _uploadUUID + "/";
@@ -274,7 +280,7 @@ bool geneTorrent::verifyDataFilesExist (vectOfStr &missingFileList)
    return missingFiles ? false : true;
 }
 
-void geneTorrent::setPieceSize ()
+void gtUpload::setPieceSize ()
 {
    struct stat fileStatus;
    unsigned long totalDataSize = 0;
@@ -298,7 +304,7 @@ void geneTorrent::setPieceSize ()
    }
 }
 
-void geneTorrent::displayMissingFilesAndExit (vectOfStr &missingFiles)
+void gtUpload::displayMissingFilesAndExit (vectOfStr &missingFiles)
 {
    vectOfStr::iterator vectIter = missingFiles.begin ();
 
@@ -307,10 +313,10 @@ void geneTorrent::displayMissingFilesAndExit (vectOfStr &missingFiles)
       screenOutput ("Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter);
       vectIter++;
    }
-   gtError ("file(s) listed above were not found (or is (are) not readable)", 82, geneTorrent::DEFAULT_ERROR);
+   gtError ("file(s) listed above were not found (or is (are) not readable)", 82, gtUpload::DEFAULT_ERROR);
 }
 
-std::string geneTorrent::makeTorrent (std::string filePath, std::string torrentName)
+std::string gtUpload::makeTorrent (std::string filePath, std::string torrentName)
 {
    std::string creator = std::string ("GeneTorrent-") + VERSION;
 
@@ -355,7 +361,7 @@ std::string geneTorrent::makeTorrent (std::string filePath, std::string torrentN
    return "";
 }
 
-void geneTorrent::processManifestFile ()
+void gtUpload::processManifestFile ()
 {
    vectOfStr fileNames;
 
@@ -405,7 +411,7 @@ void geneTorrent::processManifestFile ()
 }
 
 //DJN upload
-void geneTorrent::performGtoUpload (std::string torrentFileName)
+void gtUpload::performGtoUpload (std::string torrentFileName)
 {
    if (_verbosityLevel > 0)
    {
@@ -455,7 +461,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
  
       if (std::string::npos == (foundPos = uri.find (pathToKeep)))
       {
-         gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, geneTorrent::DEFAULT_ERROR);
+         gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtUpload::DEFAULT_ERROR);
       }
 
       std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
@@ -539,7 +545,7 @@ void geneTorrent::performGtoUpload (std::string torrentFileName)
 
 //DJN upload
 // do not include files that are not present in _filesToUpload
-bool geneTorrent::fileFilter (std::string const fileName)
+bool gtUpload::fileFilter (std::string const fileName)
 {
    vectOfStr::iterator vectIter = _filesToUpload.begin ();
 
@@ -561,12 +567,12 @@ bool geneTorrent::fileFilter (std::string const fileName)
 
 //DJN upload
 // do not include files and folders whose name starts with a ., based on file_filter from libtorrent
-bool geneTorrent::file_filter (boost::filesystem::path const& filename)
+bool gtUpload::file_filter (boost::filesystem::path const& filename)
 {
    std::string fileName = filename.filename().string();
 
    if (fileName[0] == '.')
       return false;
 
-   return ((geneTorrent *)geneTorrCallBackPtr)->fileFilter (fileName);
+   return ((gtUpload *)geneTorrCallBackPtr)->fileFilter (fileName);
 }

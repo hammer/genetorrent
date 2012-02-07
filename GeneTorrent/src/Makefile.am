@@ -34,16 +34,17 @@
 
 bin_PROGRAMS = GeneTorrent
 
-GeneTorrent_SOURCES = geneTorrent.cpp \
-                      gtServer.cpp \
-                      gtUpload.cpp \
+GeneTorrent_SOURCES = gtBase.cpp \
                       gtDownload.cpp \
+                      gtUpload.cpp \
+                      gtServer.cpp \
 		      gtMain.cpp \
 		      stringTokenizer.cpp \
 		      tclapOutput.cpp \
 		      gtLog.cpp \
 		      gtAlerts.cpp \
 		      geneTorrentUtils.cpp
+
 
 GTdatadir = $(datadir)/GeneTorrent
 
@@ -56,6 +57,7 @@ GeneTorrent_LDADD = -L/usr/lib64 \
                     -ltorrent-rasterbar \
                     -lboost_system-mt \
                     -lboost_filesystem-mt \
+                    -lboost_program_options-mt \
                     -lboost_regex
 
 man_MANS = GeneTorrent.1

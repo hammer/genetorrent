@@ -65,7 +65,7 @@
 
 #include <curl/curl.h>
 
-#include "geneTorrent.h"
+#include "gtServer.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
 #include "tclapOutput.h"
@@ -75,7 +75,23 @@
 
 extern void *geneTorrCallBackPtr; 
 
-void geneTorrent::getFilesInQueueDirectory (vectOfStr &files)
+
+
+
+gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm), _serverQueuePath (""), _serverDataPath (""),    _activeSessions ()
+{
+
+
+
+
+
+   _maxActiveSessions = _portEnd - _portStart + 1;
+}
+
+
+
+
+void gtServer::getFilesInQueueDirectory (vectOfStr &files)
 {
    boost::filesystem::path queueDir (_serverQueuePath);
 
@@ -91,9 +107,9 @@ void geneTorrent::getFilesInQueueDirectory (vectOfStr &files)
    }
 }
 
-void geneTorrent::checkSessions ()
+void gtServer::checkSessions ()
 {
-   geneTorrent::activeSessionRec *workingSessionRec = NULL;
+   gtServer::activeSessionRec *workingSessionRec = NULL;
 
    while (_activeSessions.size () == 0) // Loop until a session is added
    {
@@ -101,7 +117,7 @@ void geneTorrent::checkSessions ()
 
       if (workingSession)
       {
-         workingSessionRec = new geneTorrent::activeSessionRec;
+         workingSessionRec = new gtServer::activeSessionRec;
          workingSessionRec->torrentSession = workingSession;
 
          _activeSessions.push_back (workingSessionRec);
@@ -119,7 +135,7 @@ void geneTorrent::checkSessions ()
 
       if (workingSession)
       {
-         workingSessionRec = new geneTorrent::activeSessionRec;
+         workingSessionRec = new gtServer::activeSessionRec;
          workingSessionRec->torrentSession = workingSession;
 
          _activeSessions.push_back (workingSessionRec);
@@ -134,7 +150,7 @@ void geneTorrent::checkSessions ()
 //
 //
 //
-void geneTorrent::runServerMode ()
+void gtServer::run ()
 {
    int cdRet = chdir (_serverDataPath.c_str ());
 
@@ -189,7 +205,7 @@ void geneTorrent::runServerMode ()
    }
 }
 
-void geneTorrent::processServerModeAlerts ()
+void gtServer::processServerModeAlerts ()
 {
    libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds(2);
 
@@ -206,7 +222,7 @@ void geneTorrent::processServerModeAlerts ()
    }
 }
 
-void geneTorrent::servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents)
+void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents)
 {
    std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
    while (listIter != _activeSessions.end ())
@@ -327,7 +343,7 @@ std::cerr << "inside with time = " << time(NULL) << std::endl;
    }
 }
 
-bool geneTorrent::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
+bool gtServer::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
 {
    bool dlMode = false;
 
@@ -367,7 +383,7 @@ bool geneTorrent::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
    return dlMode;       
 }
 
-bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
+bool gtServer::addTorrentToServingList (std::string pathAndFileName)
 {
    activeSessionRec *workSession = findSession ();
 
@@ -465,13 +481,13 @@ bool geneTorrent::addTorrentToServingList (std::string pathAndFileName)
    return true;
 }
 
-geneTorrent::activeSessionRec *geneTorrent::findSession ()
+gtServer::activeSessionRec *gtServer::findSession ()
 {
    checkSessions (); // start or adds sessions if unused session slots exist
 
    std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
    unsigned int torrentsBeingServed = (*listIter)->mapOfSessionTorrents.size ();
-   geneTorrent::activeSessionRec *workingSessionRec = *listIter;
+   gtServer::activeSessionRec *workingSessionRec = *listIter;
 
    while (listIter != _activeSessions.end ())
    {
@@ -486,16 +502,16 @@ geneTorrent::activeSessionRec *geneTorrent::findSession ()
    return workingSessionRec;;
 }
 
-void geneTorrent::deleteGTOfromQueue (std::string fileName)
+void gtServer::deleteGTOfromQueue (std::string fileName)
 {
    int ret = unlink (fileName.c_str ()); 
    if (ret != 0)
    {
-      gtError ("Unable to remove ", NO_EXIT, geneTorrent::ERRNO_ERROR, errno);
+      gtError ("Unable to remove ", NO_EXIT, gtServer::ERRNO_ERROR, errno);
    }
 }
 
-libtorrent::session *geneTorrent::addActiveSession ()
+libtorrent::session *gtServer::addActiveSession ()
 {
    libtorrent::session *sessionNew = new libtorrent::session (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (sessionNew);
@@ -510,4 +526,32 @@ libtorrent::session *geneTorrent::addActiveSession ()
    }
 
    return sessionNew;
+}
+
+time_t gtServer::getExpirationTime (std::string torrentPathAndFileName)
+{
+   time_t expireTime = 2114406000;     // Default to 1/1/2037
+
+   FILE *result = popen (("gtoinfo -x " + torrentPathAndFileName).c_str(), "r");
+
+   if (result != NULL)
+   {
+      char vBuff[15];
+
+      if (NULL != fgets (vBuff, 15, result))
+      {
+         expireTime = strtol (vBuff, NULL, 10);
+      }
+      else
+      {
+         Log (PRIORITY_HIGH, "Failure running gtoinfo on %s or no 'expires on' in GTO, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
+      }
+      pclose (result);
+   }  
+   else
+   {  
+      Log (PRIORITY_HIGH, "Failure running gtoinfo on %s, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
+   }  
+
+   return expireTime;       
 }

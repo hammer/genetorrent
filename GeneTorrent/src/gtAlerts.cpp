@@ -49,12 +49,12 @@
 
 #include "libtorrent/alert_types.hpp"
 
-#include "geneTorrent.h"
+#include "gtBase.h"
 
 #include "gtLog.h"
 #include "loggingmask.h"
 
-void geneTorrent::checkAlerts (libtorrent::session &torrSession)
+void gtBase::checkAlerts (libtorrent::session &torrSession)
 {
    std::deque <libtorrent::alert *> alerts;
    torrSession.pop_alerts (&alerts);   
@@ -62,13 +62,13 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {
       // Leaving this code in for now -- it existed prior to using alerts for logging, this needs to be fixed with a dns loookup at startup to verify the tracker is resolvable.
-      if (((*dequeIter)->category() & libtorrent::alert::tracker_notification) && ((*dequeIter)->category() & libtorrent::alert::error_notification))
+      if (((*dequeIter)->category() & libtorrent::alert::tracker_notification) && ((*dequeIter)->category() & libtorrent::alert::error_notification) && ((*dequeIter)->type() == libtorrent::tracker_error_alert::alert_type))
       {
          libtorrent::tracker_error_alert *tea = libtorrent::alert_cast<libtorrent::tracker_error_alert> (*dequeIter);
 
          if (tea->times_in_row > 2)
          {
-            gtError ("Failure communicating with the transactor on URL:  " + tea->url, 214, geneTorrent::DEFAULT_ERROR, 0, tea->error.message());
+            gtError ("Failure communicating with the transactor on URL:  " + tea->url, 214, gtBase::DEFAULT_ERROR, 0, tea->error.message());
          }
       }
 
@@ -133,7 +133,7 @@ void geneTorrent::checkAlerts (libtorrent::session &torrSession)
    alerts.clear();
 }
 
-void geneTorrent::getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash)
+void gtBase::getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash)
 {
    if (alert->handle.is_valid())
    {
@@ -149,7 +149,7 @@ void geneTorrent::getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::
    }
 }
 
-void geneTorrent::processUnimplementedAlert (bool haveError, libtorrent::alert *alrt)
+void gtBase::processUnimplementedAlert (bool haveError, libtorrent::alert *alrt)
 {
    if (_logMask & LOG_UNIMPLEMENTED_ALERTS)
    {
@@ -157,7 +157,7 @@ void geneTorrent::processUnimplementedAlert (bool haveError, libtorrent::alert *
    }
 }
 
-void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processPeerNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_PEER_NOTIFICATION))
    {
@@ -176,7 +176,7 @@ void geneTorrent::processPeerNotification (bool haveError, libtorrent::alert *al
    }   
 }
 
-void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processDebugNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_DEBUG_NOTIFICATION))
    {
@@ -228,7 +228,7 @@ void geneTorrent::processDebugNotification (bool haveError, libtorrent::alert *a
    }   
 }
 
-void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processStorageNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_STORAGE_NOTIFICATION))
    {
@@ -247,7 +247,7 @@ void geneTorrent::processStorageNotification (bool haveError, libtorrent::alert 
    }   
 }
 
-void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processStatNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_STATS_NOTIFICATION))
    {
@@ -275,7 +275,7 @@ void geneTorrent::processStatNotification (bool haveError, libtorrent::alert *al
    }   
 }
 
-void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *alrt)
+void gtBase::processPerformanceWarning (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_PERFORMANCE_WARNING))
    {
@@ -302,7 +302,7 @@ void geneTorrent::processPerformanceWarning (bool haveError, libtorrent::alert *
    }   
 }
 
-void geneTorrent::processIpBlockNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processIpBlockNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_IP_BLOCK_NOTIFICATION))
    {
@@ -321,7 +321,7 @@ void geneTorrent::processIpBlockNotification (bool haveError, libtorrent::alert 
    }   
 }
 
-void geneTorrent::processProgressNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processProgressNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_PROGRESS_NOTIFICATION))
    {
@@ -340,7 +340,7 @@ void geneTorrent::processProgressNotification (bool haveError, libtorrent::alert
    }   
 }
 
-void geneTorrent::processTrackerNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_TRACKER_NOTIFICATION))
    {
@@ -359,7 +359,7 @@ void geneTorrent::processTrackerNotification (bool haveError, libtorrent::alert 
    }   
 }
 
-void geneTorrent::processStatusNotification (bool haveError, libtorrent::alert *alrt)
+void gtBase::processStatusNotification (bool haveError, libtorrent::alert *alrt)
 {
    if (!(_logMask & LOG_STATUS_NOTIFICATION))
    {
