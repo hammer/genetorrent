@@ -43,6 +43,7 @@
 
 class gtServer : public gtBase
 {
+
    public:
       gtServer (boost::program_options::variables_map &vm);
       void run ();
@@ -56,8 +57,6 @@ class gtServer : public gtBase
       std::list <activeSessionRec *> _activeSessions;
       unsigned int _maxActiveSessions;
 
-
-
       void getFilesInQueueDirectory (vectOfStr &files);
       void checkSessions();
       void runServerMode();
@@ -69,6 +68,10 @@ class gtServer : public gtBase
       void deleteGTOfromQueue (std::string fileName);
       libtorrent::session *addActiveSession ();
       time_t getExpirationTime (std::string torrentPathAndFileName);
+
+      void pcfacliSecurityAPI (boost::program_options::variables_map &vm);
+      void pcfacliQueue (boost::program_options::variables_map &vm);
+      void pcfacliServer (boost::program_options::variables_map &vm);
 };
 
 #endif

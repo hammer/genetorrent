@@ -68,6 +68,8 @@ class gtUpload : public gtBase
       void processManifestFile();
       void performGtoUpload (std::string torrentFileName);
       void performTorrentUpload();
+
+      void pcfacliUpload (boost::program_options::variables_map &vm);
 };
 
 #endif

@@ -68,17 +68,81 @@
 #include "gtBase.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
-#include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
 #include "gtDownload.h"
 
+static char const* download_state_str[] = {
+   "checking (q)",            // queued_for_checking,
+   "checking",                // checking_files,
+   "dl metadata",             // downloading_metadata,
+   "downloading",             // downloading,
+   "finished",                // finished,
+   "cleanup",                 // seeding,
+   "allocating",              // allocating,
+   "checking (r)"             // checking_resume_data
+};
+
 extern void *geneTorrCallBackPtr; 
 
 gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload ()
 {
+   pcfacliMaxChildren (vm);
+   pcfacliDownloadList (vm);
+   _downloadSavePath = pcfacliPath(vm);
 
+   _startUpComplete = true;
+}
+
+void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
+{
+   if (vm.count (MAX_CHILDREN_CLI_OPT) == 1 && vm.count (MAX_CHILDREN_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + MAX_CHILDREN_CLI_OPT + " and " + MAX_CHILDREN_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   if (vm.count (MAX_CHILDREN_CLI_OPT) == 1)
+   {
+      _maxChildren = vm[MAX_CHILDREN_CLI_OPT].as< uint32_t >();
+   }
+   else if (vm.count (MAX_CHILDREN_CLI_OPT) == 1)
+   {
+      _maxChildren = vm[MAX_CHILDREN_CLI_OPT_LEGACY].as< uint32_t >();
+   }
+}
+
+void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
+{
+   _cliArgsDownloadList = vm[DOWNLOAD_CLI_OPT].as< std::vector <std::string> >();
+
+   vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
+
+   bool needCreds = false;
+
+   while (vectIter != _cliArgsDownloadList.end () && needCreds == false) // Check the list of -d arguments to see if any require a credential file
+   {
+      std::string inspect = *vectIter;
+
+      if (inspect.size () > 4) // Check for GTO file
+      {
+         if (inspect.substr (inspect.size () - 4) == GTO_FILE_EXTENSION)
+         {
+            vectIter++;
+            continue;
+         }
+      }
+
+      needCreds = true;
+      vectIter++;
+   }
+
+   std::cerr << "need creds = " << needCreds << std::endl;
+
+   if (needCreds)
+   {
+      checkCredentials ();
+   }
 }
 
 void gtDownload::run ()

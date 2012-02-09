@@ -50,11 +50,11 @@
 #include <boost/filesystem/v3/path.hpp>
 #include <boost/program_options.hpp>
 
-#include <tclap/CmdLine.h>
-
 #include "libtorrent/session.hpp"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
+
+#include "accumulator.hpp"
 
 class gtBase
 {
@@ -119,6 +119,9 @@ class gtBase
 
       libtorrent::fingerprint *_gtFingerPrint;
 
+      bool _startUpComplete;
+
+      void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
       void getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
@@ -140,6 +143,11 @@ class gtBase
 
       std::string getInfoHash (std::string torrentFile);
 
+      std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload
+      void checkCredentials ();
+
+      std::string sanitizePath (std::string inPath);
+
    private:
       std::string _bindIP;
       std::string _exposedIP;
@@ -149,15 +157,9 @@ class gtBase
 
       uint32_t _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
 
-// DJN still needed?
-      bool _startUpComplete;
-
-      std::string sanitizePath (std::string inPath);
       static void loggingCallBack (std::string);
 
       std::string getHttpErrorMessage (int code);
-
-      void loadCredentialsFile (bool credsSet, std::string credsFile);
 
       bool generateCSR (std::string uuid);
       bool acquireSignedCSR (std::string info_hash, std::string CSRsigningURL, std::string uuid);
@@ -178,52 +180,15 @@ class gtBase
       void processProgressNotification(bool, libtorrent::alert*);
       void processTrackerNotification(bool, libtorrent::alert*);
       void processStatusNotification(bool, libtorrent::alert*);
+
+      // Process command config file and command line interface
+      void pcfacliBindIP (boost::program_options::variables_map &vm);
+      void pcfacliConfDir (boost::program_options::variables_map &vm);
+      void pcfacliCredentialFile (boost::program_options::variables_map &vm);
+      void pcfacliAdvertisedIP (boost::program_options::variables_map &vm);
+      void pcfacliInternalPort (boost::program_options::variables_map &vm);
+      void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
+      void pcfacliLog (boost::program_options::variables_map &vm);
 };
 
 #endif /* GT_BASE_H_ */
-
-
-
-
-//      time_t getExpirationTime (std::string torrentPathAndFileName);
-//      void runDownloadMode(std::string);
-
-//      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
-//      int64_t getFreeDiskSpace ();
-
-//      void performTorrentDownload(int64_t);
-
-//      std::string buildTorrentSymlinks(std::string UUID, std::string fileForTorrent);
-//
-
-/*
-      void prepareDownloadList (std::string);
-      void extractURIsFromXML (std::string xmlFileNmae, vectOfStr &urisToDownload);
-
-      void buildURIsToDownloadFromUUID (vectOfStr &uuids);
-      void downloadGtoFilesByURI (vectOfStr &uris);
-*/
-      //  Command line argument processing and variables
-//      TCLAP::CmdLine _args;
-
-
-/*
-      std::string _manifestFile;
-      std::string _uploadUUID;
-      std::string _uploadSubmissionURL;
-
-      std::string _dataFilePath;
-*/
-/*
-      std::string _serverQueuePath;
-      std::string _serverDataPath;
-      std::string _serverModeCsrSigningUrl;
-*/
-/*
-      vectOfStr  _filesToUpload;
-      int _pieceSize;
-*/
-/*
-      std::list <activeSessionRec *> _activeSessions;
-      unsigned int _maxActiveSessions;
-*/

@@ -68,7 +68,6 @@
 #include "gtBase.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
-#include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
@@ -83,6 +82,8 @@ void *geneTorrCallBackPtr;
 // at the saem time another thread is trying to add to a buffer
 static pthread_mutex_t callBackLoggerLock;
 
+extern int global_verbosity;
+
 gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode) : 
    _verbosityLevel (0), 
    _logToStdErr (false),
@@ -90,55 +91,26 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _devMode (false),
    _tmpDir (""), 
    _logDestination ("none"),     // default to no logging
-
    _portStart (20892), 
    _portEnd (20900), 
    _exposedPortDelta (0), 
-   
+   _startUpComplete (false),
    _bindIP (""), 
    _exposedIP (""), 
-
    _operatingMode (mode), 
-
    _confDir (CONF_DIR_DEFAULT), 
-   _logMask (0),                 // set all bits to 0
-   _startUpComplete (false)
-
-  // _args (SHORT_DESCRIPTION, ' ', VERSION), 
-/*
-   _manifestFile (""), 
-   _uploadUUID (""), 
-   _uploadSubmissionURL (""), 
-   _dataFilePath (""), 
-*/
-/*
-   _cliArgsDownloadList (), 
-   _downloadSavePath (""), 
-   _maxChildren (8),
-*/
-/*
-   _serverQueuePath (""), 
-   _serverDataPath (""), 
-*/
-
-/*
-   _filesToUpload (), 
-   _pieceSize (4194304), 
-   _torrentListToDownload (), 
-   _activeSessions (), 
-*/
+   _logMask (0)                 // set all bits to 0
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
    pthread_mutex_init (&callBackLoggerLock, NULL);
 
    std::ostringstream startUpMessage;
-// DJN fix to add the command line to the startup message
+
+// TODO fix to add the command line to the startup message
    startUpMessage << "Starting version " << VERSION << " with the command line: ";
 
-
 /*
- 
    for (int loop = 1; loop < argc; loop++)
    {
       startUpMessage << " " << argv[loop];
@@ -156,303 +128,9 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
       setTempDir();
    }
 
-/*
-   // General purpose command line arguments.
-   // Bind IP address (on local machine), upload, download, cghub server
-   TCLAP::ValueArg <std::string> bindIP ("b", "bindIP", "Description Not Used", false, "", "string");
-   _args.add (bindIP);
+   processConfigFileAndCLI (commandLine);
 
-   // configuration directory
-   TCLAP::ValueArg <std::string> confDir ("C", "confDir", "Description Not Used", false, "", "string");
-   _args.add (confDir);
-
-   // Exposed IP address (of local machine), upload, download, cghub server
-   TCLAP::ValueArg <std::string> exposedIP ("e", "advertisedIP", "Description Not Used", false, "", "string");
-   _args.add (exposedIP);
-
-   // Exposed ports (of local machine), upload, download, cghub server
-   TCLAP::ValueArg <int> exposedPort ("f", "advertisedPort", "Description Not Used", false, 0, "int");
-   _args.add (exposedPort);
-
-   // Internal ports (of local machine), upload, download, cghub server
-   TCLAP::ValueArg <std::string> internalPort ("i", "internalPorts", "Description Not Used", false, "", "string");
-   _args.add (internalPort);
-
-   // Logging option, 3 fields destination:level:mask
-   TCLAP::ValueArg <std::string> logging ("l", "log", "Description Not Used", false, "", "string");
-   _args.add (logging);
-
-   // Generic path used by upload, download, cghub server
-   TCLAP::ValueArg <std::string> genericPath ("p", "path", "Description Not Used", false, "", "string");
-   _args.add (genericPath);
-
-   // Verbosity
-   TCLAP::MultiSwitchArg verbosity ("v", "verbose", "Description Not Used", false);
-   _args.add (verbosity);
-
-// Download mode
-   // Credential File
-   TCLAP::ValueArg <std::string> credentialFile ("c", "credentialFile", "Description Not Used", false, "", "string"); // this implies download mode
-   _args.add (credentialFile);
-
-   // download flag and repeatable argument indicating download items
-   TCLAP::MultiArg <std::string> downloadList ("d", "download", "Description Not Used", false, "string"); // this implies download mode
-   _args.add (downloadList);
-
-   // Max number of children for download
-   TCLAP::ValueArg <int> maxDownloadChildren ("", "maxChildren", "Description Not Used", false, 8, "int");
-    _args.add (maxDownloadChildren);
-
-// Upload mode 
-   //
-   TCLAP::ValueArg <std::string> manifestFN ("u", "manifestFile", "Description Not Used", false, "", "string"); // This implies upload mode
-   _args.add (manifestFN);
-
-// Seeder mode
-   // path to queue directory
-   TCLAP::ValueArg <std::string> serverQueuePath ("q", "queue", "Description Not Used", false, "", "string");
-   _args.add (serverQueuePath);
-
-   // server mode flag and path to directory containing UUID directories
-   TCLAP::ValueArg <std::string> serverDataPath ("s", "server", "Description Not Used", false, "", "string");
-   _args.add (serverDataPath);
-
-   // URL to use for signing CSR in server mode
-   TCLAP::ValueArg <std::string> serverModeCsrSigningUrl ("", "security-api", "Description Not Used", false, "", "string");
-   _args.add (serverModeCsrSigningUrl);
-
-   tclapOutput outputOverride;
-
-   try
-   {
-      _args.setOutput (&outputOverride); // Setup our custom help page
-
-//      _args.parse (argc, argv); // Parse the command line
-
-      // serverDataPath -> server mode, manifestFN -> upload mode, downloadList -> download mode
-      // Verify only one mode is selected on the CLI
-      if ((serverDataPath.isSet() && manifestFN.isSet()) || (serverDataPath.isSet() && downloadList.isSet()) || (manifestFN.isSet() && downloadList.isSet()))
-      {
-         TCLAP::ArgException argError ("Command line may only specifiy one of -d, -s, or -u", "");
-         throw(argError);
-      }
-
-      // Process the General Args
-      if (bindIP.isSet ())
-      {
-         _bindIP = bindIP.getValue ();
-      }
-
-      if (exposedIP.isSet ())
-      {
-         _exposedIP = exposedIP.getValue ();
-      }
-
-      if (internalPort.isSet ())
-      {
-         strTokenize strToken (internalPort.getValue (), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
-
-         int lowPort = strtol (strToken.getToken (1).c_str (), NULL, 10);
-         int highPort = -1;
-
-         if (strToken.size () > 1)
-         {
-            highPort = strtol (strToken.getToken (2).c_str (), NULL, 10);
-         }
-
-         if (highPort > 0)
-         {
-            if (lowPort <= highPort)
-            {
-               _portStart = lowPort;
-               _portEnd = highPort;
-            }
-            else
-            {
-               TCLAP::ArgException argError ("when using -i (--internalPorts) string1 must be smaller than string2", "");
-               throw(argError);
-            }
-         }
-         else
-         {
-            _portStart = lowPort;
-            _portEnd = _portStart + 8; // default 8 ports
-         }
-      }
-
-//       _maxActiveSessions = _portEnd - _portStart + 1;
-
-      if (exposedPort.isSet ())
-      {
-         _exposedPortDelta = exposedPort.getValue () - _portStart;
-      }
-
-      // Generic path (option -p) is collected when needed
-
-      // configuration directory
-      if (confDir.isSet())
-      {
-         _confDir = sanitizePath (confDir.getValue ());
-         if ((_confDir.size () == 0) || (_confDir[0] != '/'))
-         {
-             TCLAP::ArgException argError ("configuration directory must be an absolute path: \"" + _confDir + "\"", "");
-             throw(argError);
-         }
-
-         if (statFileOrDirectory (_confDir) != 0)
-         {
-            gtError ("Failure opening configuration path:  " + _confDir, 202, ERRNO_ERROR, errno);
-         }
-      }
-
-      if (logging.isSet())
-      {
-         strTokenize strToken (logging.getValue (), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
-
-         _logDestination = strToken.getToken(1);
-
-         std::string level = strToken.getToken(2);
-
-         if ("verbose" == level)
-         {
-            _logMask  = LOGMASK_VERBOSE;
-         }
-         else if ("full" == level)
-         {
-            _logMask  = LOGMASK_FULL;
-         }
-         else if ("standard" == level || level.size() == 0) // default to standard
-         {
-            _logMask  = LOGMASK_STANDARD;
-         }
-         else
-         {
-            _logMask = strtoul (level.c_str(), NULL, 0);
-         }
-      }
-
-      _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
-
-      Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
-
-      if (verbosity.isSet ())
-      {
-         _verbosityLevel = verbosity.getValue ();
-      }
-
-      if (manifestFN.isSet ()) // upload mode
-      {
-
-         _manifestFile = manifestFN.getValue ();
-
-         if (statFileOrDirectory (_manifestFile) != 0)
-         {
-            gtError ("Failure opening " + _manifestFile + " for input.", 202, ERRNO_ERROR, errno);
-         }
-
-         _dataFilePath = sanitizePath (genericPath.getValue ()); // default is ""
-
-         if (_dataFilePath.size () > 0)
-         {
-            if (statFileOrDirectory (_dataFilePath) != 0)
-            {
-               gtError ("Failure opening data path:  " + _dataFilePath, 202, ERRNO_ERROR, errno);
-            }
-         }
-         loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
-         _operatingMode = UPLOAD_MODE;
-      }
-      else if (downloadList.isSet ()) // download mode
-      {
-         _cliArgsDownloadList = downloadList.getValue ();
-
-         vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
-
-         bool needCreds = false;
-
-         while (vectIter != _cliArgsDownloadList.end () && needCreds == false) // Check the list of -d arguments to see if any require a credential file
-         {
-            std::string inspect = *vectIter;
-
-            if (inspect.size () > 4) // Check for GTO file
-            {
-               if (inspect.substr (inspect.size () - 4) == GTO_FILE_EXTENSION)
-               {
-                  vectIter++;
-                  continue;
-               }
-            }
-
-            needCreds = true;
-            vectIter++;
-         }
-
-         if (needCreds)
-         {
-            loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
-         }
-
-         if (maxDownloadChildren.isSet ())
-         {
-            _maxChildren = maxDownloadChildren.getValue();
-         }
-
-         _downloadSavePath = sanitizePath (genericPath.getValue ()); // default is ""
-
-         if (_downloadSavePath.size () > 0)
-         {
-            if (statFileOrDirectory (_downloadSavePath) != 0)
-            {
-               gtError ("Failure accessing download save path:  " + _downloadSavePath, 202, ERRNO_ERROR, errno);
-            }
-         }
-         _operatingMode = DOWNLOAD_MODE;
-      }
-      else if (serverDataPath.isSet ()) // server  mode
-      {
-         _serverDataPath = sanitizePath (serverDataPath.getValue ());
-
-         if (statFileOrDirectory (_serverDataPath) != 0)
-         {
-            gtError ("Failure opening server data path:  " + _serverDataPath, 202, ERRNO_ERROR, errno);
-         }
-
-         if (!serverQueuePath.isSet ())
-         {
-            TCLAP::ArgException argError ("Must include a queue path when operating in server mode", "");
-            throw(argError);
-         }
-
-         _serverQueuePath = sanitizePath (serverQueuePath.getValue ());
-
-         if (statFileOrDirectory (_serverQueuePath) != 0)
-         {
-            gtError ("Failure opening server queue path:  " + _serverQueuePath, 202, ERRNO_ERROR, errno);
-         }
-
-         if (!serverModeCsrSigningUrl.isSet())
-         {
-            TCLAP::ArgException argError ("--security-api missing, Must include a full URL to the security API services", "");
-            throw(argError);
-         }
-
-         _serverModeCsrSigningUrl = serverModeCsrSigningUrl.getValue();
-
-         loadCredentialsFile (credentialFile.isSet (), credentialFile.getValue ());
-         _operatingMode = SERVER_MODE;
-      }
-      else
-      {
-         TCLAP::ArgException argError ("No operational mode detected, must include one of -u, -d, or -s when starting.", "");
-         throw(argError);
-      }
-   }
-   catch (TCLAP::ArgException &e) // catch any exceptions
-   {
-      outputOverride.failure (_args, e);
-   }
-
-*/
+   _verbosityLevel = global_verbosity;
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    _gtOpenSslConf = _confDir + "/" + GT_OPENSSL_CONF;
@@ -484,9 +162,254 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
 
    strTokenize strToken (VERSION, ".", strTokenize::INDIVIDUAL_CONSECUTIVE_SEPARATORS);
 
-   _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), strtol (strToken.getToken (4).c_str (), NULL, 10));
+  _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), strtol (strToken.getToken (4).c_str (), NULL, 10));
+}
 
-   _startUpComplete = true;
+void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
+{
+   pcfacliBindIP (vm);
+   pcfacliConfDir (vm);
+   pcfacliCredentialFile (vm);
+   pcfacliAdvertisedIP (vm);
+   pcfacliInternalPort (vm);    // Internal ports must be processed before the Advertised port
+   pcfacliAdvertisedPort (vm);
+   pcfacliLog (vm);
+   pcfacliPath (vm);
+}
+
+void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
+{
+   if (vm.count (BIND_IP_CLI_OPT) == 1 && vm.count (BIND_IP_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + BIND_IP_CLI_OPT + " and " + BIND_IP_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   if (vm.count (BIND_IP_CLI_OPT) == 1)
+   { 
+      _bindIP = vm[BIND_IP_CLI_OPT].as<std::string>();
+   }
+   else if (vm.count (BIND_IP_CLI_OPT_LEGACY) == 1)
+   { 
+      _bindIP = vm[BIND_IP_CLI_OPT_LEGACY].as<std::string>();
+   }
+}
+
+void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
+{
+   if (vm.count (CONF_DIR_CLI_OPT) == 1 && vm.count (CONF_DIR_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + CONF_DIR_CLI_OPT + " and " + CONF_DIR_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   if (vm.count (CONF_DIR_CLI_OPT) == 1)
+   { 
+      _confDir = sanitizePath (vm[CONF_DIR_CLI_OPT].as<std::string>());
+   }
+   else if (vm.count (CONF_DIR_CLI_OPT_LEGACY) == 1)
+   { 
+      _confDir = sanitizePath (vm[CONF_DIR_CLI_OPT_LEGACY].as<std::string>());
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   if ((_confDir.size () == 0) || (_confDir[0] != '/'))
+   {
+      commandLineError ("configuration directory '" + _confDir + "' must be an absolute path");
+   }
+
+   if (statFileOrDirectory (_confDir) != 0)
+   {
+      commandLineError ("unable to opening configuration directory '" + _confDir + "'");
+   }
+}
+
+void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
+{
+   if (vm.count (CRED_FILE_CLI_OPT) == 1 && vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + CRED_FILE_CLI_OPT + " and " + CRED_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   std::string credsPathAndFile;
+
+   if (vm.count (CRED_FILE_CLI_OPT) == 1)
+   { 
+      credsPathAndFile = vm[CRED_FILE_CLI_OPT].as<std::string>();
+   }
+   else if (vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
+   { 
+      credsPathAndFile = vm[CRED_FILE_CLI_OPT_LEGACY].as<std::string>();
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   std::ifstream credFile;
+
+   credFile.open (credsPathAndFile.c_str(), std::ifstream::in);
+
+   if (!credFile.good ())
+   {
+      commandLineError ("file not found (or is not readable):  " + credsPathAndFile);
+   }
+
+   credFile >> _authToken;
+
+   credFile.close ();
+}
+
+void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
+{
+   if (vm.count (ADVERT_IP_CLI_OPT) == 1 && vm.count (ADVERT_IP_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + ADVERT_IP_CLI_OPT + " and " + ADVERT_IP_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   if (vm.count (ADVERT_IP_CLI_OPT) == 1)
+   { 
+      _exposedIP = vm[ADVERT_IP_CLI_OPT].as<std::string>();
+   }
+   else if (vm.count (ADVERT_IP_CLI_OPT_LEGACY) == 1)
+   { 
+      _exposedIP = vm[ADVERT_IP_CLI_OPT_LEGACY].as<std::string>();
+   }
+}
+
+void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
+{
+   if (vm.count (INTERNAL_PORT_CLI_OPT) == 1 && vm.count (INTERNAL_PORT_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + INTERNAL_PORT_CLI_OPT + " and " + INTERNAL_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   std::string portList;
+
+   if (vm.count (INTERNAL_PORT_CLI_OPT) == 1)
+   { 
+      portList = vm[INTERNAL_PORT_CLI_OPT].as<std::string>();
+   }
+   else if (vm.count (INTERNAL_PORT_CLI_OPT_LEGACY) == 1)
+   { 
+      portList = vm[INTERNAL_PORT_CLI_OPT_LEGACY].as<std::string>();
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   strTokenize strToken (portList, ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+
+   int lowPort = strtol (strToken.getToken (1).c_str (), NULL, 10);
+   int highPort = -1;
+
+   if (strToken.size () > 1)
+   {
+      highPort = strtol (strToken.getToken (2).c_str (), NULL, 10);
+   }
+
+   if (highPort > 0)
+   {
+      if (lowPort <= highPort)
+      {
+         _portStart = lowPort;
+         _portEnd = highPort;
+      }
+      else
+      {
+         commandLineError ("when using -i (--internal-port) string1 must be smaller than string2");
+      }
+   }
+   else
+   {
+      _portStart = lowPort;
+      _portEnd = _portStart + 8; // default 8 ports
+   }
+}
+
+void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
+{
+   if (vm.count (ADVERT_PORT_CLI_OPT) == 1 && vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + ADVERT_PORT_CLI_OPT + " and " + ADVERT_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   uint32_t exposedPort;
+
+   if (vm.count (ADVERT_PORT_CLI_OPT) == 1)
+   { 
+      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< uint32_t >();
+   }
+   else if (vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
+   { 
+      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< uint32_t >();
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   _exposedPortDelta = exposedPort - _portStart;
+}
+
+void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
+{
+   if (vm.count (LOGGING_CLI_OPT) < 1)
+   {
+      return;    
+   }
+
+   strTokenize strToken (vm[LOGGING_CLI_OPT].as<std::string>(), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+
+   _logDestination = strToken.getToken(1);
+
+   std::string level = strToken.getToken(2);
+
+   if ("verbose" == level)
+   {
+      _logMask  = LOGMASK_VERBOSE;
+   }
+   else if ("full" == level)
+   {
+      _logMask  = LOGMASK_FULL;
+   }
+   else if ("standard" == level || level.size() == 0) // default to standard
+   {
+      _logMask  = LOGMASK_STANDARD;
+   }
+   else
+   {
+      _logMask = strtoul (level.c_str(), NULL, 0);
+   }
+
+   _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
+
+// TODO, logstartup message   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+}
+
+// Used by download and upload
+std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
+{
+   if (vm.count (PATH_CLI_OPT) < 1)
+   {
+      return "";    
+   }
+
+   std::string path = sanitizePath (vm[PATH_CLI_OPT].as<std::string>());
+
+   if (path.size() == 0)
+   {
+      commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
+   }
+
+   if (statFileOrDirectory (path) != 0)
+   {
+      commandLineError ("unable to opening directory '" + path + "'");
+   }
+
+   return path;
 }
 
 // 
@@ -521,27 +444,12 @@ void gtBase::mkTempDir ()
 }
 
 // 
-void gtBase::loadCredentialsFile (bool credsSet, std::string credsFile)
+void gtBase::checkCredentials ()
 {
-   if (!credsSet)
+   if (_authToken.size() < 1)
    {
-      TCLAP::ArgException argError ("Must include a credential file when attempting to communicate with CGHub", "-c  (--credentialFile)");
-      throw(argError);
+      commandLineError ("Must include a credential file when attempting to communicate with CGHub, use -c or --" + CRED_FILE_CLI_OPT);
    }
-
-   std::ifstream credFile;
-
-   credFile.open (credsFile.c_str (), std::ifstream::in);
-
-   if (!credFile.good ())
-   {
-      TCLAP::ArgException argError ("file not found (or is not readable):  " + credsFile, "");
-      throw(argError);
-   }
-
-   credFile >> _authToken;
-
-   credFile.close ();
 }
 
 // 

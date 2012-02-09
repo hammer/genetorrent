@@ -34,7 +34,7 @@ AM_MAINTAINER_MODE
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE
 PKG_PROG_PKG_CONFIG
-AC_CONFIG_SRCDIR([src/tclapOutput.cpp])
+AC_CONFIG_SRCDIR([src/gtBase.cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -71,7 +71,7 @@ PKG_CHECK_MODULES(torrentrasterbar, libtorrent-rasterbar)
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h curl/curl.h])
-AC_CHECK_HEADERS(sstream) # needed for tclap
+# AC_CHECK_HEADERS(sstream) # needed for tclap
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

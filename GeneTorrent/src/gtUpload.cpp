@@ -68,16 +68,56 @@
 #include "gtUpload.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
-#include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
 
+static char const* upload_state_str[] = {
+   "checking (q)",                     // queued_for_checking,
+   "checking",                         // checking_files,
+   "dl metadata",                      // downloading_metadata,
+   "starting",                         // downloading,
+   "finished",                         // finished,
+   "uploading",                        // seeding,
+   "allocating",                       // allocating,
+   "checking (r)"                      // checking_resume_data
+};
+
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""),    _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
 {
+   pcfacliUpload (vm);
 
+   _dataFilePath = pcfacliPath (vm);
+
+   checkCredentials ();
+
+   _startUpComplete = true;
+}
+
+void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
+{
+   if (vm.count (CRED_FILE_CLI_OPT) == 1 && vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
+   {
+      commandLineError ("duplicate config options:  " + CRED_FILE_CLI_OPT + " and " + CRED_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
+   }
+
+   std::string credsPathAndFile;
+
+   if (vm.count (UPLOAD_FILE_CLI_OPT) == 1)
+   {
+      _manifestFile = vm[UPLOAD_FILE_CLI_OPT].as<std::string>();
+   }
+   else if (vm.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 1)
+   {
+      _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
+   }
+
+   if (statFileOrDirectory (_manifestFile) != 0)
+   {
+      commandLineError ("file not found (or is not readable):  " + credsPathAndFile);
+   }
 }
 
 void gtUpload::run ()

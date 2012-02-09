@@ -68,28 +68,83 @@
 #include "gtServer.h"
 #include "stringTokenizer.h"
 #include "gtDefs.h"
-#include "tclapOutput.h"
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
 
+static char const* server_state_str[] = {
+   "checking (q)",                    // queued_for_checking,
+   "checking",                        // checking_files,
+   "dl metadata",                     // downloading_metadata,
+   "receiving",                       // downloading,
+   "finished",                        // finished,
+   "serving",                         // seeding,
+   "allocating",                      // allocating,
+   "checking (r)"                     // checking_resume_data
+};
+
 extern void *geneTorrCallBackPtr; 
 
-
-
-
-gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SERVER_MODE), _serverQueuePath (""), _serverDataPath (""),    _activeSessions ()
+gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SERVER_MODE), _serverQueuePath (""), _serverDataPath (""), _serverModeCsrSigningUrl (""), _activeSessions (), _maxActiveSessions (_portEnd - _portStart + 1)
 {
+   pcfacliServer (vm);
+   pcfacliQueue (vm);
+   pcfacliSecurityAPI (vm);
 
+   checkCredentials ();
 
-
-
-
-   _maxActiveSessions = _portEnd - _portStart + 1;
+   _startUpComplete = true;
 }
 
+void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
+{
+   _serverDataPath = sanitizePath (vm[SERVER_CLI_OPT].as<std::string>());
 
+   if (_serverDataPath.size() == 0)
+   {
+      commandLineError ("command line or config file contains no value for '" + SERVER_CLI_OPT + "'");
+   }
 
+   if (statFileOrDirectory (_serverDataPath) != 0)
+   {
+      commandLineError ("unable to opening directory '" + _serverDataPath + "'");
+   }
+}
+
+void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
+{
+   if (vm.count (QUEUE_CLI_OPT) < 1)
+   {
+      commandLineError ("Must include a queue path when operating in server mode, -c or --" + QUEUE_CLI_OPT);
+   }
+
+   _serverQueuePath = sanitizePath (vm[QUEUE_CLI_OPT].as<std::string>());
+
+   if (_serverQueuePath.size() == 0)
+   {
+      commandLineError ("command line or config file contains no value for '" + QUEUE_CLI_OPT + "'");
+   }
+
+   if (statFileOrDirectory (_serverQueuePath) != 0)
+   {
+      commandLineError ("unable to opening directory '" + _serverQueuePath + "'");
+   }
+}
+
+void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
+{
+   if (vm.count (SECURITY_API_CLI_OPT) < 1)
+   {
+      commandLineError ("Must include a full URL to the security API services in server mode, --" + SECURITY_API_CLI_OPT);
+   }
+
+   _serverModeCsrSigningUrl = vm[SECURITY_API_CLI_OPT].as<std::string>();
+
+   if (_serverModeCsrSigningUrl.size() == 0)
+   {
+      commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
+   }
+}
 
 void gtServer::getFilesInQueueDirectory (vectOfStr &files)
 {
