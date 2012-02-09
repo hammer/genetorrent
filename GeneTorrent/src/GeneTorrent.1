@@ -29,6 +29,8 @@ GeneTorrent \- transfer genomic data reliably across a network
 .SH SYNOPSIS
 .B GeneTorrent -u
 .I manifest-file
+.B -c 
+.I credentials
 .B \fR[\fP -p 
 .I path
 .R ]
@@ -82,10 +84,10 @@ The IP address for GeneTorrent to bind.  Default is to bind all
 addresses on the system.
 .TP
 .BI \-c " credential-file" "\fR,\fP \-\^\-credentialFile" " credential-file"  
-Required for download and server modes, unless you are directly
-passing a .gto file to the -d option.  The full or relative path to
-the file containing the access credentials (security token) previously
-received from the repository.
+Required for all modes, unless you are directly passing a .gto file to
+the -d option.  The full or relative path to the file containing the
+access credentials (security token) previously received from the
+repository.
 .TP
 .BI \-C " confdir" "\fR,\fP \-\^\-confDir" " confdir"
 Specify an absolute path to the GeneTorrent configuration directory.
@@ -116,7 +118,7 @@ used.  If an endPort is not specified, 9 ports will be configured, so
 .IR endPort " = " startPort " + 8."
 The default is to use ports 20892 through 20900.
 .TP
-.BI \-l " destination\fR[:\fPverbosity\fR]\fP" "\fR,\fP \-\^\-logging" " destination\fR[:\fPverbosity\fR]\fP"
+.BI \-l " destination\fR[:\fPverbosity\fR]\fP" "\fR,\fP \-\^\-log" " destination\fR[:\fPverbosity\fR]\fP"
 Specifies the destination of a log file and a verbosity level.
 Possible values for the destination include "none", "stdout",
 "stderr", "syslog", or a filename; the log output will be directed to
