@@ -82,7 +82,7 @@ const std::string CONFIG_FILE_CLI_OPT = "config-file";             // NO short o
 const std::string BIND_IP_CLI_OPT = "bind-ip";                     // -b short option
 const std::string BIND_IP_CLI_OPT_LEGACY = "bindIP";
 
-const std::string CONF_DIR_CLI_OPT = "conf-dir";                   // -C short option ( capital C )
+const std::string CONF_DIR_CLI_OPT = "config-dir";                 // -C short option ( capital C )
 const std::string CONF_DIR_CLI_OPT_LEGACY = "confDir";
 
 const std::string CRED_FILE_CLI_OPT = "credential-file";           // -c short option

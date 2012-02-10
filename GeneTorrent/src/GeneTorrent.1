@@ -30,15 +30,15 @@ GeneTorrent \- transfer genomic data reliably across a network
 .B GeneTorrent -u
 .I manifest-file
 .B -c 
-.I credentials
+.I cred
 .B \fR[\fP -p 
 .I path
 .R ]
 .br
 .B GeneTorrent -d 
-.I \fR[\fP URI \fR|\fP UUID \fR|\fP .xml \fR|\fP .gto \fR]\fP
+.I \fR<\fP URI \fR|\fP UUID \fR|\fP .xml \fR|\fP .gto \fR>\fP
 .B -c 
-.I credentials
+.I cred
 .B \fR[\fP -p 
 .I path
 .RB ] 
@@ -48,7 +48,7 @@ GeneTorrent \- transfer genomic data reliably across a network
 .B -q
 .I work-queue
 .B -c 
-.I credentials
+.I cred
 .B --security-api 
 .I signing-URI
 .SH DESCRIPTION
@@ -79,29 +79,36 @@ Print the version number of
 to the standard output stream.  This version number should be included
 in all bug reports (see below).
 .TP
-.BI \-b " address" "\fR,\fP \-\^\-bindIP" " address"
+.BI \-b " address" "\fR,\fP \-\^\-bind-ip" " address"
 The IP address for GeneTorrent to bind.  Default is to bind all
 addresses on the system.
 .TP
-.BI \-c " credential-file" "\fR,\fP \-\^\-credentialFile" " credential-file"  
+.BI \-c " credential-file" "\fR,\fP \-\^\-credential-file" " credential-file"  
 Required for all modes, unless you are directly passing a .gto file to
 the -d option.  The full or relative path to the file containing the
 access credentials (security token) previously received from the
 repository.
 .TP
-.BI \-C " confdir" "\fR,\fP \-\^\-confDir" " confdir"
+.BI \-C " confdir" "\fR,\fP \-\^\-config-dir" " confdir"
 Specify an absolute path to the GeneTorrent configuration directory.
 This directory should contain \fBGeneTorrent.openssl.conf\fP and
 \fBdhparam.pem\fP.
 .TP
-.BI \-e " address" "\fR,\fP \-\^\-advertisedIP" " address"
+.BI \-\^\-config-file " configuration-file"
+Specifies a configuration file from which to read program options.
+(See below for format.) Every option that can be specified on the
+command line can also be specified in the configuration file.  Options
+present on the command line will override the contents of the
+configuration file.
+.TP
+.BI \-e " address" "\fR,\fP \-\^\-advertised-ip" " address"
 The IP address to advertise to the transactor.  This option is useful
 when this actor is running behind a NAT firewall and the publicly
 exposed IP address is not the same as the actual IP address.  The
 default is to advertise the IP address of the host's default route, or
 the address specified with the -b option.
 .TP
-.BI \-f " port" "\fR,\fP \-\^\-advertisedPort" " port"
+.BI \-f " port" "\fR,\fP \-\^\-advertised-port" " port"
 The first port to advertise to the transactor.  This option is useful
 when this actor is running behind a NAT firewall and the publicly
 exposed ports are not the same as the ports actually bound.  The range
@@ -111,7 +118,7 @@ ports will run from
 .IR port " to " port "+8."
 The default is to advertise the ports that are actually used.
 .TP
-.BI \-i " startPort\fR[:\fPendPort\fR]\fP" "\fR,\fP \-\^\-internalPort" " startPort\fR[:\fPendPort\fR]\fP"
+.BI \-i " startPort\fR[:\fPendPort\fR]\fP" "\fR,\fP \-\^\-internal-port" " startPort\fR[:\fPendPort\fR]\fP"
 Specifies the range of ports actually used by GeneTorrent.  By default
 these ports are also advertised externally unless the -f option is
 used.  If an endPort is not specified, 9 ports will be configured, so
@@ -128,12 +135,13 @@ order of increasing volume of messages) "standard", "verbose", or
 if this parameter is not specified.
 .TP
 .BR \-v ", " \-\^\-verbose
-Verbose progress reporting to stdout.  By default GeneTorrent offers
-no status information unless an error occurs.  Use multiple -v options
-to increase the reporting level, up to a maximum of 4.
+Controls the level of on-screen progress reporting to stdout.  By
+default GeneTorrent offers no status information unless an error
+occurs.  Use multiple -v options to increase the reporting level, up
+to a maximum of 4.
 .SS "Upload Mode Command Line Arguments:"
 .TP
-.BI \-u " manifest-file" "\fR,\fP \-\^\-manifestFile" " manifest-file"  
+.BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
 Required. Indicates upload mode.  The 
 .I manifest-file 
 must follow the format specified by Annai Systems; lists all the data
@@ -177,7 +185,7 @@ and will always be added to
 .I path\fR/\fPUUID\fR.\fP
 The current directory will be used by default.
 .TP
-.BI \-\^\-maxChildren " max-children"
+.BI \-\^\-max-children " max-children"
 The maximum number of parallel children that should be spawned to
 perform the download.  By default up to 8 children are used, but this
 number may be adjusted.  In general you should have fewer children
