@@ -134,11 +134,17 @@ order of increasing volume of messages) "standard", "verbose", or
 "full"; standard is the default.  The default behavior is no logging
 if this parameter is not specified.
 .TP
-.BR \-v ", " \-\^\-verbose
+.BI \-v "\fR,\fP " \-\^\-verbose " level"
 Controls the level of on-screen progress reporting to stdout.  By
 default GeneTorrent offers no status information unless an error
-occurs.  Use multiple -v options to increase the reporting level, up
-to a maximum of 4.
+occurs.  
+
+The long and short forms of this option work slightly differently.
+With the short form, you can receive summary progress information by
+specifying a single -v, or detailed progress information by specifying
+-vv (e.g., two -v's).  With the long form, you specify a numeric level
+between 0 and 2; for instance, use --verbose=1 for summary progress
+information.
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
@@ -212,6 +218,27 @@ begin sharing content.
 Required.  
 .I signing-URI
 is a fully-qualified URI which will sign CSRs for this server instance.
+.SH CONFIGURATION FILE
+All options that can be specified on the command line can also be
+specified in a configuration file, which is specified on the command line via the 
+.B --config-file
+option.  The configuration file is a simple flat ASCII file with lines
+of the form "parameter=value".  Any long-form option from the command
+line may be used as a parameter, and the # character introduces a comment
+that spans until the end of the line.
+
+The following is a sample configuration file:
+.nf
+
+# GeneTorrent configuration file
+log=syslog:full
+server=/cghub/data
+queue=/cghub/data/workqueues/dropzone-app04
+credential-file=/cghub/home/shared/gtorrent.pem
+security-api=https://cghub-01.ucsc.edu:20000/cghub/data/gtsession
+advertised-ip=8.29.11.197
+advertised-port=6921
+.fi
 .SH COPYRIGHT
 Copyright \(co
 2011
