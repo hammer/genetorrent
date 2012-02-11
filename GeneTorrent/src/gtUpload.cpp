@@ -94,6 +94,11 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
    checkCredentials ();
 
    _startUpComplete = true;
+
+   if (_verbosityLevel > 0)
+   {
+      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
+   }
 }
 
 void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
@@ -156,7 +161,6 @@ void gtUpload::run ()
    performGtoUpload (torrentFileName);
 }
 
-//DJN upload
 std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName)
 {
    std::string realTorrentFileName = tmpTorrentFileName.substr (0, tmpTorrentFileName.size () - 1); // drop the ~ from uuid.gto~
@@ -448,7 +452,6 @@ void gtUpload::processManifestFile ()
    }
 }
 
-//DJN upload
 void gtUpload::performGtoUpload (std::string torrentFileName)
 {
    if (_verbosityLevel > 0)
@@ -581,7 +584,6 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
    checkAlerts (torrentSession);
 }
 
-//DJN upload
 // do not include files that are not present in _filesToUpload
 bool gtUpload::fileFilter (std::string const fileName)
 {
@@ -603,7 +605,6 @@ bool gtUpload::fileFilter (std::string const fileName)
    return false;
 }
 
-//DJN upload
 // do not include files and folders whose name starts with a ., based on file_filter from libtorrent
 bool gtUpload::file_filter (boost::filesystem::path const& filename)
 {

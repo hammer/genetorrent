@@ -108,7 +108,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    std::ostringstream startUpMessage;
 
 // TODO fix to add the command line to the startup message
-   startUpMessage << "Starting version " << VERSION << " with the command line: ";
+   startUpMessage << "Starting version " << VERSION << " with options:  ";
 
 /*
    for (int loop = 1; loop < argc; loop++)
@@ -129,6 +129,14 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    }
 
    processConfigFileAndCLI (commandLine);
+
+for (boost::program_options::variables_map::iterator it = commandLine.begin(); it != commandLine.end(); it++)
+{
+   std::cerr << "first = --" << it->first << "        second = " << std::endl;  // << it->second.value() << std::endl;
+
+}
+
+
 
    _verbosityLevel = global_verbosity;
 
@@ -703,10 +711,6 @@ int gtBase::curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, st
    {
       case DOWNLOAD_MODE:
       {
-         if (_verbosityLevel > 0)
-         {
-            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", download mode."); 
-         }
          runDownloadMode (saveDir);
          chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 
@@ -714,19 +718,11 @@ int gtBase::curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, st
 
       case SERVER_MODE:
       {
-         if (_verbosityLevel > 0)
-         {
-            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", server mode."); 
-         }
          runServerMode ();
       } break;
 
       default: // UPLOAD_MODE
       {
-         if (_verbosityLevel > 0)
-         {
-            screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
-         }
 
          performTorrentUpload ();
          chdir (saveDir.c_str ());      // shutting down, if the chdir back fails, so be it

@@ -93,6 +93,11 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
    _downloadSavePath = pcfacliPath(vm);
 
    _startUpComplete = true;
+
+   if (_verbosityLevel > 0)
+   {
+      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", download mode."); 
+   }
 }
 
 void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)

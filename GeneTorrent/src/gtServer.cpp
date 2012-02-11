@@ -94,6 +94,11 @@ gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SER
    checkCredentials ();
 
    _startUpComplete = true;
+
+   if (_verbosityLevel > 0)
+   {
+      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", server mode."); 
+   }
 }
 
 void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
@@ -115,7 +120,7 @@ void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
 {
    if (vm.count (QUEUE_CLI_OPT) < 1)
    {
-      commandLineError ("Must include a queue path when operating in server mode, -c or --" + QUEUE_CLI_OPT);
+      commandLineError ("Must include a queue path when operating in server mode, -q or --" + QUEUE_CLI_OPT);
    }
 
    _serverQueuePath = sanitizePath (vm[QUEUE_CLI_OPT].as<std::string>());

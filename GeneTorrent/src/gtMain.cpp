@@ -48,9 +48,9 @@
 #include "gtServer.h"
 #include "gtDownload.h"
 
-int global_verbosity;    // Work around for boost:program_options not supporting -vvvvv type arguments
+int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
 
-std::string makeOpt (std::string baseName, char secondName = SPACE)
+std::string makeOpt (std::string baseName, const char secondName = SPACE)
 {
    if (secondName != SPACE)
    {
@@ -59,22 +59,19 @@ std::string makeOpt (std::string baseName, char secondName = SPACE)
    return baseName + "," +baseName.substr(0,1);
 }
 
-void configureCommandLineOptions (boost::program_options::options_description &options)
+void configureConfigFileOptions (boost::program_options::options_description &options)
 {
    // The descriptions below are not used in the help message.
    options.add_options() 
-      (makeOpt (HELP_CLI_OPT).c_str(), "Help Message")          
-      (VERSION_CLI_OPT.c_str(),       "Display Version")       // long option only
       (makeOpt (BIND_IP_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "Bind IP")        // long and short option using first letter of long option
-      (CONFIG_FILE_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "path/file to optional config file")
       (makeOpt (CRED_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to credentials file")          
-      (makeOpt (CONF_DIR_CLI_OPT, 'C').c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")        // long option with alternate short option
-      (makeOpt (ADVERT_IP_CLI_OPT, 'e').c_str(), boost::program_options::value< std::string >(), "IP Address advertised")    
-      (makeOpt (ADVERT_PORT_CLI_OPT, 'f').c_str(), boost::program_options::value< uint32_t >(), "TCP Port advertised")      
+      (makeOpt (CONF_DIR_CLI_OPT, CONF_DIR_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")    // long option with alternate short option
+      (makeOpt (ADVERT_IP_CLI_OPT, ADVERT_IP_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "IP Address advertised")    
+      (makeOpt (ADVERT_PORT_CLI_OPT, ADVERT_PORT_SHORT_CLI_OPT).c_str(), boost::program_options::value< uint32_t >(), "TCP Port advertised")      
       (makeOpt (INTERNAL_PORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "local IP port to bind on")     
       (makeOpt (LOGGING_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to log file, follow by the log level")  
       (makeOpt (PATH_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "file system path used for uploads and downloads")
-      (makeOpt (NO_LONG_OPTION, 'v').c_str(), accumulator<int>(&global_verbosity), "on screen verbosity level")
+      (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< uint32_t >(), "on screen verbosity level")
 
       // Download
       (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value< std::vector <std::string> >()->composing(), "URI | UUID | .xml | .gto")
@@ -85,8 +82,8 @@ void configureCommandLineOptions (boost::program_options::options_description &o
 
       // Server Mode
       (makeOpt (SERVER_CLI_OPT).c_str(), boost::program_options::value< std::string >(),"server data path")
-      (makeOpt (QUEUE_CLI_OPT).c_str(), boost::program_options::value< uint32_t >(), "input GTO directory")    
-      (SECURITY_API_CLI_OPT.c_str(), boost::program_options::value< uint32_t >(), "SSL Key Signing URL")    
+      (makeOpt (QUEUE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "input GTO directory")    
+      (SECURITY_API_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "SSL Key Signing URL")    
 
       // Legacy long option names
       (BIND_IP_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "Bind IP")        
@@ -109,15 +106,38 @@ void commandLineError (std::string errMessage)
    exit (COMMAND_LINE_OR_CONFIG_FILE_ERROR);
 }
 
+void configureCommandLineOptions (boost::program_options::options_description &options)
+{
+   // The descriptions below are not used in the help message.
+   options.add_options() 
+      (CONFIG_FILE_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "path/file to optional config file")
+      (makeOpt (HELP_CLI_OPT).c_str(), "Help Message")          
+      (makeOpt (NO_LONG_CLI_OPT, VERBOSITY_SHORT_CLI_OPT).c_str(), accumulator<int>(&global_verbosity), "on screen verbosity level")
+      (VERSION_CLI_OPT.c_str(),       "Display Version")       // long option only
+   ;
+}
+
 void processCommandLine (boost::program_options::variables_map &clOptions, int argc, char **argv)
 {
+   bool haveVerboseOnCli = false;
    try
    {
-      boost::program_options::options_description commandLineOpts("Command Line Options");
+      boost::program_options::options_description configFileOpts ("Config and Command Line Options");
+      configureConfigFileOptions (configFileOpts);
+
+      boost::program_options::options_description commandLineOpts ("Command Line Only Options");
       configureCommandLineOptions (commandLineOpts);
 
+      boost::program_options::options_description allOpts ("All Options");
+      allOpts.add(configFileOpts).add(commandLineOpts);
+
       boost::program_options::variables_map cli;
-      boost::program_options::store (boost::program_options::parse_command_line (argc, argv, commandLineOpts), cli);
+      boost::program_options::store (boost::program_options::parse_command_line (argc, argv, allOpts), cli);
+
+      if (cli.count (VERBOSITY_CLI_OPT))
+      {
+         haveVerboseOnCli = true;
+      }
 
       // Check if a config file was specified
       if (cli.count (CONFIG_FILE_CLI_OPT) == 1)
@@ -125,16 +145,16 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          std::ifstream inputFile(cli[CONFIG_FILE_CLI_OPT].as<std::string>().c_str());
          if (!inputFile)
          {
-            commandLineError ("error: unable to open config file '" + cli[CONFIG_FILE_CLI_OPT].as<std::string>() + "'.");
+            commandLineError ("unable to open config file '" + cli[CONFIG_FILE_CLI_OPT].as<std::string>() + "'.");
          }
-         boost::program_options::store (boost::program_options::parse_config_file (inputFile, commandLineOpts), cli);
+         boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
       }
 
       // Check if help was requested
       if (cli.count (HELP_CLI_OPT))
       {
 // DJN remove these
-std::cout << commandLineOpts << std::endl;
+std::cout << allOpts << std::endl;
 std::cout << "\n\n\n";
          std::cout << "Usage:" << std::endl;
          std::cout << "   GeneTorrent -u manifest-file -c credentials [ -p path ] [--config-file path/file]" << std::endl;
@@ -158,8 +178,29 @@ std::cout << "\n\n\n";
       } 
 
       boost::program_options::notify (cli); 
-      clOptions = cli; 
 
+      // Verify and configure global_verbosity level here
+      if (global_verbosity > 0 && haveVerboseOnCli)
+      {
+         commandLineError ("-v and --verbosity are not permitted on the command line at the same time");
+      }
+
+      if (global_verbosity > 0)  // -v is present, -v overrides any possible --verbosity
+      {
+         if (global_verbosity > 2)  // override out of range value from legacy -vvvv or -vvv
+         {
+            global_verbosity = 2;
+         }
+      }
+      else  // check if --verbosity available and set level if present
+      {
+         if (cli.count (VERBOSITY_CLI_OPT))
+         {
+            global_verbosity =cli[VERBOSITY_CLI_OPT].as< uint32_t >();
+         }
+      }
+
+      clOptions = cli; 
    } 
    catch(std::exception &e) 
    { 

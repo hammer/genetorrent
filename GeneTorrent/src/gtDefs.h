@@ -71,7 +71,6 @@ const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 // Command Line Option defines
 const char SPACE = ' ';
 
-
 // information options
 const std::string HELP_CLI_OPT = "help";
 const std::string VERSION_CLI_OPT = "version";
@@ -82,16 +81,19 @@ const std::string CONFIG_FILE_CLI_OPT = "config-file";             // NO short o
 const std::string BIND_IP_CLI_OPT = "bind-ip";                     // -b short option
 const std::string BIND_IP_CLI_OPT_LEGACY = "bindIP";
 
+const char CONF_DIR_SHORT_CLI_OPT = 'C';                           // -C short option ( capital C )
 const std::string CONF_DIR_CLI_OPT = "config-dir";                 // -C short option ( capital C )
 const std::string CONF_DIR_CLI_OPT_LEGACY = "confDir";
 
 const std::string CRED_FILE_CLI_OPT = "credential-file";           // -c short option
 const std::string CRED_FILE_CLI_OPT_LEGACY = "credentialFile";
 
-const std::string ADVERT_IP_CLI_OPT = "advertised-ip";             // -e short option
+const char ADVERT_IP_SHORT_CLI_OPT = 'e';                          // -e short option
+const std::string ADVERT_IP_CLI_OPT = "advertised-ip";             
 const std::string ADVERT_IP_CLI_OPT_LEGACY = "advertisedIP";
 
-const std::string ADVERT_PORT_CLI_OPT = "advertised-port";         // -f short option
+const char ADVERT_PORT_SHORT_CLI_OPT = 'f';                        // -f short option
+const std::string ADVERT_PORT_CLI_OPT = "advertised-port";         
 const std::string ADVERT_PORT_CLI_OPT_LEGACY = "advertisedPort";
 
 const std::string INTERNAL_PORT_CLI_OPT = "internal-port";         // -i short option
@@ -99,8 +101,26 @@ const std::string INTERNAL_PORT_CLI_OPT_LEGACY = "internalPort";
 
 const std::string LOGGING_CLI_OPT = "log";                         // -l short option
 
-//verbosity
-const std::string NO_LONG_OPTION = "";                             // -v short option
+const std::string NO_LONG_CLI_OPT = "";                            // 
+
+// verbosity conversation, two different verbose settings are available
+// Single letter -v with increasing count or --verbosity=level
+// this is a rather ugly hack, but due to shortcomings in boost program_options
+// seems to be a workable solution
+// -v and --verbosity are independent options due to boost program_options, but work
+// together.  short options are not permitted in config files.
+//   verbosity     verbosity     -v       Result
+//   in config                            config value
+//                 on CLI                 cli value
+//                             on CLI     -v cli count
+//   in config     on CLI                 cli value
+//   in config                 on CLI     -v cli count
+//                 on CLI      on CLI     error
+//   in config     on CLI      on CLI     error
+//
+// short options are hard coded (where needed) in gtMain.cpp
+const char VERBOSITY_SHORT_CLI_OPT = 'v';                         // -v short option
+const std::string VERBOSITY_CLI_OPT = "verbosity";                 
 
 // download and upload mode options
 const std::string PATH_CLI_OPT = "path";                           // -p short option     
