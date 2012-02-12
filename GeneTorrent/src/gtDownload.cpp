@@ -198,6 +198,7 @@ void gtDownload::run ()
          {
             screenOutput (message.str()); 
          }
+
    chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }
 
@@ -760,6 +761,11 @@ int64_t gtDownload::getFreeDiskSpace ()
 
 void gtDownload::validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos)
 {
+   if (_torrentListToDownload.size() < 1)
+   {
+      gtError ("the XML file did not contain any GTO file URIs.", 97, gtBase::DEFAULT_ERROR);
+   }
+
    vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
 
    totalBytes = 0;

@@ -61,17 +61,6 @@ void gtBase::checkAlerts (libtorrent::session &torrSession)
 
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {
-      // Leaving this code in for now -- it existed prior to using alerts for logging, this needs to be fixed with a dns loookup at startup to verify the tracker is resolvable.
-      if (((*dequeIter)->category() & libtorrent::alert::tracker_notification) && ((*dequeIter)->category() & libtorrent::alert::error_notification) && ((*dequeIter)->type() == libtorrent::tracker_error_alert::alert_type))
-      {
-         libtorrent::tracker_error_alert *tea = libtorrent::alert_cast<libtorrent::tracker_error_alert> (*dequeIter);
-
-         if (tea->times_in_row > 2)
-         {
-            gtError ("Failure communicating with the transactor on URL:  " + tea->url, 214, gtBase::DEFAULT_ERROR, 0, tea->error.message());
-         }
-      }
-
       bool haveError = (*dequeIter)->category() & libtorrent::alert::error_notification;
 
       switch ((*dequeIter)->category() & ~libtorrent::alert::error_notification)
@@ -342,7 +331,11 @@ void gtBase::processProgressNotification (bool haveError, libtorrent::alert *alr
 
 void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt)
 {
-   if (!(_logMask & LOG_TRACKER_NOTIFICATION))
+// DJN mandatory TODO, every trackerNotification must be implemented to proper track the _successfulTrackerComms flag
+// this entails filtering out error and non error notifications and behaving accordingly depending on the
+// _logMask, haveError, and the tracker notification type
+
+   if ((!(_logMask & LOG_TRACKER_NOTIFICATION)) && !haveError)
    {
       return;
    }
@@ -352,6 +345,63 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
    switch (alrt->type())
    {
+      case libtorrent::tracker_error_alert::alert_type:
+      {
+         libtorrent::tracker_error_alert *tea = libtorrent::alert_cast<libtorrent::tracker_error_alert> (alrt);
+
+         getGtoNameAndInfoHash (tea, gtoName, infoHash);
+
+         Log (haveError, "%s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
+
+         if ((_operatingMode != SERVER_MODE ) && (tea->times_in_row > 2) && (_successfulTrackerComms == false))
+         {
+            gtError ("problem communicating with the transactor (3 times at startup) on URL:  " + tea->url, 214, gtBase::DEFAULT_ERROR, 0, tea->error.message());
+         }
+      } break;
+
+      case libtorrent::tracker_warning_alert::alert_type:
+      {
+processUnimplementedAlert (haveError, alrt);
+      } break;
+
+      case libtorrent::scrape_failed_alert::alert_type:
+      {
+processUnimplementedAlert (haveError, alrt);
+      } break;
+
+      case libtorrent::scrape_reply_alert::alert_type:
+      {
+processUnimplementedAlert (haveError, alrt);
+      } break;
+
+      case libtorrent::tracker_reply_alert::alert_type:
+      {
+         _successfulTrackerComms = true;
+
+         if ((!(_logMask & LOG_TRACKER_NOTIFICATION)) && !haveError)
+         {
+            return;
+         }
+
+         libtorrent::tracker_reply_alert *tra = libtorrent::alert_cast<libtorrent::tracker_reply_alert> (alrt);
+         getGtoNameAndInfoHash (tra, gtoName, infoHash);
+         Log (haveError, "%s, gto:  %s, infohash:  %s", tra->message().c_str(), gtoName.c_str(), infoHash.c_str());
+
+      } break;
+
+      case libtorrent::tracker_announce_alert::alert_type:
+      {
+         if ((!(_logMask & LOG_TRACKER_NOTIFICATION)) && !haveError)
+         {
+            return;
+         }
+
+         libtorrent::tracker_announce_alert *taa = libtorrent::alert_cast<libtorrent::tracker_announce_alert> (alrt);
+         getGtoNameAndInfoHash (taa, gtoName, infoHash);
+         Log (haveError, "%s, gto:  %s, infohash:  %s", taa->message().c_str(), gtoName.c_str(), infoHash.c_str());
+
+      } break;
+
       default:
       {
          processUnimplementedAlert (haveError, alrt);

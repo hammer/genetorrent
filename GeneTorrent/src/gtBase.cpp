@@ -99,7 +99,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _exposedIP (""), 
    _operatingMode (mode), 
    _confDir (CONF_DIR_DEFAULT), 
-   _logMask (0)                 // set all bits to 0
+   _logMask (0),                 // set all bits to 0
+   _successfulTrackerComms (false)
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
@@ -130,12 +131,18 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
 
    processConfigFileAndCLI (commandLine);
 
+
+//this does not work
 for (boost::program_options::variables_map::iterator it = commandLine.begin(); it != commandLine.end(); it++)
 {
    std::cerr << "first = --" << it->first << "        second = " << std::endl;  // << it->second.value() << std::endl;
 
 }
 
+
+   _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
+
+// TODO, logstartup message   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
 
    _verbosityLevel = global_verbosity;
@@ -391,10 +398,6 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
    {
       _logMask = strtoul (level.c_str(), NULL, 0);
    }
-
-   _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
-
-// TODO, logstartup message   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 }
 
 // Used by download and upload

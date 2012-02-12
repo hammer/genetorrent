@@ -157,6 +157,8 @@ class gtBase
 
       uint32_t _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
 
+      bool _successfulTrackerComms;
+
       static void loggingCallBack (std::string);
 
       std::string getHttpErrorMessage (int code);
