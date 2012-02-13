@@ -89,8 +89,10 @@ extern void *geneTorrCallBackPtr;
 gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload ()
 {
    pcfacliMaxChildren (vm);
-   pcfacliDownloadList (vm);
    _downloadSavePath = pcfacliPath(vm);
+   pcfacliDownloadList (vm);
+
+   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
    _startUpComplete = true;
 
@@ -115,6 +117,12 @@ void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
    {
       _maxChildren = vm[MAX_CHILDREN_CLI_OPT_LEGACY].as< uint32_t >();
    }
+   else   // Option not present
+   {
+      return;
+   }
+
+   startUpMessage << " --" << MAX_CHILDREN_CLI_OPT << "=" << _maxChildren;
 }
 
 void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
@@ -147,6 +155,13 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
    if (needCreds)
    {
       checkCredentials ();
+   }
+
+   vectIter = _cliArgsDownloadList.begin ();
+   while (vectIter != _cliArgsDownloadList.end ())
+   {
+      startUpMessage << " --" << DOWNLOAD_CLI_OPT << "=" << *vectIter;
+      vectIter++;
    }
 }
 
@@ -611,7 +626,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    torrentParams.allow_rfc1918_connections = true;
    torrentParams.auto_managed = false;
 
-   if (statFileOrDirectory ("./" + uuid) == 0)
+   if (statDirectory ("./" + uuid) == 0)
    {
       torrentParams.force_download = false;  // allows resume
    }

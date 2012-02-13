@@ -83,6 +83,7 @@ void *geneTorrCallBackPtr;
 static pthread_mutex_t callBackLoggerLock;
 
 extern int global_verbosity;
+extern std::string global_startup_message;
 
 gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode) : 
    _verbosityLevel (0), 
@@ -106,56 +107,34 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
 
    pthread_mutex_init (&callBackLoggerLock, NULL);
 
-   std::ostringstream startUpMessage;
-
-// TODO fix to add the command line to the startup message
-   startUpMessage << "Starting version " << VERSION << " with options:  ";
-
-/*
-   for (int loop = 1; loop < argc; loop++)
-   {
-      startUpMessage << " " << argv[loop];
-   }
-*/
-
    char *envValue = getenv ("GENETORRENT_DEVMODE");
    if (envValue != NULL)
    {
       _tmpDir = sanitizePath (envValue) + "/";
       _devMode = true;
+      startUpMessage << "[devModeOverride] ";
    }
    else
    {
       setTempDir();
    }
 
+   startUpMessage << "Starting version " << VERSION << " with options: " << global_startup_message;  // Begin building the startup message, completed and logged in inherited classes
+
    processConfigFileAndCLI (commandLine);
 
-
-//this does not work
-for (boost::program_options::variables_map::iterator it = commandLine.begin(); it != commandLine.end(); it++)
-{
-   std::cerr << "first = --" << it->first << "        second = " << std::endl;  // << it->second.value() << std::endl;
-
-}
-
-
    _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
-
-// TODO, logstartup message   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
-
 
    _verbosityLevel = global_verbosity;
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
-   _gtOpenSslConf = _confDir + "/" + GT_OPENSSL_CONF;
-
-   if (statFileOrDirectory (_dhParamsFile) != 0)
+   if (statFile (_dhParamsFile) != 0)
    {
       gtError ("Failure opening SSL DH Params file:  " + _dhParamsFile, 202, ERRNO_ERROR, errno);
    }
 
-   if (statFileOrDirectory (_gtOpenSslConf) != 0)
+   _gtOpenSslConf = _confDir + "/" + GT_OPENSSL_CONF;
+   if (statFile (_gtOpenSslConf) != 0)
    {
       gtError ("Failure opening OPENSSL config file:  " + _gtOpenSslConf, 202, ERRNO_ERROR, errno);
    }
@@ -182,11 +161,11 @@ for (boost::program_options::variables_map::iterator it = commandLine.begin(); i
 
 void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
 {
-   pcfacliBindIP (vm);
    pcfacliConfDir (vm);
    pcfacliCredentialFile (vm);
-   pcfacliAdvertisedIP (vm);
+   pcfacliBindIP (vm);
    pcfacliInternalPort (vm);    // Internal ports must be processed before the Advertised port
+   pcfacliAdvertisedIP (vm);
    pcfacliAdvertisedPort (vm);
    pcfacliLog (vm);
    pcfacliPath (vm);
@@ -207,6 +186,12 @@ void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
    { 
       _bindIP = vm[BIND_IP_CLI_OPT_LEGACY].as<std::string>();
    }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   startUpMessage << " --" << BIND_IP_CLI_OPT << "=" << _bindIP;
 }
 
 void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
@@ -234,10 +219,12 @@ void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
       commandLineError ("configuration directory '" + _confDir + "' must be an absolute path");
    }
 
-   if (statFileOrDirectory (_confDir) != 0)
+   if (statDirectory (_confDir) != 0)
    {
       commandLineError ("unable to opening configuration directory '" + _confDir + "'");
    }
+
+   startUpMessage << " --" << CONF_DIR_CLI_OPT << "=" << _confDir;
 }
 
 void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
@@ -268,12 +255,14 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
 
    if (!credFile.good ())
    {
-      commandLineError ("file not found (or is not readable):  " + credsPathAndFile);
+      commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
    }
 
    credFile >> _authToken;
 
    credFile.close ();
+
+   startUpMessage << " --" << CRED_FILE_CLI_OPT << "=" << credsPathAndFile.c_str();
 }
 
 void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
@@ -291,6 +280,12 @@ void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
    { 
       _exposedIP = vm[ADVERT_IP_CLI_OPT_LEGACY].as<std::string>();
    }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   startUpMessage << " --" << ADVERT_IP_CLI_OPT << "=" << _exposedIP;
 }
 
 void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
@@ -336,12 +331,15 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
       {
          commandLineError ("when using -i (--internal-port) string1 must be smaller than string2");
       }
+      startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart << ":" << _portEnd;
    }
    else
    {
       _portStart = lowPort;
       _portEnd = _portStart + 8; // default 8 ports
+      startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart;
    }
+
 }
 
 void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
@@ -367,6 +365,8 @@ void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
    }
 
    _exposedPortDelta = exposedPort - _portStart;
+
+   startUpMessage << " --" << ADVERT_PORT_CLI_OPT << "=" << exposedPort;
 }
 
 void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
@@ -398,6 +398,8 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
    {
       _logMask = strtoul (level.c_str(), NULL, 0);
    }
+
+   startUpMessage << " --" << LOGGING_CLI_OPT << "=" << vm[LOGGING_CLI_OPT].as<std::string>();
 }
 
 // Used by download and upload
@@ -415,10 +417,12 @@ std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
    }
 
-   if (statFileOrDirectory (path) != 0)
+   if (statDirectory (path) != 0)
    {
       commandLineError ("unable to opening directory '" + path + "'");
    }
+
+   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
 
    return path;
 }
@@ -468,7 +472,7 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
 {
    std::string fileContent = "";
    
-   if (statFileOrDirectory (csrFileName) != 0)
+/*   if (statFile (csrFileName) != 0)
    {
       if (_operatingMode != SERVER_MODE)
       {
@@ -480,6 +484,7 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
          return "";
       }
    }
+*/
 
    std::ifstream csrFile;
 
@@ -890,15 +895,26 @@ void gtBase::loggingCallBack (std::string message)
 }
 
 // 
-int gtBase::statFileOrDirectory (std::string dirFile)
+int gtBase::statDirectory (std::string dirFile)
 {
    time_t dummyArg;
+   return statFileOrDirectory (dirFile, gtBase::DIR_TYPE, dummyArg);
+}
+// 
 
-   return statFileOrDirectory (dirFile, dummyArg);
+int gtBase::statFile (std::string dirFile)
+{
+   time_t dummyArg;
+   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, dummyArg);
+}
+// 
+int gtBase::statFile (std::string dirFile, time_t &timeStamp)
+{
+   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, timeStamp);
 }
 
 // 
-int gtBase::statFileOrDirectory (std::string dirFile, time_t &fileMtime)
+int gtBase::statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
 {
    struct stat status;
 
@@ -906,6 +922,11 @@ int gtBase::statFileOrDirectory (std::string dirFile, time_t &fileMtime)
 
    if (statVal == 0 && S_ISDIR (status.st_mode))
    {
+      if (sType != gtBase::DIR_TYPE)  // Trying to stat a file and have a directory
+      {
+         return -1;
+      }
+
       DIR *dir;
 
       dir = opendir (dirFile.c_str());
@@ -923,6 +944,11 @@ int gtBase::statFileOrDirectory (std::string dirFile, time_t &fileMtime)
 
    if (statVal == 0 && S_ISREG (status.st_mode))
    {
+      if (sType != gtBase::FILE_TYPE)  // Trying to stat a directory and have a file
+      {
+         return -1;
+      }
+
       FILE *file;
    
       file = fopen (dirFile.c_str(), "r");

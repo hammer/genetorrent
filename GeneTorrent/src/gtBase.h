@@ -58,6 +58,9 @@
 
 class gtBase
 {
+   private:
+      typedef enum statType_ {FILE_TYPE = 91, DIR_TYPE} statType;
+
    public:
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
@@ -121,6 +124,9 @@ class gtBase
 
       bool _startUpComplete;
 
+      std::ostringstream startUpMessage;  // used to build up a startup message, version, options, tmpdir, etc.
+
+
       void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
@@ -138,8 +144,6 @@ class gtBase
 
       std::string getWorkingDirectory();
       std::string getFileName (std::string fileName);
-      int statFileOrDirectory (std::string);
-      int statFileOrDirectory (std::string, time_t &fileMtime);
 
       std::string getInfoHash (std::string torrentFile);
 
@@ -147,6 +151,10 @@ class gtBase
       void checkCredentials ();
 
       std::string sanitizePath (std::string inPath);
+
+      int statFile (std::string);
+      int statFile (std::string, time_t &fileMtime);
+      int statDirectory (std::string);
 
    private:
       std::string _bindIP;
@@ -191,6 +199,7 @@ class gtBase
       void pcfacliInternalPort (boost::program_options::variables_map &vm);
       void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
       void pcfacliLog (boost::program_options::variables_map &vm);
-};
 
+      int statFileOrDirectory (std::string, statType sType, time_t &fileMtime);
+};
 #endif /* GT_BASE_H_ */

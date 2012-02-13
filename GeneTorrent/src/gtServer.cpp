@@ -93,6 +93,8 @@ gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SER
 
    checkCredentials ();
 
+   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+
    _startUpComplete = true;
 
    if (_verbosityLevel > 0)
@@ -110,10 +112,12 @@ void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + SERVER_CLI_OPT + "'");
    }
 
-   if (statFileOrDirectory (_serverDataPath) != 0)
+   if (statDirectory (_serverDataPath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverDataPath + "'");
    }
+
+   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
 }
 
 void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
@@ -130,10 +134,12 @@ void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + QUEUE_CLI_OPT + "'");
    }
 
-   if (statFileOrDirectory (_serverQueuePath) != 0)
+   if (statDirectory (_serverQueuePath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverQueuePath + "'");
    }
+
+   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
 }
 
 void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
@@ -149,6 +155,8 @@ void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
    {
       commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
    }
+
+   startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _serverModeCsrSigningUrl;
 }
 
 void gtServer::getFilesInQueueDirectory (vectOfStr &files)
@@ -294,7 +302,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          libtorrent::torrent_status torrentStatus = mapIter->second->torrentHandle.status ();
          time_t torrentModTime = 0;
                
-         if (statFileOrDirectory (mapIter->first, torrentModTime) < 0)
+         if (statFile (mapIter->first, torrentModTime) < 0)
          {
             // The torrent has disappeared, stop serving it.
             Log (PRIORITY_NORMAL, " Stop serving:  GTO disappeared from queue:  %s info hash:  %s",  mapIter->first.c_str(), mapIter->second->infoHash.c_str());
@@ -453,7 +461,7 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
    newTorrRec->overTimeAlertIssued = false;
 
    time_t torrentModTime = 0;
-   if (statFileOrDirectory (pathAndFileName, torrentModTime) < 0)
+   if (statFile (pathAndFileName, torrentModTime) < 0)
    {
       Log (PRIORITY_HIGH, "Failure adding %s to Served GTOs, GTO file removed.  Error:  %s (%d)", pathAndFileName.c_str(), strerror (errno), errno);
       delete newTorrRec;

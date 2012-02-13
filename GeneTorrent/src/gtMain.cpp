@@ -49,6 +49,7 @@
 #include "gtDownload.h"
 
 int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
+std::string global_startup_message = "";
 
 std::string makeOpt (std::string baseName, const char secondName = SPACE)
 {
@@ -148,6 +149,8 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
             commandLineError ("unable to open config file '" + cli[CONFIG_FILE_CLI_OPT].as<std::string>() + "'.");
          }
          boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
+
+         global_startup_message = " --" + CONFIG_FILE_CLI_OPT + "=" + cli[CONFIG_FILE_CLI_OPT].as<std::string>();
       }
 
       // Check if help was requested
@@ -180,15 +183,21 @@ std::cout << "\n\n\n";
       boost::program_options::notify (cli); 
 
       // Verify and configure global_verbosity level here
+
+      std::ostringstream shortVerboseFlag;
+      shortVerboseFlag << VERBOSITY_SHORT_CLI_OPT;
+  
       if (global_verbosity > 0 && haveVerboseOnCli)
       {
-         commandLineError ("-v and --verbosity are not permitted on the command line at the same time");
+         commandLineError ("-" + shortVerboseFlag.str() + " and --" + VERBOSITY_CLI_OPT + " are not permitted on the command line at the same time");
       }
 
-      if (global_verbosity > 0)  // -v is present, -v overrides any possible --verbosity
+      if (global_verbosity > 0)  // -v is present, -v overrides any possible --verbose
       {
-         if (global_verbosity > 2)  // override out of range value from legacy -vvvv or -vvv
+         global_startup_message += " -" + shortVerboseFlag.str(); 
+         if (global_verbosity >= 2)  // override out of range value from legacy -vvvv or -vvv
          {
+            global_startup_message += shortVerboseFlag.str();
             global_verbosity = 2;
          }
       }
@@ -197,6 +206,21 @@ std::cout << "\n\n\n";
          if (cli.count (VERBOSITY_CLI_OPT))
          {
             global_verbosity =cli[VERBOSITY_CLI_OPT].as< uint32_t >();
+            if (global_verbosity < 1)
+            {
+               std::ostringstream errorMes;
+               errorMes << "--" << VERBOSITY_CLI_OPT << "=" << global_verbosity << " is not valid, try 1 or 2";
+               commandLineError (errorMes.str());
+            }
+            if (global_verbosity == 1)
+            {
+               global_startup_message += " --" + VERBOSITY_CLI_OPT + "=1";
+            }
+            else if (global_verbosity >= 2)
+            {
+               global_startup_message += " --" + VERBOSITY_CLI_OPT + "=2";
+               global_verbosity = 2;
+            }
          }
       }
 

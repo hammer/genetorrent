@@ -104,12 +104,12 @@ const std::string LOGGING_CLI_OPT = "log";                         // -l short o
 const std::string NO_LONG_CLI_OPT = "";                            // 
 
 // verbosity conversation, two different verbose settings are available
-// Single letter -v with increasing count or --verbosity=level
+// Single letter -v with increasing count or --verbose=level
 // this is a rather ugly hack, but due to shortcomings in boost program_options
 // seems to be a workable solution
-// -v and --verbosity are independent options due to boost program_options, but work
+// -v and --verbose are independent options due to boost program_options, but work
 // together.  short options are not permitted in config files.
-//   verbosity     verbosity     -v       Result
+//   verbose       verbose       -v       Result
 //   in config                            config value
 //                 on CLI                 cli value
 //                             on CLI     -v cli count
@@ -120,7 +120,7 @@ const std::string NO_LONG_CLI_OPT = "";                            //
 //
 // short options are hard coded (where needed) in gtMain.cpp
 const char VERBOSITY_SHORT_CLI_OPT = 'v';                         // -v short option
-const std::string VERBOSITY_CLI_OPT = "verbosity";                 
+const std::string VERBOSITY_CLI_OPT = "verbose";                 
 
 // download and upload mode options
 const std::string PATH_CLI_OPT = "path";                           // -p short option     

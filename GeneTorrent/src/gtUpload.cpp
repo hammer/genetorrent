@@ -87,11 +87,12 @@ extern void *geneTorrCallBackPtr;
 
 gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
 {
+   _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
 
-   _dataFilePath = pcfacliPath (vm);
-
    checkCredentials ();
+
+   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
    _startUpComplete = true;
 
@@ -103,9 +104,9 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
 
 void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
 {
-   if (vm.count (CRED_FILE_CLI_OPT) == 1 && vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
+   if (vm.count (UPLOAD_FILE_CLI_OPT) == 1 && vm.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 1)
    {
-      commandLineError ("duplicate config options:  " + CRED_FILE_CLI_OPT + " and " + CRED_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
+      commandLineError ("duplicate config options:  " + UPLOAD_FILE_CLI_OPT + " and " + UPLOAD_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
    }
 
    std::string credsPathAndFile;
@@ -119,10 +120,12 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
       _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
    }
 
-   if (statFileOrDirectory (_manifestFile) != 0)
+   if (statFile (_manifestFile) != 0)
    {
-      commandLineError ("file not found (or is not readable):  " + credsPathAndFile);
+      commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
    }
+
+   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
 }
 
 void gtUpload::run ()
@@ -311,7 +314,7 @@ bool gtUpload::verifyDataFilesExist (vectOfStr &missingFileList)
 
    while (vectIter != _filesToUpload.end ())
    {
-      if (statFileOrDirectory (workingDataPath + *vectIter) != 0)
+      if (statFile (workingDataPath + *vectIter) != 0)
       {
          missingFileList.push_back (*vectIter);
          missingFiles = true;
