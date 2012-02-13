@@ -97,7 +97,7 @@ gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SER
 
    _startUpComplete = true;
 
-   if (_verbosityLevel > 0)
+   if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Welcome to GeneTorrent version " << VERSION << ", server mode."); 
    }
@@ -262,7 +262,7 @@ void gtServer::run ()
 
          servedGtosMaintenance (timeNow, activeTorrentCollection);
 
-         if (_verbosityLevel > 0)
+         if (_verbosityLevel > VERBOSE_1)
          {
             screenOutput ("");
          }
@@ -349,7 +349,7 @@ std::cerr << "inside with time = " << time(NULL) << std::endl;
             if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
             {
                mapIter->second->overTimeAlertIssued = true;
-               if (_verbosityLevel > 0)
+               if (_verbosityLevel > VERBOSE_1)
                {
                   screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  00:01:00.");
                }
@@ -391,7 +391,7 @@ std::cerr << "inside with time = " << time(NULL) << std::endl;
                   mapIter->second->overTimeAlertIssued = true;
                }
    
-               if (_verbosityLevel > 0)
+               if (_verbosityLevel > VERBOSE_1)
                {
                   screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download");
                }
@@ -400,7 +400,7 @@ std::cerr << "inside with time = " << time(NULL) << std::endl;
          }
          else
          {
-            if (_verbosityLevel > 0)
+            if (_verbosityLevel > VERBOSE_1)
             {
                   screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".");
             }
@@ -538,7 +538,7 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
 
    newTorrRec->torrentHandle.resume();
 
-   if (_verbosityLevel > 0)
+   if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served");
    }

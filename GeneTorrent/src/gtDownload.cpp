@@ -96,7 +96,7 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
 
    _startUpComplete = true;
 
-   if (_verbosityLevel > 0)
+   if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Welcome to GeneTorrent version " << VERSION << ", download mode."); 
    }
@@ -194,7 +194,7 @@ void gtDownload::run ()
 
          Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-         if (_verbosityLevel > 0)
+         if (_verbosityLevel > VERBOSE_1)
          {
             screenOutput (message.str()); 
          }
@@ -209,7 +209,7 @@ void gtDownload::run ()
 
          Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-         if (_verbosityLevel > 0)
+         if (_verbosityLevel > VERBOSE_1)
          {
             screenOutput (message.str()); 
          }
@@ -363,7 +363,7 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
          gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 205, gtBase::HTTP_ERROR, code, "URL:  " + uri);
       }
 
-      if (_verbosityLevel > VERBOSE_3)
+      if (_verbosityLevel > VERBOSE_2)
       {
          screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
       }
@@ -598,7 +598,7 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
             }
          }
 
-         if (_verbosityLevel > 0) 
+         if (_verbosityLevel > VERBOSE_1) 
          {
             screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
          }
@@ -719,7 +719,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       fprintf (fd, "%d\n", torrentStatus.download_payload_rate);
       fflush (fd);
 
-      if (_verbosityLevel > 3)
+      if (_verbosityLevel > VERBOSE_2)
       {
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {

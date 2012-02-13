@@ -86,7 +86,7 @@ extern int global_verbosity;
 extern std::string global_startup_message;
 
 gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode) : 
-   _verbosityLevel (0), 
+   _verbosityLevel (VERBOSE_1), 
    _logToStdErr (false),
    _authToken (""), 
    _devMode (false),
@@ -1146,7 +1146,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_easy_setopt (curl, CURLOPT_URL, CSRSignURL.c_str());
    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
-   if (_verbosityLevel > VERBOSE_3)
+   if (_verbosityLevel > VERBOSE_2)
    {
        curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
    }
@@ -1197,7 +1197,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
       }
    }
 
-   if (_verbosityLevel > VERBOSE_3)
+   if (_verbosityLevel > VERBOSE_2)
    {
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }

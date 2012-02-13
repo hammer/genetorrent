@@ -96,7 +96,7 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
 
    _startUpComplete = true;
 
-   if (_verbosityLevel > 0)
+   if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
    }
@@ -247,7 +247,7 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
       gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL);
    }
 
-   if (_verbosityLevel > VERBOSE_3)
+   if (_verbosityLevel > VERBOSE_2)
    {
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
@@ -457,7 +457,7 @@ void gtUpload::processManifestFile ()
 
 void gtUpload::performGtoUpload (std::string torrentFileName)
 {
-   if (_verbosityLevel > 0)
+   if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Sending " << torrentFileName); 
    }
@@ -542,7 +542,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
 
-      if (_verbosityLevel > 0 && !displayed100Percent)
+      if (_verbosityLevel > VERBOSE_1 && !displayed100Percent)
       {
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {

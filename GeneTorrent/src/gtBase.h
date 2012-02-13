@@ -64,13 +64,12 @@ class gtBase
    public:
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
-      typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2, VERBOSE_3, VERBOSE_4} verboseLevels;
-                            // VERBOSE_1:  Operation Progress Displayed on Screen
+      typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2} verboseLevels;
+                            // VERBOSE_1:  No Operation Progress Displayed on Screen
                             // VERBOSE_2:  low volume debugging
-                            // VERBOSE_3:  medium volume debugging
-                            // VERBOSE_4:  Detailed debugging
+                            // VERBOSE_3:  Detailed debugging
                             //
-                            // -v (-vv, -vvv, -vvvv) sets the level, enum values are one less than the level to
+                            // -v and -vv (or --verbose=1 or 2) sets the level, enum values are one less than the level to
                             //                       simplify the conditional test using >
 
       typedef enum gtErrorType_ {ERRNO_ERROR = 101, CURL_ERROR, HTTP_ERROR, TORRENT_ERROR, DEFAULT_ERROR} gtErrorType;
