@@ -63,10 +63,6 @@ Upload mode is used to send files to the repository.  Download mode is
 used to retrieve files from the repository.  Server mode is used
 within the repository to create GeneTorrent server instances that
 deliver data to download actors.
-.PP
-Depending on the operating mode of GeneTorrent the same command line
-argument may have different behaviors or meanings.  In addition there
-are several options that can be used in any operating mode.
 .SH OPTIONS
 .SS "General Command Line Arguments:"
 .TP
@@ -77,7 +73,7 @@ Print a usage message briefly summarizing these command-line options, then exit.
 Print the version number of
 .B GeneTorrent
 to the standard output stream.  This version number should be included
-in all bug reports (see below).
+in all bug reports.
 .TP
 .BI \-b " address" "\fR,\fP \-\^\-bind-ip" " address"
 The IP address for GeneTorrent to bind.  Default is to bind all
@@ -96,9 +92,9 @@ This directory should contain \fBGeneTorrent.openssl.conf\fP and
 .TP
 .BI \-\^\-config-file " configuration-file"
 Specifies a configuration file from which to read program options.
-(See below for format.) Every option that can be specified on the
-command line can also be specified in the configuration file.  Options
-present on the command line will override the contents of the
+(See below for format.) Virtually every option that can be specified
+on the command line can also be specified in the configuration file.
+Options present on the command line will override the contents of the
 configuration file.
 .TP
 .BI \-e " address" "\fR,\fP \-\^\-advertised-ip" " address"
@@ -143,7 +139,7 @@ The long and short forms of this option work slightly differently.
 With the short form, you can receive summary progress information by
 specifying a single -v, or detailed progress information by specifying
 -vv (e.g., two -v's).  With the long form, you specify a numeric level
-between 0 and 2; for instance, use --verbose=1 for summary progress
+between 1 and 2; for instance, use --verbose=1 for summary progress
 information.
 .SS "Upload Mode Command Line Arguments:"
 .TP
@@ -167,16 +163,16 @@ Required. Indicates download mode.
 .I content-specifier
 should be one of the following:
 .IP
-o  A fully-qualified URI pointing to an analysis object at the
+o\ A fully-qualified URI pointing to an analysis object at the
 GeneTorrent Executive.
 .IP
-o  A UUID denoting an analysis object at the GeneTorrent Executive.  In
+o\ A UUID denoting an analysis object at the GeneTorrent Executive.  In
 this case, GeneTorrent will construct a URI based on the default
 server, currently https://cghub.ucsc.edu.  
 .IP
-o  An XML file, which will be parsed to obtain a list of URIs.
+o\ An XML file, which will be parsed to obtain a list of URIs.
 .IP
-o A .gto file directly, which eliminates all calls to the GeneTorrent
+o\ A .gto file directly, which eliminates all calls to the GeneTorrent
 Executive and causes a download to begin.  In this case you do not
 need to supply access credentials using the -c option.
 .IP
@@ -194,8 +190,9 @@ The current directory will be used by default.
 .BI \-\^\-max-children " max-children"
 The maximum number of parallel children that should be spawned to
 perform the download.  By default up to 8 children are used, but this
-number may be adjusted.  In general you should have fewer children
-than you have CPU cores on your machine.
+number may be adjusted.  For maximum performance, the recommended
+number of children is between C/2 and C, if C is the number of cores
+on your machine.
 .SS "Server Mode Command Line Arguments:"
 .TP
 .BI \-s " path" "\fR,\fP \-\^\-server" " path"
@@ -223,11 +220,12 @@ All options that can be specified on the command line can also be
 specified in a configuration file, which is specified on the command line via the 
 .B --config-file
 option.  The configuration file is a simple flat ASCII file with lines
-of the form "parameter=value".  Any long-form option from the command
-line may be used as a parameter, and the # character introduces a comment
-that spans until the end of the line.
+of the form "parameter=value".  Except for 'help', 'version',
+and 'config-file', any long-form option from the command line may be
+used as a parameter, and the # character introduces a comment that
+spans until the end of the line.
 
-The following is a sample configuration file:
+Sample GeneTorrent server configuration file:
 .nf
 
 # GeneTorrent configuration file
@@ -241,7 +239,7 @@ advertised-port=6921
 .fi
 .SH COPYRIGHT
 Copyright \(co
-2011
+2011-2012
 Annai Systems, Inc.
 .PP
 This is free software;
