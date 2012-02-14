@@ -1,5 +1,7 @@
 #!/bin/bash
 
+buildThreads="4"
+
 function usage
 {
    cat << EOF
@@ -39,18 +41,14 @@ function bailout
 
 function build_libtorrent
 {
+return
    saveDir=${PWD}
    cd libtorrent
    [[ -e ../.fullbuild ]] && { ./autotool.sh || bailout $FUNCNAME 
                              }
    ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --enable-static --disable-shared --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   if [[ `hostname -s` = "radon" || `hostname -s` = "xenon" ]]
-   then
-      make -j 64 || bailout $FUNCNAME
-   else
-      make -j 4 || bailout $FUNCNAME
-   fi
+   make -j ${buildThreads} || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
@@ -63,7 +61,7 @@ function build_GeneTorrent
                              }
    ./configure --prefix=/usr CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME
    make clean || bailout $FUNCNAME
-   make || bailout $FUNCNAME
+   make -j ${buildThreads} || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
@@ -233,6 +231,11 @@ function build_source
 [[ $#1 -lt 1 ]] && usage
 
 bDir=${PWD}
+
+if [[ `hostname -s` = "radon" || `hostname -s` = "xenon" ]]
+then
+   buildThreads="16"
+fi
 
 case $1 in 
    local)
