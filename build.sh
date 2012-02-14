@@ -41,7 +41,6 @@ function bailout
 
 function build_libtorrent
 {
-return
    saveDir=${PWD}
    cd libtorrent
    [[ -e ../.fullbuild ]] && { ./autotool.sh || bailout $FUNCNAME 

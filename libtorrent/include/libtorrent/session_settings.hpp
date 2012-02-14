@@ -271,6 +271,7 @@ namespace libtorrent
 			, read_job_every(10)
 			, use_disk_read_ahead(true)
 			, lock_files(false)
+			, ssl_listen(4433)
 #ifdef TORRENT_CALLBACK_LOGGER
 		        , loggingCallBack(NULL)
 #endif
@@ -1092,6 +1093,9 @@ namespace libtorrent
 		// if set to true, files will be locked when opened.
 		// preventing any other process from modifying them
 		bool lock_files;
+ 
+                // open an ssl listen socket for ssl torrents on this port
+                int ssl_listen;
 
 		// logging call back function
 #ifdef TORRENT_CALLBACK_LOGGER
