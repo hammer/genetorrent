@@ -586,6 +586,10 @@ libtorrent::session *gtServer::addActiveSession ()
    bindSession (sessionNew);
 
    int portUsed = sessionNew->listen_port ();
+   int sslPortUsed = sessionNew->ssl_listen_port ();
+
+std::cerr << "djn portUsed = " << portUsed << std::endl;
+std::cerr << "djn sslPortUsed = " << sslPortUsed << std::endl;
 
    if (portUsed < _portStart + _exposedPortDelta || portUsed > _portEnd + _exposedPortDelta)
    {
