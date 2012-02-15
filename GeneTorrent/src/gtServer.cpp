@@ -85,7 +85,14 @@ static char const* server_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtServer::gtServer (boost::program_options::variables_map &vm) : gtBase (vm, SERVER_MODE), _serverQueuePath (""), _serverDataPath (""), _serverModeCsrSigningUrl (""), _activeSessions (), _maxActiveSessions (_portEnd - _portStart + 1)
+gtServer::gtServer (boost::program_options::variables_map &vm) : 
+               gtBase (vm, SERVER_MODE), 
+               _serverQueuePath (""), 
+               _serverDataPath (""), 
+               _serverModeCsrSigningUrl (""), 
+               _activeSessions (), 
+               _maxActiveSessions ((_portEnd - _portStart + 1) / 2)    // 1 port for SSL and 1 port for None SSL per session
+                                                                       // maximum sessions is 1/2 the allowed port range
 {
    pcfacliServer (vm);
    pcfacliQueue (vm);
@@ -588,10 +595,9 @@ libtorrent::session *gtServer::addActiveSession ()
    int portUsed = sessionNew->listen_port ();
    int sslPortUsed = sessionNew->ssl_listen_port ();
 
-std::cerr << "djn portUsed = " << portUsed << std::endl;
-std::cerr << "djn sslPortUsed = " << sslPortUsed << std::endl;
-
-   if (portUsed < _portStart + _exposedPortDelta || portUsed > _portEnd + _exposedPortDelta)
+   // verify both portUsed and sslPortUsed fall within the allowed pool
+   if ((portUsed < _portStart + _exposedPortDelta || portUsed > _portEnd + _exposedPortDelta) ||
+       (sslPortUsed < _portStart + _exposedPortDelta || sslPortUsed > _portEnd + _exposedPortDelta))
    {
       delete sessionNew;
       return NULL;

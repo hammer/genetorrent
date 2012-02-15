@@ -2087,7 +2087,7 @@ namespace aux {
 
 #ifdef TORRENT_USE_OPENSSL
                 tcp::endpoint ssl_interface = m_listen_interface;
-                ssl_interface.port(m_settings.ssl_listen);
+//                ssl_interface.port(m_settings.ssl_listen);
 #endif
 
 
@@ -2117,7 +2117,7 @@ namespace aux {
                         {
                                 listen_socket_t s;
                                 s.ssl = true;
-                                setup_listener(&s, ssl_interface, 10, false, flags, ec);
+                                setup_listener(&s, ssl_interface, m_listen_port_retries, false, flags, ec);
  
                                 if (s.sock)
                                 {
@@ -2147,7 +2147,7 @@ namespace aux {
                                         listen_socket_t s;
                                         s.ssl = true;
                                         setup_listener(&s, tcp::endpoint(address_v6::any(), ssl_interface.port())
-                                                , 10, false, flags, ec);
+                                                , m_listen_port_retries, false, flags, ec);
  
                                         if (s.sock)
                                         {
@@ -2197,7 +2197,7 @@ namespace aux {
                         {
                                 listen_socket_t s;
                                 s.ssl = true;
-                                setup_listener(&s, ssl_interface, 10, false, flags, ec);
+                                setup_listener(&s, ssl_interface, m_listen_port_retries, false, flags, ec);
  
                                 if (s.sock)
                                 {
@@ -4803,7 +4803,6 @@ namespace aux {
 		, const char* net_interface, int flags)
 	{
 		INVARIANT_CHECK;
-
 		tcp::endpoint new_interface;
 		if (net_interface && std::strlen(net_interface) > 0)
 		{

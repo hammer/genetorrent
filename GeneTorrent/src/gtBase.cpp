@@ -322,7 +322,7 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
 
    if (highPort > 0)
    {
-      if (lowPort <= highPort)
+      if (lowPort < highPort)
       {
          _portStart = lowPort;
          _portEnd = highPort;
