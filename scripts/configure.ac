@@ -30,14 +30,24 @@
 
 AC_PREREQ([2.63])
 
-#
-AC_INIT(GeneTorrentScripts, 0)
-#AC_INIT(GeneTorrentScripts)
+# make the script version number dependent upon the version number of
+# GeneTorrent.  This is an ugly bit of m4 programming that grabs the
+# version number out of the file ../GeneTorrent/configure.ac.  The
+# m4_bpatsubst nonsense is there to strip that trailing newline left
+# there by esyscmd
+
+m4_define(scriptver, 
+          m4_bpatsubst(esyscmd([sed -ne '/^AC_INIT/ s/^AC_INIT(.*, \([^)]*\))$/\1/p' ../GeneTorrent/configure.ac]), [\([0-9.]*\)\(\w\|\W\)*], [\1]))
+
+AC_INIT(GeneTorrentScripts, scriptver)
+
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_FILES([
 Makefile 
+GTLoadBalancer
+gtoinfo
 ])
 AC_OUTPUT
 

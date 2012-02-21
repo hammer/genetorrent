@@ -38,7 +38,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.1.0.2'
+revlevel = '@PACKAGE_VERSION@'
 
 # Load a couple of useful modules
 from optparse import OptionParser

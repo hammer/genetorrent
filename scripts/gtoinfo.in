@@ -77,7 +77,7 @@
 ################################################################################
 
 # Current version
-revlevel = '0.1.4.0'
+revlevel = '@PACKAGE_VERSION@'
 
 # Load a couple of useful modules
 import re
