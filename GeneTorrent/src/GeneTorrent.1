@@ -81,21 +81,21 @@ addresses on the system.
 .TP
 .BI \-c " credential-file" "\fR,\fP \-\^\-credential-file" " credential-file"  
 Required for all modes, unless you are directly passing a .gto file to
-the -d option.  The full or relative path to the file containing the
+the -d option.  The absolute or relative path to the file containing the
 access credentials (security token) previously received from the
 repository.
 .TP
 .BI \-C " confdir" "\fR,\fP \-\^\-config-dir" " confdir"
-Specify an absolute path to the GeneTorrent configuration directory.
-This directory should contain \fBGeneTorrent.openssl.conf\fP and
-\fBdhparam.pem\fP.
+Specify an absolute or relative path to the GeneTorrent configuration
+directory.  This directory should contain
+\fBGeneTorrent.openssl.conf\fP and \fBdhparam.pem\fP.
 .TP
 .BI \-\^\-config-file " configuration-file"
-Specifies a configuration file from which to read program options.
-(See below for format.) Virtually every option that can be specified
-on the command line can also be specified in the configuration file.
-Options present on the command line will override the contents of the
-configuration file.
+Specifies the absolute or relative path to a configuration file from
+which to read program options.  (See below for format.) Virtually
+every option that can be specified on the command line can also be
+specified in the configuration file.  Options present on the command
+line will override the contents of the configuration file.
 .TP
 .BI \-e " address" "\fR,\fP \-\^\-advertised-ip" " address"
 The IP address to advertise to the transactor.  This option is useful
@@ -144,15 +144,15 @@ information.
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
-Required. Indicates upload mode.  The 
-.I manifest-file 
-must follow the format specified by Annai Systems; lists all the data
-files that are to be transferred to the repository.
+Required; indicates upload mode.  The absolute or relative path to the
+manifest-file, which must follow the format specified by Annai
+Systems. This file lists all the data files that are to be transferred
+to the repository.
 .TP
 .BI \-p " path" "\fR,\fP \-\^\-path" " path"
-Root path to read data files.  Note that files to be uploaded must
-always be in a subdirectory named after the analysis UUID for the
-sumission.  If the -p option is present,
+The absolute or relative path to the root directory for upload.  Note
+that files to be uploaded must always be in a subdirectory named after
+the analysis UUID for the sumission.  If the -p option is present,
 .I path
 can point to the UUID directory, or to the directory that contains the
 UUID directory.  The current directory will be used by default.
@@ -170,20 +170,22 @@ o\ A UUID denoting an analysis object at the GeneTorrent Executive.  In
 this case, GeneTorrent will construct a URI based on the default
 server, currently https://cghub.ucsc.edu.  
 .IP
-o\ An XML file, which will be parsed to obtain a list of URIs.
+o\ The absolute or relative path to an XML file, which will be parsed
+to obtain a list of URIs.
 .IP
-o\ A .gto file directly, which eliminates all calls to the GeneTorrent
-Executive and causes a download to begin.  In this case you do not
-need to supply access credentials using the -c option.
+o\ The absolute or relative path to a .gto file directly, which
+eliminates all calls to the GeneTorrent Executive and causes a
+download to begin.  In this case you do not need to supply access
+credentials using the -c option.
 .IP
 Note that multiple -d options can be specified on the same command
 line, in which case multiple analysis objects will be downloaded.
 .TP
 .BI \-p " path" "\fR,\fP \-\^\-path" " path"
-Path to save data files in the gto file(s).  UUID is part of the gto
-and will always be added to 
+The absolute or relaative path to save data files in the gto file(s).
+UUID is part of the gto and will always be added to
 .I path
-, so data files will be found at
+, so after download data files will be found at
 .I path\fR/\fPUUID\fR.\fP
 The current directory will be used by default.
 .TP
@@ -198,9 +200,9 @@ on your machine.
 .BI \-s " path" "\fR,\fP \-\^\-server" " path"
 Required.  Indicates server mode.  
 .I path
-is the directory under which
-the data files being shared are to be found.  Note that UUID is always
-be added to 
+is the absolute or relative path to the directory under which the data
+files being shared are to be found.  Note that UUID is always be added
+to
 .I path\fR,\fP
 so data files will be found at 
 .I path\fR/\fPUUID\fR.\fP
@@ -208,8 +210,8 @@ so data files will be found at
 .BI \-q " work-queue" "\fR,\fP \-\^\-queue" " work-queue"
 Required.  
 .I work-queue
-is the path where this server instance will look for .gto files to
-begin sharing content.
+is the absolute or relative path to a directory where this server
+instance will look for .gto files to begin sharing content.
 .TP
 .BI \-\^\-security-api " signing-URI"
 Required.  
