@@ -135,6 +135,27 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       boost::program_options::variables_map cli;
       boost::program_options::store (boost::program_options::parse_command_line (argc, argv, allOpts), cli);
 
+      // Check if help was requested
+      if (cli.count (HELP_CLI_OPT))
+      {
+// DJN remove these
+std::cout << allOpts << std::endl;
+std::cout << "\n\n\n";
+         std::cout << "Usage:" << std::endl;
+         std::cout << "   GeneTorrent -u manifest-file -c credentials [ -p path ] [--config-file path/file]" << std::endl;
+         std::cout << "   GeneTorrent -d [ URI | UUID | .xml | .gto ] -c credentials [ -p path ] [--config-file path/file]" << std::endl;
+         std::cout << "   GeneTorrent -s path -q work-queue -c credentials --security-api signing-URI [--config-file path/file]" << std::endl;
+         std::cout << std::endl;
+         std::cout << "Type 'man GeneTorrent' for more information." << std::endl;
+         exit (0);
+      }
+
+      if (cli.count (VERSION_CLI_OPT))
+      {
+         std::cout << "GeneTorrent release " << VERSION << std::endl;
+         exit (0);
+      }
+
       if (cli.count (VERBOSITY_CLI_OPT))
       {
          haveVerboseOnCli = true;
@@ -160,21 +181,6 @@ std::cerr << "configPathAndFile = " << configPathAndFile << std::endl;
          boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
 
          global_startup_message = " --" + CONFIG_FILE_CLI_OPT + "=" + cli[CONFIG_FILE_CLI_OPT].as<std::string>();
-      }
-
-      // Check if help was requested
-      if (cli.count (HELP_CLI_OPT))
-      {
-// DJN remove these
-std::cout << allOpts << std::endl;
-std::cout << "\n\n\n";
-         std::cout << "Usage:" << std::endl;
-         std::cout << "   GeneTorrent -u manifest-file -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -d [ URI | UUID | .xml | .gto ] -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -s path -q work-queue -c credentials --security-api signing-URI [--config-file path/file]" << std::endl;
-         std::cout << std::endl;
-         std::cout << "Type 'man GeneTorrent' for more information." << std::endl;
-         exit (0);
       }
 
       if (cli.count (SERVER_CLI_OPT) == 0 && cli.count (DOWNLOAD_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)

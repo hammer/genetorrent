@@ -254,7 +254,7 @@ void gtBase::processStatNotification (bool haveError, libtorrent::alert *alrt)
 
          getGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (haveError, "%s, infohash:  %s", statsAlert->message().c_str(), infoHash.c_str());
       } break;
 
       default:

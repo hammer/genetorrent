@@ -122,6 +122,11 @@ void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
       return;
    }
 
+   if (_maxChildren < 1)
+   {
+      commandLineError ("--" + MAX_CHILDREN_CLI_OPT + " must be greater than 0");
+   }
+
    startUpMessage << " --" << MAX_CHILDREN_CLI_OPT << "=" << _maxChildren;
 }
 
