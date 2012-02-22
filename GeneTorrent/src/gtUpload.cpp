@@ -120,12 +120,14 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
       _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
    }
 
+   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
+   relativizePath (_manifestFile);
+
    if (statFile (_manifestFile) != 0)
    {
       commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
    }
 
-   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
 }
 
 void gtUpload::run ()
@@ -229,7 +231,7 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    if (res != CURLE_OK)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 203, gtUpload::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 203, gtUpload::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
    }
 
    long code;
@@ -238,14 +240,13 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    if (res != CURLE_OK)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 204, gtUpload::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 204, gtUpload::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
    }
 
    if (code != 200)
    {
       curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL);
-   }
+      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL); }
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -293,12 +294,10 @@ void gtUpload::findDataAndSetWorkingDirectory ()
       gtError ("Failure changing directory to .. from " + getWorkingDirectory(), 202, ERRNO_ERROR, errno);
    }
 
-   if (verifyDataFilesExist (missingFiles))
+   if (!verifyDataFilesExist (missingFiles))
    {
-      return; // all data is present
+      displayMissingFilesAndExit (missingFiles); // Give up
    }
-
-   displayMissingFilesAndExit (missingFiles); // Give up
 }
 
 // This function verifies that all files specified in the manifest file exist in a

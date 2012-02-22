@@ -54,13 +54,11 @@
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
 
+#include "gtUtils.h"
 #include "accumulator.hpp"
 
 class gtBase
 {
-   private:
-      typedef enum statType_ {FILE_TYPE = 91, DIR_TYPE} statType;
-
    public:
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
@@ -150,10 +148,7 @@ class gtBase
       void checkCredentials ();
 
       std::string sanitizePath (std::string inPath);
-
-      int statFile (std::string);
-      int statFile (std::string, time_t &fileMtime);
-      int statDirectory (std::string);
+      void relativizePath (std::string &inPath);
 
    private:
       std::string _bindIP;
@@ -198,7 +193,5 @@ class gtBase
       void pcfacliInternalPort (boost::program_options::variables_map &vm);
       void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
       void pcfacliLog (boost::program_options::variables_map &vm);
-
-      int statFileOrDirectory (std::string, statType sType, time_t &fileMtime);
 };
 #endif /* GT_BASE_H_ */

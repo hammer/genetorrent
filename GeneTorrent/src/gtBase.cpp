@@ -40,9 +40,6 @@
 
 #include <config.h>
 
-#include <sys/statvfs.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <iostream>
 #include <fstream>
@@ -258,7 +255,14 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
       commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
    }
 
-   credFile >> _authToken;
+   try
+   {
+      credFile >> _authToken;
+   }
+   catch (...)
+   {
+      commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
+   }
 
    credFile.close ();
 
@@ -313,15 +317,28 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
    strTokenize strToken (portList, ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
 
    int lowPort = strtol (strToken.getToken (1).c_str (), NULL, 10);
-   int highPort = -1;
+
+   if (lowPort < 1024 || lowPort > 65535)
+   {
+      commandLineError ("-i (--internal-port) " + strToken.getToken (1) + " out of range (1024-65535)");
+   }
+
+   int highPort;
+   bool highPortSet = false;
 
    if (strToken.size () > 1)
    {
       highPort = strtol (strToken.getToken (2).c_str (), NULL, 10);
+      highPortSet = true;
    }
 
-   if (highPort > 0)
+   if (highPortSet)
    {
+      if (highPort < 1024 || highPort > 65535)
+      {
+         commandLineError ("-i (--internal-port) " + strToken.getToken (2) + " out of range (1024-65535)");
+      }
+
       if (lowPort <= highPort)
       {
          _portStart = lowPort;
@@ -329,17 +346,22 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
       }
       else
       {
-         commandLineError ("when using -i (--internal-port) string1 must be smaller than string2");
+         commandLineError ("when using -i (--internal-port) " + strToken.getToken (1) + " must be smaller than " + strToken.getToken (2));
       }
       startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart << ":" << _portEnd;
    }
    else
    {
       _portStart = lowPort;
+
+      if (_portStart + 8 > 65535)
+      {
+         commandLineError ("-i (--internal-port) implicit (add 8 ports) end value exceeds 65535");
+      }
+
       _portEnd = _portStart + 8; // default 8 ports
       startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart;
    }
-
 }
 
 void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
@@ -349,19 +371,24 @@ void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
       commandLineError ("duplicate config options:  " + ADVERT_PORT_CLI_OPT + " and " + ADVERT_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
    }
 
-   uint32_t exposedPort;
+   int exposedPort;
 
    if (vm.count (ADVERT_PORT_CLI_OPT) == 1)
    { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< uint32_t >();
+      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< int >();
    }
    else if (vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
    { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< uint32_t >();
+      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< int >();
    }
    else   // Option not present
    {
       return;    
+   }
+
+   if (exposedPort < 1024 || exposedPort > 65535)
+   {
+      commandLineError ("-f (--advertised-port) out of range (1024-65535)");
    }
 
    _exposedPortDelta = exposedPort - _portStart;
@@ -417,12 +444,13 @@ std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
+   relativizePath (path);
+
    if (statDirectory (path) != 0)
    {
       commandLineError ("unable to opening directory '" + path + "'");
    }
-
-   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
 
    return path;
 }
@@ -524,6 +552,14 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
    return fileContent;
 }
 
+void gtBase::relativizePath (std::string &inPath)
+{
+   if (inPath[0] != '/')
+   {
+      inPath = getWorkingDirectory() + "/" + inPath;
+   }
+}
+
 // 
 std::string gtBase::sanitizePath (std::string inPath)
 {
@@ -532,7 +568,7 @@ std::string gtBase::sanitizePath (std::string inPath)
       inPath.erase (inPath.size () - 1);
    }
 
-   return (inPath);
+   return inPath;
 }
 
 // 
@@ -838,12 +874,32 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
 
       if (_bindIP.size())
       {
-         ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
+         try
+         {
+            ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
+         }
+         catch (boost::system::system_error e)
+         {  
+            std::ostringstream messageBuff;
+            messageBuff << "invalid --" << BIND_IP_CLI_OPT << " address of:  " << _bindIP << " caused an exception:  " << e.what();
+            Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
+            exit(98);
+         }
       }
 
       if (_exposedIP.size())
       {
-         ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
+         try
+         {
+            ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
+         }
+         catch (boost::system::system_error e)
+         {  
+            std::ostringstream messageBuff;
+            messageBuff << "invalid --" << ADVERT_IP_CLI_OPT << " address of:  " << _exposedIP << " caused an exception:  " << e.what();
+            Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
+            exit(98);
+         }
       }
 
       torrentSession->set_ip_filter(ipFilter);
@@ -894,81 +950,6 @@ void gtBase::loggingCallBack (std::string message)
    pthread_mutex_unlock (&callBackLoggerLock);
 }
 
-// 
-int gtBase::statDirectory (std::string dirFile)
-{
-   time_t dummyArg;
-   return statFileOrDirectory (dirFile, gtBase::DIR_TYPE, dummyArg);
-}
-// 
-
-int gtBase::statFile (std::string dirFile)
-{
-   time_t dummyArg;
-   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, dummyArg);
-}
-// 
-int gtBase::statFile (std::string dirFile, time_t &timeStamp)
-{
-   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, timeStamp);
-}
-
-// 
-int gtBase::statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
-{
-   struct stat status;
-
-   int statVal = stat (dirFile.c_str (), &status);
-
-   if (statVal == 0 && S_ISDIR (status.st_mode))
-   {
-      if (sType != gtBase::DIR_TYPE)  // Trying to stat a file and have a directory
-      {
-         return -1;
-      }
-
-      DIR *dir;
-
-      dir = opendir (dirFile.c_str());
-  
-      if (dir != NULL)
-      {
-         closedir (dir);
-         return 0;
-      }
-      else 
-      {
-         return -1;
-      }
-   }
-
-   if (statVal == 0 && S_ISREG (status.st_mode))
-   {
-      if (sType != gtBase::FILE_TYPE)  // Trying to stat a directory and have a file
-      {
-         return -1;
-      }
-
-      FILE *file;
-   
-      file = fopen (dirFile.c_str(), "r");
-  
-      if (file != NULL)
-      {
-         fileMtime = status.st_mtime;
-         fclose (file);
-         return 0;
-      }
-      else 
-      {
-         return -1;
-      }
-   }
-
-   return -1;
-}
-
-// 
 std::string gtBase::getWorkingDirectory ()
 {
    long size;

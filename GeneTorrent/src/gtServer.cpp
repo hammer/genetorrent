@@ -112,12 +112,13 @@ void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + SERVER_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
+   relativizePath (_serverDataPath);
+
    if (statDirectory (_serverDataPath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverDataPath + "'");
    }
-
-   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
 }
 
 void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
@@ -134,12 +135,13 @@ void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + QUEUE_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
+   relativizePath (_serverQueuePath);
+
    if (statDirectory (_serverQueuePath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverQueuePath + "'");
    }
-
-   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
 }
 
 void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
@@ -154,6 +156,11 @@ void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
    if (_serverModeCsrSigningUrl.size() == 0)
    {
       commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
+   }
+
+   if (std::string::npos == _serverModeCsrSigningUrl.find ("http") || std::string::npos == _serverModeCsrSigningUrl.find ("://"))
+   {
+      commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
    }
 
    startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _serverModeCsrSigningUrl;

@@ -35,6 +35,7 @@
 bin_PROGRAMS = GeneTorrent
 
 GeneTorrent_SOURCES = gtBase.cpp \
+                      gtUtils.cpp \
                       gtDownload.cpp \
                       gtUpload.cpp \
                       gtServer.cpp \

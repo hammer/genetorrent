@@ -55,7 +55,7 @@ class gtDownload : public gtBase
       vectOfStr _torrentListToDownload;
 
       void runDownloadMode (std::string startupDir);
-      void prepareDownloadList (std::string startDirectory);
+      void prepareDownloadList ();
       void downloadGtoFilesByURI (vectOfStr &uris);
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
       void performTorrentDownload (int64_t totalSizeOfDownload);
