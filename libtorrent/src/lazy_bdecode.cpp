@@ -260,24 +260,6 @@ namespace libtorrent
 		m_len = start - m_begin + length;
 	}
 
-	namespace
-	{
-		// str1 is null-terminated
-		// str2 is not, str2 is len2 chars
-		bool string_equal(char const* str1, char const* str2, int len2)
-		{
-			while (len2 > 0)
-			{
-				if (*str1 != *str2) return false;
-				if (*str1 == 0) return false;
-				++str1;
-				++str2;
-				--len2;
-			}
-			return *str1 == 0;
-		}
-	}
-
 	std::pair<std::string, lazy_entry const*> lazy_entry::dict_at(int i) const
 	{
 		TORRENT_ASSERT(m_type == dict_t);
@@ -321,7 +303,7 @@ namespace libtorrent
 		return e->int_value();
 	}
 
-	lazy_entry const* lazy_entry::dict_find_dict(char const* name) const
+	lazy_entry const* lazy_entry::dict_find_dict(const std::string name) const
 	{
 		lazy_entry const* e = dict_find(name);
 		if (e == 0 || e->type() != lazy_entry::dict_t) return 0;
@@ -335,13 +317,15 @@ namespace libtorrent
 		return e;
 	}
 
-	lazy_entry* lazy_entry::dict_find(char const* name)
+	lazy_entry* lazy_entry::dict_find(const std::string name)
 	{
 		TORRENT_ASSERT(m_type == dict_t);
 		for (int i = 0; i < int(m_size); ++i)
 		{
 			lazy_dict_entry& e = m_data.dict[i];
-			if (string_equal(name, e.name, e.val.m_begin - e.name))
+			int len = e.val.m_begin - e.name;
+
+			if (len == name.size() && memcmp(name.data(), e.name, len) == 0) 
 				return &e.val;
 		}
 		return 0;
