@@ -863,7 +863,7 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
    settings.enable_incoming_utp = false;
    settings.apply_ip_filter_to_trackers= false;
 
-   settings.no_atime_storage = true;
+   settings.no_atime_storage = false;
    settings.max_queued_disk_bytes = 1024 * 1024 * 1024;
 
    torrentSession->set_settings (settings);

@@ -352,7 +352,6 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          // two seeders are present due to tracker scraping
          if (mapIter->second->downloadGTO == false && mapIter->second->torrentHandle.status().state == libtorrent::torrent_status::seeding)
          {
-std::cerr << "inside with time = " << time(NULL) << std::endl;
             if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
             {
                mapIter->second->overTimeAlertIssued = true;
