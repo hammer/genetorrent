@@ -228,25 +228,9 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
 
    res = curl_easy_perform (curl);
 
-   if (res != CURLE_OK)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 203, gtUpload::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
-   }
+   fclose (gtoFile);
 
-   long code;
-   res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-   if (res != CURLE_OK)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 204, gtUpload::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
-   }
-
-   if (code != 200)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL); }
+   processCurlResponse (curl, res, realTorrentFileName, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -254,8 +238,6 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    }
 
    curl_easy_cleanup (curl);
-
-   fclose (gtoFile);
 
    return realTorrentFileName;
 }
@@ -529,7 +511,6 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
 
    while (torrentStatus.num_complete < 2)
    {
-      torrentHandle.scrape_tracker();
       sessionStatus = torrentSession.status();
       torrentStatus = torrentHandle.status();
 
@@ -540,6 +521,8 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
+
+      torrentHandle.scrape_tracker();
 
       if (_verbosityLevel > VERBOSE_1 && !displayed100Percent)
       {

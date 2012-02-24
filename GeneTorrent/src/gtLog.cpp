@@ -69,7 +69,9 @@ inline const char *filebase(const char *file)
 bool gtLogger::create_globallog(std::string progName, std::string log, int childID) 
 {
    if (GlobalLog == NULL)
+   {
       GlobalLog = new gtLogger(progName, log, childID);
+   }
 
    s_global_refcnt++;
 
@@ -88,8 +90,6 @@ void gtLogger::delete_globallog()
 // priority determines if messages are sent to stderr if logging to a file, syslog, or none
 gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode (gtLoggerOutputNone), m_fd (NULL), m_last_timestamp (0)
 {
-   time_t clocktime;
-  
    m_progname = strdup (progName.c_str());
    m_filename = strdup (log.c_str());
 
@@ -111,6 +111,7 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
    else if (!strcmp(m_filename, "syslog")) 
    {
       m_mode = gtLoggerOutputSyslog;
+      openlog (PACKAGE_NAME, LOG_PID, LOG_LOCAL0);
    }
    else 
    {
@@ -149,6 +150,7 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
       m_mode = gtLoggerOutputFile;
    }
 
+   time_t clocktime;
    time(&clocktime);
 
    if (m_mode == gtLoggerOutputFile) 

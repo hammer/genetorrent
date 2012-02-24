@@ -50,10 +50,13 @@
 #include <boost/filesystem/v3/path.hpp>
 #include <boost/program_options.hpp>
 
+#include <curl/curl.h>
+
 #include "libtorrent/session.hpp"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
 
+#include "gtDefs.h"
 #include "gtUtils.h"
 #include "accumulator.hpp"
 
@@ -136,8 +139,10 @@ class gtBase
 
       bool generateSSLcertAndGetSigned (std::string torrentFile, std::string signUrl, std::string torrentUUID);
 
-      void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
       static int curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, std::string *buffer);
+      bool processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage);
+      bool processHTTPError (int errorCode, std::string, int exitCode = HTTP_ERROR_EXIT_CODE);
+      void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
       std::string getWorkingDirectory();
       std::string getFileName (std::string fileName);
@@ -173,7 +178,7 @@ class gtBase
       void cleanupTmpDir();
       void setTempDir ();
       void mkTempDir ();
-
+ 
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);

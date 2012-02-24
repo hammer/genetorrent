@@ -1127,6 +1127,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_easy_setopt (curl, CURLOPT_URL, CSRSignURL.c_str());
    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
+
    if (_verbosityLevel > VERBOSE_2)
    {
        curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
@@ -1136,47 +1137,9 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    res = curl_easy_perform (curl);
 
-   if (res != CURLE_OK)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 203, gtBase::CURL_ERROR, res, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, res, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
+   fclose (signedCert);
 
-   long code;
-   res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-   if (res != CURLE_OK)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
-
-   if (code != 200)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 205, gtBase::HTTP_ERROR, code, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
+   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -1185,9 +1148,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    curl_easy_cleanup (curl);
 
-   fclose (signedCert);
-
-   return true;
+   return successfulPerform;
 }
 
 void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
@@ -1201,3 +1162,105 @@ void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
    }
 }
 
+bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int optionalExitCode)
+{
+   try
+   {
+      XQilla xqilla;
+      AutoDelete <XQQuery> query (xqilla.parse (X("//CGHUB_error/usermsg/text()|//CGHUB_error/effect/text()|//CGHUB_error/remediation/text()")));
+      AutoDelete <DynamicContext> context (query->createDynamicContext ());
+
+      Sequence seq = context->resolveDocument (X(fileWithErrorXML.c_str()));
+
+      if (!seq.isEmpty () && seq.first ()->isNode ())
+      {
+         context->setContextItem (seq.first ());
+         context->setContextPosition (1);
+         context->setContextSize (1);
+      }
+      else
+      {
+         throw ("Empty set, likely invalid xml");
+      }
+
+      Result result = query->execute (context);
+      Item::Ptr item;
+   
+      item = result->next (context);
+      std::string userMsg = UTF8(item->asString(context));
+      item = result->next (context);
+      std::string effect = UTF8(item->asString(context));
+      item = result->next (context);
+      std::string remediation = UTF8(item->asString(context));
+
+      if (!(userMsg.size() && effect.size() && remediation.size()))
+      {
+         throw ("Incomplete message set.");
+      }
+
+      std::cerr << "Error:  " << userMsg << "  " << effect << "  " << remediation << std::endl;
+   }
+   catch (...)
+   {
+      // Catch any error from parsing and return false to indicate process is not complete, e.g., no xml, invalid xml, etc.
+      return false;
+   }
+
+   if (ERROR_NO_EXIT == optionalExitCode)
+   {
+      return true;
+   }
+
+   exit (optionalExitCode);
+}
+ 
+bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage)
+{
+   if (result != CURLE_OK)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {
+         gtError (defaultMessage + uuid, 203, gtBase::CURL_ERROR, result, "URL:  " + url);
+      }
+      else
+      {
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result, "URL:  " + url);
+         return false;
+      }
+   }
+
+   long code;
+   result = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+
+   if (result != CURLE_OK)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {
+         gtError (defaultMessage + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
+      }
+      else
+      {
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
+         return false;
+      }
+   }
+
+// get content type ?
+   if (code != 200)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {          
+         processHTTPError (code, fileName);  // exits if successful processes XML, otherwise turn it over to GTError which exits
+         gtError (defaultMessage + uuid, 205, gtBase::HTTP_ERROR, code, "URL:  " + url);
+      }
+      else
+      {
+         if (!processHTTPError (code, fileName, ERROR_NO_EXIT))  // returns true if successfully used the XML in the file, otherwise log generic error with GTError
+         {
+            gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + url);
+         }
+         return false;   // return false to indicate failed curl transaction
+      }
+   }
+   return true;    // success curl transaction
+}

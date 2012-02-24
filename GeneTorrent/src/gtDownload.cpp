@@ -331,26 +331,9 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 
       res = curl_easy_perform (curl);
 
-      if (res != CURLE_OK)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:  " + torrUUID, 203, gtBase::CURL_ERROR, res, "URL:  " + uri);
-      }
+      fclose (gtoFile);
 
-      long code;
-      res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-      if (res != CURLE_OK)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:  " + torrUUID, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + uri);
-      }
-
-      if (code != 200)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:  " + torrUUID, 205, gtBase::HTTP_ERROR, code, "URL:  " + uri);
-      }
+      processCurlResponse (curl, res, fileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
 
       if (_verbosityLevel > VERBOSE_2)
       {
@@ -358,8 +341,6 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
       }
 
       curl_easy_cleanup (curl);
-
-      fclose (gtoFile);
 
       std::string torrFile = getWorkingDirectory () + '/' + fileName;
 

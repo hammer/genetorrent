@@ -63,7 +63,7 @@
 
 #include <xqilla/xqilla-simple.hpp>
 
-#include <curl/curl.h>
+// #include <curl/curl.h>
 
 #include "gtServer.h"
 #include "stringTokenizer.h"
