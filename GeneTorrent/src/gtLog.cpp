@@ -111,7 +111,7 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
    else if (!strcmp(m_filename, "syslog")) 
    {
       m_mode = gtLoggerOutputSyslog;
-      openlog (PACKAGE_NAME, LOG_PID, LOG_LOCAL0);
+      openlog (progName.c_str(), LOG_PID, LOG_LOCAL0);
    }
    else 
    {
@@ -244,7 +244,14 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
    {
       char sysLogBuffer[2048];
       vsnprintf(sysLogBuffer, sizeof(sysLogBuffer), buffer, ap);
-      syslog (LOG_INFO, "%s", sysLogBuffer);
+      if (priority)
+      {
+         syslog (LOG_ALERT, "%s", sysLogBuffer);
+      }
+      else
+      {
+         syslog (LOG_INFO, "%s", sysLogBuffer);
+      }
    }
 
    va_end(ap);

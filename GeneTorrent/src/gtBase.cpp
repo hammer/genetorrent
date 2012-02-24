@@ -1198,7 +1198,9 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
          throw ("Incomplete message set.");
       }
 
-      std::cerr << "Error:  " << userMsg << "  " << effect << "  " << remediation << std::endl;
+      std::ostringstream logMessage;
+      logMessage << "Error:  " << userMsg << "  " << effect << "  " << remediation << std::endl;
+      Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
    }
    catch (...)
    {
