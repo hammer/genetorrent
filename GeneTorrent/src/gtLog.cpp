@@ -155,7 +155,6 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
 
    if (m_mode == gtLoggerOutputFile) 
    {
-      //assert(m_fd == NULL);
       // Write a log header
       fprintf(m_fd, "Log file initiated at %s", ctime(&clocktime));
       fprintf(m_fd, "Process id: %d\n", getpid());

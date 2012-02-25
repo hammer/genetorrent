@@ -66,10 +66,8 @@ class gtBase
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
       typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2} verboseLevels;
-                            // VERBOSE_1:  No Operation Progress Displayed on Screen
-                            // VERBOSE_2:  low volume debugging
-                            // VERBOSE_3:  Detailed debugging
-                            //
+                            // VERBOSE_1:  Low volume debugging
+                            // VERBOSE_2:  Detailed debuggin
                             // -v and -vv (or --verbose=1 or 2) sets the level, enum values are one less than the level to
                             //                       simplify the conditional test using >
 
@@ -126,7 +124,6 @@ class gtBase
 
       std::ostringstream startUpMessage;  // used to build up a startup message, version, options, tmpdir, etc.
 
-
       void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
@@ -146,7 +143,6 @@ class gtBase
 
       std::string getWorkingDirectory();
       std::string getFileName (std::string fileName);
-
       std::string getInfoHash (std::string torrentFile);
 
       std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload

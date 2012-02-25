@@ -85,7 +85,7 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
 {
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
@@ -127,7 +127,6 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
    {
       commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
    }
-
 }
 
 void gtUpload::run ()

@@ -38,7 +38,6 @@
 
 #include <sys/statvfs.h>
 #include <sys/types.h>
-// #include <sys/wait.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -54,13 +53,14 @@ int statDirectory (std::string dirFile)
    time_t dummyArg;
    return statFileOrDirectory (dirFile, DIR_TYPE, dummyArg);
 }
-// 
 
+// 
 int statFile (std::string dirFile)
 {
    time_t dummyArg;
    return statFileOrDirectory (dirFile, FILE_TYPE, dummyArg);
 }
+
 // 
 int statFile (std::string dirFile, time_t &timeStamp)
 {

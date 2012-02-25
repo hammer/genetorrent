@@ -39,18 +39,10 @@
 #define _DARWIN_C_SOURCE 1
 
 #include <config.h>
-/*
-#include "libtorrent/entry.hpp"
-#include "libtorrent/bencode.hpp"
-#include "libtorrent/create_torrent.hpp"
-#include "libtorrent/peer_info.hpp"
-#include "libtorrent/ip_filter.hpp"
-*/
 
-#include "libtorrent/alert_types.hpp"
+#include <libtorrent/alert_types.hpp>
 
 #include "gtBase.h"
-
 #include "gtLog.h"
 #include "loggingmask.h"
 

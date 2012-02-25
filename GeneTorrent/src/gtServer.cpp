@@ -352,7 +352,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          // two seeders are present due to tracker scraping
          if (mapIter->second->downloadGTO == false && mapIter->second->torrentHandle.status().state == libtorrent::torrent_status::seeding)
          {
-            if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
+            if (!mapIter->second->overTimeAlertIssued)   // first pass set true
             {
                mapIter->second->overTimeAlertIssued = true;
                if (_verbosityLevel > VERBOSE_1)
@@ -361,7 +361,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
                }
                mapIter++;
             }
-            else                                         // second pass, remove the torrent from serviing
+            else                                         // second pass, remove the torrent from serving
             {
                Log (PRIORITY_NORMAL, "Stop serving:  upload complete %s info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
 

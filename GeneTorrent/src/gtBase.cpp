@@ -500,20 +500,6 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
 {
    std::string fileContent = "";
    
-/*   if (statFile (csrFileName) != 0)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Failure opening " + csrFileName + " for input.", 202, ERRNO_ERROR, errno);
-      }
-      else
-      {
-         gtError ("Failure opening " + csrFileName + " for input.", ERROR_NO_EXIT, ERRNO_ERROR, errno);
-         return "";
-      }
-   }
-*/
-
    std::ifstream csrFile;
 
    csrFile.open (csrFileName.c_str (), std::ifstream::in);
@@ -744,38 +730,6 @@ int gtBase::curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, st
 
    return result;
 }
-
-// 
-//void gtBase::run ()
-//{
-/*
-   std::string saveDir = getWorkingDirectory ();
-
-   switch (_operatingMode)
-   {
-      case DOWNLOAD_MODE:
-      {
-         runDownloadMode (saveDir);
-         chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
-
-      } break;
-
-      case SERVER_MODE:
-      {
-         runServerMode ();
-      } break;
-
-      default: // UPLOAD_MODE
-      {
-
-         performTorrentUpload ();
-         chdir (saveDir.c_str ());      // shutting down, if the chdir back fails, so be it
-      } break;
-   }
-
-   cleanupTmpDir();
-}
-*/
 
 // 
 void gtBase::cleanupTmpDir()
@@ -1247,7 +1201,7 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
       }
    }
 
-// get content type ?
+// TODO, use content type
    if (code != 200)
    {
       if (_operatingMode != SERVER_MODE)

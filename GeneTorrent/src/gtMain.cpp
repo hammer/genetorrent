@@ -138,15 +138,12 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       // Check if help was requested
       if (cli.count (HELP_CLI_OPT))
       {
-// DJN remove these
-std::cout << allOpts << std::endl;
-std::cout << "\n\n\n";
          std::cout << "Usage:" << std::endl;
-         std::cout << "   GeneTorrent -u manifest-file -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -d [ URI | UUID | .xml | .gto ] -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -s path -q work-queue -c credentials --security-api signing-URI [--config-file path/file]" << std::endl;
+         std::cout << "   GeneTorrent -u manifest-file -c cred [ -p path ]" << std::endl;
+         std::cout << "   GeneTorrent -d < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
+         std::cout << "   GeneTorrent -s path -q work-queue -c cred --security-api signing-URI" << std::endl;
          std::cout << std::endl;
-         std::cout << "Type 'man GeneTorrent' for more information." << std::endl;
+         std::cout << "Additional options are available.  Type 'man GeneTorrent' for more information." << std::endl;
          exit (0);
       }
 
@@ -198,7 +195,6 @@ std::cerr << "configPathAndFile = " << configPathAndFile << std::endl;
       boost::program_options::notify (cli); 
 
       // Verify and configure global_verbosity level here
-
       std::ostringstream shortVerboseFlag;
       shortVerboseFlag << VERBOSITY_SHORT_CLI_OPT;
   
