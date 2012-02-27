@@ -30,41 +30,24 @@
  */
 
 /*
- * gtDownload.h
+ * gtUtils.h
  *
- *  Created on: feb 5, 2012
+ *  Created on: Feb 15, 2012
  *      Author: donavan
  */
-#ifndef GT_DOWNLOAD_H_
-#define GT_DOWNLOAD_H_
 
-#include "gtBase.h"
+#ifndef GT_UTILS_H_
+#define GT_UTILS_H_
 
-class gtDownload : public gtBase
-{
-   public:
-      gtDownload (boost::program_options::variables_map &vm);
-      void run ();
+#include <string>
 
-   protected:
+      typedef enum statType_ {FILE_TYPE = 91, DIR_TYPE} statType;
 
-   private:
-      vectOfStr _cliArgsDownloadList;
-      std::string _downloadSavePath;
-      int _maxChildren;
-      vectOfStr _torrentListToDownload;
+      int statFile (std::string);
+      int statFile (std::string, time_t &fileMtime);
 
-      void runDownloadMode (std::string startupDir);
-      void prepareDownloadList ();
-      void downloadGtoFilesByURI (vectOfStr &uris);
-      void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
-      void performTorrentDownload (int64_t totalSizeOfDownload);
-      int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
-      int64_t getFreeDiskSpace ();
-      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
+      int statDirectory (std::string);
 
-      void pcfacliDownloadList (boost::program_options::variables_map &vm);
-      void pcfacliMaxChildren (boost::program_options::variables_map &vm);
-};
-
+      // do NOT call this directly
+      int statFileOrDirectory (std::string, statType sType, time_t &fileMtime);
 #endif

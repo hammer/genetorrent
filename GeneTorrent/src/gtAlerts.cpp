@@ -39,18 +39,10 @@
 #define _DARWIN_C_SOURCE 1
 
 #include <config.h>
-/*
-#include "libtorrent/entry.hpp"
-#include "libtorrent/bencode.hpp"
-#include "libtorrent/create_torrent.hpp"
-#include "libtorrent/peer_info.hpp"
-#include "libtorrent/ip_filter.hpp"
-*/
 
-#include "libtorrent/alert_types.hpp"
+#include <libtorrent/alert_types.hpp>
 
 #include "gtBase.h"
-
 #include "gtLog.h"
 #include "loggingmask.h"
 
@@ -254,7 +246,7 @@ void gtBase::processStatNotification (bool haveError, libtorrent::alert *alrt)
 
          getGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", statsAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (haveError, "%s, infohash:  %s", statsAlert->message().c_str(), infoHash.c_str());
       } break;
 
       default:

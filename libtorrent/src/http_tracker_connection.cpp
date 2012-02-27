@@ -243,7 +243,7 @@ namespace libtorrent
 		boost::shared_ptr<request_callback> cb = requester();
 		if (cb)
 		{
-			cb->debug_log("==> TRACKER_REQUEST [ url: " + url + " ]");
+			cb->debug_log("==> TRACKER_REQUEST [ url: " + url + " ] info-hash:  " + to_hex (tracker_req().info_hash.to_string()));
 		}
 #endif
 	}
@@ -427,7 +427,7 @@ namespace libtorrent
 				return;
 			}
 
-			lazy_entry const* scrape_data = files->dict_find_dict(ih.c_str());
+			lazy_entry const* scrape_data = files->dict_find_dict(ih);
 			if (scrape_data == 0)
 			{
 				fail(error_code(errors::invalid_hash_entry), -1, ""

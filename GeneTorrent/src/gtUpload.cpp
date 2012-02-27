@@ -85,7 +85,7 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE),    _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
 {
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
@@ -120,12 +120,13 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
       _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
    }
 
+   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
+   relativizePath (_manifestFile);
+
    if (statFile (_manifestFile) != 0)
    {
       commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
    }
-
-   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
 }
 
 void gtUpload::run ()
@@ -226,26 +227,9 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
 
    res = curl_easy_perform (curl);
 
-   if (res != CURLE_OK)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 203, gtUpload::CURL_ERROR, res, "URL:  " + _uploadSubmissionURL);
-   }
+   fclose (gtoFile);
 
-   long code;
-   res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-   if (res != CURLE_OK)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 204, gtUpload::DEFAULT_ERROR, 0, "URL:  " + _uploadSubmissionURL);
-   }
-
-   if (code != 200)
-   {
-      curlCleanupOnFailure (realTorrentFileName, gtoFile);
-      gtError ("Problem communicating with GeneTorrent Executive while trying to submit metadata for UUID:  " + _uploadUUID, 205, gtUpload::HTTP_ERROR, code, "URL:  " + _uploadSubmissionURL);
-   }
+   processCurlResponse (curl, res, realTorrentFileName, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -253,8 +237,6 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    }
 
    curl_easy_cleanup (curl);
-
-   fclose (gtoFile);
 
    return realTorrentFileName;
 }
@@ -293,12 +275,10 @@ void gtUpload::findDataAndSetWorkingDirectory ()
       gtError ("Failure changing directory to .. from " + getWorkingDirectory(), 202, ERRNO_ERROR, errno);
    }
 
-   if (verifyDataFilesExist (missingFiles))
+   if (!verifyDataFilesExist (missingFiles))
    {
-      return; // all data is present
+      displayMissingFilesAndExit (missingFiles); // Give up
    }
-
-   displayMissingFilesAndExit (missingFiles); // Give up
 }
 
 // This function verifies that all files specified in the manifest file exist in a
@@ -530,7 +510,6 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
 
    while (torrentStatus.num_complete < 2)
    {
-      torrentHandle.scrape_tracker();
       sessionStatus = torrentSession.status();
       torrentStatus = torrentHandle.status();
 
@@ -541,6 +520,8 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
+
+      torrentHandle.scrape_tracker();
 
       if (_verbosityLevel > VERBOSE_1 && !displayed100Percent)
       {

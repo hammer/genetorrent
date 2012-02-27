@@ -41,7 +41,6 @@ The following packages and minimum versions must be installed on the build
 machine prior to using build.sh.
 
 Boost 1.48 
-TCLAP 1.21
 xerces-c 3.0.1
 xqilla 2.2.3
 libcurl 7.19.7

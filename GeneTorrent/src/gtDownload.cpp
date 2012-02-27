@@ -111,15 +111,20 @@ void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
 
    if (vm.count (MAX_CHILDREN_CLI_OPT) == 1)
    {
-      _maxChildren = vm[MAX_CHILDREN_CLI_OPT].as< uint32_t >();
+      _maxChildren = vm[MAX_CHILDREN_CLI_OPT].as< int >();
    }
-   else if (vm.count (MAX_CHILDREN_CLI_OPT) == 1)
+   else if (vm.count (MAX_CHILDREN_CLI_OPT_LEGACY) == 1)
    {
-      _maxChildren = vm[MAX_CHILDREN_CLI_OPT_LEGACY].as< uint32_t >();
+      _maxChildren = vm[MAX_CHILDREN_CLI_OPT_LEGACY].as< int >();
    }
    else   // Option not present
    {
       return;
+   }
+
+   if (_maxChildren < 1)
+   {
+      commandLineError ("--" + MAX_CHILDREN_CLI_OPT + " must be greater than 0");
    }
 
    startUpMessage << " --" << MAX_CHILDREN_CLI_OPT << "=" << _maxChildren;
@@ -150,8 +155,6 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
       vectIter++;
    }
 
-   std::cerr << "need creds = " << needCreds << std::endl;
-
    if (needCreds)
    {
       checkCredentials ();
@@ -167,9 +170,10 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
 
 void gtDownload::run ()
 {
+   time_t startTime = time(NULL);
    std::string saveDir = getWorkingDirectory ();
 
-         time_t startTime = time(NULL);
+   prepareDownloadList ();
 
          if (_downloadSavePath.size())
          {
@@ -180,8 +184,6 @@ void gtDownload::run ()
                gtError ("Failure changing directory to " + _downloadSavePath, 202, ERRNO_ERROR, errno);
             }
          }
-
-         prepareDownloadList (saveDir);
 
          uint64_t totalBytes; 
          int totalFiles;
@@ -217,7 +219,7 @@ void gtDownload::run ()
    chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }
 
-void gtDownload::prepareDownloadList (std::string startDirectory)
+void gtDownload::prepareDownloadList ()
 {
    vectOfStr urisToDownload; // This list of URIs is used to download .gto files.
 
@@ -234,28 +236,15 @@ void gtDownload::prepareDownloadList (std::string startDirectory)
 
          if (tail == GTO_FILE_EXTENSION) // have an existing .gto
          {
-            if (inspect[0] == '/') // presume a full path is present
-            {
-               _torrentListToDownload.push_back (inspect);
-            }
-            else
-            {
-               _torrentListToDownload.push_back (startDirectory + "/" + inspect);
-            }
+            relativizePath(inspect);
+            _torrentListToDownload.push_back (inspect);
          }
          else if (tail == ".xml" || tail == ".XML") // Extract a list of URIs from passed XML
          {
-            if (inspect[0] == '/') // presume a full path is present
-            {
-               extractURIsFromXML (inspect, urisToDownload);
-            }
-            else
-            {
-               extractURIsFromXML (startDirectory + "/" + inspect, urisToDownload);
-            }
-            
+            relativizePath(inspect);
+            extractURIsFromXML (inspect, urisToDownload);
          }
-         else if (std::string::npos != inspect.find ("/")) // Have a URI, add the token later if needed.
+         else if (std::string::npos != inspect.find ("/")) // Have a URI
          {
             urisToDownload.push_back (inspect);
          }
@@ -342,26 +331,9 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 
       res = curl_easy_perform (curl);
 
-      if (res != CURLE_OK)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 203, gtBase::CURL_ERROR, res, "URL:  " + uri);
-      }
+      fclose (gtoFile);
 
-      long code;
-      res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-      if (res != CURLE_OK)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + uri);
-      }
-
-      if (code != 200)
-      {
-         curlCleanupOnFailure (fileName, gtoFile);
-         gtError ("Problem communicating with GeneTorrent Executive while trying to retrieve transfer metadata for UUID:  " + torrUUID, 205, gtBase::HTTP_ERROR, code, "URL:  " + uri);
-      }
+      processCurlResponse (curl, res, fileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
 
       if (_verbosityLevel > VERBOSE_2)
       {
@@ -369,8 +341,6 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
       }
 
       curl_easy_cleanup (curl);
-
-      fclose (gtoFile);
 
       std::string torrFile = getWorkingDirectory () + '/' + fileName;
 
@@ -802,5 +772,9 @@ void gtDownload::validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &to
       totalGtos++;
       vectIter++;
    }
-}
 
+   if (totalBytes < 1 || totalFiles < 1)
+   {
+      gtError ("no data in GTOs to download.", 97, gtBase::DEFAULT_ERROR);
+   }
+}

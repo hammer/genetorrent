@@ -68,15 +68,15 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (CRED_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to credentials file")          
       (makeOpt (CONF_DIR_CLI_OPT, CONF_DIR_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")    // long option with alternate short option
       (makeOpt (ADVERT_IP_CLI_OPT, ADVERT_IP_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "IP Address advertised")    
-      (makeOpt (ADVERT_PORT_CLI_OPT, ADVERT_PORT_SHORT_CLI_OPT).c_str(), boost::program_options::value< uint32_t >(), "TCP Port advertised")      
+      (makeOpt (ADVERT_PORT_CLI_OPT, ADVERT_PORT_SHORT_CLI_OPT).c_str(), boost::program_options::value< int >(), "TCP Port advertised")      
       (makeOpt (INTERNAL_PORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "local IP port to bind on")     
       (makeOpt (LOGGING_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to log file, follow by the log level")  
       (makeOpt (PATH_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "file system path used for uploads and downloads")
-      (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< uint32_t >(), "on screen verbosity level")
+      (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< int >(), "on screen verbosity level")
 
       // Download
       (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value< std::vector <std::string> >()->composing(), "URI | UUID | .xml | .gto")
-      (MAX_CHILDREN_CLI_OPT.c_str(), boost::program_options::value< uint32_t >(), "number of download children")
+      (MAX_CHILDREN_CLI_OPT.c_str(), boost::program_options::value< int >(), "number of download children")
 
       // Upload
       (makeOpt (UPLOAD_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "uuid/manifest.xml")
@@ -91,10 +91,10 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (CRED_FILE_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "path/file to credentials file")          
       (CONF_DIR_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")          
       (ADVERT_IP_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "IP Address advertised")         
-      (ADVERT_PORT_CLI_OPT_LEGACY.c_str(), boost::program_options::value< uint32_t >(), "TCP Port advertised")          
-      (INTERNAL_PORT_CLI_OPT_LEGACY.c_str(), boost::program_options::value< uint32_t >(), "local IP port to bind on")          
+      (ADVERT_PORT_CLI_OPT_LEGACY.c_str(), boost::program_options::value< int >(), "TCP Port advertised")          
+      (INTERNAL_PORT_CLI_OPT_LEGACY.c_str(), boost::program_options::value< int >(), "local IP port to bind on")          
       (UPLOAD_FILE_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "manifest.xml")
-      (MAX_CHILDREN_CLI_OPT_LEGACY.c_str(), boost::program_options::value< uint32_t >(), "number of download children")
+      (MAX_CHILDREN_CLI_OPT_LEGACY.c_str(), boost::program_options::value< int >(), "number of download children")
    ;
 }
 
@@ -135,6 +135,24 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       boost::program_options::variables_map cli;
       boost::program_options::store (boost::program_options::parse_command_line (argc, argv, allOpts), cli);
 
+      // Check if help was requested
+      if (cli.count (HELP_CLI_OPT))
+      {
+         std::cout << "Usage:" << std::endl;
+         std::cout << "   GeneTorrent -u manifest-file -c cred [ -p path ]" << std::endl;
+         std::cout << "   GeneTorrent -d < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
+         std::cout << "   GeneTorrent -s path -q work-queue -c cred --security-api signing-URI" << std::endl;
+         std::cout << std::endl;
+         std::cout << "Additional options are available.  Type 'man GeneTorrent' for more information." << std::endl;
+         exit (0);
+      }
+
+      if (cli.count (VERSION_CLI_OPT))
+      {
+         std::cout << "GeneTorrent release " << VERSION << std::endl;
+         exit (0);
+      }
+
       if (cli.count (VERBOSITY_CLI_OPT))
       {
          haveVerboseOnCli = true;
@@ -143,29 +161,23 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       // Check if a config file was specified
       if (cli.count (CONFIG_FILE_CLI_OPT) == 1)
       {
-         std::ifstream inputFile(cli[CONFIG_FILE_CLI_OPT].as<std::string>().c_str());
+         std::string configPathAndFile = cli[CONFIG_FILE_CLI_OPT].as<std::string>();
+std::cerr << "configPathAndFile = " << configPathAndFile << std::endl;
+         if (statFile (configPathAndFile) != 0)
+         {
+            commandLineError ("unable to open config file '" + configPathAndFile + "'.");
+         }
+         
+         std::ifstream inputFile(configPathAndFile.c_str());
+
          if (!inputFile)
          {
-            commandLineError ("unable to open config file '" + cli[CONFIG_FILE_CLI_OPT].as<std::string>() + "'.");
+            commandLineError ("unable to open config file '" + configPathAndFile + "'.");
          }
+
          boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
 
          global_startup_message = " --" + CONFIG_FILE_CLI_OPT + "=" + cli[CONFIG_FILE_CLI_OPT].as<std::string>();
-      }
-
-      // Check if help was requested
-      if (cli.count (HELP_CLI_OPT))
-      {
-// DJN remove these
-std::cout << allOpts << std::endl;
-std::cout << "\n\n\n";
-         std::cout << "Usage:" << std::endl;
-         std::cout << "   GeneTorrent -u manifest-file -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -d [ URI | UUID | .xml | .gto ] -c credentials [ -p path ] [--config-file path/file]" << std::endl;
-         std::cout << "   GeneTorrent -s path -q work-queue -c credentials --security-api signing-URI [--config-file path/file]" << std::endl;
-         std::cout << std::endl;
-         std::cout << "Type 'man GeneTorrent' for more information." << std::endl;
-         exit (0);
       }
 
       if (cli.count (SERVER_CLI_OPT) == 0 && cli.count (DOWNLOAD_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
@@ -183,7 +195,6 @@ std::cout << "\n\n\n";
       boost::program_options::notify (cli); 
 
       // Verify and configure global_verbosity level here
-
       std::ostringstream shortVerboseFlag;
       shortVerboseFlag << VERBOSITY_SHORT_CLI_OPT;
   
@@ -205,21 +216,22 @@ std::cout << "\n\n\n";
       {
          if (cli.count (VERBOSITY_CLI_OPT))
          {
-            global_verbosity =cli[VERBOSITY_CLI_OPT].as< uint32_t >();
-            if (global_verbosity < 1)
+            global_verbosity =cli[VERBOSITY_CLI_OPT].as< int >();
+
+            if (global_verbosity < 1 ||global_verbosity > 2)
             {
                std::ostringstream errorMes;
                errorMes << "--" << VERBOSITY_CLI_OPT << "=" << global_verbosity << " is not valid, try 1 or 2";
                commandLineError (errorMes.str());
             }
+
             if (global_verbosity == 1)
             {
                global_startup_message += " --" + VERBOSITY_CLI_OPT + "=1";
             }
-            else if (global_verbosity >= 2)
+            else
             {
                global_startup_message += " --" + VERBOSITY_CLI_OPT + "=2";
-               global_verbosity = 2;
             }
          }
       }

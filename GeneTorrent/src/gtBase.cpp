@@ -40,9 +40,6 @@
 
 #include <config.h>
 
-#include <sys/statvfs.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <iostream>
 #include <fstream>
@@ -258,7 +255,14 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
       commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
    }
 
-   credFile >> _authToken;
+   try
+   {
+      credFile >> _authToken;
+   }
+   catch (...)
+   {
+      commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
+   }
 
    credFile.close ();
 
@@ -313,33 +317,51 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
    strTokenize strToken (portList, ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
 
    int lowPort = strtol (strToken.getToken (1).c_str (), NULL, 10);
-   int highPort = -1;
+
+   if (lowPort < 1024 || lowPort > 65535)
+   {
+      commandLineError ("-i (--internal-port) " + strToken.getToken (1) + " out of range (1024-65535)");
+   }
+
+   int highPort;
+   bool highPortSet = false;
 
    if (strToken.size () > 1)
    {
       highPort = strtol (strToken.getToken (2).c_str (), NULL, 10);
+      highPortSet = true;
    }
 
-   if (highPort > 0)
+   if (highPortSet)
    {
-      if (lowPort < highPort)
+      if (highPort < 1024 || highPort > 65535)
+      {
+         commandLineError ("-i (--internal-port) " + strToken.getToken (2) + " out of range (1024-65535)");
+      }
+
+      if (lowPort <= highPort)
       {
          _portStart = lowPort;
          _portEnd = highPort;
       }
       else
       {
-         commandLineError ("when using -i (--internal-port) string1 must be smaller than string2");
+         commandLineError ("when using -i (--internal-port) " + strToken.getToken (1) + " must be smaller than " + strToken.getToken (2));
       }
       startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart << ":" << _portEnd;
    }
    else
    {
       _portStart = lowPort;
+
+      if (_portStart + 8 > 65535)
+      {
+         commandLineError ("-i (--internal-port) implicit (add 8 ports) end value exceeds 65535");
+      }
+
       _portEnd = _portStart + 8; // default 8 ports
       startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart;
    }
-
 }
 
 void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
@@ -349,19 +371,24 @@ void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
       commandLineError ("duplicate config options:  " + ADVERT_PORT_CLI_OPT + " and " + ADVERT_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
    }
 
-   uint32_t exposedPort;
+   int exposedPort;
 
    if (vm.count (ADVERT_PORT_CLI_OPT) == 1)
    { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< uint32_t >();
+      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< int >();
    }
    else if (vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
    { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< uint32_t >();
+      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< int >();
    }
    else   // Option not present
    {
       return;    
+   }
+
+   if (exposedPort < 1024 || exposedPort > 65535)
+   {
+      commandLineError ("-f (--advertised-port) out of range (1024-65535)");
    }
 
    _exposedPortDelta = exposedPort - _portStart;
@@ -417,12 +444,13 @@ std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
+   relativizePath (path);
+
    if (statDirectory (path) != 0)
    {
       commandLineError ("unable to opening directory '" + path + "'");
    }
-
-   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
 
    return path;
 }
@@ -472,20 +500,6 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
 {
    std::string fileContent = "";
    
-/*   if (statFile (csrFileName) != 0)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Failure opening " + csrFileName + " for input.", 202, ERRNO_ERROR, errno);
-      }
-      else
-      {
-         gtError ("Failure opening " + csrFileName + " for input.", ERROR_NO_EXIT, ERRNO_ERROR, errno);
-         return "";
-      }
-   }
-*/
-
    std::ifstream csrFile;
 
    csrFile.open (csrFileName.c_str (), std::ifstream::in);
@@ -524,6 +538,14 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
    return fileContent;
 }
 
+void gtBase::relativizePath (std::string &inPath)
+{
+   if (inPath[0] != '/')
+   {
+      inPath = getWorkingDirectory() + "/" + inPath;
+   }
+}
+
 // 
 std::string gtBase::sanitizePath (std::string inPath)
 {
@@ -532,7 +554,7 @@ std::string gtBase::sanitizePath (std::string inPath)
       inPath.erase (inPath.size () - 1);
    }
 
-   return (inPath);
+   return inPath;
 }
 
 // 
@@ -710,38 +732,6 @@ int gtBase::curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, st
 }
 
 // 
-//void gtBase::run ()
-//{
-/*
-   std::string saveDir = getWorkingDirectory ();
-
-   switch (_operatingMode)
-   {
-      case DOWNLOAD_MODE:
-      {
-         runDownloadMode (saveDir);
-         chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
-
-      } break;
-
-      case SERVER_MODE:
-      {
-         runServerMode ();
-      } break;
-
-      default: // UPLOAD_MODE
-      {
-
-         performTorrentUpload ();
-         chdir (saveDir.c_str ());      // shutting down, if the chdir back fails, so be it
-      } break;
-   }
-
-   cleanupTmpDir();
-}
-*/
-
-// 
 void gtBase::cleanupTmpDir()
 {
    if (!_devMode)
@@ -827,7 +817,7 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
    settings.enable_incoming_utp = false;
    settings.apply_ip_filter_to_trackers= false;
 
-   settings.no_atime_storage = true;
+   settings.no_atime_storage = false;
    settings.max_queued_disk_bytes = 1024 * 1024 * 1024;
 
    torrentSession->set_settings (settings);
@@ -838,12 +828,32 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
 
       if (_bindIP.size())
       {
-         ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
+         try
+         {
+            ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
+         }
+         catch (boost::system::system_error e)
+         {  
+            std::ostringstream messageBuff;
+            messageBuff << "invalid --" << BIND_IP_CLI_OPT << " address of:  " << _bindIP << " caused an exception:  " << e.what();
+            Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
+            exit(98);
+         }
       }
 
       if (_exposedIP.size())
       {
-         ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
+         try
+         {
+            ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
+         }
+         catch (boost::system::system_error e)
+         {  
+            std::ostringstream messageBuff;
+            messageBuff << "invalid --" << ADVERT_IP_CLI_OPT << " address of:  " << _exposedIP << " caused an exception:  " << e.what();
+            Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
+            exit(98);
+         }
       }
 
       torrentSession->set_ip_filter(ipFilter);
@@ -894,81 +904,6 @@ void gtBase::loggingCallBack (std::string message)
    pthread_mutex_unlock (&callBackLoggerLock);
 }
 
-// 
-int gtBase::statDirectory (std::string dirFile)
-{
-   time_t dummyArg;
-   return statFileOrDirectory (dirFile, gtBase::DIR_TYPE, dummyArg);
-}
-// 
-
-int gtBase::statFile (std::string dirFile)
-{
-   time_t dummyArg;
-   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, dummyArg);
-}
-// 
-int gtBase::statFile (std::string dirFile, time_t &timeStamp)
-{
-   return statFileOrDirectory (dirFile, gtBase::FILE_TYPE, timeStamp);
-}
-
-// 
-int gtBase::statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
-{
-   struct stat status;
-
-   int statVal = stat (dirFile.c_str (), &status);
-
-   if (statVal == 0 && S_ISDIR (status.st_mode))
-   {
-      if (sType != gtBase::DIR_TYPE)  // Trying to stat a file and have a directory
-      {
-         return -1;
-      }
-
-      DIR *dir;
-
-      dir = opendir (dirFile.c_str());
-  
-      if (dir != NULL)
-      {
-         closedir (dir);
-         return 0;
-      }
-      else 
-      {
-         return -1;
-      }
-   }
-
-   if (statVal == 0 && S_ISREG (status.st_mode))
-   {
-      if (sType != gtBase::FILE_TYPE)  // Trying to stat a directory and have a file
-      {
-         return -1;
-      }
-
-      FILE *file;
-   
-      file = fopen (dirFile.c_str(), "r");
-  
-      if (file != NULL)
-      {
-         fileMtime = status.st_mtime;
-         fclose (file);
-         return 0;
-      }
-      else 
-      {
-         return -1;
-      }
-   }
-
-   return -1;
-}
-
-// 
 std::string gtBase::getWorkingDirectory ()
 {
    long size;
@@ -1146,6 +1081,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_easy_setopt (curl, CURLOPT_URL, CSRSignURL.c_str());
    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
+
    if (_verbosityLevel > VERBOSE_2)
    {
        curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
@@ -1155,47 +1091,9 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    res = curl_easy_perform (curl);
 
-   if (res != CURLE_OK)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 203, gtBase::CURL_ERROR, res, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, res, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
+   fclose (signedCert);
 
-   long code;
-   res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-
-   if (res != CURLE_OK)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
-
-   if (code != 200)
-   {
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, 205, gtBase::HTTP_ERROR, code, "URL:  " + CSRSignURL);
-      }
-      else
-      {
-         gtError ("Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:  " + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + CSRSignURL);
-         return false;
-      }
-   }
+   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -1204,9 +1102,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    curl_easy_cleanup (curl);
 
-   fclose (signedCert);
-
-   return true;
+   return successfulPerform;
 }
 
 void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
@@ -1220,3 +1116,107 @@ void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
    }
 }
 
+bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int optionalExitCode)
+{
+   try
+   {
+      XQilla xqilla;
+      AutoDelete <XQQuery> query (xqilla.parse (X("//CGHUB_error/usermsg/text()|//CGHUB_error/effect/text()|//CGHUB_error/remediation/text()")));
+      AutoDelete <DynamicContext> context (query->createDynamicContext ());
+
+      Sequence seq = context->resolveDocument (X(fileWithErrorXML.c_str()));
+
+      if (!seq.isEmpty () && seq.first ()->isNode ())
+      {
+         context->setContextItem (seq.first ());
+         context->setContextPosition (1);
+         context->setContextSize (1);
+      }
+      else
+      {
+         throw ("Empty set, likely invalid xml");
+      }
+
+      Result result = query->execute (context);
+      Item::Ptr item;
+   
+      item = result->next (context);
+      std::string userMsg = UTF8(item->asString(context));
+      item = result->next (context);
+      std::string effect = UTF8(item->asString(context));
+      item = result->next (context);
+      std::string remediation = UTF8(item->asString(context));
+
+      if (!(userMsg.size() && effect.size() && remediation.size()))
+      {
+         throw ("Incomplete message set.");
+      }
+
+      std::ostringstream logMessage;
+      logMessage << "Error:  " << userMsg << "  " << effect << "  " << remediation << std::endl;
+      Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
+   }
+   catch (...)
+   {
+      // Catch any error from parsing and return false to indicate process is not complete, e.g., no xml, invalid xml, etc.
+      return false;
+   }
+
+   if (ERROR_NO_EXIT == optionalExitCode)
+   {
+      return true;
+   }
+
+   exit (optionalExitCode);
+}
+ 
+bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage)
+{
+   if (result != CURLE_OK)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {
+         gtError (defaultMessage + uuid, 203, gtBase::CURL_ERROR, result, "URL:  " + url);
+      }
+      else
+      {
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result, "URL:  " + url);
+         return false;
+      }
+   }
+
+   long code;
+   result = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+
+   if (result != CURLE_OK)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {
+         gtError (defaultMessage + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
+      }
+      else
+      {
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
+         return false;
+      }
+   }
+
+// TODO, use content type
+   if (code != 200)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {          
+         processHTTPError (code, fileName);  // exits if successful processes XML, otherwise turn it over to GTError which exits
+         gtError (defaultMessage + uuid, 205, gtBase::HTTP_ERROR, code, "URL:  " + url);
+      }
+      else
+      {
+         if (!processHTTPError (code, fileName, ERROR_NO_EXIT))  // returns true if successfully used the XML in the file, otherwise log generic error with GTError
+         {
+            gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + url);
+         }
+         return false;   // return false to indicate failed curl transaction
+      }
+   }
+   return true;    // success curl transaction
+}

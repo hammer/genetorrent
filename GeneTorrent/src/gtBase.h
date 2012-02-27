@@ -50,25 +50,24 @@
 #include <boost/filesystem/v3/path.hpp>
 #include <boost/program_options.hpp>
 
+#include <curl/curl.h>
+
 #include "libtorrent/session.hpp"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
 
+#include "gtDefs.h"
+#include "gtUtils.h"
 #include "accumulator.hpp"
 
 class gtBase
 {
-   private:
-      typedef enum statType_ {FILE_TYPE = 91, DIR_TYPE} statType;
-
    public:
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
       typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2} verboseLevels;
-                            // VERBOSE_1:  No Operation Progress Displayed on Screen
-                            // VERBOSE_2:  low volume debugging
-                            // VERBOSE_3:  Detailed debugging
-                            //
+                            // VERBOSE_1:  Low volume debugging
+                            // VERBOSE_2:  Detailed debuggin
                             // -v and -vv (or --verbose=1 or 2) sets the level, enum values are one less than the level to
                             //                       simplify the conditional test using >
 
@@ -125,7 +124,6 @@ class gtBase
 
       std::ostringstream startUpMessage;  // used to build up a startup message, version, options, tmpdir, etc.
 
-
       void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
@@ -138,22 +136,20 @@ class gtBase
 
       bool generateSSLcertAndGetSigned (std::string torrentFile, std::string signUrl, std::string torrentUUID);
 
-      void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
       static int curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, std::string *buffer);
+      bool processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage);
+      bool processHTTPError (int errorCode, std::string, int exitCode = HTTP_ERROR_EXIT_CODE);
+      void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
       std::string getWorkingDirectory();
       std::string getFileName (std::string fileName);
-
       std::string getInfoHash (std::string torrentFile);
 
       std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload
       void checkCredentials ();
 
       std::string sanitizePath (std::string inPath);
-
-      int statFile (std::string);
-      int statFile (std::string, time_t &fileMtime);
-      int statDirectory (std::string);
+      void relativizePath (std::string &inPath);
 
    private:
       std::string _bindIP;
@@ -178,7 +174,7 @@ class gtBase
       void cleanupTmpDir();
       void setTempDir ();
       void mkTempDir ();
-
+ 
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);
@@ -198,7 +194,5 @@ class gtBase
       void pcfacliInternalPort (boost::program_options::variables_map &vm);
       void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
       void pcfacliLog (boost::program_options::variables_map &vm);
-
-      int statFileOrDirectory (std::string, statType sType, time_t &fileMtime);
 };
 #endif /* GT_BASE_H_ */

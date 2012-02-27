@@ -2409,22 +2409,18 @@ while (certBeginPos != std::string::npos)
 
 #if (defined TORRENT_VERBOSE_LOGGING || defined TORRENT_LOGGING) && TORRENT_USE_IOSTREAM || defined TORRENT_MINIMAL_LOGGING
 		std::stringstream s;
-		s << "TRACKER RESPONSE:\n"
-			"interval: " << interval << "\n"
-			"peers:\n";
-		for (std::vector<peer_entry>::const_iterator i = peer_list.begin();
-			i != peer_list.end(); ++i)
-		{
-			s << "  " << std::setfill(' ') << std::setw(16) << i->ip
-				<< " " << std::setw(5) << std::dec << i->port << "  ";
-			if (!i->pid.is_all_zeros()) s << " " << i->pid << " " << identify_client(i->pid);
-			s << "\n";
-		}
-		s << "external ip: " << external_ip << "\n";
-		s << "tracker ips: ";
+		s << "TRACKER_RESPONSE  info-hash: " << r.info_hash << "  interval: " << interval << "  peers: ";
+                if ( peer_list.size() == 0) 
+                        s << "<none>";
+                else
+		        for (std::vector<peer_entry>::const_iterator i = peer_list.begin(); i != peer_list.end(); ++i)
+		        {
+			        s << "  " << std::setfill(' ') << std::setw(16) << i->ip << " " << std::setw(5) << std::dec << i->port << ",  ";
+			        if (!i->pid.is_all_zeros()) s << " " << i->pid << " " << identify_client(i->pid) << ", ";
+		        }
+		s << " external ip: " << external_ip << " tracker ips: ";
 		std::copy(tracker_ips.begin(), tracker_ips.end(), std::ostream_iterator<address>(s, " "));
-		s << "\n";
-		s << "we connected to: " << tracker_ip << "\n";
+		s << "  we connected to: " << tracker_ip << "\n";
 		debug_log(s.str());
 #endif
 		// for each of the peers we got from the tracker

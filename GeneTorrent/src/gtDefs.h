@@ -54,6 +54,7 @@ const int ERROR_NO_EXIT = -1;
 const long UNKNOWN_HTTP_HEADER_CODE = 987654321;     // arbitrary number
 const int ALERT_CHECK_PAUSE_INTERVAL = 50000;        // in useconds
 const int COMMAND_LINE_OR_CONFIG_FILE_ERROR = 9;
+const int HTTP_ERROR_EXIT_CODE = 10;
 
 const int64_t DISK_FREE_WARN_LEVEL = 1000 * 1000 * 1000;  // 1 GB, aka 10^9
 

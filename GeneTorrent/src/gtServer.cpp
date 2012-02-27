@@ -63,7 +63,7 @@
 
 #include <xqilla/xqilla-simple.hpp>
 
-#include <curl/curl.h>
+// #include <curl/curl.h>
 
 #include "gtServer.h"
 #include "stringTokenizer.h"
@@ -119,12 +119,13 @@ void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + SERVER_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
+   relativizePath (_serverDataPath);
+
    if (statDirectory (_serverDataPath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverDataPath + "'");
    }
-
-   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
 }
 
 void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
@@ -141,12 +142,13 @@ void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + QUEUE_CLI_OPT + "'");
    }
 
+   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
+   relativizePath (_serverQueuePath);
+
    if (statDirectory (_serverQueuePath) != 0)
    {
       commandLineError ("unable to opening directory '" + _serverQueuePath + "'");
    }
-
-   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
 }
 
 void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
@@ -161,6 +163,11 @@ void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
    if (_serverModeCsrSigningUrl.size() == 0)
    {
       commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
+   }
+
+   if (std::string::npos == _serverModeCsrSigningUrl.find ("http") || std::string::npos == _serverModeCsrSigningUrl.find ("://"))
+   {
+      commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
    }
 
    startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _serverModeCsrSigningUrl;
@@ -352,8 +359,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          // two seeders are present due to tracker scraping
          if (mapIter->second->downloadGTO == false && mapIter->second->torrentHandle.status().state == libtorrent::torrent_status::seeding)
          {
-std::cerr << "inside with time = " << time(NULL) << std::endl;
-            if (!mapIter->second->overTimeAlertIssued)   // first pass set this true
+            if (!mapIter->second->overTimeAlertIssued)   // first pass set true
             {
                mapIter->second->overTimeAlertIssued = true;
                if (_verbosityLevel > VERBOSE_1)
@@ -362,7 +368,7 @@ std::cerr << "inside with time = " << time(NULL) << std::endl;
                }
                mapIter++;
             }
-            else                                         // second pass, remove the torrent from serviing
+            else                                         // second pass, remove the torrent from serving
             {
                Log (PRIORITY_NORMAL, "Stop serving:  upload complete %s info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
 

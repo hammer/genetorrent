@@ -30,41 +30,94 @@
  */
 
 /*
- * gtDownload.h
+ * gtUtils.cpp
  *
- *  Created on: feb 5, 2012
+ *  Created on: Feb 15, 2012
  *      Author: donavan
  */
-#ifndef GT_DOWNLOAD_H_
-#define GT_DOWNLOAD_H_
 
-#include "gtBase.h"
+#include <sys/statvfs.h>
+#include <sys/types.h>
 
-class gtDownload : public gtBase
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <cstdio>
+
+#include "gtUtils.h"
+
+// 
+int statDirectory (std::string dirFile)
 {
-   public:
-      gtDownload (boost::program_options::variables_map &vm);
-      void run ();
+   time_t dummyArg;
+   return statFileOrDirectory (dirFile, DIR_TYPE, dummyArg);
+}
 
-   protected:
+// 
+int statFile (std::string dirFile)
+{
+   time_t dummyArg;
+   return statFileOrDirectory (dirFile, FILE_TYPE, dummyArg);
+}
 
-   private:
-      vectOfStr _cliArgsDownloadList;
-      std::string _downloadSavePath;
-      int _maxChildren;
-      vectOfStr _torrentListToDownload;
+// 
+int statFile (std::string dirFile, time_t &timeStamp)
+{
+   return statFileOrDirectory (dirFile, FILE_TYPE, timeStamp);
+}
 
-      void runDownloadMode (std::string startupDir);
-      void prepareDownloadList ();
-      void downloadGtoFilesByURI (vectOfStr &uris);
-      void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
-      void performTorrentDownload (int64_t totalSizeOfDownload);
-      int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
-      int64_t getFreeDiskSpace ();
-      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
+// Do not use this function directly
+int statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
+{
+   struct stat status;
 
-      void pcfacliDownloadList (boost::program_options::variables_map &vm);
-      void pcfacliMaxChildren (boost::program_options::variables_map &vm);
-};
+   int statVal = stat (dirFile.c_str (), &status);
 
-#endif
+   if (statVal == 0 && S_ISDIR (status.st_mode))
+   {
+      if (sType != DIR_TYPE)  // Trying to stat a file and have a directory
+      {
+         return -1;
+      }
+
+      DIR *dir;
+
+      dir = opendir (dirFile.c_str());
+  
+      if (dir != NULL)
+      {
+         closedir (dir);
+         return 0;
+      }
+      else 
+      {
+         return -1;
+      }
+   }
+
+   if (statVal == 0 && S_ISREG (status.st_mode))
+   {
+      if (sType != FILE_TYPE)  // Trying to stat a directory and have a file
+      {
+         return -1;
+      }
+
+      FILE *file;
+   
+      file = fopen (dirFile.c_str(), "r");
+  
+      if (file != NULL)
+      {
+         fileMtime = status.st_mtime;
+         fclose (file);
+         return 0;
+      }
+      else 
+      {
+         return -1;
+      }
+   }
+
+   return -1;
+}
