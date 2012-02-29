@@ -1118,15 +1118,16 @@ void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
 
 bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int optionalExitCode)
 {
+   XQilla xqilla;
+
    try
    {
-      XQilla xqilla;
       AutoDelete <XQQuery> query (xqilla.parse (X("//CGHUB_error/usermsg/text()|//CGHUB_error/effect/text()|//CGHUB_error/remediation/text()")));
       AutoDelete <DynamicContext> context (query->createDynamicContext ());
 
       Sequence seq = context->resolveDocument (X(fileWithErrorXML.c_str()));
 
-      if (!seq.isEmpty () && seq.first ()->isNode ())
+      if (!seq.isEmpty () && seq.first()->isNode ())
       {
          context->setContextItem (seq.first ());
          context->setContextPosition (1);
@@ -1141,10 +1142,28 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
       Item::Ptr item;
    
       item = result->next (context);
+
+      if (!item)
+      {
+         throw ("Empty item, no matching xml nodes");
+      }
+
       std::string userMsg = UTF8(item->asString(context));
       item = result->next (context);
+
+      if (!item)
+      {
+         throw ("Empty item, no matching xml nodes");
+      }
+
       std::string effect = UTF8(item->asString(context));
       item = result->next (context);
+
+      if (!item)
+      {
+         throw ("Empty item, no matching xml nodes");
+      }
+
       std::string remediation = UTF8(item->asString(context));
 
       if (!(userMsg.size() && effect.size() && remediation.size()))
@@ -1158,7 +1177,7 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
    }
    catch (...)
    {
-      // Catch any error from parsing and return false to indicate process is not complete, e.g., no xml, invalid xml, etc.
+      // Catch any error from parsing and return false to indicate processing is not complete, e.g., no xml, invalid xml, etc.
       return false;
    }
 

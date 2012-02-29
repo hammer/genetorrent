@@ -391,47 +391,59 @@ void gtUpload::processManifestFile ()
    vectOfStr fileNames;
 
    XQilla xqilla;
-   AutoDelete <XQQuery> query (xqilla.parse (X("for $variable in //SUBMISSION return //$variable/(SERVER_INFO/(@server_path|@submission_uri)|FILES/FILE/@filename)")));
-   AutoDelete <DynamicContext> context (query->createDynamicContext ());
-   Sequence seq = context->resolveDocument (X(_manifestFile.c_str()));
-
-   if (!seq.isEmpty () && seq.first ()->isNode ())
+   
+   try
    {
-      context->setContextItem (seq.first ());
-      context->setContextPosition (1);
-      context->setContextSize (1);
-   }
+      AutoDelete <XQQuery> query (xqilla.parse (X("for $variable in //SUBMISSION return //$variable/(SERVER_INFO/(@server_path|@submission_uri)|FILES/FILE/@filename)")));
+      AutoDelete <DynamicContext> context (query->createDynamicContext ());
+      Sequence seq = context->resolveDocument (X(_manifestFile.c_str()));
 
-   Result result = query->execute (context);
-
-   Item::Ptr item;
-
-   item = result->next (context);
-
-   while (item != NULL)
-   {
-      strTokenize strToken (std::string (UTF8(item->asString(context))), "{}\"=", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
-
-      std::string token1 = strToken.getToken (1);
-
-      if (token1 == "server_path")
+      if (!seq.isEmpty () && seq.first ()->isNode ())
       {
-         _uploadUUID = strToken.getToken (2);
-      }
-      else if (token1 == "submission_uri")
-      {
-         _uploadSubmissionURL = strToken.getToken (2);
-      }
-      else if (token1 == "filename")
-      {
-         _filesToUpload.push_back (strToken.getToken (2));
+         context->setContextItem (seq.first ());
+         context->setContextPosition (1);
+         context->setContextSize (1);
       }
       else
       {
-         gtError ("Invalid manifest.xml file, unexpected attribute returned:  '" + token1 + "'", 201);
+         throw ("Empty set, invalid xml");
       }
 
-      item = result->next (context); // Get the next node in the list from the xquery
+      Result result = query->execute (context);
+
+      Item::Ptr item;
+
+      item = result->next (context);
+
+      while (item != NULL)
+      {
+         strTokenize strToken (std::string (UTF8(item->asString(context))), "{}\"=", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+
+         std::string token1 = strToken.getToken (1);
+
+         if (token1 == "server_path")
+         {
+            _uploadUUID = strToken.getToken (2);
+         }
+         else if (token1 == "submission_uri")
+         {
+            _uploadSubmissionURL = strToken.getToken (2);
+         }
+         else if (token1 == "filename")
+         {
+            _filesToUpload.push_back (strToken.getToken (2));
+         }
+         else
+         {
+            gtError ("Invalid manifest.xml file, unexpected attribute returned:  '" + token1 + "'", 201);
+         }
+
+         item = result->next (context); // Get the next node in the list from the xquery
+      }
+   }
+   catch (...)
+   {
+      gtError ("Encountered an error attempting to process the file:  " + _manifestFile + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
    }
 }
 

@@ -376,33 +376,38 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload)
 {
    XQilla xqilla;
-   AutoDelete <XQQuery> query (xqilla.parse (X("//ResultSet/Result/analysis_data_uri/text()")));
-   AutoDelete <DynamicContext> context (query->createDynamicContext ());
-   Sequence seq = context->resolveDocument (X(xmlFileName.c_str()));
-
-   if (!seq.isEmpty () && seq.first ()->isNode ())
+   try
    {
-      context->setContextItem (seq.first ());
-      context->setContextPosition (1);
-      context->setContextSize (1);
+      AutoDelete <XQQuery> query (xqilla.parse (X("//ResultSet/Result/analysis_data_uri/text()")));
+      AutoDelete <DynamicContext> context (query->createDynamicContext ());
+      Sequence seq = context->resolveDocument (X(xmlFileName.c_str()));
+
+      if (!seq.isEmpty () && seq.first ()->isNode ())
+      {
+         context->setContextItem (seq.first ());
+         context->setContextPosition (1);
+         context->setContextSize (1);
+      }
+      else
+      {
+         throw ("Empty set, invalid xml");
+      }
+
+      Result result = query->execute (context);
+      Item::Ptr item;
+
+      // add to the list of URIs from the XML file
+      item = result->next (context);
+
+      while (item != NULL)
+      {
+         urisToDownload.push_back (UTF8(item->asString(context)));
+         item = result->next (context); // Get the next node in the list from the xquery
+      }
    }
-   else
+   catch (...)
    {
-       // TODO: replace with better error message
-       std::cerr << "Empty set, invalid xml" << std::endl; 
-       exit (70);
-   }
-
-   Result result = query->execute (context);
-   Item::Ptr item;
-
-   // add to the list of URIs from the XML file
-   item = result->next (context);
-
-   while (item != NULL)
-   {
-      urisToDownload.push_back (UTF8(item->asString(context)));
-      item = result->next (context); // Get the next node in the list from the xquery
+      gtError ("Encountered an error attempting to process the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
    }
 }
 
