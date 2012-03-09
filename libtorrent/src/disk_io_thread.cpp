@@ -346,7 +346,7 @@ namespace libtorrent
 		if (idx.empty()) return 0;
 
 		cache_lru_index_t::iterator i = idx.begin();
-		if (i->piece == ignore)
+		while (i->piece == ignore)
 		{
 			++i;
 			if (i == idx.end()) return 0;
