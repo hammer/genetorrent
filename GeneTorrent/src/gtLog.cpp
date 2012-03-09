@@ -111,7 +111,7 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
    else if (!strcmp(m_filename, "syslog")) 
    {
       m_mode = gtLoggerOutputSyslog;
-      openlog (progName.c_str(), LOG_PID, LOG_LOCAL0);
+      openlog (m_progname, LOG_PID, LOG_LOCAL0);
    }
    else 
    {
