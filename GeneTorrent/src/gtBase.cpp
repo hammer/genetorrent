@@ -46,6 +46,10 @@
 #include <iomanip>
 #include <cstdio>
 
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/rand.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/regex.hpp>
@@ -130,10 +134,13 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
       gtError ("Failure opening SSL DH Params file:  " + _dhParamsFile, 202, ERRNO_ERROR, errno);
    }
 
-   _gtOpenSslConf = _confDir + "/" + GT_OPENSSL_CONF;
-   if (statFile (_gtOpenSslConf) != 0)
+   OpenSSL_add_all_algorithms();
+   ERR_load_crypto_strings();
+   initSSLattributes();
+
+   if (4096 != RAND_load_file("/dev/urandom", 4096))
    {
-      gtError ("Failure opening OPENSSL config file:  " + _gtOpenSslConf, 202, ERRNO_ERROR, errno);
+      gtError ("Failure opening /dev/urandom to prime the OpenSSL PRNG", 202);
    }
 
    if (!_devMode)
@@ -154,6 +161,34 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    strTokenize strToken (VERSION, ".", strTokenize::INDIVIDUAL_CONSECUTIVE_SEPARATORS);
 
    _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), 0);
+}
+
+
+void gtBase::initSSLattributes ()
+{
+   // If you add entries here you must adjust  CSR_ATTRIBUTE_ENTRY_COUNT in gtDefs.h
+   attributes[0].key = "countryName";
+   attributes[0].value = "US";
+
+   attributes[1].key = "stateOrProvinceName";
+   attributes[1].value = "CA";
+
+   attributes[2].key = "localityName";
+   attributes[2].value = "San Jose";
+
+   attributes[3].key = "organizationName";
+   attributes[3].value = "ploaders, Inc";
+
+   attributes[4].key = "organizationalUnitName";
+   attributes[4].value = "staff";
+
+   attributes[5].key = "commonName";
+   attributes[5].value = "www.uploadersinc.com";
+
+   attributes[6].key = "emailAddress";
+   attributes[6].value = "root@uploadersinc.com";
+
+   // If you add entries here you must adjust  CSR_ATTRIBUTE_ENTRY_COUNT in gtDefs.h
 }
 
 void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
@@ -920,28 +955,205 @@ std::string gtBase::getWorkingDirectory ()
    return result;
 }
 
+void gtBase::processSSLError (std::string message)
+{
+   std::string errorMessage = message;
+
+   unsigned long sslError;
+   char sslErrorBuf[150];
+
+   while (0 != ( sslError = ERR_get_error()))
+   {
+      ERR_error_string_n (sslError, sslErrorBuf, sizeof (sslErrorBuf));
+      errorMessage += sslErrorBuf + std::string (", ");
+   }
+
+   if (_operatingMode != SERVER_MODE)
+   {
+      gtError (errorMessage, SSL_ERROR_EXIT_CODE);
+   }
+   else
+   {
+      gtError (errorMessage, ERROR_NO_EXIT);
+   }
+}
+
 // 
 bool gtBase::generateCSR (std::string uuid)
 {
-    // TODO: migrate this to a direct call of the OpenSSL API instead
-    // of calling a subprocess
-   std::string cmd = "openssl req -config " + _gtOpenSslConf + " -new -nodes -out " + _tmpDir + uuid + ".csr -keyout " + _tmpDir + uuid + ".key";
+   RSA *rsaKey;
 
-   int result = system (cmd.c_str());
+   // Generate RSA Key
+   rsaKey =  RSA_generate_key(RSA_KEY_SIZE, RSA_F4, NULL, NULL);
 
-   if (result != 0)
+   if (NULL == rsaKey)
    {
-      if (_operatingMode != SERVER_MODE)
+      processSSLError ("Failure generating OpenSSL Key:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+
+   EVP_PKEY *pKey;
+
+   // Initialize private key store
+   pKey = EVP_PKEY_new();
+
+   if (NULL == pKey)
+   {
+      RSA_free(rsaKey);
+      processSSLError ("Failure initializing OpenSSL EVP object:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }    
+
+   // Add key to private key store
+   if (!(EVP_PKEY_set1_RSA (pKey, rsaKey)))
+   {
+      EVP_PKEY_free (pKey);
+      RSA_free (rsaKey);
+      processSSLError ("Failure adding OpenSSL key to EVP object:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }    
+
+   X509_REQ *csr;
+
+   // Allocate a CSR
+   csr = X509_REQ_new();
+
+   if (NULL == csr)
+   {
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure allocating OpenSSL CSR:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }    
+
+   // set the public key part of the SCR
+   if (!(X509_REQ_set_pubkey (csr, pKey)))
+   {
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free (rsaKey);
+      processSSLError ("Failure adding public key to OpenSSL CSR:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }    
+  
+   // allocate subject attribute structure 
+   X509_NAME *subject;
+
+   subject = X509_NAME_new();
+
+   if (NULL == subject)
+   {
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure allocating OpenSSL X509 Name Structure:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }    
+
+   // Add attributes to subject
+   for (int i = 0; i < CSR_ATTRIBUTE_ENTRY_COUNT; i++)
+   {
+      if (!X509_NAME_add_entry_by_txt(subject, attributes[i].key.c_str(), MBSTRING_ASC, (const unsigned char *)attributes[i].value.c_str(), -1, -1, 0))
       {
-         gtError ("Failure creating SSL CSR and/or key file(s):  " + _tmpDir + uuid + ".csr and/or " + _tmpDir + uuid + ".key", 202, ERRNO_ERROR, errno);
-      }
-      else
-      {
-         gtError ("Failure creating SSL CSR and/or key file(s): " + _tmpDir + uuid + ".csr and/or " + _tmpDir + uuid + ".key", ERROR_NO_EXIT, ERRNO_ERROR, errno);
+         X509_NAME_free (subject);
+         X509_REQ_free (csr); 
+         EVP_PKEY_free (pKey);
+         RSA_free(rsaKey);
+         processSSLError ("Failure adding " + attributes[i].key + " to OpenSSL X509 Name Structure:  ");   // if this returns server mode is active and we bail on this attempt
          return false;
       }
    }
-   
+
+   // Add the subject to the CSR
+   if (!(X509_REQ_set_subject_name(csr, subject)))
+   {
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure adding X509 Name Structure to CSR:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+
+   EVP_MD *digest;
+
+   digest = (EVP_MD *)EVP_sha1();
+
+   if (NULL == digest)
+   {
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure allocating OpenSSL sha1 digest:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+
+   if (!(X509_REQ_sign(csr, pKey, digest)))
+   {
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure creating OpenSSL CSR:  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+
+   FILE *outputFile;
+   std::string csrPathAndFile = _tmpDir + uuid + ".csr";
+
+   if (NULL == (outputFile = fopen(csrPathAndFile.c_str(), "w")))
+   {
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure opening " + csrPathAndFile + " for output.  Unable to write OpenSSL CSR.");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+ 
+   if (PEM_write_X509_REQ(outputFile, csr) != 1)
+   {
+      fclose(outputFile);
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure writing OpenSSL CSR to " + csrPathAndFile + ":  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+   fclose(outputFile);
+
+   std::string pKeyPathAndFile = _tmpDir + uuid + ".key";
+
+   if (NULL == (outputFile = fopen(pKeyPathAndFile.c_str(), "w")))
+   {
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure opening " + pKeyPathAndFile + " for output.  Unable to write OpenSSL private key.");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+
+   if (PEM_write_PrivateKey(outputFile, pKey, NULL, NULL, 0, 0, NULL) != 1)
+   {
+      fclose(outputFile);
+      X509_NAME_free (subject);
+      X509_REQ_free (csr); 
+      EVP_PKEY_free (pKey);
+      RSA_free(rsaKey);
+      processSSLError ("Failure writing OpenSSL Private Key to " + pKeyPathAndFile + ":  ");   // if this returns server mode is active and we bail on this attempt
+      return false;
+   }
+   fclose(outputFile);
+
+   // Clean up memory allocated
+   X509_NAME_free (subject);
+   X509_REQ_free (csr); 
+   EVP_PKEY_free (pKey);
+   RSA_free (rsaKey);
+
    return true;
 }
 

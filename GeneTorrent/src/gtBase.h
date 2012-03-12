@@ -60,6 +60,13 @@
 #include "gtUtils.h"
 #include "accumulator.hpp"
 
+typedef struct attributeEntry_
+{
+    std::string key;
+    std::string value;
+}attributeEntry;
+
+
 class gtBase
 {
    public:
@@ -152,11 +159,11 @@ class gtBase
       void relativizePath (std::string &inPath);
 
    private:
+      attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];
       std::string _bindIP;
       std::string _exposedIP;
       opMode _operatingMode;
       std::string _confDir;
-      std::string _gtOpenSslConf;
 
       uint32_t _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
 
@@ -168,6 +175,8 @@ class gtBase
 
       bool generateCSR (std::string uuid);
       bool acquireSignedCSR (std::string info_hash, std::string CSRsigningURL, std::string uuid);
+      void processSSLError (std::string message);
+      void initSSLattributes ();
       std::string loadCSRfile (std::string csrFileName);
       std::string getInfoHash (libtorrent::torrent_info *torrentInfo);
 

@@ -69,6 +69,13 @@ const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 #define SSL_OP_NO_COMPRESSION   0x00020000L
 #endif
 
+// OpenSSL private key and CSR defaults
+const int RSA_KEY_SIZE = 1024;
+const int SSL_ERROR_EXIT_CODE = 237;
+const int CSR_ATTRIBUTE_ENTRY_COUNT = 7;
+
+// CSR Attributes are defined in gtBase.h
+
 // Command Line Option defines
 const char SPACE = ' ';
 

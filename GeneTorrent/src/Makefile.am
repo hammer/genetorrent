@@ -48,8 +48,7 @@ GeneTorrent_SOURCES = gtBase.cpp \
 
 GTdatadir = $(datadir)/GeneTorrent
 
-GTdata_DATA = dhparam.pem \
-              GeneTorrent.openssl.conf
+GTdata_DATA = dhparam.pem
 
 GeneTorrent_CPPFLAGS = $(torrentrasterbar_CFLAGS)
 
