@@ -142,6 +142,10 @@ def tokenize(text, match=re.compile("([idle])|(\d+):|(-?\d+)").match):
     i = 0
     while i < len(text):
         m = match(text, i)
+        if (not m and text[i:].isspace()):
+            # this allows trailing whitespace, which is common if a
+            # GTO file was edited by hand
+            break
         s = m.group(m.lastindex)
         i = m.end()
         # create a metatoken for bstrings
