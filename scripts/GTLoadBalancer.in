@@ -55,7 +55,6 @@ import syslog
 import traceback
 import pwd
 import grp
-import filecmp
 
 # log()
 #
@@ -82,7 +81,7 @@ def log(level, msg):
 # Note: at the moment, this function returns the sum of the sizes of
 # the GTO files in q_dir.  This is different from (and not as accurate
 # as) the total size of the files pointed to by the GTOs.  It's less
-# cmputationally intensive to get the size of the GTO files, and as
+# computationally intensive to get the size of the GTO files, and as
 # long as piece size is reasonably constant across GTOs, then the
 # sizes of the GTOs is a relatively good proxy for the size of the
 # files they contain.
@@ -138,6 +137,22 @@ def build_worklist(config):
 # - ret -- a string which represents the expiration of the GTO
 def get_expiration(config, gto):
     cmd = [config['gtoinfo'], '--get-key=expires on', gto]
+    ret = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+    return ret.strip()
+
+
+# get_infohash()
+#
+# Returns the infohash of the supplied GTO file.
+#
+# Inputs:
+# - config -- the config dict, originally read from the config file
+# - gto -- the fully-qualified pathname to the GTO file
+#
+# Outputs:
+# - ret -- a string which represents the infohash of the GTO
+def get_infohash(config, gto):
+    cmd = [config['gtoinfo'], '--infohash', gto]
     ret = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
     return ret.strip()
 
@@ -359,14 +374,36 @@ def save_gto(config, src_dir, gto):
 
     if (os.path.isfile(dst)):
         # dest file exists; perform comparison
-        if (not filecmp.cmp(src, dst)):
+        src_hash=get_infohash(config, src)
+        dst_hash=get_infohash(config, dst)
+        if (dst_hash != src_hash):
             raise ValueError("File %s exists but does not match new GTO" % dst)
-    else:
-        shutil.copyfile(src, dst)
+
+    shutil.copyfile(src, dst)
 
     os.chmod(dst, config['save_gto_perms'])
     os.chown(dst, config['save_gto_owner'], config['save_gto_group'])
 
+
+# remove_previous_copies_of_gto()
+#
+# Iterate through all the instance queues, and remove any files that
+# match the input GTO.
+#
+# Inputs:
+# - gto -- the gto file
+# - config -- the config dict, originally read from the config file
+#
+# Output: Any previous copies of the gto that exist in any instance
+# queues will be deleted.
+#
+def remove_previous_copies_of_gto(gto, config):
+    for q_dir in config['instance_qs']:
+        f=os.path.join(q_dir, gto)
+        if (os.path.exists(f)):
+            os.remove(f)
+            log(syslog.LOG_INFO, "Removed previous version of gto %s from instance queue %s"
+                % (gto, pretty_pathname(config, q_dir)))
 
 # process_input_q()
 #
@@ -396,6 +433,8 @@ def process_input_q(config, q_type):
             if (q_type == 'download'):
                 set_download_flag(q_dir, gto, config)
                 validate_gto(config, fullname)
+            elif (q_type == 'upload'):
+                remove_previous_copies_of_gto(gto, config)
             add_expiration(q_dir, gto, config)
             assign_gto(q_dir, gto, factor, config)
             assigned = True
