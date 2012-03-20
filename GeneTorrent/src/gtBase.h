@@ -114,16 +114,17 @@ class gtBase
 
    protected:
       int  _verbosityLevel;
-      bool _logToStdErr;         // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
+      bool _logToStdErr;           // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
       std::string _authToken;
-      bool _devMode;             // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
+      bool _devMode;               // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
       std::string _tmpDir;
-      std::string   _logDestination;
+      std::string _logDestination;
       std::string _dhParamsFile;
 
-      int _portStart;         // based on --internalIP
-      int _portEnd;           // based on --internalIP
+      int _portStart;              // based on --internalIP
+      int _portEnd;                // based on --internalIP
       int _exposedPortDelta;
+      bool _addTimestamps;         // Controls the addition of timestamps to stderr/stdout screen messages.
 
       libtorrent::fingerprint *_gtFingerPrint;
 
@@ -141,6 +142,7 @@ class gtBase
       void optimizeSession (libtorrent::session *torrentSession);
       void optimizeSession (libtorrent::session &torrentSession);
 
+      std::string makeTimeStamp ();
       bool generateSSLcertAndGetSigned (std::string torrentFile, std::string signUrl, std::string torrentUUID);
 
       static int curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, std::string *buffer);
@@ -203,5 +205,6 @@ class gtBase
       void pcfacliInternalPort (boost::program_options::variables_map &vm);
       void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
       void pcfacliLog (boost::program_options::variables_map &vm);
+      void pcfacliTimestamps (boost::program_options::variables_map &vm);
 };
 #endif /* GT_BASE_H_ */

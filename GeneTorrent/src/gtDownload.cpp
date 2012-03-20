@@ -175,46 +175,46 @@ void gtDownload::run ()
 
    prepareDownloadList ();
 
-         if (_downloadSavePath.size())
-         {
-            int cdRet = chdir (_downloadSavePath.c_str());
+   if (_downloadSavePath.size())
+   {
+      int cdRet = chdir (_downloadSavePath.c_str());
 
-            if (cdRet != 0 )
-            {
-               gtError ("Failure changing directory to " + _downloadSavePath, 202, ERRNO_ERROR, errno);
-            }
-         }
+      if (cdRet != 0 )
+      {
+         gtError ("Failure changing directory to " + _downloadSavePath, 202, ERRNO_ERROR, errno);
+      }
+   }
 
-         uint64_t totalBytes; 
-         int totalFiles;
-         int totalGtos;
+   uint64_t totalBytes; 
+   int totalFiles;
+   int totalGtos;
 
-         validateAndCollectSizeOfTorrents (totalBytes, totalFiles, totalGtos);
+   validateAndCollectSizeOfTorrents (totalBytes, totalFiles, totalGtos);
 
-         std::ostringstream message;
-         message << "Ready to download " << totalGtos << " GTO(s) with " << totalFiles << " file(s) comprised of " << add_suffix (totalBytes) << " of data"; 
+   std::ostringstream message;
+   message << "Ready to download " << totalGtos << " GTO(s) with " << totalFiles << " file(s) comprised of " << add_suffix (totalBytes) << " of data"; 
 
-         Log (PRIORITY_NORMAL, "%s", message.str().c_str());
+   Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-         if (_verbosityLevel > VERBOSE_1)
-         {
-            screenOutput (message.str()); 
-         }
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput (message.str()); 
+   }
 
-         performTorrentDownload (totalBytes);
+   performTorrentDownload (totalBytes);
 
-         message.str("");
+   message.str("");
   
-         time_t duration = time(NULL) - startTime;
+   time_t duration = time(NULL) - startTime;
 
-         message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+   message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
 
-         Log (PRIORITY_NORMAL, "%s", message.str().c_str());
+   Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-         if (_verbosityLevel > VERBOSE_1)
-         {
-            screenOutput (message.str()); 
-         }
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput (message.str()); 
+   }
 
    chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }

@@ -72,6 +72,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (INTERNAL_PORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "local IP port to bind on")     
       (makeOpt (LOGGING_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to log file, follow by the log level")  
       (makeOpt (PATH_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "file system path used for uploads and downloads")
+      (makeOpt (TIMESTAMP_STD_CLI_OPT).c_str(), "add timestamps to messages logged to the screen")
       (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< int >(), "on screen verbosity level")
 
       // Download
@@ -80,6 +81,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
 
       // Upload
       (makeOpt (UPLOAD_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "uuid/manifest.xml")
+      (UPLOAD_GTO_PATH_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "writable path for .GTO file during creation and transmission")
 
       // Server Mode
       (makeOpt (SERVER_CLI_OPT).c_str(), boost::program_options::value< std::string >(),"server data path")

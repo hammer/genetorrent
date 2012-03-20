@@ -44,9 +44,12 @@
 // some constants
 const std::string SHORT_DESCRIPTION = "GeneTorrent: Genomic Data Transfer Tool";
 const std::string GTO_FILE_EXTENSION = ".gto";
+const std::string RESUME_FILE_EXT = ".resume";
+const std::string PROGRESS_FILE_EXT = ".progress";
+
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
-const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
+// const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
 const std::string PYTHON_TRUE = "TRUE";
 
 const int NO_EXIT = 0;
@@ -109,6 +112,8 @@ const std::string INTERNAL_PORT_CLI_OPT_LEGACY = "internalPort";
 
 const std::string LOGGING_CLI_OPT = "log";                         // -l short option
 
+const std::string TIMESTAMP_STD_CLI_OPT = "timestamps";            // -t short option
+
 const std::string NO_LONG_CLI_OPT = "";                            // 
 
 // verbosity conversation, two different verbose settings are available
@@ -137,6 +142,8 @@ const std::string PATH_CLI_OPT = "path";                           // -p short o
 const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short option
 const std::string UPLOAD_FILE_CLI_OPT_LEGACY = "manifestFile";
 
+const std::string UPLOAD_GTO_PATH_CLI_OPT = "upload-gto-path";     // no short option
+
 // Download Mode
 const std::string DOWNLOAD_CLI_OPT = "download";                   // -d short option
 
@@ -157,17 +164,39 @@ void commandLineError (std::string errMessage);
 // Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
 // send output messages to log files where users may not see them.
 // X is one or more stream manipulters
-#define screenOutput(x)               \
-{                                     \
-   if (_logToStdErr)                  \
-   {                                  \
-      std::cout << x << std::endl;    \
-   }                                  \
-   else                               \
-   {                                  \
-      std::cerr << x << std::endl;    \
-   }                                  \
-}                            
+#define screenOutput(x)                                    \
+{                                                          \
+   std::string timeStamp = "";                             \
+   if (_addTimestamps)                                     \
+   {                                                       \
+      timeStamp = makeTimeStamp () + + " ";                \
+   }                                                       \
+   if (_logToStdErr)                                       \
+   {                                                       \
+      std::cout << timeStamp << x << std::endl;            \
+   }                                                       \
+   else                                                    \
+   {                                                       \
+      std::cerr << timeStamp << x << std::endl;            \
+   }                                                       \
+}
+
+#define screenOutputNoNewLine(x)                           \
+{                                                          \
+   std::string timeStamp = "";                             \
+   if (_addTimestamps)                                     \
+   {                                                       \
+      timeStamp = makeTimeStamp () + + " ";                \
+   }                                                       \
+   if (_logToStdErr)                                       \
+   {                                                       \
+      std::cout << timeStamp << x;                         \
+   }                                                       \
+   else                                                    \
+   {                                                       \
+      std::cerr << timeStamp << x;                         \
+   }                                                       \
+}
 
 // TODO figure out if these are saying in the subclass or this can be 
 // refactored cleanly into something that doesn't throw compiler warnings

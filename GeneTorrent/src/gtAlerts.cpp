@@ -343,6 +343,13 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
          getGtoNameAndInfoHash (tea, gtoName, infoHash);
 
+         std::string errorMessage = tea->message();
+
+         if (std::string::npos != errorMessage.find("[FATAL ERROR]"))
+         {
+            gtError (errorMessage, 214);
+         }
+
          Log (haveError, "%s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
 
          if ((_operatingMode != SERVER_MODE ) && (tea->times_in_row > 2) && (_successfulTrackerComms == false))
@@ -353,17 +360,28 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
       case libtorrent::tracker_warning_alert::alert_type:
       {
-processUnimplementedAlert (haveError, alrt);
+         libtorrent::tracker_warning_alert *twa = libtorrent::alert_cast<libtorrent::tracker_warning_alert> (alrt);
+
+         getGtoNameAndInfoHash (twa, gtoName, infoHash);
+
+         std::string errorMessage = twa->message();
+        
+         if (std::string::npos != errorMessage.find("[WARNING]"))
+         {
+            screenOutput (errorMessage);
+         }
+
+         Log (haveError, "%s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());
       } break;
 
       case libtorrent::scrape_failed_alert::alert_type:
       {
-processUnimplementedAlert (haveError, alrt);
+         processUnimplementedAlert (haveError, alrt);
       } break;
 
       case libtorrent::scrape_reply_alert::alert_type:
       {
-processUnimplementedAlert (haveError, alrt);
+         processUnimplementedAlert (haveError, alrt);
       } break;
 
       case libtorrent::tracker_reply_alert::alert_type:
@@ -377,7 +395,7 @@ processUnimplementedAlert (haveError, alrt);
 
          libtorrent::tracker_reply_alert *tra = libtorrent::alert_cast<libtorrent::tracker_reply_alert> (alrt);
          getGtoNameAndInfoHash (tra, gtoName, infoHash);
-         Log (haveError, "%s, gto:  %s, infohash:  %s", tra->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (haveError, "%s, infohash:  %s", tra->message().c_str(), infoHash.c_str());
 
       } break;
 
@@ -390,7 +408,7 @@ processUnimplementedAlert (haveError, alrt);
 
          libtorrent::tracker_announce_alert *taa = libtorrent::alert_cast<libtorrent::tracker_announce_alert> (alrt);
          getGtoNameAndInfoHash (taa, gtoName, infoHash);
-         Log (haveError, "%s, gto:  %s, infohash:  %s", taa->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (haveError, "%s, infohash:  %s", taa->message().c_str(), infoHash.c_str());
 
       } break;
 
@@ -417,5 +435,5 @@ void gtBase::processStatusNotification (bool haveError, libtorrent::alert *alrt)
       {
          processUnimplementedAlert (haveError, alrt);
       } break;
-   }   
+   }
 }

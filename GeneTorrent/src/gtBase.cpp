@@ -96,6 +96,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _portStart (20892), 
    _portEnd (20900), 
    _exposedPortDelta (0), 
+   _addTimestamps (false), 
    _startUpComplete (false),
    _bindIP (""), 
    _exposedIP (""), 
@@ -201,6 +202,7 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliAdvertisedPort (vm);
    pcfacliLog (vm);
    pcfacliPath (vm);
+   pcfacliTimestamps (vm);
 }
 
 void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
@@ -224,6 +226,20 @@ void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
    }
 
    startUpMessage << " --" << BIND_IP_CLI_OPT << "=" << _bindIP;
+}
+
+void gtBase::pcfacliTimestamps (boost::program_options::variables_map &vm)
+{
+   if (vm.count (TIMESTAMP_STD_CLI_OPT) == 1)
+   { 
+      _addTimestamps = true;
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   startUpMessage << " --" << TIMESTAMP_STD_CLI_OPT;
 }
 
 void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
@@ -459,6 +475,10 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
    else
    {
       _logMask = strtoul (level.c_str(), NULL, 0);
+      if (0 == _logMask)
+      {
+         commandLineError ("Unexpected logging level encountered.");
+      }
    }
 
    startUpMessage << " --" << LOGGING_CLI_OPT << "=" << vm[LOGGING_CLI_OPT].as<std::string>();
@@ -1328,6 +1348,27 @@ void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
    }
 }
 
+std::string gtBase::makeTimeStamp ()
+{
+   const int BUFF_SIZE = 25;
+   char buffer[BUFF_SIZE];
+   char tail[BUFF_SIZE];
+   char secBuff[BUFF_SIZE];
+   struct timeval tp;
+
+   gettimeofday (&tp, NULL);
+
+   snprintf (secBuff, BUFF_SIZE, ".%03d", int (tp.tv_usec/1000));
+
+   struct tm newTime;
+
+   localtime_r (&tp.tv_sec, &newTime);
+   strftime (buffer, BUFF_SIZE, "%m/%d-%T", &newTime);
+   strftime (tail, BUFF_SIZE, "%z", &newTime);
+
+   return buffer + std::string (secBuff) + tail;
+}
+
 bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int optionalExitCode)
 {
    XQilla xqilla;
@@ -1384,7 +1425,7 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
       }
 
       std::ostringstream logMessage;
-      logMessage << "Error:  " << userMsg << "  " << effect << "  " << remediation << std::endl;
+      logMessage << userMsg << "  " << effect << "  " << remediation << std::endl;
       Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
    }
    catch (...)

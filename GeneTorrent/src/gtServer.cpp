@@ -625,17 +625,22 @@ time_t gtServer::getExpirationTime (std::string torrentPathAndFileName)
       if (NULL != fgets (vBuff, 15, result))
       {
          expireTime = strtol (vBuff, NULL, 10);
+         if (0 == expireTime)
+         {
+            expireTime = 2114406000;     // set back to 1/1/2037
+            Log (PRIORITY_HIGH, "Failure running gtoinfo on %s or no 'expires on' in GTO, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
+         }
       }
       else
       {
          Log (PRIORITY_HIGH, "Failure running gtoinfo on %s or no 'expires on' in GTO, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
       }
       pclose (result);
-   }  
+   }
    else
-   {  
+   {
       Log (PRIORITY_HIGH, "Failure running gtoinfo on %s, serving using default expiration of 1/1/2037", torrentPathAndFileName.c_str());
-   }  
+   }
 
-   return expireTime;       
+   return expireTime;
 }

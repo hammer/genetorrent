@@ -49,6 +49,8 @@ class gtUpload : public gtBase
 
       static bool file_filter (boost::filesystem::path const& filename);
       bool fileFilter (std::string const filename);
+
+      void hashCallbackImpl (int piece);
    protected:
 
    private:
@@ -58,18 +60,24 @@ class gtUpload : public gtBase
       vectOfStr  _filesToUpload;
       int _pieceSize;
       std::string _dataFilePath;
+      std::string _uploadGTODir;  //  This directory is used to store the upload GTO and upload progress state when set (otherwise the uuid directory is used)
+      int _piecesInTorrent;       // Used by the hash callback function to display progress
 
-      std::string submitTorrentToGTExecutive (std::string torrentFileName);
+      void submitTorrentToGTExecutive (std::string torrentFileName, bool);
       void findDataAndSetWorkingDirectory ();
       bool verifyDataFilesExist (vectOfStr &);
-      void setPieceSize ();
+      unsigned long setPieceSize (unsigned &);
       void displayMissingFilesAndExit (vectOfStr &missingFiles);
-      std::string makeTorrent(std::string, std::string);
+      void makeTorrent(std::string, std::string &);
       void processManifestFile();
-      void performGtoUpload (std::string torrentFileName);
+      void performGtoUpload (std::string torrentFileName, long, bool);
       void performTorrentUpload();
+      void configureUploadGTOdir (std::string uuid);
+      long evaluateUploadResume (time_t, std::string);
 
       void pcfacliUpload (boost::program_options::variables_map &vm);
+      void pcfacliUploadGTODir (boost::program_options::variables_map &vm);
+      static void hashCallback (int piece);
 };
 
 #endif

@@ -85,10 +85,11 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath ("")
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath (""), _uploadGTODir (""), _piecesInTorrent (0)
 {
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
+   pcfacliUploadGTODir (vm);
 
    checkCredentials ();
 
@@ -99,6 +100,26 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
    if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
+   }
+}
+
+void gtUpload::pcfacliUploadGTODir (boost::program_options::variables_map &vm)
+{
+   if (vm.count (UPLOAD_GTO_PATH_CLI_OPT) == 1)
+   {
+      _uploadGTODir = sanitizePath (vm[UPLOAD_GTO_PATH_CLI_OPT].as<std::string>());
+   }
+   else   // Option not present
+   {
+      _uploadGTODir = "";   // Set to current directory
+      return;    
+   }
+
+   startUpMessage << " --" << UPLOAD_GTO_PATH_CLI_OPT << "=" << _uploadGTODir;
+
+   if (statDirectory (_uploadGTODir) != 0)
+   {
+      commandLineError ("Unable to access directory '" + _uploadGTODir + "'");
    }
 }
 
@@ -129,55 +150,124 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
    }
 }
 
-void gtUpload::run ()
+void gtUpload::configureUploadGTOdir (std::string uuid)
 {
-   processManifestFile ();
-
-   if (_uploadSubmissionURL.size () < 1)
+   if (_uploadGTODir.size())      // User supplied something on the CLI
    {
-      gtError ("No Submission URL found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
-   }
-
-   if (_uploadUUID.size () < 1)
-   {
-      gtError ("No server_path (UUID) found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
-   }
-
-   if (_filesToUpload.size () < 1)
-   {
-      gtError ("No files found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
-   }
-
-   std::string torrentFileName;
-   if (_devMode == false)
-   {
-      findDataAndSetWorkingDirectory ();
-      setPieceSize ();
-
-      torrentFileName = makeTorrent (_uploadUUID, _uploadUUID + GTO_FILE_EXTENSION);
-      torrentFileName = submitTorrentToGTExecutive (torrentFileName);
+      relativizePath (_uploadGTODir);
+      _uploadGTODir +=  "/";
    }
    else
    {
-      torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
+      _uploadGTODir = getWorkingDirectory() + "/" + uuid + "/";
    }
-
-   performGtoUpload (torrentFileName);
 }
 
-std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName)
+void gtUpload::run ()
 {
-   std::string realTorrentFileName = tmpTorrentFileName.substr (0, tmpTorrentFileName.size () - 1); // drop the ~ from uuid.gto~
+   std::string saveDir = getWorkingDirectory ();
+   processManifestFile ();
+
+   unsigned long totalBytes = 0;
+   unsigned totalFiles = 0;
+   std::string torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
+   bool inResumeMode = false;
+   long resumeProgress = 0;
+
+   if (!_devMode)        // devMode assumes the GTO is present, either from a previous run or manual assembly and is in the current directory
+   {
+      findDataAndSetWorkingDirectory ();
+      configureUploadGTOdir (_uploadUUID);
+      totalBytes = setPieceSize (totalFiles);
+
+      time_t gtoTimeStamp;
+
+      if (!statFile (_uploadGTODir + torrentFileName, gtoTimeStamp))
+      {      // resume mode
+         torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
+         inResumeMode = true;
+      }
+
+      if (inResumeMode)
+      {
+         resumeProgress = evaluateUploadResume(gtoTimeStamp, torrentFileName);
+      }
+      else
+      {
+         makeTorrent (_uploadUUID, torrentFileName); 
+      }
+      
+      submitTorrentToGTExecutive (torrentFileName, inResumeMode);
+   }
+
+   time_t startTime = time(NULL);
+   std::ostringstream message;
+
+   if (!inResumeMode)              // This message will not be accurate in dev mode
+   {
+      message << "Ready to upload 1 GTO with " << totalFiles << " file(s) comprised of " << add_suffix (totalBytes) << " of data"; 
+
+      Log (PRIORITY_NORMAL, "%s", message.str().c_str());
+
+      if (_verbosityLevel > VERBOSE_1)
+      {
+         screenOutput (message.str()); 
+      }
+   }
+
+   performGtoUpload (_uploadGTODir + torrentFileName, resumeProgress, inResumeMode);
+
+   message.str("");
+  
+   if (!inResumeMode)              // This message will not be accurate in dev mode
+   {
+      time_t duration = time(NULL) - startTime;
+
+      message << "Uploaded " << add_suffix (totalBytes) << " in " << durationToStr (duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+   }
+   else
+   {
+      message << "Resumed upload completed.  Total of " << add_suffix (totalBytes) << " uploaded over multiple sessions.";
+   }
+
+   Log (PRIORITY_NORMAL, "%s", message.str().c_str());
+
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput (message.str()); 
+   }
+
+   chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
+}
+
+void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool resumedUpload)
+{
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput ("Submitting GTO to GT Executive...");
+   }
+
+   if (resumedUpload)
+   {
+      try
+      {
+         boost::filesystem::rename (_uploadGTODir + torrentFileName, _uploadGTODir + torrentFileName + RESUME_FILE_EXT);
+      }
+      catch (const boost::filesystem::filesystem_error& e)
+      {
+         gtError ("Failure moving GTO " + _uploadGTODir + torrentFileName + " to " + _uploadGTODir + torrentFileName + RESUME_FILE_EXT + ", " + e.what(), 202);
+      }
+   }
 
    std::string uuidForErrors = _uploadUUID;
 
    FILE *gtoFile;
 
-   gtoFile = fopen (realTorrentFileName.c_str (), "wb");
+   gtoFile = fopen ((_uploadGTODir + torrentFileName).c_str (), "wb");
 
    if (gtoFile == NULL)
    {
-      gtError ("Failure opening " + realTorrentFileName + " for output.", 202, ERRNO_ERROR, errno);
+      gtError ("Failure opening " + _uploadGTODir + torrentFileName + " for output.", 202, ERRNO_ERROR, errno);
    }
 
    char errorBuffer[CURL_ERROR_SIZE + 1];
@@ -211,8 +301,14 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    struct curl_httppost *last=NULL;
 
    curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
-
-   curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, tmpTorrentFileName.c_str(), CURLFORM_END);
+   if (resumedUpload)
+   {
+      curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, (_uploadGTODir + torrentFileName + RESUME_FILE_EXT).c_str(), CURLFORM_FILENAME, torrentFileName.c_str(), CURLFORM_END);
+   }
+   else
+   {
+      curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, (_uploadGTODir + torrentFileName + "~").c_str(), CURLFORM_FILENAME, torrentFileName.c_str(), CURLFORM_END);
+   }
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
@@ -229,7 +325,7 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
 
    fclose (gtoFile);
 
-   processCurlResponse (curl, res, realTorrentFileName, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
+   processCurlResponse (curl, res, _uploadGTODir + torrentFileName, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -237,8 +333,6 @@ std::string gtUpload::submitTorrentToGTExecutive (std::string tmpTorrentFileName
    }
 
    curl_easy_cleanup (curl);
-
-   return realTorrentFileName;
 }
 
 void gtUpload::findDataAndSetWorkingDirectory ()
@@ -305,7 +399,7 @@ bool gtUpload::verifyDataFilesExist (vectOfStr &missingFileList)
    return missingFiles ? false : true;
 }
 
-void gtUpload::setPieceSize ()
+unsigned long gtUpload::setPieceSize (unsigned &fileCount)
 {
    struct stat fileStatus;
    unsigned long totalDataSize = 0;
@@ -321,12 +415,15 @@ void gtUpload::setPieceSize ()
          totalDataSize += fileStatus.st_size;
       }
       vectIter++;
+      fileCount++;
    }
 
    while (totalDataSize / _pieceSize > 15000)
    {
       _pieceSize *= 2;
    }
+
+   return totalDataSize;
 }
 
 void gtUpload::displayMissingFilesAndExit (vectOfStr &missingFiles)
@@ -338,52 +435,170 @@ void gtUpload::displayMissingFilesAndExit (vectOfStr &missingFiles)
       screenOutput ("Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter);
       vectIter++;
    }
+
    gtError ("file(s) listed above were not found (or is (are) not readable)", 82, gtUpload::DEFAULT_ERROR);
 }
 
-std::string gtUpload::makeTorrent (std::string filePath, std::string torrentName)
+long gtUpload::evaluateUploadResume (time_t gtoTimeStamp, std::string torrentName)
 {
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput ("Evaluating " << torrentName << " for resume suitability...");
+   }
+
+   time_t fileTimeStamp;
+
+   if (statFile (_manifestFile, fileTimeStamp))
+   {
+      gtError ("Unable to fstat " + _manifestFile + " for upload resume evaluation purposes.", 202, ERRNO_ERROR, errno);
+   }
+
+   if (fileTimeStamp > gtoTimeStamp)
+   {
+      gtError ("Unable to evaluate " + torrentName + " for upload resume purposes.  " + _manifestFile + " file is newer than GTO.", 217);
+   }
+
+   libtorrent::error_code torrentError;
+   libtorrent::torrent_info torrentInfo (_uploadGTODir + torrentName, torrentError);
+
+   if (torrentError)
+   {
+      gtError ("Unable to evaluate " + torrentName + " for upload resume purposes.", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+   }
+
+   for (libtorrent::torrent_info::file_iterator i = torrentInfo.begin_files(); i != torrentInfo.end_files(); ++i)
+   {
+      time_t fileTimeStamp;
+
+      if (statFile (torrentInfo.files().file_path(*i), fileTimeStamp))
+      {
+         gtError ("Unable to evaluate contents of " + torrentName + " for upload resume purposes.  fstat failure on file:  " + torrentInfo.files().file_path(*i), 202, ERRNO_ERROR, errno);
+      }
+
+      if (fileTimeStamp > gtoTimeStamp)
+      {
+         gtError ("Unable to enable upload resume for " + torrentName + ".  Data files are newer than the .gto", 217);
+      }
+   }
+
+   std::ifstream progressFile;
+   long progress = 0;
+
+   progressFile.open ((_uploadGTODir + torrentName + PROGRESS_FILE_EXT).c_str(), std::ifstream::in);
+
+   if (!progressFile.good ())
+   {
+      gtError ("Unable to open previous upload progress file " + torrentName + PROGRESS_FILE_EXT + ".  The upload will resume, but % complete is not correct.", ERROR_NO_EXIT);
+      return progress;
+   }
+
+   try
+   {
+      progressFile >> progress;
+   }
+   catch (...)
+   {
+      gtError ("Unable to read previous upload progress file " + torrentName + PROGRESS_FILE_EXT + ".  The upload will resume, but % complete is not correct.", ERROR_NO_EXIT);
+   }
+
+   return progress;
+}
+
+void gtUpload::makeTorrent (std::string uuid, std::string &torrentName)
+{
+   torrentName = uuid + GTO_FILE_EXTENSION;
+ 
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput ("Preparing GTO for upload...");
+      screenOutputNoNewLine ("Computing checksums...");
+   }
+
    std::string creator = std::string ("GeneTorrent-") + VERSION;
+   std::string dataPath = libtorrent::complete (uuid);
 
    int flags = 0;
-
-   torrentName += '~';
 
    try
    {
       libtorrent::file_storage fileStore;
 
-      std::string full_path = libtorrent::complete (filePath);
-
-      libtorrent::add_files (fileStore, full_path, file_filter, flags);
+      libtorrent::add_files (fileStore, dataPath, file_filter, flags);
 
       libtorrent::create_torrent torrent (fileStore, _pieceSize, -1, 0);
       torrent.add_tracker (DEFAULT_TRACKER_URL);
 
-      libtorrent::set_piece_hashes (torrent, libtorrent::parent_path(full_path));
+      _piecesInTorrent = torrent.num_pieces();
+
+      libtorrent::set_piece_hashes (torrent, libtorrent::parent_path(dataPath), &hashCallback);
       torrent.set_creator (creator.c_str ());
 
       std::vector <char> finishedTorrent;
       bencode (back_inserter (finishedTorrent), torrent.generate ());
 
-      FILE *output = fopen (torrentName.c_str (), "wb+");
+      FILE *output = fopen ((_uploadGTODir + torrentName + '~').c_str (), "wb+");
 
       if (output == NULL)
       {
-         gtError ("Failure opening " + torrentName + " for output.", 202, ERRNO_ERROR, errno);
+         gtError ("Failure opening " + _uploadGTODir + torrentName + " for output.", 202, ERRNO_ERROR, errno);
       }
 
       fwrite (&finishedTorrent[0], 1, finishedTorrent.size (), output);
       fclose (output);
-
-      return torrentName;
    }
    catch (...)
    {
-       // TODO: better error handling here
-       exit (71);
+      // TODO: better error handling here
+      gtError ("Exception creating " + torrentName + " for output.", 232);
    }
-   return "";
+}
+
+void gtUpload::hashCallback (int piece)
+{
+   ((gtUpload *)geneTorrCallBackPtr)->hashCallbackImpl (piece);
+}
+
+void gtUpload::hashCallbackImpl (int piece)
+{
+   static time_t nextUpdate = 0;
+ 
+   if (_verbosityLevel > VERBOSE_1 && piece > 0)   // Don't disply until we have something other than 0 to display
+   {
+      time_t timeNow = time(NULL); 
+    
+      if (timeNow > nextUpdate || piece + 1 == _piecesInTorrent)
+      {
+         std::ostringstream mess;
+         if (nextUpdate > 0 )
+         {
+            mess << "\b\b\b\b\b\b\b";
+         }
+         mess << std::setw (6) << std::setprecision (2) << std::fixed << 100.0 * (piece + 1) / _piecesInTorrent << "%";
+
+         if (_logToStdErr) 
+         {
+            std::cout << mess.str();
+         }
+         else
+         {
+            std::cerr << mess.str();
+         }
+         nextUpdate = timeNow + 1;
+     
+         // clean up screen as a new line is not printed 
+         if (piece + 1 == _piecesInTorrent)
+         {
+            if (_logToStdErr) 
+            {
+               std::cout << std::endl;
+            }
+            else
+            {
+               std::cerr << std::endl;
+            }
+         }
+      }
+   }
 }
 
 void gtUpload::processManifestFile ()
@@ -445,15 +660,25 @@ void gtUpload::processManifestFile ()
    {
       gtError ("Encountered an error attempting to process the file:  " + _manifestFile + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
    }
-}
 
-void gtUpload::performGtoUpload (std::string torrentFileName)
-{
-   if (_verbosityLevel > VERBOSE_1)
+   if (_uploadSubmissionURL.size () < 1)
    {
-      screenOutput ("Sending " << torrentFileName); 
+      gtError ("No Submission URL found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
    }
 
+   if (_uploadUUID.size () < 1)
+   {
+      gtError ("No server_path (UUID) found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
+   }
+
+   if (_filesToUpload.size () < 1)
+   {
+      gtError ("No files found in manifest file:  " + _manifestFile, 214, gtUpload::DEFAULT_ERROR);
+   }
+}
+
+void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgress, bool inResumeMode)
+{
    libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
    optimizeSession (torrentSession);
    bindSession (torrentSession);
@@ -515,19 +740,29 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
 
    torrentHandle.resume();
 
+   double percentComplete = 0.0;
+   if (_verbosityLevel > VERBOSE_1 && inResumeMode && previousProgress > 0)
+   {
+      percentComplete = 100.0 * previousProgress / torrentParams.ti->total_size();
+      screenOutput ("Resuming upload that is approximately:  "  << std::fixed << std::setprecision(3) << percentComplete << "% complete.");
+   }
+
    bool displayed100Percent = false;
 
    libtorrent::session_status sessionStatus = torrentSession.status ();
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
-   while (torrentStatus.num_complete < 2)
+   percentComplete = 0.0;
+std::cerr << "outside torrentStatus.uploaded = " << torrentStatus.uploaded << std::endl;
+   while (torrentStatus.uploaded < 1)
    {
+std::cerr << "inside torrentStatus.uploaded = " << torrentStatus.uploaded << std::endl;
       sessionStatus = torrentSession.status();
       torrentStatus = torrentHandle.status();
 
       libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
 
-      while (torrentStatus.num_complete < 2 && libtorrent::time_now_hires() < endMonitoring)
+      while (torrentStatus.uploaded < 1 && libtorrent::time_now_hires() < endMonitoring)
       {
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
@@ -535,22 +770,45 @@ void gtUpload::performGtoUpload (std::string torrentFileName)
 
       torrentHandle.scrape_tracker();
 
+      FILE *gtoFile;
+
+      gtoFile = fopen ((torrentFileName + PROGRESS_FILE_EXT).c_str (), "w");
+
+      if (gtoFile != NULL)
+      {
+         fprintf (gtoFile, "%ld", previousProgress + torrentStatus.total_payload_upload);
+         fclose (gtoFile);
+      }
+      else // log error and continue
+      {
+         gtError ("Failure opening " + torrentFileName + PROGRESS_FILE_EXT + " for output.", ERROR_NO_EXIT, ERRNO_ERROR, errno);
+      }
+
       if (_verbosityLevel > VERBOSE_1 && !displayed100Percent)
       {
          if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
          {
-            double percentComplete = torrentStatus.total_payload_upload / (torrentParams.ti->total_size () * 1.0) * 100.0;
+            percentComplete = (previousProgress + torrentStatus.total_payload_upload) / (torrentParams.ti->total_size () * 1.0) * 100.0;
 
             if (percentComplete > 99.999999999)
             {
                percentComplete = 100.000000;
                displayed100Percent = true;
             }
-            screenOutput ("Status:"  << std::setw(8) << (torrentStatus.total_payload_upload > 0 ? add_suffix(torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
+            screenOutput ("Status:"  << std::setw(8) << (previousProgress + torrentStatus.total_payload_upload > 0 ? add_suffix(previousProgress + torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
                                      " uploaded (" << std::fixed << std::setprecision(3) << percentComplete <<
                                      "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
          }
       }
+   }
+
+   // It is possible to not display 100% based on the tracker scraping behavior.
+   // test here and log 100
+   if (!displayed100Percent)
+   {
+      percentComplete = 100.000000;
+      screenOutput ("Status:"  << std::setw(8) << (previousProgress + torrentStatus.total_payload_upload > 0 ? add_suffix(previousProgress + torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
+                    " uploaded (" << std::fixed << std::setprecision(3) << percentComplete << "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
    }
 
    checkAlerts (torrentSession);
