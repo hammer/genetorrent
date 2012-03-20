@@ -243,7 +243,20 @@ namespace libtorrent
 		boost::shared_ptr<request_callback> cb = requester();
 		if (cb)
 		{
-			cb->debug_log("==> TRACKER_REQUEST [ url: " + url + " ] info-hash:  " + to_hex (tracker_req().info_hash.to_string()));
+			std::string logURL = url;
+
+                                                
+			size_t start = logURL.find("?info_hash=");
+			if (start != std::string::npos)
+                        {
+				size_t end = logURL.find('&', start+1);
+				if (start != std::string::npos)
+                        	{
+                                   logURL.erase (start, end - start - 1);
+				}
+			}
+
+			cb->debug_log("==> TRACKER_REQUEST [ url: " + logURL + " ] info-hash:  " + to_hex (tracker_req().info_hash.to_string()));
 		}
 #endif
 	}
@@ -438,8 +451,9 @@ namespace libtorrent
 			int incomplete = int(scrape_data->dict_find_int_value("incomplete", -1));
 			int downloaded = int(scrape_data->dict_find_int_value("downloaded", -1));
 			int downloaders = int(scrape_data->dict_find_int_value("downloaders", -1));
+			int uploaded = int(scrape_data->dict_find_int_value("state", -1));
 			cb->tracker_scrape_response(tracker_req(), complete
-				, incomplete, downloaded, downloaders);
+				, incomplete, downloaded, downloaders, uploaded);
 			return;
 		}
 

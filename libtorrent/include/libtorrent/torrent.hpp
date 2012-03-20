@@ -471,7 +471,7 @@ namespace libtorrent
 		virtual void tracker_warning(tracker_request const& req
 			, std::string const& msg);
 		virtual void tracker_scrape_response(tracker_request const& req
-			, int complete, int incomplete, int downloaded, int downloaders);
+			, int complete, int incomplete, int downloaded, int downloaders, int uploaded);
 
 		// if no password and username is set
 		// this will return an empty string, otherwise
@@ -1254,6 +1254,10 @@ namespace libtorrent
 		// the scrape data from the tracker response, this
 		// is optional and may be 0xffffff
 		unsigned int m_incomplete:24;
+
+		// the scrape data from the tracker response, indicates
+		// if upload is copmlete
+		unsigned int m_uploaded:24;
 
 		// progress parts per million (the number of
 		// millionths of completeness)

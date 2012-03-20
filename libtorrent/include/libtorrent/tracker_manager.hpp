@@ -145,7 +145,7 @@ namespace libtorrent
 			, std::string const& msg) = 0;
 		virtual void tracker_scrape_response(tracker_request const& /*req*/
 			, int /*complete*/, int /*incomplete*/, int /*downloads*/
-			, int /*downloaders*/) {}
+			, int /*downloaders*/, int /*uploaded*/) {}
 		virtual void tracker_response(
 			tracker_request const& req
 			, address const& tracker_ip

@@ -447,6 +447,7 @@ namespace libtorrent
 			, num_peers(0)
 			, num_complete(-1)
 			, num_incomplete(-1)
+		        , uploaded (-1)
 			, list_seeds(0)
 			, list_peers(0)
 			, connect_candidates(0)
@@ -566,8 +567,10 @@ namespace libtorrent
 		// set to the total number of peers that
 		// have the whole file and the total number
 		// of peers that are still downloading
+		// and number of uploaded from the tracker response
 		int num_complete;
 		int num_incomplete;
+		int uploaded;
 
 		// this is the number of seeds whose IP we know
 		// but are not necessarily connected to

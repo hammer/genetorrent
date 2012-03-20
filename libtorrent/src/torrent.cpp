@@ -406,6 +406,7 @@ namespace libtorrent
 		, m_complete(0xffffff)
 		, m_priority(0)
 		, m_incomplete(0xffffff)
+		, m_uploaded (0xffffff)
 		, m_progress_ppm(0)
 		, m_abort(false)
 		, m_announce_to_dht(!p.paused)
@@ -2333,7 +2334,7 @@ while (certBeginPos != std::string::npos)
 	}
 	
  	void torrent::tracker_scrape_response(tracker_request const& req
- 		, int complete, int incomplete, int downloaded, int downloaders)
+ 		, int complete, int incomplete, int downloaded, int downloaders, int uploaded)
  	{
 		TORRENT_ASSERT(m_ses.is_network_thread());
  
@@ -2343,6 +2344,7 @@ while (certBeginPos != std::string::npos)
  		if (complete >= 0) m_complete = complete;
  		if (incomplete >= 0) m_incomplete = incomplete;
  		if (downloaders >= 0) m_downloaders = downloaders;
+ 		if (uploaded >= 0) m_uploaded = uploaded;
  
  		if (m_ses.m_alerts.should_post<scrape_reply_alert>())
  		{
@@ -4086,7 +4088,6 @@ while (certBeginPos != std::string::npos)
 		, std::string const& dh_params
 		, std::string const& passphrase)
 	{
-//std::cerr << "m_ssl_ctx = " << m_ssl_ctx << std::endl;
 		if (!m_ssl_ctx) return;
 
 		using boost::asio::ssl::context;
@@ -4094,28 +4095,24 @@ while (certBeginPos != std::string::npos)
 		m_ssl_ctx->set_password_callback(boost::bind(&password_callback, _1, _2, passphrase), ec);
 		if (ec)
 		{
-//std::cerr << "have ec in 1:  m_ssl_ctx = " << m_ssl_ctx << std::endl;
 			if (alerts().should_post<torrent_error_alert>())
 				alerts().post_alert(torrent_error_alert(get_handle(), ec));
 		}
 		m_ssl_ctx->use_certificate_file(certificate, context::pem, ec);
 		if (ec)
 		{
-//std::cerr << "have ec in 2:  m_ssl_ctx = " << m_ssl_ctx << std::endl;
 			if (alerts().should_post<torrent_error_alert>())
 				alerts().post_alert(torrent_error_alert(get_handle(), ec));
 		}
 		m_ssl_ctx->use_private_key_file(private_key, context::pem, ec);
 		if (ec)
 		{
-//std::cerr << "have ec in 3:  m_ssl_ctx = " << m_ssl_ctx << "  " << ec.message()  << std::endl;
 			if (alerts().should_post<torrent_error_alert>())
 				alerts().post_alert(torrent_error_alert(get_handle(), ec));
 		}
 		m_ssl_ctx->use_tmp_dh_file(dh_params, ec);
 		if (ec)
 		{
-//std::cerr << "have ec in 4:  m_ssl_ctx = " << m_ssl_ctx << std::endl;
 			if (alerts().should_post<torrent_error_alert>())
 				alerts().post_alert(torrent_error_alert(get_handle(), ec));
 		}
@@ -7949,6 +7946,7 @@ while (certBeginPos != std::string::npos)
 
 		st->num_complete = (m_complete == 0xffffff) ? -1 : m_complete;
 		st->num_incomplete = (m_incomplete == 0xffffff) ? -1 : m_incomplete;
+		st->uploaded = (m_uploaded == 0xffffff) ? -1 : m_uploaded;
 		st->paused = is_torrent_paused();
 		st->auto_managed = m_auto_managed;
 		st->sequential_download = m_sequential_download;
