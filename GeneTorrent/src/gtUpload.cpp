@@ -753,10 +753,9 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
    percentComplete = 0.0;
-std::cerr << "outside torrentStatus.uploaded = " << torrentStatus.uploaded << std::endl;
+
    while (torrentStatus.uploaded < 1)
    {
-std::cerr << "inside torrentStatus.uploaded = " << torrentStatus.uploaded << std::endl;
       sessionStatus = torrentSession.status();
       torrentStatus = torrentHandle.status();
 

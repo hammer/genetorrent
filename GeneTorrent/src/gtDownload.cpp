@@ -555,12 +555,6 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
 
          freeSpace = getFreeDiskSpace();
 
-         // Note that totalDataDownloaded and xfer both reflect retransmissions, so they are only approximate.  It is
-         // possible (even common) for 
-         //    (totalDataDownloaded + xfer) > totalSizeOfDownload 
-         // So we need to be careful with the equation below so that it doesn't ov
-         //
-         // Dec 16, 2011, the above comment is no longer applicable to the best of my knowledge (DN)
          if (totalSizeOfDownload > totalDataDownloaded + xfer + freeSpace) 
          {
             if (freeSpace > DISK_FREE_WARN_LEVEL)

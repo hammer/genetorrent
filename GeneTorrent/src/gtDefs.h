@@ -49,7 +49,6 @@ const std::string PROGRESS_FILE_EXT = ".progress";
 
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
-// const std::string GT_OPENSSL_CONF = "GeneTorrent.openssl.conf";
 const std::string PYTHON_TRUE = "TRUE";
 
 const int NO_EXIT = 0;
@@ -76,8 +75,6 @@ const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
 const int RSA_KEY_SIZE = 1024;
 const int SSL_ERROR_EXIT_CODE = 237;
 const int CSR_ATTRIBUTE_ENTRY_COUNT = 7;
-
-// CSR Attributes are defined in gtBase.h
 
 // Command Line Option defines
 const char SPACE = ' ';

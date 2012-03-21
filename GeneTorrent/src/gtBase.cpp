@@ -188,7 +188,6 @@ void gtBase::initSSLattributes ()
 
    attributes[6].key = "emailAddress";
    attributes[6].value = "root@uploadersinc.com";
-
    // If you add entries here you must adjust  CSR_ATTRIBUTE_ENTRY_COUNT in gtDefs.h
 }
 

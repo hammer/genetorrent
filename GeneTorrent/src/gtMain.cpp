@@ -164,7 +164,7 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       if (cli.count (CONFIG_FILE_CLI_OPT) == 1)
       {
          std::string configPathAndFile = cli[CONFIG_FILE_CLI_OPT].as<std::string>();
-std::cerr << "configPathAndFile = " << configPathAndFile << std::endl;
+
          if (statFile (configPathAndFile) != 0)
          {
             commandLineError ("unable to open config file '" + configPathAndFile + "'.");
