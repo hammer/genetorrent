@@ -141,6 +141,11 @@ specifying a single -v, or detailed progress information by specifying
 -vv (e.g., two -v's).  With the long form, you specify a numeric level
 between 1 and 2; for instance, use --verbose=1 for summary progress
 information.
+.TP
+.BR \-t ", " \-\^\-timestamps
+Specifies that the on-screen progress messages (controlled by the -v
+flag, above) should include a timestamp.  This is primarily useful
+when these messages are being redirected to a file for later review.
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
@@ -156,6 +161,12 @@ the analysis UUID for the sumission.  If the -p option is present,
 .I path
 can point to the UUID directory, or to the directory that contains the
 UUID directory.  The current directory will be used by default.
+.TP
+.BI \-\^\-upload-gto-path " path"
+The absolute or relative path to a directory in which the GTO file and
+other temporary files can be created.  The GTO file is created as a
+part of the upload process by GeneTorrent.  By default, it will be
+stored in the UUID directory for the submission.
 .SS "Download Mode Command Line Arguments:"
 .TP
 .BI \-d " content-specifier" "\fR,\fP \-\^\-download" " content-specifier"
