@@ -56,7 +56,7 @@ std::string add_suffix (float val, char const* suffix)
       return ret;
    }
 
-   const char* prefix[] = { "kB", "MB", "GB", "TB" };
+   const char* prefix[] = { " kB", " MB", " GB", " TB" };
    const int num_prefix = sizeof(prefix) / sizeof(const char*);
    for (int i = 0; i < num_prefix; ++i)
    {
@@ -71,7 +71,7 @@ std::string add_suffix (float val, char const* suffix)
       }
    }
    ret = to_string (val, 4);
-   ret += "PB";
+   ret += " PB";
    if (suffix)
       ret += suffix;
    return ret;
@@ -85,7 +85,11 @@ std::string to_string (int v, int width)
    s.width (width);
    s.fill (' ');
    s << v;
-   return s.str ();
+   if (s.str().size())
+   {
+      return s.str()[s.str().size()-1] != '.' ? s.str() : ' ' + s.str().substr(0, s.str().size()-1);
+   }
+   return s.str();
 }
 
 std::string& to_string (float v, int width, int precision)
@@ -105,6 +109,13 @@ std::string& to_string (float v, int width, int precision)
    ret.resize (20);
    int size = snprintf (&ret[0], 20, "%*.*f", width, precision, v);
    ret.resize ((std::min) (size, width));
+   if (ret.size())
+   {
+      if (ret[ret.size()-1] == '.')
+      {
+         ret.erase(ret.size()-1, 1);
+      }
+   }
    return ret;
 }
 

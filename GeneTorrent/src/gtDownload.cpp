@@ -91,6 +91,7 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
    pcfacliMaxChildren (vm);
    _downloadSavePath = pcfacliPath(vm);
    pcfacliDownloadList (vm);
+   pcfacliRateLimit (vm);
 
    Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
@@ -650,7 +651,12 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
             
       torrentHandle.set_ssl_certificate (sslCert, sslKey, _dhParamsFile);
    }
-   
+  
+   if (_rateLimit > 0)
+   { 
+      torrentHandle.set_download_limit (_rateLimit/totalChildren);
+   }
+
    torrentHandle.resume();
 
    libtorrent::torrent_status::state_t currentState = torrentHandle.status().state;

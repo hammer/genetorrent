@@ -126,6 +126,9 @@ class gtBase
       int _exposedPortDelta;
       bool _addTimestamps;         // Controls the addition of timestamps to stderr/stdout screen messages.
 
+      long _rateLimit;            // limits data transfer rate of uploads and downloads (if set), this is expressed in libtorrent units of bytes per second
+                                  // The conversion from command line argument value to libtorrent value is performed in pcfacliRateLimit()
+
       libtorrent::fingerprint *_gtFingerPrint;
 
       bool _startUpComplete;
@@ -155,6 +158,7 @@ class gtBase
       std::string getInfoHash (std::string torrentFile);
 
       std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload
+      void pcfacliRateLimit (boost::program_options::variables_map &vm);
       void checkCredentials ();
 
       std::string sanitizePath (std::string inPath);

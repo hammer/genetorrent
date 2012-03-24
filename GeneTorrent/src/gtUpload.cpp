@@ -90,6 +90,7 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
    pcfacliUploadGTODir (vm);
+   pcfacliRateLimit (vm);
 
    checkCredentials ();
 
@@ -736,6 +737,11 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
       std::string sslKey = _tmpDir + uuid + ".key";
             
       torrentHandle.set_ssl_certificate (sslCert, sslKey, _dhParamsFile);
+   }
+
+   if (_rateLimit > 0)
+   {
+      torrentHandle.set_upload_limit (_rateLimit);
    }
 
    torrentHandle.resume();

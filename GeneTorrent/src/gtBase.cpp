@@ -93,10 +93,11 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _devMode (false),
    _tmpDir (""), 
    _logDestination ("none"),     // default to no logging
-   _portStart (20892), 
-   _portEnd (20900), 
-   _exposedPortDelta (0), 
-   _addTimestamps (false), 
+   _portStart (20892),
+   _portEnd (20900),
+   _exposedPortDelta (0),
+   _addTimestamps (false),
+   _rateLimit (-1),
    _startUpComplete (false),
    _bindIP (""), 
    _exposedIP (""), 
@@ -481,6 +482,24 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
    }
 
    startUpMessage << " --" << LOGGING_CLI_OPT << "=" << vm[LOGGING_CLI_OPT].as<std::string>();
+}
+
+// Used by download and upload
+void  gtBase::pcfacliRateLimit (boost::program_options::variables_map &vm)
+{
+   if (vm.count (RATE_LIMIT_CLI_OPT) < 1)
+   {
+      return;    
+   }
+
+   float inRate = vm[RATE_LIMIT_CLI_OPT].as<float>();      // As MB (megabytes) per second
+
+   _rateLimit = inRate * 1000 * 1000;      // convert to bytes per second, using SI units as that is what libtorrent displays
+
+   if (_rateLimit < 10000) // 10kB
+   {
+      commandLineError ("Configured rate limit is too low.  Please specify a value larger than 0.01 for '" + RATE_LIMIT_CLI_OPT + "'");
+   }
 }
 
 // Used by download and upload

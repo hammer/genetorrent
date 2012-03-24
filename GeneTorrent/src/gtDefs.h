@@ -134,6 +134,7 @@ const std::string VERBOSITY_CLI_OPT = "verbose";
 
 // download and upload mode options
 const std::string PATH_CLI_OPT = "path";                           // -p short option     
+const std::string RATE_LIMIT_CLI_OPT = "rate-limit";               // -r short option     
 
 // Upload Mode
 const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short option
