@@ -1351,6 +1351,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    }
 
    curl_easy_cleanup (curl);
+   curl_formfree (post);
 
    return successfulPerform;
 }

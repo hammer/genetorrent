@@ -143,4 +143,6 @@ void strTokenize::tokenizeMultiple (std::string buff, const char *separators)
       _tokenMap[tokenCount++] = token;
       token = strtok_r (NULL, separators, &emptyBuff);
    }
+
+   delete [] s;
 }

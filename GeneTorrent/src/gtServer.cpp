@@ -247,8 +247,9 @@ void gtServer::run ()
                                                    // that is maintained inside the list of activeSessions.
                                                    // This list is maintained here for simplicity and speed
 
-   while (1) // Get the collection of .gto files in the queue directory
+   while (statFile ("/tmp/GeneTorrent.stop"))    // statFile returns -1 on error
    {
+      // Get the collection of .gto files in the queue directory
       vectOfStr filesInQueue;
       getFilesInQueueDirectory (filesInQueue);
       vectOfStr::iterator vectIter = filesInQueue.begin ();
@@ -285,6 +286,30 @@ void gtServer::run ()
 
       processServerModeAlerts();
    }
+
+   servedGtosMaintenance (time(NULL), activeTorrentCollection, true);
+
+   // Note that remove_torrent does at least two things asynchronously: 1) it
+   // sets in motion the deletion of this torrent object, and 2) it sends the
+   // stopped event to the tracker and waits for a response.  So if we were to
+   // exit immediately, two bad things happen.  First, the stopped event is
+   // probably not sent.  Second, we end up doubly-deleting some objects
+   // inside of libtorrent (because the deletion is already in progress and
+   // then the call to exit() causes some cleanup as well), and we get nasty
+   // complaints about malloc corruption printed to the console by glibc.
+   //
+   // The "proper" approached from a libtorrent perspective is to wait to
+   // receive both the cache_flushed_alert and the tracker_reply_alert,
+   // indicating that all is well.  However in the case of tearing down a
+   // torrent, libtorrent appears to squelch the tracker_reply_alert so we
+   // never get it (even though the tracker does in fact respond to the
+   // stopped event sent to it by libtorrent).
+   //
+   // Therefore, ugly as it is, for the time being we will simply sleep here.
+   // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
+   // the two events mentioned above.
+
+   sleep(5);
 }
 
 void gtServer::processServerModeAlerts ()
@@ -304,7 +329,7 @@ void gtServer::processServerModeAlerts ()
    }
 }
 
-void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents)
+void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents, bool shutdownFlag)
 {
    std::list <activeSessionRec *>::iterator listIter = _activeSessions.begin ();
    while (listIter != _activeSessions.end ())
@@ -323,6 +348,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
 
             (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
             activeTorrents.erase (mapIter->first);
+            delete (mapIter->second);
             (*listIter)->mapOfSessionTorrents.erase (mapIter++);
 
             continue;
@@ -337,6 +363,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
                activeTorrents.erase (mapIter->first);
+               delete (mapIter->second);
                (*listIter)->mapOfSessionTorrents.erase (mapIter++);
 
                continue;
@@ -375,25 +402,30 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
                deleteGTOfromQueue (mapIter->first);
                activeTorrents.erase (mapIter->first);
+               delete (mapIter->second);
                (*listIter)->mapOfSessionTorrents.erase (mapIter++);
             }
 
             continue;
          }
 
-         if (timeNow >= mapIter->second->expires)       // This GTO is expired
+         if (timeNow >= mapIter->second->expires || shutdownFlag)       // This GTO is expired or shutting down
          {
             std::vector <libtorrent::peer_info> peers;
 
             mapIter->second->torrentHandle.get_peer_info (peers);
 
-            if (peers.size () == 0)
+            if (peers.size () == 0 || shutdownFlag)
             {
-               Log (PRIORITY_NORMAL, "Stop serving:  Expiring %s info hash:  %s", mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
+               Log (PRIORITY_NORMAL, "%s:  %s info hash:  %s", (shutdownFlag ? "Shutting Down (stop servering)" : "Expiring"), mapIter->first.c_str(), getInfoHash (mapIter->first).c_str());
 
                (*listIter)->torrentSession->remove_torrent (mapIter->second->torrentHandle);
-               deleteGTOfromQueue (mapIter->first);
+               if (!shutdownFlag)        // If shutting down, keep the GTO files in the queue
+               {
+                  deleteGTOfromQueue (mapIter->first);
+               }
                activeTorrents.erase (mapIter->first);
+               delete (mapIter->second);
                (*listIter)->mapOfSessionTorrents.erase (mapIter++);
             }
             else

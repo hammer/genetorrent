@@ -111,6 +111,14 @@ void gtBase::checkAlerts (libtorrent::session &torrSession)
          } break;
       }
    }
+int count = 0;
+   std::deque<libtorrent::alert *>::iterator queueIter = alerts.begin();
+   while (!alerts.empty())
+   {
+      libtorrent::alert *deleteMe = alerts.front();
+      alerts.pop_front();
+      delete (deleteMe);
+   }
    alerts.clear();
 }
 
