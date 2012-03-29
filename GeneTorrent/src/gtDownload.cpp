@@ -268,6 +268,12 @@ void gtDownload::prepareDownloadList ()
 
 void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 {
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutputNoNewLine ("Commuicating with GT Executive ...        ");
+   }
+
+   unsigned int counter = 0;
    vectOfStr::iterator vectIter = uris.begin ();
 
    while (vectIter != uris.end ())
@@ -371,6 +377,34 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
          generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
       }
       vectIter++;
+
+      if (_verbosityLevel == VERBOSE_2)   // only display when not dumping headers
+      {
+         counter++;
+         std::ostringstream mess;
+         mess << "\b\b\b\b\b\b\b" << std::setw (6) << std::setprecision (2) << std::fixed << 100.0 * (counter) / uris.size() << "%";
+
+         if (_logToStdErr) 
+         {
+            std::cout << mess.str();
+         }
+         else
+         {
+            std::cerr << mess.str();
+         }
+
+         if (counter == uris.size())
+         {
+            if (_logToStdErr) 
+            {
+               std::cout << std::endl;
+            }
+            else
+            {
+               std::cerr << std::endl;
+            }
+         }
+      }
    }
 }
 
