@@ -1393,6 +1393,8 @@ while (certBeginPos != std::string::npos)
    // add cert to cert_store
    X509_STORE_add_cert(cert_store, certificate);
 
+   X509_free(certificate);
+
    certBeginPos = cert.find (beginCert, certEndPos);
 }
 		// wrap the PEM certificate in a BIO, for openssl to read
