@@ -2351,7 +2351,7 @@ while (certBeginPos != std::string::npos)
  		if (m_ses.m_alerts.should_post<scrape_reply_alert>())
  		{
  			m_ses.m_alerts.post_alert(scrape_reply_alert(
- 				get_handle(), m_incomplete, m_complete, req.url));
+ 				get_handle(), m_incomplete, m_complete, m_uploaded, req.url));
  		}
  	}
  

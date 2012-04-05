@@ -312,10 +312,12 @@ namespace libtorrent
 		scrape_reply_alert(torrent_handle const& h
 			, int incomplete_
 			, int complete_
+			, int state_
 			, std::string const& url_)
 			: tracker_alert(h, url_)
 			, incomplete(incomplete_)
 			, complete(complete_)
+			, state(state_)
 		{ TORRENT_ASSERT(!url.empty()); }
 
 		TORRENT_DEFINE_ALERT(scrape_reply_alert);
@@ -324,6 +326,7 @@ namespace libtorrent
 
 		int incomplete;
 		int complete;
+		int state;
 	};
 
 	struct TORRENT_EXPORT scrape_failed_alert: tracker_alert

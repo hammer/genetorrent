@@ -154,8 +154,8 @@ namespace libtorrent {
 	std::string scrape_reply_alert::message() const
 	{
 		char ret[400];
-		snprintf(ret, sizeof(ret), "%s scrape reply: %u %u"
-			, tracker_alert::message().c_str(), incomplete, complete);
+		snprintf(ret, sizeof(ret), "%s scrape reply: %u %u state:%u"
+			, tracker_alert::message().c_str(), incomplete, complete, state);
 		return ret;
 	}
 
