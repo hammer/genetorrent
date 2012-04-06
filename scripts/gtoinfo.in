@@ -373,13 +373,31 @@ def encode_dict(data):
 # - backup: if True and the file already exists, a backup copy will be written
 #
 def emit_gto(gtodict, filename, backup):
-    # copy the filename, if it exists, to a backup location
-    if (backup and os.path.exists(filename)):
-        shutil.copy(filename, filename+"~")
     encoded_text = encode_dict(gtodict)
-    f = open(filename, "wb")
+
+    # in order to make the writing of the file atomic, we write into a
+    # tmp file and then move it to the real deal.
+    procid = os.getpid()
+    hostname = os.uname()[2]
+    tmp_file = "%s.%s.%s.tmp" % (filename, hostname, procid)
+
+    f = open(tmp_file, "wb")
     f.write(encoded_text)
     f.close()
+
+    stat = os.stat(filename)
+    os.chmod(tmp_file, stat.st_mode)
+    try:
+        os.chown(tmp_file, -1, stat.st_gid)  # maybe we can preserve the original group?
+    except Exception:
+        sys.exc_clear()
+
+    # move the filename to a backup location
+    if (backup):
+        shutil.move(filename, filename+"~")
+
+    # move the tmp file into place
+    shutil.move(tmp_file, filename)
 
 
 # compute_size()
@@ -692,23 +710,6 @@ if (params.decode_file is False and params.total_size is False and params.inspec
     and params.get_expire is False and params.infohash is False and params.list_files is False
     and params.ssl_cert == "" and params.set_key == None):
     params.decode_file = True
-
-
-# Debug prints
-# print 'num files       =', len(gto_filenames)
-# for gto_filename in gto_filenames:
-#  	print ' file           =', gto_filename
-# print 'decode_file     =', params.decode_file   
-# print 'total_size      =', params.total_size
-# print 'inspect_key     =', params.inspect_key
-# print 'piece_index     =', params.piece_index
-# print 'raw_time        =', params.raw_time
-# print 'get_expire      =', params.get_expire
-# print 'infohash        =', params.infohash
-# print 'list_files      =', params.list_files
-# print 'no_backup       =', params.no_backup
-# print 'announce_url    =', params.announce_url
-# print 'expiry          =', params.expiry
 
 try:
     process(params, gto_filenames)
