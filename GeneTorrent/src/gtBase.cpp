@@ -844,27 +844,6 @@ void gtBase::bindSession (libtorrent::session *torrentSession)
       settings.announce_ip = _exposedIP;
    }
 
-   // when a connection fails, retry it more quickly than the libtorrent default.  Note that this is multiplied by the attempt
-   // number, so the delay before the 2nd attempt is (min_reconnect_time * 2) and before the 3rd attempt is *3, and so on...
-   settings.min_reconnect_time = 3;
-
-   // This is the minimum interval that we will restatus the tracker.
-   // The tracker itself tells us (via the interval parameter) when we
-   // should restatus it.  However, if the value sent by the tracker
-   // is less than the value below, then libtorrent follows the value
-   // below.  So, setting this value low allows us to respond quickly
-   // in the case where the tracker sends back a very low interval
-   settings.min_announce_interval = 2;
-
-    // prevent keepalives from being sent.  this will cause servers to
-    // time out peers more rapidly.  
-    //
-    // TODO: probably a good idea to set this in ALL modes, but for now
-    // we don't want to risk introducing a new bug to server mode
-   if (_operatingMode != SERVER_MODE)
-   { 
-      settings.inhibit_keepalives = true;
-   }
    torrentSession->set_settings (settings);
 }
 
@@ -891,7 +870,42 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
    settings.apply_ip_filter_to_trackers= false;
 
    settings.no_atime_storage = false;
-   settings.max_queued_disk_bytes = 1024 * 1024 * 1024;
+   settings.max_queued_disk_bytes = 256 * 1024 * 1024;
+
+   // when a connection fails, retry it more quickly than the libtorrent default.  Note that this is multiplied by the attempt
+   // number, so the delay before the 2nd attempt is (min_reconnect_time * 2) and before the 3rd attempt is *3, and so on...
+   settings.min_reconnect_time = 3;
+
+   // This is the minimum interval that we will restatus the tracker.
+   // The tracker itself tells us (via the interval parameter) when we
+   // should restatus it.  However, if the value sent by the tracker
+   // is less than the value below, then libtorrent follows the value
+   // below.  So, setting this value low allows us to respond quickly
+   // in the case where the tracker sends back a very low interval
+   settings.min_announce_interval = 2;
+
+   // prevent keepalives from being sent.  this will cause servers to
+   // time out peers more rapidly.  
+   //
+   // TODO: probably a good idea to set this in ALL modes, but for now
+   // we don't want to risk introducing a new bug to server mode
+   if (_operatingMode != SERVER_MODE)
+   { 
+      settings.inhibit_keepalives = true;
+   }
+
+   if (_operatingMode == SERVER_MODE)
+   {
+      settings.alert_queue_size = 10000;
+
+      settings.send_buffer_watermark = 256 * 1024 * 1024;
+
+      // put 1.5 seconds worth of data in the send buffer this gives the disk I/O more heads-up on disk reads, and can maximize throughput
+      settings.send_buffer_watermark_factor = 150;
+
+      // don't retry peers if they fail once. Let them connect to us if they want to
+      settings.max_failcount = 1;
+   }
 
    torrentSession->set_settings (settings);
 
