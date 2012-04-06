@@ -594,11 +594,11 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
          {
             if (freeSpace > DISK_FREE_WARN_LEVEL)
             {
-               gtError ("The system *might* run out of disk space before all downloads are complete", NO_EXIT, gtBase::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
+               gtError ("The system *might* run out of disk space before all downloads are complete", ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
             }
             else
             {
-                   gtError ("The system is running low on disk space.  Closing download client", 97, gtBase::DEFAULT_ERROR, 0);
+               gtError ("The system is running low on disk space.  Shutting down download client.", 97, gtBase::DEFAULT_ERROR, 0);
             }
          }
 
@@ -696,15 +696,6 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    libtorrent::torrent_status::state_t currentState = torrentHandle.status().state;
    while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished)
    {
-      if (getppid() == 1)   // Parent has died, follow course
-      {
-         if (childID == 1)   // Only alert that download children are dying in 1 child
-         {
-            gtError ("download parent process has died, all download children are exiting", 197, gtBase::DEFAULT_ERROR);
-         }
-         exit (197);
-      }
-
       libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);  // 5 seconds
 
       while (currentState != libtorrent::torrent_status::seeding && currentState != libtorrent::torrent_status::finished && libtorrent::time_now_hires() < endMonitoring)
@@ -712,9 +703,14 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
          checkAlerts (torrentSession);
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
          currentState = torrentHandle.status().state;
+
+         if (getppid() == 1)   // Parent has died, follow course
+         {
+            gtError ("download parent process has exited, gracefully exiting child process.", NO_EXIT);
+         }
       }
 
-      if (currentState == libtorrent::torrent_status::seeding)
+      if (currentState == libtorrent::torrent_status::seeding || getppid() == 1)
       {
          break;
       }
@@ -741,25 +737,25 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    checkAlerts (torrentSession);
    torrentSession.remove_torrent (torrentHandle);
 
-    // Note that remove_torrent does at least two things asynchronously: 1) it
-    // sets in motion the deletion of this torrent object, and 2) it sends the
-    // stopped event to the tracker and waits for a response.  So if we were to
-    // exit immediately, two bad things happen.  First, the stopped event is
-    // probably not sent.  Second, we end up doubly-deleting some objects
-    // inside of libtorrent (because the deletion is already in progress and
-    // then the call to exit() causes some cleanup as well), and we get nasty
-    // complaints about malloc corruption printed to the console by glibc.
-    //
-    // The "proper" approached from a libtorrent perspective is to wait to
-    // receive both the cache_flushed_alert and the tracker_reply_alert,
-    // indicating that all is well.  However in the case of tearing down a
-    // torrent, libtorrent appears to squelch the tracker_reply_alert so we
-    // never get it (even though the tracker does in fact respond to the
-    // stopped event sent to it by libtorrent).
-    //
-    // Therefore, ugly as it is, for the time being we will simply sleep here.
-    // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
-    // the two events mentioned above.
+   // Note that remove_torrent does at least two things asynchronously: 1) it
+   // sets in motion the deletion of this torrent object, and 2) it sends the
+   // stopped event to the tracker and waits for a response.  So if we were to
+   // exit immediately, two bad things happen.  First, the stopped event is
+   // probably not sent.  Second, we end up doubly-deleting some objects
+   // inside of libtorrent (because the deletion is already in progress and
+   // then the call to exit() causes some cleanup as well), and we get nasty
+   // complaints about malloc corruption printed to the console by glibc.
+   //
+   // The "proper" approached from a libtorrent perspective is to wait to
+   // receive both the cache_flushed_alert and the tracker_reply_alert,
+   // indicating that all is well.  However in the case of tearing down a
+   // torrent, libtorrent appears to squelch the tracker_reply_alert so we
+   // never get it (even though the tracker does in fact respond to the
+   // stopped event sent to it by libtorrent).
+   //
+   // Therefore, ugly as it is, for the time being we will simply sleep here.
+   // TODO: fix libtorrent so we ca do the proper thing of waiting to receive
+   // the two events mentioned above.
 
    sleep(5);
    checkAlerts (torrentSession);
