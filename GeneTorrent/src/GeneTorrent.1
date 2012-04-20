@@ -161,6 +161,9 @@ the analysis UUID for the sumission.  If the -p option is present,
 can point to the UUID directory, or to the directory that contains the
 UUID directory.  The current directory will be used by default.
 .TP
+.BI \-r " max-rate" "\fR,\fP \-\^\-rate-limit" " max-rate"
+The maximum data rate to upload, specified in MB/sec (megabytes per second).
+.TP
 .BI \-\^\-upload-gto-path " path"
 The absolute or relative path to a directory in which the GTO file and
 other temporary files can be created.  The GTO file is created as a
@@ -205,6 +208,9 @@ perform the download.  By default up to 8 children are used, but this
 number may be adjusted.  For maximum performance, the recommended
 number of children is between C/2 and C, if C is the number of cores
 on your machine.
+.TP
+.BI \-r " max-rate" "\fR,\fP \-\^\-rate-limit" " max-rate"
+The maximum data rate to download, specified in MB/sec (megabytes per second).
 .SS "Server Mode Command Line Arguments:"
 .TP
 .BI \-s " path" "\fR,\fP \-\^\-server" " path"
