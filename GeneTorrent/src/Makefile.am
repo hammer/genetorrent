@@ -5,10 +5,7 @@
 # Redistribution and use in source and binary forms, with or without modification, 
 # are permitted provided that the following conditions are met:
 # 
-#    1. Redistributions of source code must retain the above copyright notice, 
-#       this list of conditions and the following disclaimer.
-# 
-#    2. Redistributions in binary form must reproduce the above copyright notice, 
+#    1. Redistributions of source code must retain the above copyright notice, #       this list of conditions and the following disclaimer.  # #    2. Redistributions in binary form must reproduce the above copyright notice, 
 #       this list of conditions and the following disclaimer in the documentation 
 #       and/or other materials provided with the distribution.
 # 
@@ -52,11 +49,10 @@ GTdata_DATA = dhparam.pem
 
 GeneTorrent_CPPFLAGS = $(torrentrasterbar_CFLAGS)
 
-GeneTorrent_LDADD = -L/usr/lib64 \
-                    -ltorrent-rasterbar \
-                    -lboost_system-mt \
-                    -lboost_filesystem-mt \
-                    -lboost_program_options-mt \
+GeneTorrent_LDADD = -ltorrent-rasterbar \
+                    -lboost_system \
+                    -lboost_filesystem \
+                    -lboost_program_options \
                     -lboost_regex
 
 man_MANS = GeneTorrent.1

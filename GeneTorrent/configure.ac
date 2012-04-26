@@ -51,16 +51,19 @@ AC_LANG_CPLUSPLUS
 # FIXME: Replace `main' with a function in `-lboost_system':
 # static linking AC_CHECK_LIB([boost_filesystem], [main])
 # FIXME: Replace `main' with a function in `-lcurl':
+
+AC_CHECK_LIB([ssl3], [main])
+AC_CHECK_LIB([dl], [main])
+AC_CHECK_LIB([crypto], [main])
+AC_CHECK_LIB([ssl], [main])
+AC_CHECK_LIB([xerces-c], [main])
 AC_CHECK_LIB([curl], [main])
-# FIXME: Replace `main' with a function in `-lpthread':
 AC_CHECK_LIB([pthread], [main])
-# FIXME: Replace `main' with a function in `-lxqilla':
 AC_CHECK_LIB([xqilla], [main])
 
 AC_CHECK_LIB([c], [main])
 AC_CHECK_LIB([rt], [main])
-AC_CHECK_LIB([ssl], [main])
-AC_CHECK_LIB([ssl3], [main])
+
 AC_CHECK_LIB([ssh2], [main])
 AC_CHECK_LIB([ldap], [main])
 AC_CHECK_LIB([idn], [main])

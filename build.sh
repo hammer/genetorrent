@@ -1,6 +1,7 @@
 #!/bin/bash
 
 buildThreads="4"
+cVersion="`lsb_release -rs|cut -f1 -d\.`"
 
 function usage
 {
@@ -43,12 +44,15 @@ function build_libtorrent
 {
    saveDir=${PWD}
    cd libtorrent
-   [[ -e ../.fullbuild ]] && { ./autotool.sh || bailout $FUNCNAME 
-                             }
-   ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --enable-static --disable-shared --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME
+   [[ -e ../.fullbuild ]] && ( ./autotool.sh || bailout $FUNCNAME )
+
+   [[ ${cVersion} -eq 5 ]] && ( ./configure ${*} --disable-geoip --disable-dht --prefix=/home/donavan/deps --enable-static --disable-shared --with-openssl=/home/donavan/deps --with-boost=/home/donavan/deps CFLAGS="-g -O2" CXXFLAGS="-g -O2" LIBS="-L/home/donavan/deps/lib -ldl" || bailout $FUNCNAME )
+   [[ ${cVersion} -eq 6 ]] && ( ./configure ${*} --disable-geoip --disable-dht --prefix=/usr --enable-static --disable-shared --with-boost-libdir=/usr/lib64 --libdir=/usr/lib64 CFLAGS="-g -O2" CXXFLAGS="-g -O2" || bailout $FUNCNAME )
    make clean || bailout $FUNCNAME
    make -j ${buildThreads} || bailout $FUNCNAME
-   sudo make install || bailout $FUNCNAME
+
+   [[ ${cVersion} -eq 5 ]] && ( make install || bailout $FUNCNAME )
+   [[ ${cVersion} -eq 6 ]] && ( sudo make install || bailout $FUNCNAME )
    cd ${saveDir}
 }
 
@@ -56,11 +60,11 @@ function build_GeneTorrent
 {
    saveDir=${PWD}
    cd GeneTorrent
-   [[ -e ../.fullbuild ]] && { ./autogen.sh || bailout $FUNCNAME 
-                             }
-   ./configure --prefix=/usr CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME
+   [[ -e ../.fullbuild ]] && ( ./autogen.sh || bailout $FUNCNAME )
+   [[ ${cVersion} -eq 5 ]] && ( PKG_CONFIG_PATH="/home/donavan/deps/lib/pkgconfig" ./configure --prefix=/usr LDFLAGS="-L/home/donavan/deps/lib -L/usr/lib64" CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME )
+   [[ ${cVersion} -eq 6 ]] && ( ./configure --prefix=/usr CFLAGS="-g -O2 -Wall" CXXFLAGS="-g -O2 -Wall" || bailout $FUNCNAME )
    make clean || bailout $FUNCNAME
-   make -j ${buildThreads} || bailout $FUNCNAME
+   make -j ${buildThreads} LDFLAGS="-L/home/donavan/deps/lib -L/usr/lib64" || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
@@ -69,8 +73,7 @@ function build_scripts
 {
    saveDir=${PWD}
    cd scripts
-   [[ -e ../.fullbuild ]] && { ./autogen.sh || bailout $FUNCNAME 
-                             }
+   [[ -e ../.fullbuild ]] && ( ./autogen.sh || bailout $FUNCNAME )
    ./configure --prefix=/usr || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
@@ -119,10 +122,6 @@ function collectRPMS
    cd ~/rpmbuild/RPMS/x86_64
    cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
    cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/.
-
-   cd - > /dev/null
-
-   ## cp ${startDir}/release.notes.txt ~/GeneTorrent-${geneTorrentVer}/.
 
    cd
 
@@ -231,11 +230,17 @@ function build_source
 
 bDir=${PWD}
 
-if [[ `hostname -s` = "radon" || `hostname -s` = "xenon" ]]
-then
-   buildThreads="16"
-fi
+hostName=`hostname -s`
 
+case $hostName in
+   radon|xenon|c5builder*|c5dev*)
+      buildThreads="16"
+      ;;
+   *|c6builder)
+      buildThreads="3"
+      ;;
+esac
+      
 case $1 in 
    local)
       [[ ! -e libtorrent/configure ]] && touch .fullbuild
