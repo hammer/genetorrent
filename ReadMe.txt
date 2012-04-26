@@ -45,5 +45,9 @@ xerces-c 3.0.1
 xqilla 2.2.3
 libcurl 7.19.7
 
+On centos 5.x
+
+openssl 1.0.1a
+
 If using the source release of GeneTorrent, Boost 1.48 must be built without 
 icu support and static libraries must be provided.
