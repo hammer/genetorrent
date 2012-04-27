@@ -1,5 +1,5 @@
 Name:           GeneTorrent
-Version:        0.9.9.0
+Version:        3.1.0
 Release:        1%{?dist}.CP
 Summary:        GeneTorrent
 
@@ -17,6 +17,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # This prevents binaries from being stripped of their debug bits by rpmbuild
 %define __spec_install_post /usr/lib/rpm/brp-compress
+
+%define debug_package %{nil}
 
 %description
 GeneTorrent

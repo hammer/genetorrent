@@ -81,6 +81,8 @@ function build_scripts
 
 function configureRPMBuild
 {
+   echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros   
+   echo "%dist .Centos${cVersion}" >> ~/.rpmmacros
    cd rpmbuild/SPECS
 
    sed -i "s/Version:.*/Version:        ${geneTorrentVer}/" GeneTorrent.spec
@@ -91,7 +93,7 @@ function configureRPMBuild
    # dummy source hack
    if [[ -e GeneTorrent-${geneTorrentVer} || -e GeneTorrent-${geneTorrentVer}.tgz ]]
    then
-      rm -f GeneTorrent-${geneTorrentVer} GeneTorrent-${geneTorrentVer}.tgz
+      rm -rf GeneTorrent-${geneTorrentVer} GeneTorrent-${geneTorrentVer}.tgz
    fi
    cp -ar GeneTorrent-template GeneTorrent-${geneTorrentVer}
    tar czf GeneTorrent-${geneTorrentVer}.tgz GeneTorrent-${geneTorrentVer}
@@ -108,7 +110,8 @@ function buildRPMS
 
    cp -ar rpmbuild ~/.
    cd ~/rpmbuild/SPECS
-
+   mkdir ../BUILD
+   mkdir ../RPMS
    rpmbuild -bb GeneTorrent.spec
 
    cd - > /dev/null
@@ -120,8 +123,8 @@ function collectRPMS
    mkdir ~/GeneTorrent-${geneTorrentVer}
 
    cd ~/rpmbuild/RPMS/x86_64
-   cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
-   cp GeneTorrent-${geneTorrentVer}-1.el6.CP.x86_64.rpm ~/.
+   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
+   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
 
    cd
 
@@ -221,7 +224,7 @@ function build_source
    cd ${bDir}
    maker distclean
    cd ..
-   tar czvf GeneTorrent-${geneTorrentVer}.src.tgz --exclude-vcs --exclude="\.*" --exclude="rpmbuild" $1
+   tar czvf GeneTorrent-${geneTorrentVer}.src.tgz --exclude="\.*" --exclude="rpmbuild" $1
    cp GeneTorrent-${geneTorrentVer}.src.tgz ~/.
    cd - >/dev/null
 }
@@ -297,14 +300,16 @@ case $1 in
       ;;
 
    release)   # hidden option
-      touch .fullbuild
-      build_standard
-      rm -f .fullbuild
+#      touch .fullbuild
+#      build_standard
+#      rm -f .fullbuild
       build_rpm
-      build_source ${bDir##*/}
+#      build_source ${bDir##*/}
       ;;
 
    *)
       usage
       ;;
 esac
+
+
