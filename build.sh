@@ -300,11 +300,11 @@ case $1 in
       ;;
 
    release)   # hidden option
-#      touch .fullbuild
-#      build_standard
-#      rm -f .fullbuild
+      touch .fullbuild
+      build_standard
+      rm -f .fullbuild
       build_rpm
-#      build_source ${bDir##*/}
+      build_source ${bDir##*/}
       ;;
 
    *)
