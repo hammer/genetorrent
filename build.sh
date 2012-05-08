@@ -236,10 +236,10 @@ bDir=${PWD}
 hostName=`hostname -s`
 
 case $hostName in
-   radon|xenon|c5builder*|c5dev*)
+   radon|xenon|c5build*|c5dev*|c6build*)
       buildThreads="16"
       ;;
-   *|c6builder)
+   *)
       buildThreads="3"
       ;;
 esac
