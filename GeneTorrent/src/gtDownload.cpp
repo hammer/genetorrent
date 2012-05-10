@@ -270,7 +270,7 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
 {
    if (_verbosityLevel > VERBOSE_1)
    {
-      screenOutputNoNewLine ("Commuicating with GT Executive ...        ");
+      screenOutputNoNewLine ("Communicating with GT Executive ...        ");
    }
 
    unsigned int counter = 0;
