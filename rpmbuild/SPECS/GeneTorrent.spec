@@ -1,5 +1,5 @@
 Name:           GeneTorrent
-Version:        3.1.0
+Version:        3.1.1
 Release:        1%{?dist}.CP
 Summary:        GeneTorrent
 
@@ -23,6 +23,27 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
 GeneTorrent
 
+%package Agent
+Obsoletes: GeneTorrent
+Conflicts: GeneTorrent-Server GeneTorrent-Client
+Summary: GeneTorrent Agent process (and related files).
+%description Agent
+GeneTorrent Agent.  This process runs in the background as a daemon querying <cghub> to see if any download requests have been received.
+
+%package Server
+Obsoletes: GeneTorrent
+Conflicts: GeneTorrent-Agent GeneTorrent-Client
+Summary: GeneTorrent Server process (and related files).
+%description Server
+GeneTorrent Server.  This package contains GeneTorrent Server components.
+
+%package Client
+Obsoletes: GeneTorrent
+Conflicts: GeneTorrent-Agent GeneTorrent-Server
+Summary: GeneTorrent Client process (and related files).
+%description Client
+GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
+
 %prep
 %setup -q
 
@@ -40,13 +61,26 @@ make install DESTDIR=%{buildroot}
 %clean
 rm -rf %{buildroot}
 
-%files
+%files Agent
 %defattr(-,root,root,-)
+%{_bindir}/%{name}
+%{_mandir}/man1/%{name}*
+
+%files Client
+%defattr(-,root,root,-)
+%{_bindir}/%{name}
+%{_mandir}/man1/%{name}*
+
+%files Server
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
+
+%files
+%defattr(-,root,root,-)
+%{nil}
 
 %changelog
 * Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1

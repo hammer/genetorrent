@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 buildThreads="4"
 cVersion="`lsb_release -rs|cut -f1 -d\.`"
@@ -123,11 +123,14 @@ function collectRPMS
    mkdir ~/GeneTorrent-${geneTorrentVer}
 
    cd ~/rpmbuild/RPMS/x86_64
-   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
-   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
+
+   for c in Agent Server Client
+   do
+      cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
+      cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
+   done
 
    cd
-
    echo "All done!  GeneTorrent-${geneTorrentVer} is available in ~ for testing and delivery to the client."
 }
 
@@ -300,16 +303,14 @@ case $1 in
       ;;
 
    release)   # hidden option
-      touch .fullbuild
-      build_standard
-      rm -f .fullbuild
+#      touch .fullbuild
+#      build_standard
+#      rm -f .fullbuild
       build_rpm
-      build_source ${bDir##*/}
+#      build_source ${bDir##*/}
       ;;
 
    *)
       usage
       ;;
 esac
-
-
