@@ -784,7 +784,7 @@ def main():
                           usage="usage: %prog [options]")
 
     parser.add_option('-c', '--config-file', action='store', 
-                      default="/etc/GTLoadBalancer.conf", dest='config_file',
+                      default="/etc/gnos.d/GTLoadBalancer.conf", dest='config_file',
                       help='the location of the configuration file; default is %default')
 
     (params, other_args) = parser.parse_args()
