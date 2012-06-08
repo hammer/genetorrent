@@ -3228,7 +3228,7 @@ while (certBeginPos != std::string::npos)
 					(*m_ses.m_logger) << time_now_string() << " *** BANNING PEER [ " << p->ip()
 						<< " ] 'too many corrupt pieces'\n";
 #endif
-#if defined TORRENT_VERBOSE_LOGGING || defined TORRENT_ERROR_LOGGING || defined TORRENT_MINIMAL_LOGGING
+#if defined TORRENT_VERBOSE_LOGGING || defined TORRENT_ERROR_LOGGING
 					(*p->connection->m_logger) << "*** BANNING PEER [ " << p->ip()
 						<< " ] 'too many corrupt pieces'\n";
 #endif
