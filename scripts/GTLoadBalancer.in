@@ -421,7 +421,12 @@ def process_input_q(config, q_type):
     factor = config["%s_factor" % q_type]
     if (q_dir == "DISABLED"):
         return False
-    gtos = os.listdir(q_dir)
+    try:
+        gtos = os.listdir(q_dir)
+    except OSError as e:
+        log(syslog.LOG_ALERT, "Error: Could not read queue dir: %s " % e)
+        return False
+
     assigned = False
     for gto in gtos:
         log(syslog.LOG_NOTICE, "New GTO %s added to %s queue." % (gto, q_type))
@@ -476,8 +481,15 @@ def mainloop(config):
         if assigned:
             dump_worklist(config)
 
+        sleep(1)
+
         # poll to see if we should re-read our config file
-        mtime = os.path.getmtime(config['config_file'])
+        try:
+            mtime = os.path.getmtime(config['config_file'])
+        except OSError as e:
+            log(syslog.LOG_ALERT, "Error reading config file: %s" % e)
+            continue
+
         if (mtime > config['config_file_mtime']):
             try:
                 newconfig = parse_config_file(config['config_file'])
@@ -491,7 +503,6 @@ def mainloop(config):
                 # error every time thru the loop
                 config['config_file_mtime'] = os.path.getmtime(config['config_file'])
 
-        sleep(1)
 
 
 # subs_qr()
