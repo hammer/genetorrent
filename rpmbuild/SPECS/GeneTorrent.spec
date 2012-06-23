@@ -23,23 +23,16 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
 GeneTorrent
 
-%package Agent
-Obsoletes: GeneTorrent
-Conflicts: GeneTorrent-Server GeneTorrent-Client
-Summary: GeneTorrent Agent process (and related files).
-%description Agent
-GeneTorrent Agent.  This process runs in the background as a daemon querying <cghub> to see if any download requests have been received.
-
 %package Server
 Obsoletes: GeneTorrent
-Conflicts: GeneTorrent-Agent GeneTorrent-Client
+Conflicts: GeneTorrent-Client
 Summary: GeneTorrent Server process (and related files).
 %description Server
 GeneTorrent Server.  This package contains GeneTorrent Server components.
 
 %package Client
 Obsoletes: GeneTorrent
-Conflicts: GeneTorrent-Agent GeneTorrent-Server
+Conflicts: GeneTorrent-Server
 Summary: GeneTorrent Client process (and related files).
 %description Client
 GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
@@ -61,15 +54,12 @@ make install DESTDIR=%{buildroot}
 %clean
 rm -rf %{buildroot}
 
-%files Agent
-%defattr(-,root,root,-)
-%{_bindir}/%{name}
-%{_mandir}/man1/%{name}*
-
 %files Client
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
+%{_bindir}/gtoinfo
 %{_mandir}/man1/%{name}*
+%{_datadir}/GeneTorrent/*
 
 %files Server
 %{_bindir}/%{name}
