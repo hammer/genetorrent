@@ -136,6 +136,8 @@ const std::string VERBOSITY_CLI_OPT = "verbose";
 const std::string PATH_CLI_OPT = "path";                           // -p short option     
 const std::string RATE_LIMIT_CLI_OPT = "rate-limit";               // -r short option     
 
+const std::string GTA_CLIENT_CLI_OPT = "gta";                      // no short option
+
 // Upload Mode
 const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short option
 const std::string UPLOAD_FILE_CLI_OPT_LEGACY = "manifestFile";
@@ -175,7 +177,15 @@ void commandLineError (std::string errMessage);
    }                                                       \
    else                                                    \
    {                                                       \
-      std::cerr << timeStamp << x << std::endl;            \
+      if (global_gtAgentMode)                              \
+      {                                                    \
+         std::cout << timeStamp << x << std::endl;         \
+         std::cout.flush();                                \
+      }                                                    \
+      else                                                 \
+      {                                                    \
+         std::cerr << timeStamp << x << std::endl;         \
+      }                                                    \
    }                                                       \
 }
 

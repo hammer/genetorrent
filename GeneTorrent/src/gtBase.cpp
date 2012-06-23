@@ -105,6 +105,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _confDir (CONF_DIR_DEFAULT), 
    _logMask (0),                 // set all bits to 0
    _successfulTrackerComms (false)
+   //_gtAgentMode (false)
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
@@ -226,6 +227,20 @@ void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
    }
 
    startUpMessage << " --" << BIND_IP_CLI_OPT << "=" << _bindIP;
+}
+
+void gtBase::pcfacliGTAgentMode (boost::program_options::variables_map &vm)
+{
+   if (vm.count (GTA_CLIENT_CLI_OPT) == 1)
+   { 
+      global_gtAgentMode = true;
+   }
+   else   // Option not present
+   {
+      return;    
+   }
+
+   startUpMessage << " --" << GTA_CLIENT_CLI_OPT;
 }
 
 void gtBase::pcfacliTimestamps (boost::program_options::variables_map &vm)
@@ -1525,3 +1540,4 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
    }
    return true;    // success curl transaction
 }
+

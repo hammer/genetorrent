@@ -49,6 +49,7 @@
 #include "gtDownload.h"
 
 int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
+bool global_gtAgentMode;
 std::string global_startup_message = "";
 
 std::string makeOpt (std::string baseName, const char secondName = SPACE)
@@ -73,6 +74,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (LOGGING_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to log file, follow by the log level")  
       (makeOpt (PATH_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "file system path used for uploads and downloads")
       (makeOpt (RATE_LIMIT_CLI_OPT).c_str(), boost::program_options::value< float >(), "transfer rate limiter in MB/s (megabytes/second)")
+      (makeOpt (GTA_CLIENT_CLI_OPT).c_str(), "Operating as a child of GTA, this option is hidden")
       (makeOpt (TIMESTAMP_STD_CLI_OPT).c_str(), "add timestamps to messages logged to the screen")
       (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< int >(), "on screen verbosity level")
 
@@ -105,7 +107,15 @@ void commandLineError (std::string errMessage)
 {
    if (errMessage.size())
    {
-      std::cerr << "error:  " << errMessage << std::endl;
+      if (global_gtAgentMode)
+      {
+         std::cout << "error:  " << errMessage << std::endl;
+         std::cout.flush();
+      }
+      else
+      {
+         std::cerr << "error:  " << errMessage << std::endl;
+      }
    }
    exit (COMMAND_LINE_OR_CONFIG_FILE_ERROR);
 }
@@ -147,6 +157,7 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          std::cout << "   GeneTorrent -s path -q work-queue -c cred --security-api signing-URI" << std::endl;
          std::cout << std::endl;
          std::cout << "Additional options are available.  Type 'man GeneTorrent' for more information." << std::endl;
+sleep (20);
          exit (0);
       }
 
@@ -181,6 +192,11 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
 
          global_startup_message = " --" + CONFIG_FILE_CLI_OPT + "=" + cli[CONFIG_FILE_CLI_OPT].as<std::string>();
+      }
+
+      if (cli.count (GTA_CLIENT_CLI_OPT) == 1)
+      { 
+         global_gtAgentMode = true;
       }
 
       if (cli.count (SERVER_CLI_OPT) == 0 && cli.count (DOWNLOAD_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
@@ -238,6 +254,20 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
             }
          }
       }
+
+      if (cli.count (GTA_CLIENT_CLI_OPT) > 0)
+      {
+         if (global_verbosity > 0)
+         {
+            commandLineError ("--" + GTA_CLIENT_CLI_OPT + " may not be combined with either -" + shortVerboseFlag.str() + " or --" + VERBOSITY_CLI_OPT + ".");
+         }
+
+         if (cli.count (DOWNLOAD_CLI_OPT) == 0)
+         {
+            commandLineError ("--" + GTA_CLIENT_CLI_OPT + " can only be used with the --" + DOWNLOAD_CLI_OPT + " command line option.");
+         }
+      }
+
 
       clOptions = cli; 
    } 

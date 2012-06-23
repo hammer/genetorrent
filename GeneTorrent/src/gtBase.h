@@ -60,12 +60,13 @@
 #include "gtUtils.h"
 #include "accumulator.hpp"
 
+extern bool global_gtAgentMode;
+
 typedef struct attributeEntry_
 {
     std::string key;
     std::string value;
 }attributeEntry;
-
 
 class gtBase
 {
@@ -210,5 +211,6 @@ class gtBase
       void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
       void pcfacliLog (boost::program_options::variables_map &vm);
       void pcfacliTimestamps (boost::program_options::variables_map &vm);
+      void pcfacliGTAgentMode (boost::program_options::variables_map &vm);
 };
 #endif /* GT_BASE_H_ */

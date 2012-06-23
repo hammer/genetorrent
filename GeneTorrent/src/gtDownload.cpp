@@ -378,6 +378,18 @@ void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
       }
       vectIter++;
 
+      if (global_gtAgentMode)
+      {
+         std::vector<libtorrent::announce_entry> const trackers = torrentInfo.trackers();
+         
+         std::vector<libtorrent::announce_entry>::const_iterator trackerIter = trackers.begin();
+         while (trackerIter != trackers.end())
+         {
+            std::cout << (*trackerIter).url << std::endl;
+            trackerIter++;
+         }
+      }
+
       if (_verbosityLevel == VERBOSE_2)   // only display when not dumping headers
       {
          counter++;
