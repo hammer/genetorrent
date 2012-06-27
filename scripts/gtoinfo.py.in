@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-#
-# gtoinfo.py -- a somewhat less-simple GeneTorrent Secret Decoder Ring,
-# based on "A Simple BitTorrent 'bencode' Decoder" by Fredrik Lundh.
+# gtoinfo -- a GeneTorrent Secret Decoder Ring,
+# based in part on "A Simple BitTorrent 'bencode' Decoder" by Fredrik Lundh.
 #
 ################################################################################
 # 
@@ -79,9 +77,10 @@
 # Current version
 revlevel = '@PACKAGE_VERSION@'
 
-# Load a couple of useful modules
+# imports
 import re
 from optparse import OptionParser
+from collections import deque
 import binascii
 import os
 import sys
@@ -422,7 +421,7 @@ def compute_size(data):
 
 
 # piece_hash()
-# Returns the hash, in printable hexadecimal, for the requested piece
+# Returns the hash, in binary form, for the requested piece
 #
 # Inputs:
 # - data: top-level GTO dictionary from decode()
@@ -440,10 +439,9 @@ def piece_hash(data, piece_index):
                              % (piece_index, num_pieces))
         st=piece_index * 20
         end=st+20
-        piece = pieces[st:end]
+        return pieces[st:end]
     except (KeyError):
         raise ValueError('Bad GTO structure')
-    return binascii.b2a_hex(piece)
 
 
 # infohash()
@@ -458,6 +456,91 @@ def piece_hash(data, piece_index):
 def infohash(data):
     inf = encode_dict(data['info'])
     return hashlib.sha1(inf).hexdigest()
+
+
+# piece_length()
+# Returns the piece_length for the given GTO file
+#
+# Inputs:
+# - data: top-level GTO dictionary from decode()
+#
+# Outputs: 
+# - piece_length
+#
+def piece_length(data):
+    return data['info']['piece length']
+
+
+# find_piece_bytes()
+#
+# From start_piece to end_piece, returns a list of where the bytes for
+# that piece can be found.  
+#
+# Inputs:
+# - data: top-level GTO dictionary from decode()
+# - start_index: first piece number, indexed from 0
+# - end_index: last piece number
+#
+# Outputs: 
+# The structure returned is a list of lists of lists
+# Top level list: one list per piece
+#   per-piece list: list of file chunks
+#     file-chunk list: filename, start offset, num bytes
+#
+def find_piece_bytes(data, start_index, end_index):
+    # validate start_piece and end_piece
+    pieces=data['info']['pieces']
+    num_pieces = len(pieces)/20 - 1
+    if (start_index > num_pieces):
+        raise ValueError('Invalid piece index %d (expected 0 - %d)' 
+                         % (start_index, num_pieces))
+    if (end_index > num_pieces + 1):
+        raise ValueError('Invalid piece index %d (expected 0 - %d)' 
+                         % (end_index, num_pieces))
+    if (start_index >= end_index):
+        raise ValueError('Start index %d is greater than end index %d'
+                         % (start_index, end_index))
+
+    plen = piece_length(data)
+    start_offset = start_index * plen
+    end_offset = end_index * plen
+
+    dirname = data['info']['name']
+    files = deque(data['info']['files'])
+    cur_file = files.popleft()
+    cur_file_offset = 0  # the offset of the first byte of the current file
+
+    # skip thru files until we get to the first file
+    while (cur_file_offset + cur_file['length'] < start_offset):
+        cur_file_offset += cur_file['length']
+        cur_file = files.popleft()
+        
+    # ok, cur_file contains part of the first piece.  Start processing
+    top_list = list()
+    while (start_offset < end_offset):
+        piece_list = list()
+        piece_bytes_consumed = 0
+        while (piece_bytes_consumed < plen):
+            fn = "%s/%s" % (dirname, "/".join(cur_file['path']))
+            st = start_offset + piece_bytes_consumed - cur_file_offset
+            if (plen - piece_bytes_consumed < cur_file['length'] - st):
+                sz = plen - piece_bytes_consumed
+            else:
+                # need to advance to next file if there is one
+                sz = cur_file['length'] - st
+                cur_file_offset += cur_file['length']
+                if (len(files) == 0):
+                    piece_list.append([fn, st, sz])
+                    break
+                cur_file = files.popleft()
+
+            piece_list.append([fn, st, sz])
+            piece_bytes_consumed += sz
+                
+        top_list.append(piece_list)
+        start_offset += plen
+
+    return top_list
 
 
 # list_files()
@@ -478,21 +561,6 @@ def list_files(data):
         return "\n".join(file_list)
     except (KeyError):
         raise ValueError('Bad GTO structure')
-
-
-# is_output()
-#
-# Returns True if the cmd line options cause output to be emitted to
-# the screen, False otherwise
-#
-# Inputs:
-# - params: the command line parameters
-def is_output(params):
-    retval = False
-    if (params.decode_file or params.piece_index != -1 or params.inspect_key != None
-        or params.get_expire is True or params.infohash is True or params.list_files is True):
-        retval = True
-    return retval
 
 
 # set_key()
@@ -517,6 +585,40 @@ def set_key(gtodict, key, value):
     return retval
 
 
+# read_gto()
+#
+# Reads in a GTO file and returns the gtodict structure
+#
+# Inputs:
+# - gto_filename: the file to read in
+#
+# Outputs:
+# - the gtodict
+#
+def read_gto(gto_filename):
+    bencode_text = open(gto_filename, "rb").read()
+    gtodict = decode(bencode_text)
+    if (not ('info' in gtodict)):
+        raise ValueError('Bad GTO structure')
+    return gtodict
+    
+
+# is_output()
+#
+# Returns True if the cmd line options cause output to be emitted to
+# the screen, False otherwise
+#
+# Inputs:
+# - params: the command line parameters
+def is_output(params):
+    retval = False
+    if (params.decode_file or params.piece_index != -1 or params.find_piece_index != -1 
+        or params.inspect_key != None or params.get_expire is True or params.infohash is True 
+        or params.list_files is True or params.piece_length is True):
+        retval = True
+    return retval
+
+
 # process()
 #
 # Does the main work of the program
@@ -537,13 +639,8 @@ def process(params, gto_filenames):
 
     for gto_filename in gto_filenames:
         gto_file_changed = False
-        bencode_text = open(gto_filename, "rb").read()
 
-        # Decode the bencoded text
-        gtodict = decode(bencode_text)
-
-        if (not ('info' in gtodict)):
-            raise ValueError('Bad GTO structure')
+        gtodict = read_gto(gto_filename)
 
         # Modify it as needed
         if (params.announce_url != ''):
@@ -614,7 +711,12 @@ def process(params, gto_filenames):
             cum_size += compute_size(gtodict)
 
         if (params.piece_index != -1):
-            print "%s" % piece_hash(gtodict, params.piece_index)
+            print "%s" % binascii.b2a_hex(piece_hash(gtodict, params.piece_index))
+
+        if (params.find_piece_index != -1):
+            r = find_piece_bytes(gtodict, params.find_piece_index, params.find_piece_index+1)
+            for file_chunk in r[0]:
+                print "%s, offset %d, size %d" % (file_chunk[0], file_chunk[1], file_chunk[2])
 
         if (params.infohash):
             print infohash(gtodict)
@@ -622,15 +724,112 @@ def process(params, gto_filenames):
         if (params.list_files):
             print list_files(gtodict)
 
+        if (params.piece_length):
+            print piece_length(gtodict)
+
         if (gto_file_changed):
             emit_gto(gtodict, gto_filename, (not params.no_backup))
 
     if (params.total_size):
         print cum_size
 
-################################################################################
-# What would be main() in another language... 
-################################################################################
+# main()
+#
+# Parses the cmd line options and then calls process() to process each
+# GTO file
+#
+# Return the exit code
+def main():
+    # Parse the command line parameters
+    parser = OptionParser(description='Manipulate a GTO file.', 
+                          version=("%%prog %s" % revlevel),
+                          usage="usage: %prog [options] gtofile [gtofile ...]")
+
+    # arguments that simply print to stdout
+
+    parser.add_option('-d', '--decode', action='store_true', 
+                      default=False, dest='decode_file',
+                      help='Pretty-print the contents of the GTO files, without hashes')
+
+    parser.add_option('-f', '--find-piece', action='store', 
+                      default=-1, dest='find_piece_index', metavar='INDEX', type=int,
+                      help='Show the file bytes that comprise a given piece')
+
+    parser.add_option('-g', '--get-key', '--inspect', action='append', 
+                      default=None, dest='inspect_key', metavar='KEY',
+                      help='Print just a particular key')
+
+    parser.add_option('--infohash', action='store_true', 
+                      default=False, dest='infohash', 
+                      help='Show the infohash for this GTO file')
+
+    parser.add_option('--list-files', action='store_true', 
+                      default=False, dest='list_files', 
+                      help='List the files contained in this GTO file, with their sizes')
+
+    parser.add_option('-p', '--piece-hash', action='store', 
+                      default=-1, dest='piece_index', metavar='INDEX', type=int,
+                      help='Show the SHA-1 hash for one piece')
+
+    parser.add_option('--piece-length', action='store_true', 
+                      default=False, dest='piece_length',
+                      help='Show the piece length for this GTO')
+
+    parser.add_option('-r', '--raw-time', action='store_true',
+                      default=False, dest='raw_time',
+                      help='Print all time/date values seconds-since-Unix-epoch')
+
+    parser.add_option('-t', '--total-size', action='store_true', 
+                      default=False, dest='total_size',
+                      help='Print the total size of the files, in bytes')
+
+    parser.add_option('-x', '--get-expire', action='store_true', 
+                      default=False, dest='get_expire', 
+                      help='Extract GTO "expires on" time as time since epoch')
+
+    # arguments that cause the file to be modified
+
+    parser.add_option('--no-backup', action='store_true', 
+                      default=False, dest='no_backup',
+                      help='Don\'t store a backup copy of the GTO before modifying it. (By default, GTOs are backed up to gtoname~ before being modified.)')
+
+    parser.add_option('-a', '--announce', action='store', 
+                      default='', dest='announce_url',
+                      help='Add or modify the announce URL')
+
+    parser.add_option('-e', '--expires', action='store', 
+                      default="", dest='expiry', 
+                      help='Add or modify the expiration date. EXPIRY is specified in hours from now; or it specifies the absolute expiration time in seconds since the epoch on %s; or, in the form (number)[smhd], it specifies the expiration time in seconds, minutes, hours, or days from now.' % time.strftime("%d %b %Y %H:%M:%S %Z", time.gmtime(0)))
+
+    parser.add_option('-s', '--ssl-cert', action='store', 
+                      default="", dest='ssl_cert', 
+                      help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
+
+    parser.add_option('', '--set-key', action='store', nargs=2,
+                      default=None, dest='set_key', metavar='KEY VALUE',
+                      help='Add or modify the specified key, setting it to value.')
+
+    (params, gto_filenames) = parser.parse_args()
+
+    if (len(gto_filenames) == 0):
+        parser.print_help()
+        return 1
+
+    if (params.decode_file is False and params.total_size is False and params.inspect_key == None
+        and params.find_piece_index == -1 and params.piece_index == -1 
+        and params.announce_url == "" and params.expiry == "" and params.get_expire is False 
+        and params.infohash is False and params.list_files is False 
+        and params.piece_length is False and params.ssl_cert == "" and params.set_key == None):
+        params.decode_file = True
+
+    try:
+        process(params, gto_filenames)
+    except:
+        print "Error:", sys.exc_info()[1]
+        return 1
+
+    return 0
+
 
 # Check the python version for compatability.  Python 3 is not
 # backward compatible.
@@ -638,81 +837,5 @@ if sys.version_info[0] != 2 or sys.version_info[1] < 6:
     print("This script requires Python version 2.6")
     sys.exit(1)
 
-# Parse the command line parameters
-parser = OptionParser(description='Manipulate a GTO file.', 
-                      version=("%%prog %s" % revlevel),
-                      usage="usage: %prog [options] gtofile [gtofile ...]")
-
-# arguments that simply print to stdout
-
-parser.add_option('-d', '--decode', action='store_true', 
-                  default=False, dest='decode_file',
-                  help='Pretty-print the contents of the GTO files, without hashes')
-
-parser.add_option('-g', '--get-key', '--inspect', action='append', 
-                  default=None, dest='inspect_key', metavar='KEY',
-                  help='Print just a particular key')
-
-parser.add_option('--infohash', action='store_true', 
-                  default=False, dest='infohash', 
-                  help='Show the infohash for this GTO file')
-
-parser.add_option('--list-files', action='store_true', 
-                  default=False, dest='list_files', 
-                  help='List the files contained in this GTO file, with their sizes')
-
-parser.add_option('-p', '--piece-hash', action='store', 
-                  default=-1, dest='piece_index', type=int,
-                  help='Show the SHA-1 hash for one piece')
-
-parser.add_option('-r', '--raw-time', action='store_true',
-                  default=False, dest='raw_time',
-                  help='Print all time/date values seconds-since-Unix-epoch')
-
-parser.add_option('-t', '--total-size', action='store_true', 
-                  default=False, dest='total_size',
-                  help='Print the total size of the files, in bytes')
-
-parser.add_option('-x', '--get-expire', action='store_true', 
-                  default=False, dest='get_expire', 
-                  help='Extract GTO "expires on" time as time since epoch')
-
-# arguments that cause the file to be modified
-
-parser.add_option('--no-backup', action='store_true', 
-                  default=False, dest='no_backup',
-                  help='Don\'t store a backup copy of the GTO before modifying it. (By default, GTOs are backed up to gtoname~ before being modified.)')
-
-parser.add_option('-a', '--announce', action='store', 
-                  default='', dest='announce_url',
-                  help='Add or modify the announce URL')
-
-parser.add_option('-e', '--expires', action='store', 
-                  default="", dest='expiry', 
-                  help='Add or modify the expiration date. EXPIRY is specified in hours from now; or it specifies the absolute expiration time in seconds since the epoch on %s; or, in the form (number)[smhd], it specifies the expiration time in seconds, minutes, hours, or days from now.' % time.strftime("%d %b %Y %H:%M:%S %Z", time.gmtime(0)))
-
-parser.add_option('-s', '--ssl-cert', action='store', 
-                  default="", dest='ssl_cert', 
-                  help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
-
-parser.add_option('', '--set-key', action='store', nargs=2,
-                  default=None, dest='set_key', metavar='KEY VALUE',
-                  help='Add or modify the specified key, setting it to value.')
-
-(params, gto_filenames) = parser.parse_args()
-
-if (len(gto_filenames) == 0):
-    parser.print_help()
-    sys.exit(1)
-
-if (params.decode_file is False and params.total_size is False and params.inspect_key == None
-    and params.piece_index == -1 and params.announce_url == "" and params.expiry == ""
-    and params.get_expire is False and params.infohash is False and params.list_files is False
-    and params.ssl_cert == "" and params.set_key == None):
-    params.decode_file = True
-
-try:
-    process(params, gto_filenames)
-except:
-    print "Error:", sys.exc_info()[1]
-    sys.exit(1)
+if __name__ == "__main__":
+    sys.exit(main())

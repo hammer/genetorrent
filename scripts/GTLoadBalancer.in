@@ -92,6 +92,10 @@ def compute_instance_q_size(q_dir):
     for gto in gtos:
         if (re.match(".*\.(gto|GTO)$", gto) != None):
             try:
+                # it's possible that the GTO has been expired by
+                # GeneTorrent (and thus removed from the q_dir) in the
+                # time since we called os.listdir above; hence the
+                # try/except block
                 size += os.path.getsize(os.path.join(q_dir, gto))
             except:
                 pass

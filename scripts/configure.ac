@@ -44,10 +44,14 @@ AC_INIT(GeneTorrentScripts, scriptver)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
+AM_PATH_PYTHON([2.6])
+
 AC_CONFIG_FILES([
 Makefile 
 GTLoadBalancer
-gtoinfo
+python_wrapper
+gtoinfo.py
+gtocheck
 ])
 AC_OUTPUT
 
