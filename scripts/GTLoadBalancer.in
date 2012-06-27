@@ -91,7 +91,10 @@ def compute_instance_q_size(q_dir):
     gtos = os.listdir(q_dir)
     for gto in gtos:
         if (re.match(".*\.(gto|GTO)$", gto) != None):
-            size += os.path.getsize(os.path.join(q_dir, gto))
+            try:
+                size += os.path.getsize(os.path.join(q_dir, gto))
+            except:
+                pass
     return size
 
 
@@ -467,7 +470,11 @@ def mainloop(config):
     while True:
         # (re)build the worklist
         if ('worklist' not in config or config['worklist_refresh'] < time.time()):
-            build_worklist(config)
+            try:
+                build_worklist(config)
+            except:
+                log(syslog.LOG_ALERT, "Error rebuilding worklist; continuing...")
+                continue
 
         # process the two input queues
         assigned = False
