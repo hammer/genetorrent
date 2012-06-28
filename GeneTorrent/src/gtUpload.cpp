@@ -184,18 +184,13 @@ void gtUpload::run ()
       time_t gtoTimeStamp;
 
       if (!statFile (_uploadGTODir + torrentFileName, gtoTimeStamp))
-      {      // resume mode
-         torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
+      {  // resume mode
          inResumeMode = true;
-      }
-
-      if (inResumeMode)
-      {
          resumeProgress = evaluateUploadResume(gtoTimeStamp, torrentFileName);
       }
       else
       {
-         makeTorrent (_uploadUUID, torrentFileName); 
+         makeTorrent (_uploadUUID);
       }
       
       submitTorrentToGTExecutive (torrentFileName, inResumeMode);
@@ -248,27 +243,15 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
       screenOutput ("Submitting GTO to GT Executive...");
    }
 
-   if (resumedUpload)
-   {
-      try
-      {
-         boost::filesystem::rename (_uploadGTODir + torrentFileName, _uploadGTODir + torrentFileName + RESUME_FILE_EXT);
-      }
-      catch (const boost::filesystem::filesystem_error& e)
-      {
-         gtError ("Failure moving GTO " + _uploadGTODir + torrentFileName + " to " + _uploadGTODir + torrentFileName + RESUME_FILE_EXT + ", " + e.what(), 202);
-      }
-   }
-
    std::string uuidForErrors = _uploadUUID;
 
    FILE *gtoFile;
 
-   gtoFile = fopen ((_uploadGTODir + torrentFileName).c_str (), "wb");
+   gtoFile = fopen ((_uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION).c_str (), "wb");
 
    if (gtoFile == NULL)
    {
-      gtError ("Failure opening " + _uploadGTODir + torrentFileName + " for output.", 202, ERRNO_ERROR, errno);
+      gtError ("Failure opening " + _uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION + " for output.", 202, ERRNO_ERROR, errno);
    }
 
    char errorBuffer[CURL_ERROR_SIZE + 1];
@@ -302,14 +285,8 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
    struct curl_httppost *last=NULL;
 
    curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
-   if (resumedUpload)
-   {
-      curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, (_uploadGTODir + torrentFileName + RESUME_FILE_EXT).c_str(), CURLFORM_FILENAME, torrentFileName.c_str(), CURLFORM_END);
-   }
-   else
-   {
-      curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, (_uploadGTODir + torrentFileName + "~").c_str(), CURLFORM_FILENAME, torrentFileName.c_str(), CURLFORM_END);
-   }
+
+   curl_formadd (&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, (_uploadGTODir + torrentFileName).c_str(), CURLFORM_FILENAME, torrentFileName.c_str(), CURLFORM_END);
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
@@ -326,11 +303,18 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
 
    fclose (gtoFile);
 
-   processCurlResponse (curl, res, _uploadGTODir + torrentFileName, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
+   processCurlResponse (curl, res, _uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
+   }
+
+   int result = rename ((_uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION).c_str(), (_uploadGTODir + torrentFileName).c_str());
+   
+   if (0 != result)
+   {
+      gtError ("Unable to rename " + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION + " to " + torrentFileName, 203, ERRNO_ERROR, errno);
    }
 
    curl_easy_cleanup (curl);
@@ -505,13 +489,15 @@ long gtUpload::evaluateUploadResume (time_t gtoTimeStamp, std::string torrentNam
    return progress;
 }
 
-void gtUpload::makeTorrent (std::string uuid, std::string &torrentName)
+void gtUpload::makeTorrent (std::string uuid)
 {
-   torrentName = uuid + GTO_FILE_EXTENSION;
+   std::string torrentName = uuid + GTO_FILE_EXTENSION;
+ 
+   std::string torrentNameBuilding = uuid + GTO_FILE_BUILDING_EXTENSION;
  
    if (_verbosityLevel > VERBOSE_1)
    {
-      screenOutput ("Preparing GTO for upload...");
+      screenOutput ("Preparing " << torrentName << " for upload...");
       screenOutputNoNewLine ("Computing checksums...");
    }
 
@@ -536,12 +522,12 @@ void gtUpload::makeTorrent (std::string uuid, std::string &torrentName)
 
       std::vector <char> finishedTorrent;
       bencode (back_inserter (finishedTorrent), torrent.generate ());
-
-      FILE *output = fopen ((_uploadGTODir + torrentName + '~').c_str (), "wb+");
+std::cerr << "_uploadGTODir = " << _uploadGTODir << std::endl;
+      FILE *output = fopen ((_uploadGTODir + torrentNameBuilding ).c_str (), "wb+");
 
       if (output == NULL)
       {
-         gtError ("Failure opening " + _uploadGTODir + torrentName + " for output.", 202, ERRNO_ERROR, errno);
+         gtError ("Failure opening " + _uploadGTODir + torrentNameBuilding + " for output.", 202, ERRNO_ERROR, errno);
       }
 
       fwrite (&finishedTorrent[0], 1, finishedTorrent.size (), output);
@@ -551,6 +537,13 @@ void gtUpload::makeTorrent (std::string uuid, std::string &torrentName)
    {
       // TODO: better error handling here
       gtError ("Exception creating " + torrentName + " for output.", 232);
+   }
+
+   int result = rename ((_uploadGTODir + torrentNameBuilding).c_str(), (_uploadGTODir + torrentName).c_str());
+   
+   if (0 != result)
+   {
+      gtError ("Unable to rename " + torrentNameBuilding + " to " + torrentName, 203, ERRNO_ERROR, errno);
    }
 }
 

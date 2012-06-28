@@ -1396,6 +1396,16 @@ void gtBase::curlCleanupOnFailure (std::string fileName, FILE *gtoFile)
    }
 }
 
+void gtBase::removeFile (std::string fileName)
+{
+   int ret = unlink (fileName.c_str ());
+
+   if (ret != 0)
+   {
+      gtError ("Unable to remove ", NO_EXIT, gtBase::ERRNO_ERROR, errno);
+   }
+}
+
 std::string gtBase::makeTimeStamp ()
 {
    const int BUFF_SIZE = 25;
@@ -1475,10 +1485,31 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
       std::ostringstream logMessage;
       logMessage << userMsg << "  " << effect << "  " << remediation << std::endl;
       Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
+
+      if (GTO_FILE_DOWNLOAD_EXTENSION == fileWithErrorXML.substr (fileWithErrorXML.size() - 1))
+      {
+         removeFile (fileWithErrorXML);
+      }
+      
    }
    catch (...)
    {
       // Catch any error from parsing and return false to indicate processing is not complete, e.g., no xml, invalid xml, etc.
+      if (GTO_FILE_DOWNLOAD_EXTENSION == fileWithErrorXML.substr (fileWithErrorXML.size() - 1))
+      {
+         std::string newFileName = fileWithErrorXML.substr (0, fileWithErrorXML.size() - 1) + GTO_ERROR_DOWNLOAD_EXTENSION;
+
+         int result = rename (fileWithErrorXML.c_str(), newFileName.c_str());
+         if (0 != result)
+         {
+            gtError ("Unable to rename " + fileWithErrorXML + " to " + newFileName, 203, ERRNO_ERROR, errno);
+         }
+
+         std::ostringstream logMessage;
+         logMessage << "error processing failure with file:  " << newFileName <<  ", review the contents of the file.";
+         Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
+         system (("cat " + newFileName).c_str());
+      }
       return false;
    }
 
@@ -1494,6 +1525,11 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
 {
    if (result != CURLE_OK)
    {
+      if (GTO_FILE_DOWNLOAD_EXTENSION == fileName.substr (fileName.size() -1))
+      {
+         removeFile (fileName);
+      }
+      
       if (_operatingMode != SERVER_MODE)
       {
          gtError (defaultMessage + uuid, 203, gtBase::CURL_ERROR, result, "URL:  " + url);
@@ -1510,6 +1546,11 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
 
    if (result != CURLE_OK)
    {
+      if (GTO_FILE_DOWNLOAD_EXTENSION == fileName.substr (fileName.size() -1))
+      {
+         removeFile (fileName);
+      }
+      
       if (_operatingMode != SERVER_MODE)
       {
          gtError (defaultMessage + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);

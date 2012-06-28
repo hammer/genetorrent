@@ -43,6 +43,9 @@
 
 // some constants
 const std::string SHORT_DESCRIPTION = "GeneTorrent: Genomic Data Transfer Tool";
+const std::string GTO_FILE_BUILDING_EXTENSION = ".gto-build";
+const std::string GTO_FILE_DOWNLOAD_EXTENSION = "~";
+const std::string GTO_ERROR_DOWNLOAD_EXTENSION = "-error";
 const std::string GTO_FILE_EXTENSION = ".gto";
 const std::string RESUME_FILE_EXT = ".resume";
 const std::string PROGRESS_FILE_EXT = ".progress";

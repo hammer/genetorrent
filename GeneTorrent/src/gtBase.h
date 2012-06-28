@@ -165,6 +165,8 @@ class gtBase
       std::string sanitizePath (std::string inPath);
       void relativizePath (std::string &inPath);
 
+      void removeFile (std::string fileName);
+
    private:
       attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];
       std::string _bindIP;
