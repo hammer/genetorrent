@@ -58,16 +58,20 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
+%{_bindir}/gtocheck
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
+/usr/lib/python2.6/site-packages/*
 
 %files Server
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
+%{_bindir}/gtocheck
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
 %{_initddir}/*
+/usr/lib/python2.6/site-packages/*
 
 %files
 %defattr(-,root,root,-)
