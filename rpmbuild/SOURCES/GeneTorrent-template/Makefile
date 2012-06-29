@@ -21,6 +21,7 @@ clean:
 
 install:
 	mkdir -p $(dataDir)
+	mkdir -p $(initDir)
 	cp $(BINDIR)/GeneTorrent $(installDir)
 	cp $(BINDIR)/gtoinfo $(installDir)
 	cp $(BINDIR)/GTLoadBalancer $(installDir)

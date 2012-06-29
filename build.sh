@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 buildThreads="4"
 cVersion="`lsb_release -rs|cut -f1 -d\.`"
@@ -120,9 +120,10 @@ function buildRPMS
 
    cp -ar rpmbuild ~/.
    cd ~/rpmbuild/SPECS
-   mkdir ../BUILD
-   mkdir ../RPMS
-   rpmbuild -bb GeneTorrent.spec
+   mkdir ../BUILD || bailout $FUNCNAME
+   mkdir ../RPMS || bailout $FUNCNAME
+   rpmbuild -bb GeneTorrent.spec || bailout $FUNCNAME
+
 
    cd - > /dev/null
 }
