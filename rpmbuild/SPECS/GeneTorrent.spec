@@ -67,7 +67,7 @@ rm -rf %{buildroot}
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-%{_initdir}/GeneTorrent/*
+%{_initddir}/GeneTorrent/*
 
 %files
 %defattr(-,root,root,-)
