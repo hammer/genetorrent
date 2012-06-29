@@ -79,6 +79,16 @@ function build_scripts
    cd ${saveDir}
 }
 
+function build_init_scripts
+{
+   saveDir=${PWD}
+   cd init.d
+   [[ -e ../.fullbuild ]] && ( ./autogen.sh || bailout $FUNCNAME )
+   ./configure --prefix=/usr || bailout $FUNCNAME
+   sudo make install || bailout $FUNCNAME
+   cd ${saveDir}
+}
+
 function configureRPMBuild
 {
    echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros   
@@ -138,6 +148,7 @@ function build_common
 {
       build_GeneTorrent
       build_scripts
+      build_init_scripts
 }
 
 function build_standard
@@ -217,6 +228,15 @@ function svn_clean
    rm -f aclocal.m4
    cd - > /dev/null
 
+   cd init.d
+   [[ -e Makefile ]] && make maintainer-clean
+   rm -fr autom4te.cache
+   rm -f configure
+   rm -f Makefile.in
+   rm -f missing install-sh
+   rm -f aclocal.m4
+
+   cd - > /dev/null
    cd rpmbuild/SOURCES
    rm -fr GeneTorrent-[0-9].[0-9].[0-9].[0-9]*
    cd - > /dev/null
