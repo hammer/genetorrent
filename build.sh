@@ -226,6 +226,7 @@ function svn_clean
    rm -f Makefile.in
    rm -f missing install-sh
    rm -f aclocal.m4
+   rm -f py-compile
    cd - > /dev/null
 
    cd init.d
