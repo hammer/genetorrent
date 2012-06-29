@@ -135,7 +135,7 @@ function collectRPMS
 
    cd ~/rpmbuild/RPMS/x86_64
 
-   for c in Agent Server Client
+   for c in Server Client
    do
       cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
       cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
