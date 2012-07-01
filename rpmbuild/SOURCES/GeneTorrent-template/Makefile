@@ -42,5 +42,5 @@ install:
 	cp /usr/share/man/man1/GeneTorrent.1 $(manDir)
 	cp /etc/rc.d/init.d/GeneTorrent $(initDir)
 	cp /etc/rc.d/init.d/GTLoadBalancer $(initDir)
-        cp $(confDir)/GeneTorrent.conf $(confDir)
-        cp $(confDir)/GeneTorrent.conf $(confDir)
+	cp $(confDir)/GeneTorrent.conf $(confDir)
+	cp $(confDir)/GeneTorrent.conf $(confDir)
