@@ -14,6 +14,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildRequires:  xqilla-devel tclap libcurl-devel log4cpp-devel
 #BuildRequires:  boost >= 1.48.0
 #BuildRequires:  boost-regex >= 1.48.0
+Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 
 # This prevents binaries from being stripped of their debug bits by rpmbuild
 %define __spec_install_post /usr/lib/rpm/brp-compress
@@ -36,6 +37,10 @@ Conflicts: GeneTorrent-Server
 Summary: GeneTorrent Client process (and related files).
 %description Client
 GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
+
+%pre
+/usr/bin/getent group gtorrent || /usr/sbin/groupadd -r gtorrent
+/usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -d /etc/gnos.d/ -s /bin/nologin gtorrent
 
 %prep
 %setup -q
@@ -70,8 +75,10 @@ rm -rf %{buildroot}
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-%{_initddir}/*
 /usr/lib/python2.6/site-packages/*
+%config(noreplace) %{_initddir}/*
+%config(noreplace) %{_confdir}/gnos.d/GeneTorrent.conf
+%config(noreplace) %{_confdir}/gnos.d/GTLoadBalancer.conf
 
 %files
 %defattr(-,root,root,-)
