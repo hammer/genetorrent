@@ -77,8 +77,8 @@ rm -rf %{buildroot}
 %{_datadir}/GeneTorrent/*
 /usr/lib/python2.6/site-packages/*
 %config(noreplace) %{_initddir}/*
-%config(noreplace) %{_confdir}/gnos.d/GeneTorrent.conf
-%config(noreplace) %{_confdir}/gnos.d/GTLoadBalancer.conf
+%config(noreplace) %{_sysconfdir}/gnos.d/GeneTorrent.conf
+%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
 
 %files
 %defattr(-,root,root,-)
