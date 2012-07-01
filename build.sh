@@ -84,7 +84,7 @@ function build_init_scripts
    saveDir=${PWD}
    cd init.d
    [[ -e ../.fullbuild ]] && ( ./autogen.sh || bailout $FUNCNAME )
-   ./configure --prefix=/usr || bailout $FUNCNAME
+   ./configure --sysconfdir=/etc/gnos.d  || bailout $FUNCNAME
    sudo make install || bailout $FUNCNAME
    cd ${saveDir}
 }
