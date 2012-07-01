@@ -38,3 +38,5 @@ LIST_OF_SCRIPTS_INIT = GeneTorrent \
 init_ddir = /etc/rc.d/init.d
 
 init_d_SCRIPTS = ${LIST_OF_SCRIPTS_INIT}
+
+sysconf_DATA = GeneTorrent.conf GTLoadBalancer.conf
