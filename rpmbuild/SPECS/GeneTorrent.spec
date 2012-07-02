@@ -40,7 +40,7 @@ GeneTorrent Client.  This package contains GeneTorrent Download and Upload clien
 
 %pre Server
 /usr/bin/getent group gtorrent || /usr/sbin/groupadd -r gtorrent
-/usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -d /etc/gnos.d/ -s /bin/nologin gtorrent
+/usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent
 
 %prep
 %setup -q
