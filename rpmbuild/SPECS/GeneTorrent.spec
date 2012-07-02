@@ -39,14 +39,16 @@ Summary: GeneTorrent Client process (and related files).
 GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
 
 %pre Server
-/usr/bin/getent group gtorrent || /usr/sbin/groupadd -r gtorrent
-/usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent
+/usr/bin/getent group gtorrent >/dev/null || /usr/sbin/groupadd -r gtorrent >/dev/null 
+/usr/bin/getent passwd gtorrent >/dev/null || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent >/dev/null
 
 %post Server
 /sbin/chkconfig --add GeneTorrent
 /sbin/chkconfig --add GTLoadBalancer
 
-%postun Server
+%preun Server
+/sbin/service GeneTorrent stop
+/sbin/service GTLoadBalancer stop
 /sbin/chkconfig --del GeneTorrent
 /sbin/chkconfig --del GTLoadBalancer
 
