@@ -43,4 +43,4 @@ install:
 	cp $(INITDIR)/GeneTorrent $(initDir)
 	cp $(INITDIR)/GTLoadBalancer $(initDir)
 	cp $(CONFDIR)/GeneTorrent.conf $(confDir)
-	cp $(CONFDIR)/GeneTorrent.conf $(confDir)
+	cp $(CONFDIR)/GTLoadBalancer.conf $(confDir)
