@@ -38,7 +38,7 @@ Summary: GeneTorrent Client process (and related files).
 %description Client
 GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
 
-%pre
+%pre Server
 /usr/bin/getent group gtorrent || /usr/sbin/groupadd -r gtorrent
 /usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -d /etc/gnos.d/ -s /bin/nologin gtorrent
 
