@@ -42,8 +42,16 @@ GeneTorrent Client.  This package contains GeneTorrent Download and Upload clien
 /usr/bin/getent group gtorrent || /usr/sbin/groupadd -r gtorrent
 /usr/bin/getent passwd gtorrent || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent
 
+%post Server
+/sbin/chkconfig --add GeneTorrent
+/sbin/chkconfig --add GTLoadBalancer
+
+%postun Server
+/sbin/chkconfig --del GeneTorrent
+/sbin/chkconfig --del GTLoadBalancer
+
 %prep
-%setup -q
+%setup -q 
 
 %build
 make %{?_smp_mflags}
