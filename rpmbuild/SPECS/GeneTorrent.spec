@@ -47,8 +47,8 @@ GeneTorrent Client.  This package contains GeneTorrent Download and Upload clien
 /sbin/chkconfig --add GTLoadBalancer
 
 %preun Server
-/sbin/service GeneTorrent stop
-/sbin/service GTLoadBalancer stop
+/sbin/service GeneTorrent stop > /dev/null
+/sbin/service GTLoadBalancer stop > /dev/null
 /sbin/chkconfig --del GeneTorrent
 /sbin/chkconfig --del GTLoadBalancer
 
