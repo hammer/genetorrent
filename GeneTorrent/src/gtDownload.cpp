@@ -464,37 +464,26 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    }
 }
 
-void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
+void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std::string torrentName)
 {
-   int64_t freeSpace = getFreeDiskSpace();
-
-   if (totalSizeOfDownload > freeSpace) 
-   {
-      gtError ("The system does not have enough free disk space to complete this transfer (transfer total size is " + add_suffix (totalSizeOfDownload) + "); free space is " + add_suffix (freeSpace), 97, gtBase::DEFAULT_ERROR, 0);
-   }
-
-   vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
-
-    // TODO: It would be good to use a system call to determine how
-    // many cores this machine has.  There shouldn't be more children
-    // than cores, so set 
-    //    maxChildren = min(_maxChildren, number_of_cores)
-    // Hard to do this in a portable manner however
-
-   int maxChildren = _maxChildren;
-   int pipes[maxChildren+1][2];
-
-   int64_t totalDataDownloaded = 0;
-
-   while (vectIter != _torrentListToDownload.end ())
-   {
       libtorrent::error_code torrentError;
-      libtorrent::torrent_info torrentInfo (*vectIter, torrentError);
+      libtorrent::torrent_info torrentInfo (torrentName, torrentError);
 
       if (torrentError)
       {
          gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
       }
+
+       // TODO: It would be good to use a system call to determine how
+       // many cores this machine has.  There shouldn't be more children
+       // than cores, so set
+       //    maxChildren = min(_maxChildren, number_of_cores)
+       // Hard to do this in a portable manner however
+
+      int maxChildren = _maxChildren;
+      int pipes[maxChildren+1][2];
+
+      int64_t totalDataDownloaded = 0;
 
       int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
       int childID=1;
@@ -521,7 +510,7 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
 
             FILE *foo =  fdopen (pipes[childID][1], "w");
 
-            downloadChild (childID, childrenThisGTO, *vectIter, foo);
+            downloadChild (childID, childrenThisGTO, torrentName, foo);
          }
          else
          {
@@ -606,7 +595,7 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
             break;
          }
 
-         freeSpace = getFreeDiskSpace();
+         int64_t freeSpace = getFreeDiskSpace();
 
          if (totalSizeOfDownload > totalDataDownloaded + xfer + freeSpace) 
          {
@@ -625,6 +614,28 @@ void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
             screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
          }
       }
+}
+
+void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
+{
+   int64_t freeSpace = getFreeDiskSpace ();
+
+   if (totalSizeOfDownload > freeSpace)
+   {
+      gtError (("The system does not have enough free disk space to complete "
+                "this transfer (transfer total size is "
+                + add_suffix (totalSizeOfDownload) + "); free space is "
+                + add_suffix (freeSpace)),
+               97, gtBase::DEFAULT_ERROR, 0);
+   }
+
+   vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
+
+   while (vectIter != _torrentListToDownload.end ())
+   {
+      std::string torrentName = *vectIter;
+
+      performSingleTorrentDownload (totalSizeOfDownload, torrentName);
 
       vectIter++;
    }

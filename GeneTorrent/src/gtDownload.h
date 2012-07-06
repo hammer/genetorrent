@@ -59,6 +59,7 @@ class gtDownload : public gtBase
       void downloadGtoFileByURI (std::string &uri);
       void downloadGtoFilesByURI (vectOfStr &uris);
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
+      void performSingleTorrentDownload (int64_t totalSizeOfDownload, std::string torrentName);
       void performTorrentDownload (int64_t totalSizeOfDownload);
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
