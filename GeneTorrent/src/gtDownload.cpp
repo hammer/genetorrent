@@ -174,7 +174,10 @@ void gtDownload::run ()
    time_t startTime = time(NULL);
    std::string saveDir = getWorkingDirectory ();
 
-   prepareDownloadList ();
+   vectOfStr urisToDownload;
+
+   prepareDownloadList (urisToDownload);
+   downloadGtoFilesByURI (urisToDownload);
 
    if (_downloadSavePath.size())
    {
@@ -220,10 +223,9 @@ void gtDownload::run ()
    chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }
 
-void gtDownload::prepareDownloadList ()
+// Pass in storage for a list of URIs that will be used to download .gto files.
+void gtDownload::prepareDownloadList (vectOfStr &urisToDownload)
 {
-   vectOfStr urisToDownload; // This list of URIs is used to download .gto files.
-
    vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
 
    // iterate over the list of -d cli arguments.
@@ -262,8 +264,6 @@ void gtDownload::prepareDownloadList ()
 
       vectIter++;
    }
-
-   downloadGtoFilesByURI (urisToDownload);
 }
 
 void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
