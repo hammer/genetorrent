@@ -86,7 +86,7 @@ static char const* download_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload ()
+gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload (), _uriListToDownload ()
 {
    pcfacliMaxChildren (vm);
    _downloadSavePath = pcfacliPath(vm);
@@ -174,10 +174,7 @@ void gtDownload::run ()
    time_t startTime = time(NULL);
    std::string saveDir = getWorkingDirectory ();
 
-   vectOfStr urisToDownload;
-
-   prepareDownloadList (urisToDownload);
-   downloadGtoFilesByURI (urisToDownload);
+   prepareDownloadList ();
 
    if (_downloadSavePath.size())
    {
@@ -189,14 +186,12 @@ void gtDownload::run ()
       }
    }
 
-   uint64_t totalBytes; 
-   int totalFiles;
-   int totalGtos;
-
-   validateAndCollectSizeOfTorrents (totalBytes, totalFiles, totalGtos);
+   int64_t totalBytes = 0;
+   int totalFiles = 0;
+   int totalGtos = 0;
 
    std::ostringstream message;
-   message << "Ready to download " << totalGtos << " GTO(s) with " << totalFiles << " file(s) comprised of " << add_suffix (totalBytes) << " of data"; 
+   message << "Ready to download";
 
    Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
@@ -205,13 +200,24 @@ void gtDownload::run ()
       screenOutput (message.str()); 
    }
 
-   performTorrentDownload (totalBytes);
+   // First, go download any torrents that the user requested by
+   // passing a .gto on the command line. The assumption here is that
+   // the .gto file has already been requested from GTO Executive and
+   // thus the clock is ticking before the .gto expires.
+   performTorrentDownloadsByGTO (totalBytes, totalFiles, totalGtos);
+
+   // Next, download any torrents the user requested by passing either
+   // URI or xml file on the command line. This will result in the
+   // .gto being requested and downloaded so that the torrent can be
+   // downloaded.
+   performTorrentDownloadsByURI (totalBytes, totalFiles, totalGtos);
 
    message.str("");
   
    time_t duration = time(NULL) - startTime;
+   time_t rate = duration ? (totalBytes / duration) : 0;
 
-   message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+   message << "Downloaded " << add_suffix (totalBytes) << " in " << durationToStr(duration) << ".  Overall Rate " << add_suffix (rate) << "/s";
 
    Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
@@ -223,8 +229,7 @@ void gtDownload::run ()
    chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
 }
 
-// Pass in storage for a list of URIs that will be used to download .gto files.
-void gtDownload::prepareDownloadList (vectOfStr &urisToDownload)
+void gtDownload::prepareDownloadList ()
 {
    vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
 
@@ -245,16 +250,16 @@ void gtDownload::prepareDownloadList (vectOfStr &urisToDownload)
          else if (tail == ".xml" || tail == ".XML") // Extract a list of URIs from passed XML
          {
             relativizePath(inspect);
-            extractURIsFromXML (inspect, urisToDownload);
+            extractURIsFromXML (inspect, _uriListToDownload);
          }
          else if (std::string::npos != inspect.find ("/")) // Have a URI
          {
-            urisToDownload.push_back (inspect);
+            _uriListToDownload.push_back (inspect);
          }
          else // we have a UUID
          {
             std::string url = CGHUB_WSI_BASE_URL + "download/" + inspect;
-            urisToDownload.push_back (url);
+            _uriListToDownload.push_back (url);
          }
       }
       else
@@ -266,11 +271,12 @@ void gtDownload::prepareDownloadList (vectOfStr &urisToDownload)
    }
 }
 
-void gtDownload::downloadGtoFileByURI (std::string &uri)
+// Returns the path to the .gto file that was downloaded.
+std::string gtDownload::downloadGtoFileByURI (std::string uri)
 {
    if (_verbosityLevel > VERBOSE_1)
    {
-      screenOutputNoNewLine ("Communicating with GT Executive ...        ");
+      screenOutput ("Communicating with GT Executive ...        ");
    }
 
    CURL *curl;
@@ -344,8 +350,6 @@ void gtDownload::downloadGtoFileByURI (std::string &uri)
 
    std::string torrFile = getWorkingDirectory () + '/' + fileName;
 
-   _torrentListToDownload.push_back (torrFile);
-
    libtorrent::error_code torrentError;
    libtorrent::torrent_info torrentInfo (torrFile, torrentError);
 
@@ -381,49 +385,8 @@ void gtDownload::downloadGtoFileByURI (std::string &uri)
          trackerIter++;
       }
    }
-}
 
-void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
-{
-   unsigned int counter = 0;
-   vectOfStr::iterator vectIter = uris.begin ();
-
-   while (vectIter != uris.end ())
-   {
-      std::string uri = *vectIter;
-
-      downloadGtoFileByURI (uri);
-
-      vectIter++;
-
-      if (_verbosityLevel == VERBOSE_2)   // only display when not dumping headers
-      {
-         counter++;
-         std::ostringstream mess;
-         mess << "\b\b\b\b\b\b\b" << std::setw (6) << std::setprecision (2) << std::fixed << 100.0 * (counter) / uris.size() << "%";
-
-         if (_logToStdErr) 
-         {
-            std::cout << mess.str();
-         }
-         else
-         {
-            std::cerr << mess.str();
-         }
-
-         if (counter == uris.size())
-         {
-            if (_logToStdErr) 
-            {
-               std::cout << std::endl;
-            }
-            else
-            {
-               std::cerr << std::endl;
-            }
-         }
-      }
-   }
+   return torrFile;
 }
 
 void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload)
@@ -464,7 +427,7 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    }
 }
 
-void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std::string torrentName)
+void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles)
 {
    libtorrent::error_code torrentError;
    libtorrent::torrent_info torrentInfo (torrentName, torrentError);
@@ -472,6 +435,21 @@ void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std:
    if (torrentError)
    {
       gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+   }
+
+   int64_t totalSizeOfDownload = torrentInfo.total_size ();
+   int64_t totalDataDownloaded = 0;
+
+   int numFilesDownloaded = torrentInfo.num_files ();
+
+   if (totalSizeOfDownload < 1)
+   {
+      gtError("Size of torrent data is zero bytes: " + torrentName, NO_EXIT);
+   }
+
+   if (numFilesDownloaded < 1)
+   {
+      gtError("Torrent contains no files: " + torrentName, NO_EXIT);
    }
 
     // TODO: It would be good to use a system call to determine how
@@ -482,8 +460,6 @@ void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std:
 
    int maxChildren = _maxChildren;
    int pipes[maxChildren+1][2];
-
-   int64_t totalDataDownloaded = 0;
 
    int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
    int childID=1;
@@ -511,6 +487,7 @@ void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std:
          FILE *foo =  fdopen (pipes[childID][1], "w");
 
          downloadChild (childID, childrenThisGTO, torrentName, foo);
+         // Should never return from downloadChild().
       }
       else
       {
@@ -614,30 +591,39 @@ void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std:
          screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
       }
    }
+
+   totalBytes += totalDataDownloaded;
+   totalFiles += numFilesDownloaded;
 }
 
-void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
+void gtDownload::performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFiles, int &totalGtos)
 {
-   int64_t freeSpace = getFreeDiskSpace ();
+   vectOfStr::iterator iter = _torrentListToDownload.begin ();
 
-   if (totalSizeOfDownload > freeSpace)
+   while (iter != _torrentListToDownload.end ())
    {
-      gtError (("The system does not have enough free disk space to complete "
-                "this transfer (transfer total size is "
-                + add_suffix (totalSizeOfDownload) + "); free space is "
-                + add_suffix (freeSpace)),
-               97, gtBase::DEFAULT_ERROR, 0);
+      std::string torrentName = *iter;
+
+      performSingleTorrentDownload (torrentName, totalBytes, totalFiles);
+      totalGtos++;
+
+      iter++;
    }
+}
 
-   vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
+void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos)
+{
+   vectOfStr::iterator iter = _uriListToDownload.begin ();
 
-   while (vectIter != _torrentListToDownload.end ())
+   while (iter != _uriListToDownload.end ())
    {
-      std::string torrentName = *vectIter;
+      std::string uri = *iter;
 
-      performSingleTorrentDownload (totalSizeOfDownload, torrentName);
+      std::string torrentName = downloadGtoFileByURI (uri);
+      performSingleTorrentDownload (torrentName, totalBytes, totalFiles);
+      totalGtos++;
 
-      vectIter++;
+      iter++;
    }
 }
 
@@ -805,40 +791,5 @@ int64_t gtDownload::getFreeDiskSpace ()
    else
    {
       return -1;
-   }
-}
-
-void gtDownload::validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos)
-{
-   if (_torrentListToDownload.size() < 1)
-   {
-      gtError ("the XML file did not contain any GTO file URIs.", 97, gtBase::DEFAULT_ERROR);
-   }
-
-   vectOfStr::iterator vectIter = _torrentListToDownload.begin ();
-
-   totalBytes = 0;
-   totalFiles = 0;
-   totalGtos = 0;
-
-   while (vectIter != _torrentListToDownload.end ())
-   {
-      libtorrent::error_code torrentError;
-      libtorrent::torrent_info torrentInfo (*vectIter, torrentError);
-
-      if (torrentError)
-      {
-         gtError (".gto processing problem", 87, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
-      }
-
-      totalBytes += torrentInfo.total_size ();
-      totalFiles += torrentInfo.num_files ();
-      totalGtos++;
-      vectIter++;
-   }
-
-   if (totalBytes < 1 || totalFiles < 1)
-   {
-      gtError ("no data in GTOs to download.", 97, gtBase::DEFAULT_ERROR);
    }
 }

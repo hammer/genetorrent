@@ -53,17 +53,17 @@ class gtDownload : public gtBase
       std::string _downloadSavePath;
       int _maxChildren;
       vectOfStr _torrentListToDownload;
+      vectOfStr _uriListToDownload;
 
       void runDownloadMode (std::string startupDir);
-      void prepareDownloadList (vectOfStr &uris);
-      void downloadGtoFileByURI (std::string &uri);
-      void downloadGtoFilesByURI (vectOfStr &uris);
+      void prepareDownloadList ();
+      std::string downloadGtoFileByURI (std::string uri);
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
-      void performSingleTorrentDownload (int64_t totalSizeOfDownload, std::string torrentName);
-      void performTorrentDownload (int64_t totalSizeOfDownload);
+      void performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles);
+      void performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFiles, int &totalGtos);
+      void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
-      void validateAndCollectSizeOfTorrents (uint64_t &totalBytes, int &totalFiles, int &totalGtos);
 
       void pcfacliDownloadList (boost::program_options::variables_map &vm);
       void pcfacliMaxChildren (boost::program_options::variables_map &vm);
