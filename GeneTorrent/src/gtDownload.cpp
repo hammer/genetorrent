@@ -466,154 +466,154 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
 
 void gtDownload::performSingleTorrentDownload (int64_t totalSizeOfDownload, std::string torrentName)
 {
-      libtorrent::error_code torrentError;
-      libtorrent::torrent_info torrentInfo (torrentName, torrentError);
+   libtorrent::error_code torrentError;
+   libtorrent::torrent_info torrentInfo (torrentName, torrentError);
 
-      if (torrentError)
+   if (torrentError)
+   {
+      gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+   }
+
+    // TODO: It would be good to use a system call to determine how
+    // many cores this machine has.  There shouldn't be more children
+    // than cores, so set
+    //    maxChildren = min(_maxChildren, number_of_cores)
+    // Hard to do this in a portable manner however
+
+   int maxChildren = _maxChildren;
+   int pipes[maxChildren+1][2];
+
+   int64_t totalDataDownloaded = 0;
+
+   int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
+   int childID=1;
+
+   std::map <pid_t, childRec *> pidList;
+   pid_t pid;
+
+   while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
+   {
+      if (pipe (pipes[childID]) < 0)
       {
-         gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+         gtError ("pipe() error", 107, ERRNO_ERROR, errno);
       }
 
-       // TODO: It would be good to use a system call to determine how
-       // many cores this machine has.  There shouldn't be more children
-       // than cores, so set
-       //    maxChildren = min(_maxChildren, number_of_cores)
-       // Hard to do this in a portable manner however
+      pid = fork();
 
-      int maxChildren = _maxChildren;
-      int pipes[maxChildren+1][2];
-
-      int64_t totalDataDownloaded = 0;
-
-      int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
-      int childID=1;
-  
-      std::map <pid_t, childRec *> pidList;
-      pid_t pid;
-
-      while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
+      if (pid < 0)
       {
-         if (pipe (pipes[childID]) < 0)
-         {
-            gtError ("pipe() error", 107, ERRNO_ERROR, errno);
-         }
-         
-         pid =fork();
+         gtError ("fork() error", 107, ERRNO_ERROR, errno);
+      }
+      else if (pid == 0)
+      {
+         close (pipes[childID][0]);
 
-         if (pid < 0)
-         {
-            gtError ("fork() error", 107, ERRNO_ERROR, errno);
-         }
-         else if (pid == 0)
-         {
-            close (pipes[childID][0]);
+         FILE *foo =  fdopen (pipes[childID][1], "w");
 
-            FILE *foo =  fdopen (pipes[childID][1], "w");
+         downloadChild (childID, childrenThisGTO, torrentName, foo);
+      }
+      else
+      {
+         close (pipes[childID][1]);
+         childRec *cRec = new childRec;
+         cRec->childID = childID;
+         cRec->dataDownloaded = 0;
+         cRec->pipeHandle = fdopen (pipes[childID][0], "r");
+         pidList[pid] = cRec;
+      }
 
-            downloadChild (childID, childrenThisGTO, torrentName, foo);
+      childID++;
+   }
+
+   int64_t xfer = 0;
+   int64_t childXfer = 0;
+   int64_t dlRate = 0;
+
+   while (pidList.size() > 0)
+   {
+      xfer = 0;
+      dlRate = 0;
+      childXfer = 0;
+
+      std::map<pid_t, childRec *>::iterator pidListIter = pidList.begin();
+
+      while (pidListIter != pidList.end())
+      {
+         int retValue;
+         char inBuff[40];
+
+         if (NULL != fgets (inBuff, 40, pidListIter->second->pipeHandle))
+         {
+            childXfer = strtoll (inBuff, NULL, 10);
+            pidListIter->second->dataDownloaded  = childXfer;
          }
          else
          {
-            close (pipes[childID][1]);
-            childRec *cRec = new childRec;
-            cRec->childID = childID;
-            cRec->dataDownloaded = 0;
-            cRec->pipeHandle = fdopen (pipes[childID][0], "r");
-            pidList[pid] = cRec;
+            childXfer = pidListIter->second->dataDownloaded;  // return data for this poll
          }
 
-         childID++;
+         if (NULL != fgets (inBuff, 40, pidListIter->second->pipeHandle))
+         {
+            dlRate += strtol (inBuff, NULL, 10);
+         }
+         else
+         {
+            usleep (250000);   // If null read, fd is closed in child, but waitpid will not detect the dead child.  pause for 1/4 second.
+         }
+
+         pid_t pidStat = waitpid (pidListIter->first, &retValue, WNOHANG);
+
+         if (pidStat == pidListIter->first)
+         {
+            if (WIFEXITED(retValue) && WEXITSTATUS(retValue) != 0)
+            {
+               char buffer[256];
+               snprintf(buffer, sizeof(buffer), "Child %d exited with exit code %d", pidListIter->first, WEXITSTATUS(retValue));
+               gtError (buffer, WEXITSTATUS(retValue), DEFAULT_ERROR);
+            }
+            else if (WIFSIGNALED(retValue))
+            {
+               char buffer[256];
+               snprintf(buffer, sizeof(buffer), "Child %d terminated with signal %d", pidListIter->first, WTERMSIG(retValue));
+               gtError (buffer, -1, DEFAULT_ERROR);
+            }
+
+            totalDataDownloaded += pidListIter->second->dataDownloaded;
+            fclose (pidListIter->second->pipeHandle);
+            delete pidListIter->second;
+            pidList.erase(pidListIter++);
+         }
+         else
+         {
+            xfer += childXfer;
+            pidListIter++;
+         }
       }
 
-      int64_t xfer = 0;
-      int64_t childXfer = 0;
-      int64_t dlRate = 0;
-
-      while (pidList.size() > 0)
+      if (pidList.begin() == pidList.end())   // Transfers are done, all children have died, 100% should have been reported on the previous pass.
       {
-         xfer = 0;
-         dlRate = 0;
-         childXfer = 0;
+         break;
+      }
 
-         std::map<pid_t, childRec *>::iterator pidListIter = pidList.begin();
+      int64_t freeSpace = getFreeDiskSpace();
 
-         while (pidListIter != pidList.end())
-         { 
-            int retValue;
-            char inBuff[40];
-            
-            if (NULL != fgets (inBuff, 40, pidListIter->second->pipeHandle))
-            {
-               childXfer = strtoll (inBuff, NULL, 10);
-               pidListIter->second->dataDownloaded  = childXfer;
-            }
-            else
-            {
-               childXfer = pidListIter->second->dataDownloaded;  // return data for this poll
-            }
-
-            if (NULL != fgets (inBuff, 40, pidListIter->second->pipeHandle))
-            {
-               dlRate += strtol (inBuff, NULL, 10);
-            }
-            else
-            {
-               usleep (250000);   // If null read, fd is closed in child, but waitpid will not detect the dead child.  pause for 1/4 second.
-            }
-
-            pid_t pidStat = waitpid (pidListIter->first, &retValue, WNOHANG);
-
-            if (pidStat == pidListIter->first)
-            {
-               if (WIFEXITED(retValue) && WEXITSTATUS(retValue) != 0) 
-               {
-                  char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "Child %d exited with exit code %d", pidListIter->first, WEXITSTATUS(retValue));
-                  gtError (buffer, WEXITSTATUS(retValue), DEFAULT_ERROR);
-               } 
-               else if (WIFSIGNALED(retValue)) 
-               {
-                  char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "Child %d terminated with signal %d", pidListIter->first, WTERMSIG(retValue));
-                  gtError (buffer, -1, DEFAULT_ERROR);
-               } 
-
-               totalDataDownloaded += pidListIter->second->dataDownloaded;
-               fclose (pidListIter->second->pipeHandle);
-               delete pidListIter->second;
-               pidList.erase(pidListIter++);
-            }
-            else
-            {
-               xfer += childXfer;
-               pidListIter++;
-            }
-         }
-  
-         if (pidList.begin() == pidList.end())   // Transfers are done, all children have died, 100% should have been reported on the previous pass.
+      if (totalSizeOfDownload > totalDataDownloaded + xfer + freeSpace)
+      {
+         if (freeSpace > DISK_FREE_WARN_LEVEL)
          {
-            break;
+            gtError ("The system *might* run out of disk space before all downloads are complete", ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
          }
-
-         int64_t freeSpace = getFreeDiskSpace();
-
-         if (totalSizeOfDownload > totalDataDownloaded + xfer + freeSpace) 
+         else
          {
-            if (freeSpace > DISK_FREE_WARN_LEVEL)
-            {
-               gtError ("The system *might* run out of disk space before all downloads are complete", ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "Downloading will continue until less than " + add_suffix (DISK_FREE_WARN_LEVEL) + " is available.");
-            }
-            else
-            {
-               gtError ("The system is running low on disk space.  Shutting down download client.", 97, gtBase::DEFAULT_ERROR, 0);
-            }
-         }
-
-         if (_verbosityLevel > VERBOSE_1) 
-         {
-            screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
+            gtError ("The system is running low on disk space.  Shutting down download client.", 97, gtBase::DEFAULT_ERROR, 0);
          }
       }
+
+      if (_verbosityLevel > VERBOSE_1)
+      {
+         screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
+      }
+   }
 }
 
 void gtDownload::performTorrentDownload (int64_t totalSizeOfDownload)
