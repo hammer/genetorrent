@@ -266,129 +266,135 @@ void gtDownload::prepareDownloadList (vectOfStr &urisToDownload)
    }
 }
 
-void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
+void gtDownload::downloadGtoFileByURI (std::string &uri)
 {
    if (_verbosityLevel > VERBOSE_1)
    {
       screenOutputNoNewLine ("Communicating with GT Executive ...        ");
    }
 
+   CURL *curl;
+   curl = curl_easy_init ();
+
+   if (!curl)
+   {
+      gtError ("libCurl initialization failure", 201);
+   }
+
+   std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
+   fileName = fileName.substr (0, fileName.find_first_of ('?'));
+   std::string torrUUID = fileName;
+   fileName += GTO_FILE_EXTENSION;
+
+   FILE *gtoFile;
+
+   gtoFile = fopen (fileName.c_str (), "wb");
+
+   if (gtoFile == NULL)
+   {
+      gtError ("Failure opening " + fileName + " for output.", 202, ERRNO_ERROR, errno);
+   }
+
+   char errorBuffer[CURL_ERROR_SIZE + 1];
+   errorBuffer[0] = '\0';
+
+   std::string curlResponseHeaders = "";
+
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
+
+   curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
+   curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, NULL);
+   curl_easy_setopt (curl, CURLOPT_HEADERFUNCTION, &curlCallBackHeadersWriter);
+   curl_easy_setopt (curl, CURLOPT_MAXREDIRS, 15);
+   curl_easy_setopt (curl, CURLOPT_WRITEDATA, gtoFile);
+   curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
+   curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
+
+   curl_easy_setopt (curl, CURLOPT_POST, (long)1);
+
+   struct curl_httppost *post=NULL;
+   struct curl_httppost *last=NULL;
+
+   curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
+
+   curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
+
+   int timeoutVal = 15;
+   int connTime = 4;
+
+   curl_easy_setopt (curl, CURLOPT_URL, uri.c_str());
+   curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
+   curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
+
+   CURLcode res;
+
+   res = curl_easy_perform (curl);
+
+   fclose (gtoFile);
+
+   processCurlResponse (curl, res, fileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
+
+   if (_verbosityLevel > VERBOSE_2)
+   {
+      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
+   }
+
+   curl_easy_cleanup (curl);
+
+   std::string torrFile = getWorkingDirectory () + '/' + fileName;
+
+   _torrentListToDownload.push_back (torrFile);
+
+   libtorrent::error_code torrentError;
+   libtorrent::torrent_info torrentInfo (torrFile, torrentError);
+
+   if (torrentError)
+   {
+      gtError (".gto processing problem with " + torrFile, 87, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+   }
+
+   if (torrentInfo.ssl_cert().size() > 0 && _devMode == false)
+   {
+      std::string pathToKeep = "/cghub/data/";
+
+      std::size_t foundPos;
+
+      if (std::string::npos == (foundPos = uri.find (pathToKeep)))
+      {
+         gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
+      }
+
+      std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
+
+      generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
+   }
+
+   if (global_gtAgentMode)
+   {
+      std::vector<libtorrent::announce_entry> const trackers = torrentInfo.trackers();
+
+      std::vector<libtorrent::announce_entry>::const_iterator trackerIter = trackers.begin();
+      while (trackerIter != trackers.end())
+      {
+         std::cout << (*trackerIter).url << std::endl;
+         trackerIter++;
+      }
+   }
+}
+
+void gtDownload::downloadGtoFilesByURI (vectOfStr &uris)
+{
    unsigned int counter = 0;
    vectOfStr::iterator vectIter = uris.begin ();
 
    while (vectIter != uris.end ())
    {
-      CURL *curl;
-      curl = curl_easy_init ();
-
-      if (!curl)
-      {
-         gtError ("libCurl initialization failure", 201);
-      }
-
       std::string uri = *vectIter;
 
-      std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
-      fileName = fileName.substr (0, fileName.find_first_of ('?'));
-      std::string torrUUID = fileName;
-      fileName += GTO_FILE_EXTENSION;
+      downloadGtoFileByURI (uri);
 
-      FILE *gtoFile;
-
-      gtoFile = fopen (fileName.c_str (), "wb");
-
-      if (gtoFile == NULL)
-      {
-         gtError ("Failure opening " + fileName + " for output.", 202, ERRNO_ERROR, errno);
-      }
-
-      char errorBuffer[CURL_ERROR_SIZE + 1];
-      errorBuffer[0] = '\0';
-
-      std::string curlResponseHeaders = "";
-
-      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
-      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
-
-      curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
-      curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, NULL);
-      curl_easy_setopt (curl, CURLOPT_HEADERFUNCTION, &curlCallBackHeadersWriter);
-      curl_easy_setopt (curl, CURLOPT_MAXREDIRS, 15);
-      curl_easy_setopt (curl, CURLOPT_WRITEDATA, gtoFile);
-      curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
-      curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
-
-      curl_easy_setopt (curl, CURLOPT_POST, (long)1);
-
-      struct curl_httppost *post=NULL;
-      struct curl_httppost *last=NULL;
-
-      curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
-
-      curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
-
-      int timeoutVal = 15;
-      int connTime = 4;
-
-      curl_easy_setopt (curl, CURLOPT_URL, uri.c_str());
-      curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
-      curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
-
-      CURLcode res;
-
-      res = curl_easy_perform (curl);
-
-      fclose (gtoFile);
-
-      processCurlResponse (curl, res, fileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
-
-      if (_verbosityLevel > VERBOSE_2)
-      {
-         screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
-      }
-
-      curl_easy_cleanup (curl);
-
-      std::string torrFile = getWorkingDirectory () + '/' + fileName;
-
-      _torrentListToDownload.push_back (torrFile);
-
-      libtorrent::error_code torrentError;
-      libtorrent::torrent_info torrentInfo (torrFile, torrentError);
-
-      if (torrentError)
-      {
-         gtError (".gto processing problem with " + torrFile, 87, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
-      }
-
-      if (torrentInfo.ssl_cert().size() > 0 && _devMode == false)
-      {
-         std::string pathToKeep = "/cghub/data/";
-  
-         std::size_t foundPos;
- 
-         if (std::string::npos == (foundPos = uri.find (pathToKeep)))
-         {
-            gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
-         }
-
-         std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
-
-         generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
-      }
       vectIter++;
-
-      if (global_gtAgentMode)
-      {
-         std::vector<libtorrent::announce_entry> const trackers = torrentInfo.trackers();
-         
-         std::vector<libtorrent::announce_entry>::const_iterator trackerIter = trackers.begin();
-         while (trackerIter != trackers.end())
-         {
-            std::cout << (*trackerIter).url << std::endl;
-            trackerIter++;
-         }
-      }
 
       if (_verbosityLevel == VERBOSE_2)   // only display when not dumping headers
       {
