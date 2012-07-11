@@ -226,7 +226,9 @@ void gtDownload::run ()
       screenOutput (message.str()); 
    }
 
-   chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
+   if ( chdir (saveDir.c_str ()) ) {
+      Log (PRIORITY_NORMAL, "Failed to chdir to saveDir"); 
+   }
 }
 
 void gtDownload::prepareDownloadList ()
@@ -733,7 +735,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
 
       checkAlerts (torrentSession);
 
-      libtorrent::session_status sessionStatus = torrentSession.status ();
+      // libtorrent::session_status sessionStatus = torrentSession.status ();
       libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
       fprintf (fd, "%lld\n", (long long) torrentStatus.total_wanted_done);

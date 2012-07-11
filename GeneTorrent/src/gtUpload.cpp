@@ -72,6 +72,7 @@
 #include "gtLog.h"
 #include "loggingmask.h"
 
+/*
 static char const* upload_state_str[] = {
    "checking (q)",                     // queued_for_checking,
    "checking",                         // checking_files,
@@ -82,6 +83,7 @@ static char const* upload_state_str[] = {
    "allocating",                       // allocating,
    "checking (r)"                      // checking_resume_data
 };
+*/
 
 extern void *geneTorrCallBackPtr; 
 
@@ -233,7 +235,10 @@ void gtUpload::run ()
       screenOutput (message.str()); 
    }
 
-   chdir (saveDir.c_str ());       // shutting down, if the chdir back fails, so be it
+   if (chdir (saveDir.c_str ()))
+   {
+      Log (PRIORITY_NORMAL, "Failed to chdir to saveDir");
+   }
 }
 
 void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool resumedUpload)

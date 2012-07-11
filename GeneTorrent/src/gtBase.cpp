@@ -824,7 +824,10 @@ void gtBase::cleanupTmpDir()
 {
    if (!_devMode)
    {
-      system (("rm -rf " + _tmpDir.substr(0,_tmpDir.size()-1)).c_str());
+      if (system (("rm -rf " + _tmpDir.substr(0,_tmpDir.size()-1)).c_str()))
+      {
+         Log (PRIORITY_NORMAL, "Failed to clean up temp directory");
+      }
    }
 }
 
@@ -1011,13 +1014,18 @@ std::string gtBase::getWorkingDirectory ()
    long size;
    char *buf;
    char *ptr;
+   std::string result;
 
    size = pathconf (".", _PC_PATH_MAX);
 
    if ((buf = (char *) malloc ((size_t) size)) != NULL)
+   {
       ptr = getcwd (buf, (size_t) size);
 
-   std::string result = buf;
+      if (ptr)
+         result = buf;
+   }
+
    free (buf);
    return result;
 }
@@ -1509,7 +1517,10 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
          std::ostringstream logMessage;
          logMessage << "error processing failure with file:  " << newFileName <<  ", review the contents of the file.";
          Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
-         system (("cat " + newFileName).c_str());
+         if (system (("cat " + newFileName).c_str()))
+         {
+            Log (PRIORITY_NORMAL, "Failed to display error XML file");  
+         }
       }
       return false;
    }

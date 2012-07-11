@@ -190,7 +190,7 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
    {
       std::string format = "Error:  " + std::string(fmt) + "\n";
       va_list ap;
-      va_start (ap, format.c_str());
+      va_start (ap, fmt);
       vfprintf(stderr, format.c_str(), ap);
       va_end(ap);
    }
