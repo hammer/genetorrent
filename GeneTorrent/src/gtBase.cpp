@@ -834,6 +834,8 @@ void gtBase::cleanupTmpDir()
 // 
 void gtBase::bindSession (libtorrent::session *torrentSession)
 {
+   boost::system::error_code ec;
+
    // the difference between the actual port used and the port to be advertised to the tracker
    if (_exposedPortDelta != 0) 
    {
@@ -846,14 +848,20 @@ void gtBase::bindSession (libtorrent::session *torrentSession)
 
    // update the IP we bind on.  
    //
-   // TODO: the listen_on function is deprecated in libtorrent, so upgrade to the newer method of doing this
+
    if (_bindIP.size () > 0)
    {
-      torrentSession->listen_on (std::make_pair (_portStart, _portEnd), _bindIP.c_str (), 0);
+      torrentSession->listen_on (std::make_pair (_portStart, _portEnd), ec, _bindIP.c_str (), 0);
    }
    else
    {
-      torrentSession->listen_on (std::make_pair (_portStart, _portEnd), NULL, 0);
+      torrentSession->listen_on (std::make_pair (_portStart, _portEnd), ec, NULL, 0);
+   }
+
+   if (ec.value())
+   {
+      Log (PRIORITY_NORMAL, "failure to set listen address or port in torrent session. (code %d) %s",
+         ec.value(), ec.message().c_str());
    }
 
    // the ip address sent to the tracker with the announce
