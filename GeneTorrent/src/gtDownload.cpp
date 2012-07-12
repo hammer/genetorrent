@@ -226,7 +226,7 @@ void gtDownload::run ()
       screenOutput (message.str()); 
    }
 
-   if ( chdir (saveDir.c_str ()) ) {
+   if (chdir (saveDir.c_str ())) {
       Log (PRIORITY_NORMAL, "Failed to chdir to saveDir"); 
    }
 }
