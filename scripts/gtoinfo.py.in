@@ -86,7 +86,12 @@ import os
 import sys
 import shutil
 import time
-import hashlib
+
+# hashlib came along in Python 2.5, and we want to support 2.4.  
+try:
+    import hashlib
+except ImportError:
+    pass
 
 # tokenize()
 # A generator function that actually returns a tokenizer object with an 
@@ -811,6 +816,11 @@ def main():
 
     (params, gto_filenames) = parser.parse_args()
 
+    if ('hashlib' not in sys.modules and params.infohash is True):
+        print("The infohash function requires the Python hashlib module, which is not present.")
+        print("This module is present in Python 2.5 and above.")
+        sys.exit(1)
+
     if (len(gto_filenames) == 0):
         parser.print_help()
         return 1
@@ -833,8 +843,8 @@ def main():
 
 # Check the python version for compatability.  Python 3 is not
 # backward compatible.
-if sys.version_info[0] != 2 or sys.version_info[1] < 6:
-    print("This script requires Python version 2.6")
+if sys.version_info[0] != 2 or sys.version_info[1] < 4:
+    print("This script requires Python version 2.4 or later")
     sys.exit(1)
 
 if __name__ == "__main__":
