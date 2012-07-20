@@ -648,6 +648,8 @@ std::string gtBase::sanitizePath (std::string inPath)
 // 
 gtBase::~gtBase ()
 {
+   delete _gtFingerPrint;
+   gtLogger::delete_globallog();
 }
 
 // 
@@ -1396,8 +1398,8 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
-   curl_easy_cleanup (curl);
    curl_formfree (post);
+   curl_easy_cleanup (curl);
 
    return successfulPerform;
 }

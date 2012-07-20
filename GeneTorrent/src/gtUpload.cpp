@@ -323,6 +323,7 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
       gtError ("Unable to rename " + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION + " to " + torrentFileName, 203, ERRNO_ERROR, errno);
    }
 
+   curl_formfree(post);
    curl_easy_cleanup (curl);
 }
 
