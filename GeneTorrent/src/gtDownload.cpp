@@ -349,6 +349,7 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
+   curl_formfree(post);
    curl_easy_cleanup (curl);
 
    std::string torrFile = getWorkingDirectory () + '/' + fileName;
@@ -777,6 +778,13 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
 
    sleep(5);
    checkAlerts (torrentSession);
+
+   // Tear down torrent session before exiting
+   // This prevents race conditions by calling the libtorrent session
+   // thread joins and object destructors in the expected order
+   torrentSession.~session ();
+
+   gtLogger::delete_globallog();
 
    exit (0);
 }
