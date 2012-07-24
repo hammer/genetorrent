@@ -1636,7 +1636,7 @@ namespace aux {
 	
 	void session_impl::abort()
 	{
-		TORRENT_ASSERT(is_network_thread());
+		TORRENT_ASSERT(is_network_thread() || m_thread == NULL);
 
 		if (m_abort) return;
 #if defined TORRENT_LOGGING
@@ -4419,6 +4419,7 @@ namespace aux {
 		{
 			error_code ec;
 			m_io_service.run(ec);
+
 			if (ec)
 			{
 #ifdef TORRENT_DEBUG
@@ -5232,7 +5233,15 @@ namespace aux {
 
 	session_impl::~session_impl()
 	{
-		m_io_service.post(boost::bind(&session_impl::abort, this));
+		// If the network thread is running, post the abort to the IO service.
+		// Otherwise, directly call abort here, which is safe if the network
+		// thread is not running.  The thread may not be running if its
+		// pthread_create call failed, and we still need to clean up the
+		// session_impl object.
+		if (m_thread)
+			m_io_service.post(boost::bind(&session_impl::abort, this));
+		else
+			abort(); // session_impl::abort()
 
 		// we need to wait for the disk-io thread to
 		// die first, to make sure it won't post any
