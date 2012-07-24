@@ -63,6 +63,8 @@ const int HTTP_ERROR_EXIT_CODE = 10;
 
 const int64_t DISK_FREE_WARN_LEVEL = 1000 * 1000 * 1000;  // 1 GB, aka 10^9
 
+const unsigned long PROCESS_MIN = 4096; // preferred minimum user NPROC soft limit for download mode
+
 // move to future config file
 const std::string GT_CERT_SIGN_TAIL = "gtsession";
 const std::string DEFAULT_CGHUB_HOSTNAME = "cghub.ucsc.edu";

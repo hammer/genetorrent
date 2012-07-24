@@ -680,9 +680,12 @@ void gtUpload::processManifestFile ()
 
 void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgress, bool inResumeMode)
 {
-   libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
-   optimizeSession (torrentSession);
-   bindSession (torrentSession);
+   libtorrent::session *torrentSession = makeTorrentSession ();
+
+   if (!torrentSession)
+   {
+      gtError ("unable to open a libtorrent session", 218, DEFAULT_ERROR);
+   }
 
    libtorrent::add_torrent_params torrentParams;
    torrentParams.seed_mode = true;
@@ -700,7 +703,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
       gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
    }
 
-   libtorrent::torrent_handle torrentHandle = torrentSession.add_torrent (torrentParams, torrentError);
+   libtorrent::torrent_handle torrentHandle = torrentSession->add_torrent (torrentParams, torrentError);
 
    if (torrentError)
    {
@@ -755,14 +758,14 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
 
    bool displayed100Percent = false;
 
-   libtorrent::session_status sessionStatus = torrentSession.status ();
+   libtorrent::session_status sessionStatus = torrentSession->status ();
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
    percentComplete = 0.0;
 
    while (torrentStatus.uploaded < 1)
    {
-      sessionStatus = torrentSession.status();
+      sessionStatus = torrentSession->status();
       torrentStatus = torrentHandle.status();
 
       libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
@@ -817,7 +820,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    }
 
    checkAlerts (torrentSession);
-   torrentSession.remove_torrent (torrentHandle);
+   torrentSession->remove_torrent (torrentHandle);
 
     // Note that remove_torrent does at least two things asynchronously: 1) it
     // sets in motion the deletion of this torrent object, and 2) it sends the
@@ -841,6 +844,8 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
 
    sleep(5);
    checkAlerts (torrentSession);
+
+   delete torrentSession;
 }
 
 // do not include files that are not present in _filesToUpload

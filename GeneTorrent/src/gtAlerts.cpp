@@ -48,8 +48,13 @@
 
 void gtBase::checkAlerts (libtorrent::session &torrSession)
 {
+   checkAlerts (&torrSession);
+}
+
+void gtBase::checkAlerts (libtorrent::session *torrSession)
+{
    std::deque <libtorrent::alert *> alerts;
-   torrSession.pop_alerts (&alerts);   
+   torrSession->pop_alerts (&alerts);
 
    for (std::deque<libtorrent::alert *>::iterator dequeIter = alerts.begin(), end(alerts.end()); dequeIter != end; ++dequeIter)
    {

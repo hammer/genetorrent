@@ -43,6 +43,8 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include <iostream>
 #include <fstream>
@@ -171,6 +173,31 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
 
 void gtDownload::run ()
 {
+   // check system resources
+   // GeneTorrent downloads are thread/process intensive
+   // If possible, set the soft process limit for user to at
+   // least PROCESS_MIN for this process.
+   struct rlimit r;
+   if (!getrlimit (RLIMIT_NPROC, &r))
+   {
+      if (r.rlim_cur < PROCESS_MIN &&
+          (r.rlim_max >= PROCESS_MIN || r.rlim_max == RLIM_INFINITY))
+      {
+         r.rlim_cur = PROCESS_MIN;
+         // no change to rlim_max, since that is a hard system policy
+
+         std::ostringstream errorstr;
+         errorstr << "setting user process soft limit to ";
+         errorstr << PROCESS_MIN;
+         gtError (errorstr.str(), NO_EXIT);
+
+         if (setrlimit (RLIMIT_NPROC, &r))
+         {
+            gtError ("setting user process soft limit failed", NO_EXIT);
+         }
+      }
+   }
+
    time_t startTime = time(NULL);
    std::string saveDir = getWorkingDirectory ();
 
@@ -468,7 +495,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
    int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
    int childID=1;
 
-   std::map <pid_t, childRec *> pidList;
+   childMap pidList;
    pid_t pid;
 
    while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
@@ -504,6 +531,32 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
       }
 
       childID++;
+
+      // throttle fork() calls so we don't overload the system with new
+      // processes and their libtorrent threads
+      // 1/10th of a second seems reasonable, and should be mostly imperceptible
+      // to users (default calls to fork is 8)
+      // In particular, we want GeneTorrent and libtorrent to stop spawning new
+      // children (and threads of children) as soon as the resource is exhausted
+      usleep (100000);
+
+      // Stop forking if any children have terminated
+      childMap::iterator pidListIter = pidList.begin();
+
+      while (pidListIter != pidList.end())
+      {
+         int retValue = 0;
+         pid_t pidStat = waitpid (pidListIter->first, &retValue, WNOHANG);
+
+         if (pidStat == pidListIter->first &&
+             (WIFEXITED(retValue) || WIFSIGNALED(retValue)))
+         {
+            // Child terminated abnormally, stop forking
+            gtError ("download child exited abnormally", 107);
+         }
+
+         pidListIter++;
+      }
    }
 
    int64_t xfer = 0;
@@ -516,7 +569,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
       dlRate = 0;
       childXfer = 0;
 
-      std::map<pid_t, childRec *>::iterator pidListIter = pidList.begin();
+      childMap::iterator pidListIter = pidList.begin();
 
       while (pidListIter != pidList.end())
       {
@@ -636,9 +689,14 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    gtLogger::delete_globallog();
    _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination, childID);
 
-   libtorrent::session torrentSession (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
-   optimizeSession (torrentSession);
-   bindSession (torrentSession);
+   libtorrent::session *torrentSession = makeTorrentSession ();
+
+   if (!torrentSession)
+   {
+      // Exiting with non-zero return code causes parent to exit
+      // Other children notice that they're init orphans and exit in turn
+      gtError ("unable to open a libtorrent session", 218, DEFAULT_ERROR);
+   }
 
    std::string uuid = torrentName;
    uuid = uuid.substr (0, uuid.rfind ('.'));
@@ -667,7 +725,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
    }
 
-   libtorrent::torrent_handle torrentHandle = torrentSession.add_torrent (torrentParams, torrentError);
+   libtorrent::torrent_handle torrentHandle = torrentSession->add_torrent (torrentParams, torrentError);
 
    if (torrentError)
    {
@@ -726,6 +784,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
          if (getppid() == 1)   // Parent has died, follow course
          {
             gtError ("download parent process has exited, gracefully exiting child process.", NO_EXIT);
+            break;
          }
       }
 
@@ -736,7 +795,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
 
       checkAlerts (torrentSession);
 
-      // libtorrent::session_status sessionStatus = torrentSession.status ();
+      // libtorrent::session_status sessionStatus = torrentSession->status ();
       libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
       fprintf (fd, "%lld\n", (long long) torrentStatus.total_wanted_done);
@@ -754,7 +813,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    }
 
    checkAlerts (torrentSession);
-   torrentSession.remove_torrent (torrentHandle);
+   torrentSession->remove_torrent (torrentHandle);
 
    // Note that remove_torrent does at least two things asynchronously: 1) it
    // sets in motion the deletion of this torrent object, and 2) it sends the
@@ -782,7 +841,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    // Tear down torrent session before exiting
    // This prevents race conditions by calling the libtorrent session
    // thread joins and object destructors in the expected order
-   torrentSession.~session ();
+   delete torrentSession;
 
    gtLogger::delete_globallog();
 

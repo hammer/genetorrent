@@ -105,6 +105,8 @@ class gtBase
          int64_t dataDownloaded;
       } childRec;
 
+      typedef std::map<pid_t, childRec *> childMap;
+
       typedef std::vector <std::string> vectOfStr;
 
       gtBase (boost::program_options::variables_map &vm, opMode mode);
@@ -139,10 +141,12 @@ class gtBase
       void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
+      void checkAlerts (libtorrent::session *torrSession);
       void getGtoNameAndInfoHash (libtorrent::torrent_alert *alert, std::string &gtoName, std::string &infoHash);
 
-      void bindSession(libtorrent::session &torrentSession);
-      void bindSession(libtorrent::session *torrentSession);
+      libtorrent::session *makeTorrentSession ();
+      void bindSession (libtorrent::session &torrentSession);
+      void bindSession (libtorrent::session *torrentSession);
       void optimizeSession (libtorrent::session *torrentSession);
       void optimizeSession (libtorrent::session &torrentSession);
 

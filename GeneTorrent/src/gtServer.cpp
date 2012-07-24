@@ -626,9 +626,10 @@ void gtServer::deleteGTOfromQueue (std::string fileName)
 
 libtorrent::session *gtServer::addActiveSession ()
 {
-   libtorrent::session *sessionNew = new libtorrent::session (*_gtFingerPrint, 0, libtorrent::alert::all_categories);
-   optimizeSession (sessionNew);
-   bindSession (sessionNew);
+   libtorrent::session *sessionNew = makeTorrentSession ();
+
+   if (!sessionNew)
+      return NULL;
 
    int portUsed = sessionNew->listen_port ();
    int sslPortUsed = sessionNew->ssl_listen_port ();

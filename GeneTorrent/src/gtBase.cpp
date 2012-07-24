@@ -833,6 +833,25 @@ void gtBase::cleanupTmpDir()
    }
 }
 
+libtorrent::session * gtBase::makeTorrentSession ()
+{
+   libtorrent::session *torrentSession = NULL;
+
+   try
+   {
+      torrentSession = new libtorrent::session(*_gtFingerPrint, 0, libtorrent::alert::all_categories);
+      optimizeSession (torrentSession);
+      bindSession (torrentSession);
+   }
+   catch (boost::system::system_error e)  // thrown by boost::asio if a pthread_create
+                                          // fails due to user/system process limits or OOM
+   {
+      gtError ("torrent session initialization error: " + std::string(e.what()), ERROR_NO_EXIT, DEFAULT_ERROR);
+   }
+
+   return torrentSession;
+}
+
 // 
 void gtBase::bindSession (libtorrent::session *torrentSession)
 {
