@@ -690,6 +690,11 @@ def process(params, gto_filenames):
                 gtodict['info']['ssl-cert'] = cert_text
                 gto_file_changed = True
 
+        if (params.remove_ssl_cert):
+            if ('ssl-cert' in gtodict['info']):
+                del gtodict['info']['ssl-cert']
+                gto_file_changed = True
+
         if (params.set_key != None):
             (k, v) = params.set_key
             gto_file_changed = set_key(gtodict, k, v)
@@ -810,6 +815,10 @@ def main():
                       default="", dest='ssl_cert', 
                       help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
 
+    parser.add_option('--remove-ssl-cert', action='store_true',
+                      default="", dest='remove_ssl_cert',
+                      help='Remove the SSL certificate.')
+
     parser.add_option('', '--set-key', action='store', nargs=2,
                       default=None, dest='set_key', metavar='KEY VALUE',
                       help='Add or modify the specified key, setting it to value.')
@@ -829,7 +838,8 @@ def main():
         and params.find_piece_index == -1 and params.piece_index == -1 
         and params.announce_url == "" and params.expiry == "" and params.get_expire is False 
         and params.infohash is False and params.list_files is False 
-        and params.piece_length is False and params.ssl_cert == "" and params.set_key == None):
+        and params.piece_length is False and params.ssl_cert == "" and params.set_key == None
+        and params.remove_ssl_cert is False):
         params.decode_file = True
 
     try:
