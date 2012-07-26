@@ -158,7 +158,6 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          std::cout << "   GeneTorrent -s path -q work-queue -c cred --security-api signing-URI" << std::endl;
          std::cout << std::endl;
          std::cout << "Additional options are available.  Type 'man GeneTorrent' for more information." << std::endl;
-sleep (20);
          exit (0);
       }
 
