@@ -44,14 +44,19 @@ AC_INIT(GeneTorrentScripts, scriptver)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
-AM_PATH_PYTHON([2.6])
-
 AC_CONFIG_FILES([
 Makefile 
-GTLoadBalancer
 python_wrapper
 gtoinfo.py
-gtocheck
 ])
+
+AM_PATH_PYTHON([2.4])                     # minimum python version to use scripts
+AM_CONDITIONAL([HAVE_NEW_PYTHON], [test $PYTHON_VERSION != "2.4"])
+
+AM_COND_IF([HAVE_NEW_PYTHON], AC_CONFIG_FILES([
+GTLoadBalancer
+gtocheck
+]))
+
 AC_OUTPUT
 
