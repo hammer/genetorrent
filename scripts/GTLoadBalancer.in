@@ -430,7 +430,7 @@ def process_input_q(config, q_type):
         return False
     try:
         gtos = os.listdir(q_dir)
-    except OSError as e:
+    except (OSError,), e:
         log(syslog.LOG_ALERT, "Error: Could not read queue dir: %s " % e)
         return False
 
@@ -497,7 +497,7 @@ def mainloop(config):
         # poll to see if we should re-read our config file
         try:
             mtime = os.path.getmtime(config['config_file'])
-        except OSError as e:
+        except (OSError,), e:
             log(syslog.LOG_ALERT, "Error reading config file: %s" % e)
             continue
 
@@ -506,7 +506,7 @@ def mainloop(config):
                 newconfig = parse_config_file(config['config_file'])
                 config = newconfig
                 log(syslog.LOG_NOTICE, "Re-read configuration file successfully")
-            except Exception as e:
+            except (Exception,), e:
                 log(syslog.LOG_ALERT, "Error reading config file: %s" % e)
                 log(syslog.LOG_ALERT, 
                     "Because of config file errors, proceeding with previous configuration")
@@ -817,7 +817,7 @@ def main():
 
     try:
         config = parse_config_file(params.config_file)
-    except Exception as e:
+    except (Exception,), e:
         msg = "Fatal error reading config file: %s" % e
         log(syslog.LOG_ALERT, msg)
         print >> sys.stderr, msg
@@ -841,7 +841,7 @@ def main():
 # Check the python version for compatability.  Python 3 is not
 # backward compatible.
 #
-if sys.version_info[0] != 2 or sys.version_info[1] < 6:
+if sys.version_info[0] != 2 or sys.version_info[1] < 4:
     print("This script requires Python version 2.6")
     sys.exit(1)
 

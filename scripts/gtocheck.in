@@ -38,9 +38,12 @@
 from optparse import OptionParser
 import sys
 import os
-import hashlib
 import gtoinfo
 import binascii
+try:
+    from hashlib import sha1 as hash_sha1
+except ImportError:
+    from sha import new as hash_sha1
 
 # Current version
 revlevel = '@PACKAGE_VERSION@'
@@ -64,12 +67,15 @@ def check_gto(gtofile, params):
 
     for p in range(num_pieces):
         expected_hash = gtoinfo.piece_hash(gtodict, p)
-        h = hashlib.sha1()
+        h = hash_sha1()
         for chunk in piece_locations[p]:
             fname = os.path.join(params.parent_dir, chunk[0])
-            with open(fname, 'r') as f: 
+            f = open(fname, 'r')
+            try:
                 f.seek(chunk[1])
                 h.update(f.read(chunk[2]))
+            finally:
+                f.close()
         if (h.digest() != expected_hash):
             if (not params.quiet):
                 print "Error: %s: piece %d is corrupt" % (os.path.basename(gtofile), p)
@@ -82,7 +88,7 @@ def check_gto(gtofile, params):
             return False
 
     return True
-                
+
 
 # main()
 #
@@ -123,9 +129,10 @@ def main():
 
 # Check the python version for compatability.  Python 3 is not
 # backward compatible.
-if sys.version_info[0] != 2 or sys.version_info[1] < 6:
-    print("This script requires Python version 2.6")
+if sys.version_info[0] != 2 or sys.version_info[1] < 4:
+    print("This script requires Python version 2.4")
     sys.exit(1)
 
 if __name__ == "__main__":
     sys.exit(main())
+

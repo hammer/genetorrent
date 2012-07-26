@@ -89,9 +89,9 @@ import time
 
 # hashlib came along in Python 2.5, and we want to support 2.4.  
 try:
-    import hashlib
+    from hashlib import sha1 as hash_sha1
 except ImportError:
-    pass
+    from sha import new as hash_sha1
 
 # tokenize()
 # A generator function that actually returns a tokenizer object with an 
@@ -460,7 +460,7 @@ def piece_hash(data, piece_index):
 #
 def infohash(data):
     inf = encode_dict(data['info'])
-    return hashlib.sha1(inf).hexdigest()
+    return hash_sha1(inf).hexdigest()
 
 
 # piece_length()
@@ -824,11 +824,6 @@ def main():
                       help='Add or modify the specified key, setting it to value.')
 
     (params, gto_filenames) = parser.parse_args()
-
-    if ('hashlib' not in sys.modules and params.infohash is True):
-        print("The infohash function requires the Python hashlib module, which is not present.")
-        print("This module is present in Python 2.5 and above.")
-        sys.exit(1)
 
     if (len(gto_filenames) == 0):
         parser.print_help()
