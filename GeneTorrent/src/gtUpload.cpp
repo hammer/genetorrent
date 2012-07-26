@@ -295,7 +295,7 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
-   // GCHUBDEV-22: Set CURL timeouts to 20 seconds
+   // CGHUBDEV-22: Set CURL timeouts to 20 seconds
    int timeoutVal = 20;
    int connTime = 20;
 

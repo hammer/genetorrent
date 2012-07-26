@@ -1391,7 +1391,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
-   // GCHUBDEV-22: Set CURL timeouts to 20 seconds
+   // CGHUBDEV-22: Set CURL timeouts to 20 seconds
    int timeoutVal = 20;
    int connTime = 20;
 
