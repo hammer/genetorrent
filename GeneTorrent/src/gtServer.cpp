@@ -581,7 +581,17 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
       newTorrRec->torrentHandle.set_ssl_certificate (sslCert, sslKey, _dhParamsFile);   // no passphrase
    }
 
-   newTorrRec->torrentHandle.resume();
+   // The resume() causes the first announce of the torrent to be sent
+   // to the tracker. If there are a lot of .gto files sitting in the
+   // workqueue which are all added to the session at once, then we
+   // will effectively DOS the tracker (looks like syn flood if N is
+   // large, say 15K). Staggering the announcements with a delay
+   // breaks the burstiness down into smaller groups.
+   static unsigned int stagger_announce_step = 0;
+   const boost::int64_t delay_step_ms = 500;
+   const int max_steps = 60; // gives max delay of 30s
+   newTorrRec->torrentHandle.resume (delay_step_ms * (stagger_announce_step % max_steps));
+   stagger_announce_step++;
 
    if (_verbosityLevel > VERBOSE_1)
    {
