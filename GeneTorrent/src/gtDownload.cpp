@@ -94,6 +94,7 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
    _downloadSavePath = pcfacliPath(vm);
    pcfacliDownloadList (vm);
    pcfacliRateLimit (vm);
+   pcfacliInactiveTimeout (vm);
 
    Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
@@ -561,13 +562,26 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
 
    int64_t xfer = 0;
    int64_t childXfer = 0;
+   int64_t totalXfer = 0; // total bytes downloaded as of last outer loop iteration
    int64_t dlRate = 0;
+   time_t lastActivity = timeout_update ();  // initialize last activity time for inactvitiy timeout
 
    while (pidList.size() > 0)
    {
       xfer = 0;
       dlRate = 0;
       childXfer = 0;
+
+      // Inactivity timeout check
+      if (timeout_check_expired (&lastActivity))
+      {
+         // Timeout message and exit here
+         // This is parent process, children will exit
+         std::ostringstream timeLenStr;
+         timeLenStr << _inactiveTimeout;
+         gtError ("Inactivity timeout triggered after " + timeLenStr.str() +
+            " minute(s).  Shutting down download client.", 206, gtBase::DEFAULT_ERROR, 0);
+      }
 
       childMap::iterator pidListIter = pidList.begin();
 
@@ -613,6 +627,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
             }
 
             totalDataDownloaded += pidListIter->second->dataDownloaded;
+            timeout_update (&lastActivity);
             fclose (pidListIter->second->pipeHandle);
             delete pidListIter->second;
             pidList.erase(pidListIter++);
@@ -647,6 +662,10 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
       {
          screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
       }
+
+      if (totalDataDownloaded + xfer > totalXfer)
+         timeout_update (&lastActivity);
+      totalXfer = totalDataDownloaded + xfer;
    }
 
    totalBytes += totalDataDownloaded;

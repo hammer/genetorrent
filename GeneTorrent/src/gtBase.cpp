@@ -98,6 +98,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _exposedPortDelta (0),
    _addTimestamps (false),
    _rateLimit (-1),
+   _inactiveTimeout (0),
    _startUpComplete (false),
    _bindIP (""), 
    _exposedIP (""), 
@@ -541,6 +542,19 @@ std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
    }
 
    return path;
+}
+
+// Used by download and upload modes
+void  gtBase::pcfacliInactiveTimeout (boost::program_options::variables_map &vm)
+{
+   if (vm.count (INACTIVE_TIMEOUT_CLI_OPT) < 1)
+   {
+      return;
+   }
+
+   int inactiveTimeout = vm[INACTIVE_TIMEOUT_CLI_OPT].as<int>();      // As minutes
+
+   _inactiveTimeout = inactiveTimeout;      // in minutes
 }
 
 // 
@@ -1621,5 +1635,29 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
       }
    }
    return true;    // success curl transaction
+}
+
+// Small wrapper around time () to initialize
+// or update a time_t struct
+time_t gtBase::timeout_update (time_t *timer)
+{
+   return time (timer);
+}
+
+// Check whether timeout is expired
+// It is expired if all of the following:
+//    this->_inactiveTimeout > 0
+//    timer != NULL
+//    time elapsed since last timer update
+//       is > _inactiveTimeout (* 60 for seconds)
+bool gtBase::timeout_check_expired (time_t *timer)
+{
+   if (_inactiveTimeout <= 0 || !timer)
+      return false;
+
+   if (time (NULL) - *timer > _inactiveTimeout * 60)
+      return true;
+
+   return false;
 }
 

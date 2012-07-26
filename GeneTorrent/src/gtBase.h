@@ -131,6 +131,7 @@ class gtBase
 
       long _rateLimit;            // limits data transfer rate of uploads and downloads (if set), this is expressed in libtorrent units of bytes per second
                                   // The conversion from command line argument value to libtorrent value is performed in pcfacliRateLimit()
+      int _inactiveTimeout;       // amount of time (in minutes) after which downloads and uploads are terminated due to inactivity
 
       libtorrent::fingerprint *_gtFingerPrint;
 
@@ -164,12 +165,17 @@ class gtBase
 
       std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload
       void pcfacliRateLimit (boost::program_options::variables_map &vm);
+      void pcfacliInactiveTimeout (boost::program_options::variables_map &vm);
       void checkCredentials ();
 
       std::string sanitizePath (std::string inPath);
       void relativizePath (std::string &inPath);
 
       void removeFile (std::string fileName);
+
+      // inactivity timeout functions for upload and download modes
+      time_t timeout_update (time_t *timer = NULL);
+      bool timeout_check_expired (time_t *timer);
 
    private:
       attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];

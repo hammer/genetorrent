@@ -143,6 +143,9 @@ const std::string RATE_LIMIT_CLI_OPT = "rate-limit";               // -r short o
 
 const std::string GTA_CLIENT_CLI_OPT = "gta";                      // no short option
 
+const char INACTIVE_TIMEOUT_SHORT_CLI_OPT = 'k';                   // -k short option
+const std::string INACTIVE_TIMEOUT_CLI_OPT = "inactivity-timeout";
+
 // Upload Mode
 const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short option
 const std::string UPLOAD_FILE_CLI_OPT_LEGACY = "manifestFile";

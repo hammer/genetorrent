@@ -93,6 +93,7 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
    pcfacliUpload (vm);
    pcfacliUploadGTODir (vm);
    pcfacliRateLimit (vm);
+   pcfacliInactiveTimeout (vm);
 
    checkCredentials ();
 
@@ -762,11 +763,29 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    libtorrent::torrent_status torrentStatus = torrentHandle.status ();
 
    percentComplete = 0.0;
+   time_t lastActivity = timeout_update ();
+   int64_t lastScrapeTotalPayUp = 0;
 
    while (torrentStatus.uploaded < 1)
    {
+      // Update session and torrent status as of last successful tracker scrape
       sessionStatus = torrentSession->status();
       torrentStatus = torrentHandle.status();
+
+      if (torrentStatus.total_payload_upload > lastScrapeTotalPayUp)
+         timeout_update (&lastActivity);
+
+      lastScrapeTotalPayUp = torrentStatus.total_payload_upload;
+
+      // Inactivity timeout check
+      if (timeout_check_expired (&lastActivity))
+      {
+         // Timeout message and exit here
+         std::ostringstream timeLenStr;
+         timeLenStr << _inactiveTimeout;
+         gtError ("Inactivity timeout triggered after " + timeLenStr.str() +
+            " minute(s).  Shutting down upload client.", 206, gtBase::DEFAULT_ERROR, 0);
+      }
 
       libtorrent::ptime endMonitoring = libtorrent::time_now_hires() + libtorrent::seconds (5);
 
@@ -776,6 +795,8 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
 
+
+      // Warning - Asynchronous call does below not update our torrentStatus struct
       torrentHandle.scrape_tracker();
 
       FILE *gtoFile;

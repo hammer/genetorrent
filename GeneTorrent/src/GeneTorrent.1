@@ -120,6 +120,15 @@ used.  If an endPort is not specified, 9 ports will be configured, so
 .IR endPort " = " startPort " + 8."
 The default is to use ports 20892 through 20900.
 .TP
+.BI \-k " minutes" "\fR,\fP \-\^\-inactivity-timeout" " minutes"
+Specifies a duration of inactivity in minutes after
+which GeneTorrent, in download or upload mode, will abort file
+transfers and exit.  The activity measured to make this determination
+is actual payload data transfer over the GeneTorrent protocol.  The
+default behavior is to never timeout, which is the recommended
+setting.  When using this setting, it is recommended that it be set
+for 40 or more minutes.
+.TP
 .BI \-l " destination\fR[:\fPverbosity\fR]\fP" "\fR,\fP \-\^\-log" " destination\fR[:\fPverbosity\fR]\fP"
 Specifies the destination of a log file and a verbosity level.
 Possible values for the destination include "none", "stdout",
