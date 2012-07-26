@@ -44,13 +44,13 @@ GeneTorrent Client.  This package contains GeneTorrent Download and Upload clien
 
 %post Server
 /sbin/chkconfig --add GeneTorrent
-%{?el6:/sbin/chkconfig --add GTLoadBalancer}
+/sbin/chkconfig --add GTLoadBalancer
 
 %preun Server
 /sbin/service GeneTorrent stop > /dev/null
-%{?el6:/sbin/service GTLoadBalancer stop > /dev/null}
+/sbin/service GTLoadBalancer stop > /dev/null
 /sbin/chkconfig --del GeneTorrent
-%{?el6:/sbin/chkconfig --del GTLoadBalancer}
+/sbin/chkconfig --del GTLoadBalancer
 
 %prep
 %setup -q 
@@ -73,29 +73,22 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
+%{_bindir}/gtocheck
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-%{?el6:%{_bindir}/gtocheck}
-%{?el6:/usr/lib/python2.6/site-packages/*}
-%if "%{dist}" == ".Centos5"
-/usr/lib/python2.4/site-packages/*
-%endif
+/usr/lib/python2.6/site-packages/*
 
 %files Server
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
+%{_bindir}/gtocheck
+%{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-%{?el6:%{_bindir}/gtocheck}
-%{?el6:%{_bindir}/GTLoadBalancer}
-%{?el6:/usr/lib/python2.6/site-packages/*}
-%if "%{dist}" == ".Centos5"
-/usr/lib/python2.4/site-packages/*
-%endif
-
+/usr/lib/python2.6/site-packages/*
 %config(noreplace) %{_initddir}/*
 %config(noreplace) %{_sysconfdir}/gnos.d/GeneTorrent.conf
-%{?el6:%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf}
+%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
 
 %files
 %defattr(-,root,root,-)
