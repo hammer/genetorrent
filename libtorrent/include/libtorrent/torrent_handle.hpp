@@ -226,7 +226,7 @@ namespace libtorrent
 
 		enum pause_flags_t { graceful_pause = 1 };
 		void pause(int flags = 0) const;
-		void resume() const;
+		void resume(boost::int64_t delay_announce_ms = 0) const;
 		void set_upload_mode(bool b) const;
 		void set_share_mode(bool b) const;
 		void flush_cache() const;

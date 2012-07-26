@@ -411,10 +411,10 @@ namespace libtorrent
 		TORRENT_ASYNC_CALL(force_recheck);
 	}
 
-	void torrent_handle::resume() const
+	void torrent_handle::resume(boost::int64_t delay_announce_ms) const
 	{
 		INVARIANT_CHECK;
-		TORRENT_ASYNC_CALL(resume);
+		TORRENT_ASYNC_CALL1(resume, delay_announce_ms);
 	}
 
 	void torrent_handle::auto_managed(bool m) const

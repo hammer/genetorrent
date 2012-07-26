@@ -6808,7 +6808,7 @@ while (certBeginPos != std::string::npos)
 		}
 	}
 
-	void torrent::resume()
+	void torrent::resume(boost::int64_t delay_announce_ms)
 	{
 		TORRENT_ASSERT(m_ses.is_network_thread());
 		INVARIANT_CHECK;
@@ -6826,10 +6826,10 @@ while (certBeginPos != std::string::npos)
 		// we need to save this new state
 		m_need_save_resume_data = true;
 
-		do_resume();
+		do_resume(delay_announce_ms);
 	}
 
-	void torrent::do_resume()
+	void torrent::do_resume(boost::int64_t delay_announce_ms)
 	{
 		TORRENT_ASSERT(m_ses.is_network_thread());
 		if (is_paused()) return;
@@ -6857,7 +6857,7 @@ while (certBeginPos != std::string::npos)
 
 		m_started = time_now();
 		clear_error();
-		start_announcing();
+		start_announcing(delay_announce_ms);
 		if (!m_queued_for_checking && should_check_files())
 			queue_torrent_check();
 	}
@@ -6942,7 +6942,7 @@ while (certBeginPos != std::string::npos)
 		m_tracker_timer.async_wait(boost::bind(&torrent::on_tracker_announce_disp, self, _1));
 	}
 
-	void torrent::start_announcing()
+	void torrent::start_announcing(boost::int64_t delay_announce_ms)
 	{
 		TORRENT_ASSERT(m_ses.is_network_thread());
 		if (is_paused()) return;
@@ -6967,7 +6967,18 @@ while (certBeginPos != std::string::npos)
 		m_total_redundant_bytes = 0;
 		m_stat.clear();
 
-		announce_with_tracker();
+		if (delay_announce_ms > 0)
+		{
+			// Call update_tracker_timer() with the requested delay
+			// before announcing.
+			ptime future = time_now_hires() + milliseconds(delay_announce_ms);
+			update_tracker_timer(future);
+		}
+		else
+		{
+			// Just announce now.
+			announce_with_tracker();
+		}
 
 		// private torrents are never announced on LSD
 		// or on DHT, we don't need this timer.

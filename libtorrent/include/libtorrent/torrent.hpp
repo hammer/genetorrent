@@ -159,7 +159,7 @@ namespace libtorrent
 		void files_checked();
 		void start_checking();
 
-		void start_announcing();
+		void start_announcing(boost::int64_t delay_announce_ms = 0);
 		void stop_announcing();
 
 		void send_share_mode();
@@ -243,7 +243,7 @@ namespace libtorrent
 
 		void flush_cache();
 		void pause(bool graceful = false);
-		void resume();
+		void resume(boost::int64_t delay_announce_ms = 0);
 		void set_allow_peers(bool b, bool graceful_pause = false);
 		void set_announce_to_dht(bool b) { m_announce_to_dht = b; }
 		void set_announce_to_trackers(bool b) { m_announce_to_trackers = b; }
@@ -251,7 +251,7 @@ namespace libtorrent
 
 		ptime started() const { return m_started; }
 		void do_pause();
-		void do_resume();
+		void do_resume(boost::int64_t delay_announce_ms = 0);
 
 		bool is_paused() const;
 		bool allows_peers() const { return m_allow_peers; }
