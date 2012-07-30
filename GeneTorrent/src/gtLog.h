@@ -72,8 +72,11 @@
 //      syslog     Log will be sent to syslog
 //      filename   Log will be written to the specified file
 
-const bool PRIORITY_HIGH = true;
-const bool PRIORITY_NORMAL = false;
+enum gtLogLevel {
+   PRIORITY_NORMAL,
+   PRIORITY_HIGH,
+   PRIORITY_DEBUG,
+};
 
 class gtLogger 
 {
@@ -81,7 +84,7 @@ class gtLogger
       static bool create_globallog (std::string, std::string, int childID = 0);
       static void delete_globallog();
 
-      void __Log (bool, const char *file, int line, const char *string, ...);
+      void __Log (gtLogLevel priority, const char *file, int line, const char *string, ...);
 
       const char *log_file_name() { return m_filename; }
       bool logToStdErr() { return m_mode == gtLoggerOutputStderr; }

@@ -184,9 +184,9 @@ gtLogger::~gtLogger()
       GlobalLog = NULL;
 }
 
-void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt, ...)
+void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const char *fmt, ...)
 {
-   if (true == priority && ( m_mode == gtLoggerOutputNone || m_mode == gtLoggerOutputSyslog || m_mode == gtLoggerOutputFile))
+   if (PRIORITY_HIGH == priority && ( m_mode == gtLoggerOutputNone || m_mode == gtLoggerOutputSyslog || m_mode == gtLoggerOutputFile))
    {
       std::string format = "Error:  " + std::string(fmt) + "\n";
       va_list ap;
@@ -211,24 +211,36 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
       localtime_r(&nowSec, &time_tm);
       strftime(timebuf, sizeof(timebuf), "%m/%d %H:%M:%S", &time_tm);
 
-      if (priority)
+      switch (priority)
       {
-          snprintf(buffer, sizeof(buffer), "%s.%03d Error:  %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
-      }
-      else
-      {
-          snprintf(buffer, sizeof(buffer), "%s.%03d %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+         case PRIORITY_HIGH:
+         {
+            snprintf(buffer, sizeof(buffer), "%s.%03d Error:  %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+         } break;
+
+         case PRIORITY_NORMAL:      // fall-through
+
+         case PRIORITY_DEBUG:
+         {
+            snprintf(buffer, sizeof(buffer), "%s.%03d %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
+         } break;
       }
    }
    else
    {
-      if (priority)
+      switch (priority)
       {
-         snprintf(buffer, sizeof(buffer), "Error:  %s", fmt);
-      }
-      else
-      {
-         snprintf(buffer, sizeof(buffer), "%s", fmt);
+         case PRIORITY_HIGH:
+         {
+            snprintf(buffer, sizeof(buffer), "Error:  %s", fmt);
+         } break;
+
+         case PRIORITY_NORMAL:      // fall-through
+
+         case PRIORITY_DEBUG:
+         {
+            snprintf(buffer, sizeof(buffer), "%s", fmt);
+         } break;
       }
    }
 
@@ -243,13 +255,22 @@ void gtLogger::__Log (bool priority, const char *file, int line, const char *fmt
    {
       char sysLogBuffer[2048];
       vsnprintf(sysLogBuffer, sizeof(sysLogBuffer), buffer, ap);
-      if (priority)
+      switch (priority)
       {
-         syslog (LOG_ALERT, "%s", sysLogBuffer);
-      }
-      else
-      {
-         syslog (LOG_INFO, "%s", sysLogBuffer);
+         case PRIORITY_HIGH:
+         {
+            syslog (LOG_ALERT, "%s", sysLogBuffer);
+         } break;
+
+         case PRIORITY_NORMAL:
+         {
+            syslog (LOG_INFO, "%s", sysLogBuffer);
+         } break;
+
+         case PRIORITY_DEBUG:
+         {
+            syslog (LOG_DEBUG, "%s", sysLogBuffer);
+         } break;
       }
    }
 

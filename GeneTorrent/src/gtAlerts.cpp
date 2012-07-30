@@ -112,7 +112,7 @@ void gtBase::checkAlerts (libtorrent::session *torrSession)
          case libtorrent::alert::rss_notification:
          default:
          {
-            Log (haveError, "Unknown alert category %08x encountered in checkAlerts() [%s : %s]", (*dequeIter)->category(), (*dequeIter)->what(), (*dequeIter)->message().c_str());
+            Log (logLevelFromBool (haveError), "Unknown alert category %08x encountered in checkAlerts() [%s : %s]", (*dequeIter)->category(), (*dequeIter)->what(), (*dequeIter)->message().c_str());
          } break;
       }
    }
@@ -146,7 +146,7 @@ void gtBase::processUnimplementedAlert (bool haveError, libtorrent::alert *alrt)
 {
    if (_logMask & LOG_UNIMPLEMENTED_ALERTS)
    {
-      Log (haveError, "%s : %s (%08x)", alrt->what(), alrt->message().c_str(), alrt->category() );
+      Log (logLevelFromBool (haveError), "%s : %s (%08x)", alrt->what(), alrt->message().c_str(), alrt->category() );
    }
 }
 
@@ -190,11 +190,11 @@ void gtBase::processDebugNotification (bool haveError, libtorrent::alert *alrt)
 
          if (pca->pid[0] != '\0')       // pid is a typedef from a big_number class as a string of 20 nulls if not assigned a proper pid, thus size() functions fail to report an empty string.
          {
-            Log (haveError, "connecting to %s:%d (ID %s), gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), pca->pid.to_string().c_str(), gtoName.c_str(), infoHash.c_str());
+            Log (logLevelFromBool (haveError), "connecting to %s:%d (ID %s), gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), pca->pid.to_string().c_str(), gtoName.c_str(), infoHash.c_str());
          }
          else
          {
-            Log (haveError, "connecting to %s:%d gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), gtoName.c_str(), infoHash.c_str());
+            Log (logLevelFromBool (haveError), "connecting to %s:%d gto: %s, infohash: %s", pca->ip.address().to_string(ec).c_str(), pca->ip.port(), gtoName.c_str(), infoHash.c_str());
          }
       } break;
 
@@ -206,11 +206,11 @@ void gtBase::processDebugNotification (bool haveError, libtorrent::alert *alrt)
 
          if (pda->pid[0] != '\0')        // pid is a typedef from a big_number class as a string of 20 nulls if not assigned a proper pid, thus size() functions fail to report an empty string.
          {
-            Log (haveError, "disconnecting from %s:%d (ID %s), reason: %s, gto: %s, infohash: %s", pda->ip.address().to_string(ec).c_str(), pda->ip.port(), pda->pid.to_string().c_str(), pda->error.message().c_str(), gtoName.c_str(), infoHash.c_str());
+            Log (logLevelFromBool (haveError), "disconnecting from %s:%d (ID %s), reason: %s, gto: %s, infohash: %s", pda->ip.address().to_string(ec).c_str(), pda->ip.port(), pda->pid.to_string().c_str(), pda->error.message().c_str(), gtoName.c_str(), infoHash.c_str());
          }
          else
          {
-            Log (haveError, "disconnecting from %s:%d reason: %s, gto: %s, infohash: %s", pda->ip.address().to_string(ec).c_str(), pda->ip.port(), pda->error.message().c_str(), gtoName.c_str(), infoHash.c_str());
+            Log (logLevelFromBool (haveError), "disconnecting from %s:%d reason: %s, gto: %s, infohash: %s", pda->ip.address().to_string(ec).c_str(), pda->ip.port(), pda->error.message().c_str(), gtoName.c_str(), infoHash.c_str());
          }
       } break;
 
@@ -258,7 +258,7 @@ void gtBase::processStatNotification (bool haveError, libtorrent::alert *alrt)
 
          getGtoNameAndInfoHash (statsAlert, gtoName, infoHash);
 
-         Log (haveError, "%s, infohash:  %s", statsAlert->message().c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "%s, infohash:  %s", statsAlert->message().c_str(), infoHash.c_str());
       } break;
 
       default:
@@ -286,7 +286,7 @@ void gtBase::processPerformanceWarning (bool haveError, libtorrent::alert *alrt)
 
          getGtoNameAndInfoHash (perfAlert, gtoName, infoHash);
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", perfAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "%s, gto:  %s, infohash:  %s", perfAlert->message().c_str(), gtoName.c_str(), infoHash.c_str());
       } break;
       default:
       {
@@ -362,7 +362,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
             gtError (errorMessage, 214);
          }
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "%s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
 
          if ((_operatingMode != SERVER_MODE ) && (tea->times_in_row > 2) && (_successfulTrackerComms == false))
          {
@@ -383,7 +383,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
             screenOutput (errorMessage);
          }
 
-         Log (haveError, "%s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "%s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());
       } break;
 
       case libtorrent::scrape_failed_alert::alert_type:
@@ -407,7 +407,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
          libtorrent::tracker_reply_alert *tra = libtorrent::alert_cast<libtorrent::tracker_reply_alert> (alrt);
          getGtoNameAndInfoHash (tra, gtoName, infoHash);
-         Log (haveError, "%s, infohash:  %s", tra->message().c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "%s, infohash:  %s", tra->message().c_str(), infoHash.c_str());
 
       } break;
 
@@ -420,7 +420,16 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
          libtorrent::tracker_announce_alert *taa = libtorrent::alert_cast<libtorrent::tracker_announce_alert> (alrt);
          getGtoNameAndInfoHash (taa, gtoName, infoHash);
-         Log (haveError, "%s, infohash:  %s", taa->message().c_str(), infoHash.c_str());
+
+         // If in server mode, non-error tracker announce notifications should
+         // be debug level
+         gtLogLevel level = PRIORITY_NORMAL;
+         if (haveError)
+            level = PRIORITY_HIGH;
+         else if (_operatingMode == SERVER_MODE)
+            level = PRIORITY_DEBUG;
+
+         Log (level, "%s, infohash:  %s", taa->message().c_str(), infoHash.c_str());
 
       } break;
 

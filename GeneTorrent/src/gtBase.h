@@ -58,6 +58,7 @@
 
 #include "gtDefs.h"
 #include "gtUtils.h"
+#include "gtLog.h"
 #include "accumulator.hpp"
 
 extern bool global_gtAgentMode;
@@ -114,6 +115,7 @@ class gtBase
 
       virtual void run () = 0;
       uint32_t getLogMask() {return _logMask;}
+      gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
 
    protected:
       int  _verbosityLevel;
