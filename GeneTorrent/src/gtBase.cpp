@@ -99,6 +99,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _addTimestamps (false),
    _rateLimit (-1),
    _inactiveTimeout (0),
+   _curlVerifySSL (true),
    _startUpComplete (false),
    _bindIP (""), 
    _exposedIP (""), 
@@ -205,6 +206,7 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliLog (vm);
    pcfacliPath (vm);
    pcfacliTimestamps (vm);
+   pcfacliCurlNoVerifySSL (vm);
 }
 
 void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
@@ -556,6 +558,18 @@ void  gtBase::pcfacliInactiveTimeout (boost::program_options::variables_map &vm)
 
    _inactiveTimeout = inactiveTimeout;      // in minutes
 }
+
+void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
+{
+   if (vm.count (CURL_NO_VERIFY_SSL_CLI_OPT) < 1)
+   {
+      return;
+   }
+
+   _curlVerifySSL = false;
+}
+
+
 
 // 
 void gtBase::setTempDir ()     
@@ -1384,8 +1398,8 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
       }
    }
 
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, _curlVerifySSL);
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, _curlVerifySSL);
 
    curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
    curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, NULL);

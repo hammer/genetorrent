@@ -78,6 +78,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (TIMESTAMP_STD_CLI_OPT).c_str(), "add timestamps to messages logged to the screen")
       (VERBOSITY_CLI_OPT.c_str(), boost::program_options::value< int >(), "on screen verbosity level")
       (makeOpt (INACTIVE_TIMEOUT_CLI_OPT, INACTIVE_TIMEOUT_SHORT_CLI_OPT).c_str(), boost::program_options::value< int >(), "timeout transfers after inactivity in minutes (40+ minutes is recommended)")
+      (makeOpt (CURL_NO_VERIFY_SSL_CLI_OPT).c_str(), "do not verify SSL certificates of web services")
 
       // Download
       (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value< std::vector <std::string> >()->composing(), "URI | UUID | .xml | .gto")

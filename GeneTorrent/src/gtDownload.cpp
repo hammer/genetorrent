@@ -336,8 +336,8 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
 
    std::string curlResponseHeaders = "";
 
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, _curlVerifySSL);
+   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, _curlVerifySSL);
 
    curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
    curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, NULL);
