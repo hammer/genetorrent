@@ -44,7 +44,7 @@ AC_INIT(GeneTorrentScripts, scriptver)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
-AM_PATH_PYTHON([2.6])
+AM_PATH_PYTHON([2.4])
 
 AC_CONFIG_FILES([
 Makefile 
