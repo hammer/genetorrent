@@ -273,8 +273,11 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
       gtError ("libCurl initialization failure", 201);
    }
 
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, _curlVerifySSL);
-   curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, _curlVerifySSL);
+   if (!_curlVerifySSL)
+   {
+      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
+   }
 
    curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
    curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, NULL);
