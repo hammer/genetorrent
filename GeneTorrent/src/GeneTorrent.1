@@ -160,28 +160,32 @@ flag, above) should include a timestamp.  This is primarily useful
 when these messages are being redirected to a file for later review.
 .TP
 .BR \-\^\-null\-storage
-Enable null storage implementation. This a command line only option,
-not available in config file.
+Enable null storage implementation. This is a command line only option
+and is not available in the configuration file.
 
-A virtual storage device intended for a receive-only peer and throws
-away all data received (rather than writing to disk).  Of course this
-means the peer cannot turn around and share any blocks it has
+A virtual storage device intended for a receive-only peer which throws away all
+data received (rather than writing to disk).  Of course this means a receive
+peer running in this mode cannot turn around and share any blocks it has
 received.
 
-Can not be used in conjuntion with \fB\-\^\-zero\-storage\fP.
+This mode can not be used to transmit files.
+
+Can not be used in conjunction with \fB\-\^\-zero\-storage\fP.
 .TP
 .BR \-\^\-zero\-storage
-Enable zero storage implementation. This a command line only option,
-not available in config file.
+Enable zero storage implementation. This is a command line only option
+and is not available in the configuration file.
 
-A virtual storage device intended for a transmit peers and throws away
-all data received (rather than writing to disk). Transmitted data will
-always consist of a stream of zeros. Of course this means the peer
-cannot turn around and share any blocks it has received and the
-reciever of transmitted data must have a torrent file which hashes
-properly.
+A virtual storage device intended for a transmit or receive peer which throws
+away all data received (rather than writing to disk). Transmitted data will
+always consist of a stream of zeros. Of course this means the receive peer
+running in this mode cannot turn around and share any blocks it has received.
 
-Can not be used in conjuntion with \fB\-\^\-null\-storage\fP.
+The transmitter of the data must have a precomputed torrent file which hashes
+properly since GeneTorrent will not be able to create a torrent file (.gto
+file) when run in zero storage mode.
+
+Can not be used in conjunction with \fB\-\^\-null\-storage\fP.
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
