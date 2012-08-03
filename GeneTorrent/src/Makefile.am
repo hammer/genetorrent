@@ -36,11 +36,11 @@ GeneTorrent_SOURCES = gtBase.cpp \
                       gtDownload.cpp \
                       gtUpload.cpp \
                       gtServer.cpp \
-		      gtMain.cpp \
-		      gtLog.cpp \
-		      gtAlerts.cpp \
-		      geneTorrentUtils.cpp \
-		      stringTokenizer.cpp
+                      gtMain.cpp \
+                      gtLog.cpp \
+                      gtAlerts.cpp \
+                      geneTorrentUtils.cpp \
+                      stringTokenizer.cpp
 
 
 GTdatadir = $(datadir)/GeneTorrent
