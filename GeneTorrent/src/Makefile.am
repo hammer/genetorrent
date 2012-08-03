@@ -40,6 +40,8 @@ GeneTorrent_SOURCES = gtBase.cpp \
                       gtLog.cpp \
                       gtAlerts.cpp \
                       geneTorrentUtils.cpp \
+                      gtNullStorage.cpp \
+                      gtZeroStorage.cpp \
                       stringTokenizer.cpp
 
 
