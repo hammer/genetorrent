@@ -130,6 +130,8 @@ void configureCommandLineOptions (boost::program_options::options_description &o
       (makeOpt (HELP_CLI_OPT).c_str(), "Help Message")          
       (makeOpt (NO_LONG_CLI_OPT, VERBOSITY_SHORT_CLI_OPT).c_str(), accumulator<int>(&global_verbosity), "on screen verbosity level")
       (VERSION_CLI_OPT.c_str(),       "Display Version")       // long option only
+      (NULL_STORAGE_OPT.c_str(), "enable use of null storage") // long option only
+      (ZERO_STORAGE_OPT.c_str(), "enable use of zero storage") // long option only
    ;
 }
 

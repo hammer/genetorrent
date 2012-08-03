@@ -93,6 +93,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _devMode (false),
    _tmpDir (""), 
    _logDestination ("none"),     // default to no logging
+   _use_null_storage (false),
+   _use_zero_storage (false),
    _portStart (20892),
    _portEnd (20900),
    _exposedPortDelta (0),
@@ -207,6 +209,7 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliPath (vm);
    pcfacliTimestamps (vm);
    pcfacliCurlNoVerifySSL (vm);
+   pcfacliStorageFlags (vm);
 }
 
 void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
@@ -570,6 +573,27 @@ void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
 }
 
 
+// Check the cli args for storage flags.
+//
+// Ensure that only one flag is set at a time.
+//
+void gtBase::pcfacliStorageFlags (boost::program_options::variables_map &vm)
+{
+   if (vm.count (NULL_STORAGE_OPT))
+   {
+      _use_null_storage = true;
+   }
+
+   if (vm.count (ZERO_STORAGE_OPT))
+   {
+      _use_zero_storage = true;
+   }
+
+   if (_use_null_storage && _use_zero_storage)
+   {
+      commandLineError ("Use of both '--null-storage' and '--zero-storage' options at same time is not allowed.");
+   }
+}
 
 // 
 void gtBase::setTempDir ()     

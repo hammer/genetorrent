@@ -167,6 +167,10 @@ const std::string QUEUE_CLI_OPT = "queue";                         // -q short o
 
 const std::string SECURITY_API_CLI_OPT = "security-api";           // NO short option
 
+// Storage Options
+const std::string NULL_STORAGE_OPT = "null-storage";               // NO short option
+const std::string ZERO_STORAGE_OPT = "zero-storage";               // NO short option
+
 // define one free function used in command line and config file process, implementation is in gtMain.cpp
 void commandLineError (std::string errMessage);
 

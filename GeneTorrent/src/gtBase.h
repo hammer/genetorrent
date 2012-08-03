@@ -126,6 +126,11 @@ class gtBase
       std::string _logDestination;
       std::string _dhParamsFile;
 
+      // Null and Zero storage are mutually exclusive. Neither should be used
+      // in production.
+      bool _use_null_storage;
+      bool _use_zero_storage;
+
       int _portStart;              // based on --internalIP
       int _portEnd;                // based on --internalIP
       int _exposedPortDelta;
@@ -228,5 +233,6 @@ class gtBase
       void pcfacliTimestamps (boost::program_options::variables_map &vm);
       void pcfacliGTAgentMode (boost::program_options::variables_map &vm);
       void pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm);
+      void pcfacliStorageFlags (boost::program_options::variables_map &vm);
 };
 #endif /* GT_BASE_H_ */

@@ -158,6 +158,30 @@ information.
 Specifies that the on-screen progress messages (controlled by the -v
 flag, above) should include a timestamp.  This is primarily useful
 when these messages are being redirected to a file for later review.
+.TP
+.BR \-\^\-null\-storage
+Enable null storage implementation. This a command line only option,
+not available in config file.
+
+A virtual storage device intended for a receive-only peer and throws
+away all data received (rather than writing to disk).  Of course this
+means the peer cannot turn around and share any blocks it has
+received.
+
+Can not be used in conjuntion with \fB\-\^\-zero\-storage\fP.
+.TP
+.BR \-\^\-zero\-storage
+Enable zero storage implementation. This a command line only option,
+not available in config file.
+
+A virtual storage device intended for a transmit peers and throws away
+all data received (rather than writing to disk). Transmitted data will
+always consist of a stream of zeros. Of course this means the peer
+cannot turn around and share any blocks it has received and the
+reciever of transmitted data must have a torrent file which hashes
+properly.
+
+Can not be used in conjuntion with \fB\-\^\-null\-storage\fP.
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  

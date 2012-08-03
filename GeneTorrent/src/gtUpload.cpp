@@ -71,6 +71,8 @@
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
+#include "gtNullStorage.h"
+#include "gtZeroStorage.h"
 
 /*
 static char const* upload_state_str[] = {
@@ -697,6 +699,15 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    torrentParams.allow_rfc1918_connections = true;
    torrentParams.auto_managed = false;
    torrentParams.save_path = "./";
+
+   if (_use_null_storage)
+   {
+      torrentParams.storage = null_storage_constructor;
+   }
+   else if (_use_zero_storage)
+   {
+      torrentParams.storage = zero_storage_constructor;
+   }
 
    libtorrent::error_code torrentError;
 

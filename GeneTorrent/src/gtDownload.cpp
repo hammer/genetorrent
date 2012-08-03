@@ -74,6 +74,7 @@
 #include "gtLog.h"
 #include "loggingmask.h"
 #include "gtDownload.h"
+#include "gtNullStorage.h"
 
 static char const* download_state_str[] = {
    "checking (q)",            // queued_for_checking,
@@ -728,6 +729,13 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    torrentParams.save_path = "./";
    torrentParams.allow_rfc1918_connections = true;
    torrentParams.auto_managed = false;
+
+   if (_use_null_storage || _use_zero_storage)
+   {
+      // On the download side, both null and zero storage are effectively the
+      // same, so just use null storage.
+      torrentParams.storage = null_storage_constructor;
+   }
 
    if (statDirectory ("./" + uuid) == 0)
    {

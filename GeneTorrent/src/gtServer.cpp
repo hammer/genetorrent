@@ -71,6 +71,8 @@
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
+#include "gtNullStorage.h"
+#include "gtZeroStorage.h"
 
 static char const* server_state_str[] = {
    "checking (q)",                    // queued_for_checking,
@@ -531,6 +533,18 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
    else
    {
       newTorrRec->downloadGTO = false;
+   }
+
+   // TODO: Might need _use_*_storage flags specific to D/L and U/L mode for
+   // gtServer.
+
+   if (_use_null_storage)
+   {
+      newTorrRec->torrentParams.storage = null_storage_constructor;
+   }
+   else if (_use_zero_storage)
+   {
+      newTorrRec->torrentParams.storage = zero_storage_constructor;
    }
 
    newTorrRec->torrentParams.auto_managed = false;
