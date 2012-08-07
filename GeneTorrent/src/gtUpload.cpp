@@ -310,8 +310,28 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
 
    CURLcode res;
+   int retries = 5;
 
-   res = curl_easy_perform (curl);
+   while (retries)
+   {
+      res = curl_easy_perform (curl);
+
+      if (res != CURLE_SSL_CONNECT_ERROR && res != CURLE_OPERATION_TIMEDOUT)
+      {
+         // Only retry on SSL connect errors or timeouts in case the other end is temporarily overloaded.
+         break;
+      }
+
+      // Give the other end time to become less loaded.
+      sleep (2);
+
+      retries--;
+
+      if (retries && (_verbosityLevel > VERBOSE_1))
+      {
+         screenOutput ("Retrying to submit gto for UUID: " + _uploadUUID);
+      }
+   }
 
    fclose (gtoFile);
 
