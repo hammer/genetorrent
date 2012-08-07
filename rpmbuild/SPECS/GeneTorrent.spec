@@ -1,5 +1,5 @@
 Name:           GeneTorrent
-Version:        3.1.1
+Version:        3.1.0
 Release:        1%{?dist}.CP
 Summary:        GeneTorrent
 
@@ -14,7 +14,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildRequires:  xqilla-devel tclap libcurl-devel log4cpp-devel
 #BuildRequires:  boost >= 1.48.0
 #BuildRequires:  boost-regex >= 1.48.0
-Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 
 # This prevents binaries from being stripped of their debug bits by rpmbuild
 %define __spec_install_post /usr/lib/rpm/brp-compress
@@ -24,36 +23,8 @@ Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 %description
 GeneTorrent
 
-%package Server
-Obsoletes: GeneTorrent
-Conflicts: GeneTorrent-Client
-Summary: GeneTorrent Server process (and related files).
-%description Server
-GeneTorrent Server.  This package contains GeneTorrent Server components.
-
-%package Client
-Obsoletes: GeneTorrent
-Conflicts: GeneTorrent-Server
-Summary: GeneTorrent Client process (and related files).
-%description Client
-GeneTorrent Client.  This package contains GeneTorrent Download and Upload client components.
-
-%pre Server
-/usr/bin/getent group gtorrent >/dev/null || /usr/sbin/groupadd -r gtorrent >/dev/null 
-/usr/bin/getent passwd gtorrent >/dev/null || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent >/dev/null
-
-%post Server
-/sbin/chkconfig --add GeneTorrent
-/sbin/chkconfig --add GTLoadBalancer
-
-%preun Server
-/sbin/service GeneTorrent stop > /dev/null
-/sbin/service GTLoadBalancer stop > /dev/null
-/sbin/chkconfig --del GeneTorrent
-/sbin/chkconfig --del GTLoadBalancer
-
 %prep
-%setup -q 
+%setup -q
 
 %build
 make %{?_smp_mflags}
@@ -69,25 +40,8 @@ make install DESTDIR=%{buildroot}
 %clean
 rm -rf %{buildroot}
 
-%files Client
+%files
 %defattr(-,root,root,-)
-%{_bindir}/%{name}
-%{_bindir}/gtoinfo
-%{_bindir}/gtocheck
-%{_mandir}/man1/%{name}*
-%{_datadir}/GeneTorrent/*
-# Files conditional on Centos5 build
-%if "%{dist}" == ".Centos5"
-/usr/lib/python2.4/site-packages/*
-%endif
-
-# Files conditional on RHEL5 build
-%{?el5:/usr/lib/python2.4/site-packages/*}
-
-# Files conditional on RHEL6/Centos6 build
-%{?el6:/usr/lib/python2.6/site-packages/*}
-
-%files Server
 %{_bindir}/%{name}
 %{_bindir}/gtoinfo
 %{_bindir}/gtocheck
@@ -105,14 +59,6 @@ rm -rf %{buildroot}
 
 # Files conditional on RHEL6/Centos6 build
 %{?el6:/usr/lib/python2.6/site-packages/*}
-
-%config(noreplace) %{_initddir}/*
-%config(noreplace) %{_sysconfdir}/gnos.d/GeneTorrent.conf
-%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
-
-%files
-%defattr(-,root,root,-)
-%{nil}
 
 %changelog
 * Mon Jul 16 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.2.2-1
