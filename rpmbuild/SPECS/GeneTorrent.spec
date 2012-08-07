@@ -76,7 +76,15 @@ rm -rf %{buildroot}
 %{_bindir}/gtocheck
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
+# Files conditional on Centos5 build
+%if "%{dist}" == ".Centos5"
+/usr/lib/python2.4/site-packages/*
+%endif
+
+# Files conditional on RHEL5 build
 %{?el5:/usr/lib/python2.4/site-packages/*}
+
+# Files conditional on RHEL6/Centos6 build
 %{?el6:/usr/lib/python2.6/site-packages/*}
 
 %files Server
@@ -97,6 +105,7 @@ rm -rf %{buildroot}
 
 # Files conditional on RHEL6/Centos6 build
 %{?el6:/usr/lib/python2.6/site-packages/*}
+
 %config(noreplace) %{_initddir}/*
 %config(noreplace) %{_sysconfdir}/gnos.d/GeneTorrent.conf
 %config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
