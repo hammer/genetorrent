@@ -76,7 +76,8 @@ rm -rf %{buildroot}
 %{_bindir}/gtocheck
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-/usr/lib/python2.6/site-packages/*
+%{?el5:/usr/lib/python2.4/site-packages/*}
+%{?el6:/usr/lib/python2.6/site-packages/*}
 
 %files Server
 %{_bindir}/%{name}
@@ -85,7 +86,8 @@ rm -rf %{buildroot}
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/%{name}*
 %{_datadir}/GeneTorrent/*
-/usr/lib/python2.6/site-packages/*
+%{?el5:/usr/lib/python2.4/site-packages/*}
+%{?el6:/usr/lib/python2.6/site-packages/*}
 %config(noreplace) %{_initddir}/*
 %config(noreplace) %{_sysconfdir}/gnos.d/GeneTorrent.conf
 %config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
@@ -95,6 +97,8 @@ rm -rf %{buildroot}
 %{nil}
 
 %changelog
+* Mon Jul 16 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.2.2-1
+- Add site-packages dirs and gtocheck script
 * Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1
 - Prevent binaires from being stripped
 
