@@ -135,11 +135,9 @@ function collectRPMS
 
    cd ~/rpmbuild/RPMS/x86_64
 
-   for c in Server Client
-   do
-      cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
-      cp GeneTorrent-${c}-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
-   done
+
+   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/GeneTorrent-${geneTorrentVer}/.
+   cp GeneTorrent-${geneTorrentVer}-1.*.CP.x86_64.rpm ~/.
 
    cd
    echo "All done!  GeneTorrent-${geneTorrentVer} is available in ~ for testing and delivery to the client."
