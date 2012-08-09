@@ -103,7 +103,7 @@ CC="$PTHREAD_CC"
 AS_ECHO
 AS_ECHO "Checking for boost libraries:"
 
-AX_BOOST_BASE([1.36])
+AX_BOOST_BASE([1.48])
 
 AX_BOOST_SYSTEM()
 AS_IF([test -z "$BOOST_SYSTEM_LIB"],
