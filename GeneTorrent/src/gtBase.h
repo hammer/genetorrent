@@ -47,7 +47,7 @@
 #include <map>
 #include <vector>
 
-#include <boost/filesystem/v3/path.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/program_options.hpp>
 
 #include <curl/curl.h>
