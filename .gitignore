@@ -28,3 +28,5 @@ libtorrent/m4/lt~obsolete.m4
 
 scripts/py-compile
 
+docs/*.pdf
+docs/*.html
