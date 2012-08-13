@@ -206,7 +206,6 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliAdvertisedIP (vm);
    pcfacliAdvertisedPort (vm);
    pcfacliLog (vm);
-   pcfacliPath (vm);
    pcfacliTimestamps (vm);
    pcfacliCurlNoVerifySSL (vm);
    pcfacliStorageFlags (vm);
