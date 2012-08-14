@@ -111,7 +111,7 @@ Functional API
 
 The following functions will be exposed to the higher level application:
 
-.. include:: ../GeneTorrent/src/gtBlockIO.h
+.. include:: ../src/gtBlockIO.h
     :start-after: // DOC: start: Functional API
     :end-before: // DOC: end: Functional API
     :literal:
@@ -390,14 +390,14 @@ the actual read operation.
 
 |gtio_read| psuedocode implementation:
 
-.. include:: ../GeneTorrent/src/gtBlockIO.cpp
+.. include:: ../src/gtBlockIO.cpp
     :start-after: // RST-DOC: start: read
     :end-before: // RST-DOC: end: read
     :literal:
 
 |gtio_pread| psuedocode implementation:
 
-.. include:: ../GeneTorrent/src/gtBlockIO.cpp
+.. include:: ../src/gtBlockIO.cpp
     :start-after: // RST-DOC: start: pread
     :end-before: // RST-DOC: end: pread
     :literal:
@@ -408,7 +408,7 @@ needs and asynchronously fetch the pieces with libtorrent.
 
 |gtio_lseek| psuedocode implementation:
 
-.. include:: ../GeneTorrent/src/gtBlockIO.cpp
+.. include:: ../src/gtBlockIO.cpp
     :start-after: // RST-DOC: start: lseek
     :end-before: // RST-DOC: end: lseek
     :literal:
