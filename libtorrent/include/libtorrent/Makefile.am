@@ -1,10 +1,8 @@
-includedir = @includedir@/libtorrent
-
 if WITH_SHIPPED_GEOIP
 GEOIP_H = GeoIP.h
 endif
 
-nobase_include_HEADERS = \
+noinst_HEADERS = \
   address.hpp                  \
   add_torrent_params.hpp       \
   alert.hpp                    \
@@ -98,6 +96,7 @@ nobase_include_HEADERS = \
   stat.hpp                     \
   storage.hpp                  \
   storage_defs.hpp             \
+  struct_debug.hpp             \
   thread.hpp                   \
   time.hpp                     \
   timestamp_history.hpp        \

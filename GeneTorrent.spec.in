@@ -1,0 +1,126 @@
+%if "%{dist}" == ".el5.centos"
+   %global gt_dist .Centos5
+%endif
+
+%if "%{dist}" == ".el6"
+   %global gt_dist .Centos6
+%endif
+
+%if 0%{!?gt_dist:1}
+   %global gt_dist %{dist}
+%endif
+
+Name:           GeneTorrent
+Version:        @PACKAGE_VERSION@
+Release:        1%{?gt_dist}.CP
+Summary:        GeneTorrent
+
+Group:          Development/Libraries
+License:        Unknown
+URL:            http://annaisystems.com/
+Source0:        GeneTorrent-%{version}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+%if "%{dist}" == ".el5.centos"
+Requires:       xqilla curl
+%else
+Requires:       xqilla libcurl
+%endif
+
+%if "%{dist}" == ".el5.centos"
+BuildRequires:  xqilla-devel curl-devel gcc-c++
+%else
+BuildRequires:  xqilla-devel libcurl-devel gcc-c++ openssl-devel
+%endif
+
+# This prevents binaries from being stripped of their debug bits by rpmbuild
+%define __spec_install_post /usr/lib/rpm/brp-compress
+
+%define debug_package %{nil}
+
+%define gt_python_sitelib  %(%{__python} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
+
+%description
+GeneTorrent
+
+%package devel
+Summary:  Development files for GeneTorrent
+Group: Development/Libraries
+
+%description devel
+GeneTorrent development files
+
+%prep
+%setup -q
+
+%build
+# must get and build boost 1.48.0 first
+boost/buildGeneTorrentBoost.sh
+
+# if centos5, must get and build openssl first
+%if "%{dist}" == ".el5.centos"
+openssl/buildGeneTorrentOpenSSL.sh
+%endif
+
+# LD_LIBRARY_PATH so that configure script can resolve dependent links when
+# testing boost support
+LD_LIBRARY_PATH=${PWD}/boost/lib ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost --with-openssl=${PWD}/openssl
+
+make %{?_smp_mflags}
+
+%install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+make install DESTDIR=%{buildroot}
+
+%clean
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+%{_bindir}/%{name}
+%{_bindir}/gtoinfo
+%{_bindir}/gtocheck
+%{_bindir}/GTLoadBalancer
+%{_mandir}/man1/%{name}*
+%{_datadir}/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/GTLoadBalancer.conf
+%config(noreplace) %{_sysconfdir}/rc.d/init.d/%{name}
+%config(noreplace) %{_sysconfdir}/rc.d/init.d/GTLoadBalancer
+%{_libdir}/%{name}/libtorrent-rasterbar.so.6
+%{_libdir}/%{name}/libtorrent-rasterbar.so.6.0.0
+%{_libdir}/%{name}/libtorrent-rasterbar.so
+%{_libdir}/%{name}/libboost_filesystem.so
+%{_libdir}/%{name}/libboost_filesystem.so.1.48.0
+%{_libdir}/%{name}/libboost_program_options.so
+%{_libdir}/%{name}/libboost_program_options.so.1.48.0
+%{_libdir}/%{name}/libboost_regex.so
+%{_libdir}/%{name}/libboost_regex.so.1.48.0
+%{_libdir}/%{name}/libboost_system.so
+%{_libdir}/%{name}/libboost_system.so.1.48.0
+%if "%{dist}" == ".el5.centos"
+%{_libdir}/%{name}/libssl.so
+%{_libdir}/%{name}/libssl.so.1.0.0
+%{_libdir}/%{name}/libcrypto.so
+%{_libdir}/%{name}/libcrypto.so.1.0.0
+%endif
+%{gt_python_sitelib}/gtoinfo.py
+%{gt_python_sitelib}/gtoinfo.pyc
+%{gt_python_sitelib}/gtoinfo.pyo
+%{_docdir}/%{name}/LICENSE
+%{_docdir}/%{name}/README
+
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/libtorrent-rasterbar.la
+%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
+
+%changelog
+* Fri Aug 10 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
+- Reorganize source layout, improve RPM build process
+* Mon Jul 16 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.2.2-1
+- Add site-packages dirs and gtocheck script
+* Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1
+- Prevent binaires from being stripped
+

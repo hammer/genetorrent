@@ -28,26 +28,34 @@ This is the read me file for GeneTorrent
 
 Directory Contents
 
-build.sh            Master build script
-GeneTorrent         GeneTorrent root directory
-libtorrent          libtorrent root directory
-ReadMe.txt          This file
-rpmbuild            Files required to construct a GeneTorrent RPM
+src                 GeneTorrent src directory
+libtorrent          libtorrent src directory
+README              This file
+LICENSE             GeneTorrent and other license information
+GeneTorrent.spec    File required to construct a GeneTorrent RPM
 scripts             Utility Scripts-part of GeneTorrent not the build process
+init.d              config files and init scripts
+boost               contains a script to build the required boost libraries
+                    (if necessary)
+openssl             contains a script to build the required openssl
+                    (if necessary)
 
 Build Requirements:
 
-The following packages and minimum versions must be installed on the build 
-machine prior to using build.sh.
+This package has been tested with the following minimum library versions:
 
-Boost 1.48 
-xerces-c 3.0.1
-xqilla 2.2.3
-libcurl 7.19.7
-
-On centos 5.x
-
+xerces-c 2.7.0
+xqilla 2.0.0
+libcurl 7.15.5
 openssl 1.0.1a
+boost 1.48.0
 
-If using the source release of GeneTorrent, Boost 1.48 must be built without 
-icu support and static libraries must be provided.
+If using the source release of GeneTorrent, Boost 1.48 must be built without
+icu support.
+
+Build Options:
+
+To enable verbose logging, configure with --enable-logging=verbose
+
+To create a debug build, configure with --enable-debug --enable-logging=verbose
+

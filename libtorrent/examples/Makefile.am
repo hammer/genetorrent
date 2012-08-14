@@ -4,10 +4,7 @@ example_programs = \
   enum_if          \
   make_torrent     \
   simple_client    \
-  seeder \
   rss_reader       \
-  sc1 \
-  sc2 \
   utp_test
 
 if ENABLE_EXAMPLES

@@ -1,4 +1,4 @@
-#  Copyright (c) 2011, Annai Systems, Inc.
+#  Copyright (c) 2012, Annai Systems, Inc.
 #  All rights reserved.
 #  
 #  Redistribution and use in source and binary forms, with or without
@@ -25,33 +25,31 @@
 # 
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+EXTRA_DIST = buildGeneTorrentOpenSSL.sh
 
-AC_PREREQ([2.63])
+OPENSSLVER = 1.0.0
+LEXT = .so.$(OPENSSLVER)
 
-# make the script version number dependent upon the version number of
-# GeneTorrent.  This is an ugly bit of m4 programming that grabs the
-# version number out of the file ../GeneTorrent/configure.ac.  The
-# m4_bpatsubst nonsense is there to strip that trailing newline left
-# there by esyscmd
+all:
+	mkdir -p lib include
 
-m4_define(scriptver, 
-          m4_bpatsubst(esyscmd([sed -ne '/^AC_INIT/ s/^AC_INIT(.*, \([^)]*\))$/\1/p' ../GeneTorrent/configure.ac]), [\([0-9.]*\)\(\w\|\W\)*], [\1]))
+install:
+	@echo "Installing openssl libraries into $(DESTDIR)$(pkglibdir)"
+	test ! -f $(srcdir)/lib/libcrypto$(LEXT) || \
+		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libcrypto$(LEXT) \
+		$(DESTDIR)$(pkglibdir)/libcrypto$(LEXT)
+	test ! -f $(srcdir)/lib/libcrypto$(LEXT) || \
+      (cd $(DESTDIR)$(pkglibdir) && rm -f libcrypto.so && \
+         $(LN_S) libcrypto$(LEXT) libcrypto.so)
+	test ! -f $(srcdir)/lib/libssl$(LEXT) || \
+		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libssl$(LEXT) \
+		$(DESTDIR)$(pkglibdir)/libssl$(LEXT)
+	test ! -f $(srcdir)/lib/libssl$(LEXT) || \
+      (cd $(DESTDIR)$(pkglibdir) && rm -f libssl.so && \
+         $(LN_S) libssl$(LEXT) libssl.so)
 
-AC_INIT(GeneTorrentScripts, scriptver)
+clean:
+	rm -rf bin certs lib man openssl-1.0.1c* openssl.cnf include misc private
 
-AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE
-
-AM_PATH_PYTHON([2.4])
-
-AC_CONFIG_FILES([
-Makefile 
-GTLoadBalancer
-python_wrapper
-gtoinfo.py
-gtocheck
-])
-AC_OUTPUT
+.PHONY: install clean
 

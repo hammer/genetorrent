@@ -25,4 +25,26 @@
 # 
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
-SUBDIRS = src
+ACLOCAL_AMFLAGS = -I m4
+
+SUBDIRS = boost openssl libtorrent src scripts init.d
+
+EXTRA_DIST =                     \
+   LICENSE                       \
+   libtorrent/configure.gnu      \
+   GeneTorrent.spec              \
+   autogen.sh
+
+dist_doc_DATA =                  \
+   LICENSE                       \
+   README
+
+rpm: dist
+	$(MAKE) rpmbuild-internal
+
+rpmcheck: distcheck
+	$(MAKE) rpmbuild-internal
+
+rpmbuild-internal:
+	rpmbuild -ta $(distdir).tar.gz
+

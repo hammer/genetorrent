@@ -297,8 +297,9 @@ int main (int argc, char **argv)
    boost::program_options::variables_map commandLine;
    processCommandLine (commandLine, argc, argv);
 
-   gtBase *app;
+   gtBase *app = NULL;
 
+#ifdef GENETORRENT_ALL
    if (commandLine.count (DOWNLOAD_CLI_OPT))
    {
       app = new gtDownload (commandLine);
@@ -307,14 +308,26 @@ int main (int argc, char **argv)
    {
       app = new gtUpload (commandLine);
    }
-   else  // default to Server mode as the mode was previously verified
+   else
    {
       app = new gtServer (commandLine);
    }
+#endif
+#ifdef GENETORRENT_DOWNLOAD
+   app = new gtDownload (commandLine);
+#endif
+#ifdef GENETORRENT_UPLOAD
+   app = new gtUpload (commandLine);
+#endif
+#ifdef GENETORRNET_SERVER
+   app = new gtServer (commandLine);
+#endif
 
-   app->run();
-
-   delete app;
+   if (app)
+   {
+      app->run();
+      delete app;
+   }
 
    return 0;
 }
