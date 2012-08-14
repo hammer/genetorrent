@@ -280,20 +280,28 @@ functionality via the following command line options:
 
     The option value will consist of the following colon separated fields:
 
-    <uuid>
+    **<uuid>**
        The uuid of the analysis object. This is needed to continue to
        allow multiple the user to pass the *-d* option multiple time
        on a single invocation of GeneTorrent.
 
-    <filename>
+    **<filename>**
        The name of file in the torrent.
 
-    <start>
+    **<start>**
        The offset (in bytes) of the begining of the range in the
        file. This is relative to the first byte of the file.
 
-    <length>
+    **<length>**
        The number of bytes to be read from the file.
+
+**--gtio-file <uuid>:<filename>**
+    Restricts the data downloaded to only the data needed for the
+    given filename (assumed to be a file in the torrent).
+
+    The downloaded data will be written to the following relative path::
+
+        <uuid>/<filename>
 
 **--gtio-range <uuid>:<start>:<length>**
     Restricts the data downloaded to the given range of the specified
@@ -314,6 +322,33 @@ functionality via the following command line options:
 
     **<length>**
        The number of bytes to be read from the torrent.
+
+**--gtio-piece-range <uuid>:<index>:<count>**
+    Restricts the data downloaded to the given range of the specified
+    UUID torrent.
+
+    The downloaded data will be written to the following relative path::
+
+        <uuid>/range-<start>:<length>
+
+    where ``<start>`` is in bytes (`index * piece_size`) and
+    ``<length>`` is also in bytes (`count * piece_size`)
+
+    .. note:: Would it make more sense having the filename be
+              ``<uuid>/piece-range-<index>:<count>`` to avoid
+              confusion with `--gtio-range`?
+
+    The option value will consist of the following colon separated fields:
+
+    **<uuid>**
+       The uuid of the analysis object.
+
+    **<index>**
+       The index of the first piece of the range in the
+       torrent. This is relative to the first piece of the torrent stream.
+
+    **<count>**
+       The number of pieces to be read from the torrent.
 
 Multiple ranges can be specified for a single invocation. Overlapping
 ranges are also permissible.
@@ -340,6 +375,10 @@ event. The tracker will also be sent a *stopped* event during the
 Also during the |gtio_open| process, the GT Executive will need to be
 contacted in order to get the GTO file processed so the client can
 start fetching pieces as a result of future calls to |gtio_read|.
+
+A background thread will be started by |gtio_open| to handle
+asynchronous communication with libtorrent. The background thread will
+be shutdown during the |gtio_close| operation.
 
 Reading from a Torrent
 ++++++++++++++++++++++
@@ -386,25 +425,53 @@ Caching
 The underlying implementation will cache recently downloaded pieces to
 avoid having to re-download them on subsequent reads.
 
-The cache will be implemented as a map keyed by the sha1 value of the
-piece. Each data item in the map will be a (time, piece_data)
-pair. The algorithm for accessing the cache follows (psuedo code)::
+Cached pieces will be written to filesystem storage instead of being
+stored in memory. The filename of the cached piece on disk will be
+based on the SHA1 value of the piece. For example, if a piece has a
+SHA1 hash of ``6154cd76dac7b3c4e2b781d98bbbfef15a5bf3e8``, the filename
+in the cache dir for that piece will be::
 
-    uint8_t *check_cache(string &piece_sha1)
+    <cache-dir>/61/54cd76dac7b3c4e2b781d98bbbfef15a5bf3e8
+
+where ``<cache-dir>`` will be specific to the UUID. Notice that the
+first two characters of the SHA1 are used to create a directory for
+the actual piece file.
+
+.. note:: Instead of the above piece based caching, it may make more
+          sense to just have libtorrent write the sparse file to disk
+          as it normally does. Then the cache would just be the
+          partially downloaded files from the torrent and libtorrent
+          can keep track of which pieces have been downloaded already.
+          This approach may make the code for interacting with
+          libtorrent simpler.
+
+	  The downside of this alternate approach is that the caching
+	  layer would be a bit more complicated due to it having to
+	  figure out the offsets of each piece within each file and
+	  deal with a piece spanning files.
+
+Initial implementation of the cache have the following properties:
+
+* Cache is created during |gtio_open|.
+* Cache is destroyed during |gtio_close| (thus deleting the cache from disk).
+* Cache size is unbounded (max size is the size of the complete torrent).
+
+The algorithm for accessing the cache follows (psuedo code)::
+
+    uint8_t *cache_fetch(string &piece_sha1)
     {
         if (piece_sha1 in cache)
-	    return cache[piece_sha1].second();
-	else
+            return cache_read_from_disk(piece_sha1);
+        else
             return NULL;
     }
 
-    void insert_cache(string &sha1, uint8_t *data)
+    void cache_insert(string &sha1, uint8_t *data)
     {
-        time t = now();
-	cache[sha1] = pair(t, data);
-
-	while (cache.size() > MAX_CACHE_SIZE)
-            cache.remove_oldest()
+        if (piece not in cache)
+        {
+            cache_write_to_disk(sha1, data);
+        }
     }
 
 Example of using the cache::
@@ -412,27 +479,20 @@ Example of using the cache::
     // Memory allocation/freeing of data still needs addressed.
     uint8_t *get_piece(string &piece_sha1, int piece_index)
     {
-        uint8_t *data = check_cache(piece_sha1);
+        uint8_t *data = cache_fetch(piece_sha1);
 	if (!data)
 	{
 	    data = download_piece(piece_sha1, piece_index);
 	    if (data)
 	    {
-	        insert_cache(piece_sha1, data);
+	        cache_insert(piece_sha1, data);
 	    }
 	}
 	return data;
     }
 
-Since GeneTorrent is typically dealing with 4 MB piece sizes, having a
-cache depth of 25 pieces will require 100 MB memory overhead for the
-application. To allow the user to tune the cache for their
-environment, the depth of the cache will need to be configurable via
-either the command line or a config file.
-
-.. note:: Is this caching scheme too simplistic when downloading lots
-          of overlapping ranges? At what point does just downloading
-          the entire torrent become more practical?
+.. note:: At what point does just downloading the entire torrent
+          become more practical?
 
 .. raw:: pdf
 
@@ -530,10 +590,6 @@ Consider the following example situation:
    completes. They have effectively killed any potential benefits of
    the bittorrent transfer parallelism by doing this.
 
-How is this going to fit into FUSE and have any kind of decent
-performance? The reads could be very random in nature and may kill
-caching performance.
-
 Command Line Usage Performance
 ++++++++++++++++++++++++++++++
 
@@ -543,6 +599,56 @@ GeneTorrent could make some optimizations by precomputing all of the
 pieces it will need. It can then perform that reads in such a way to
 minimize the time waiting for downloading of pieces to complete. This
 is still suboptimal and counter to the way bittorrent works.
+
+Language Bindings
+-----------------
+
+C/C++
++++++
+
+Provided by including ``gtBlockIO.h`` and linking to library (lib name
+still to be determined).
+
+Python
+++++++
+
+Python bindings to the |blk_api| will be provided using SWIG_.
+
+.. note:: Will provide more concise Python API once the C/C++ API has solidified.
+
+The Python API will be documented using Sphinx_.
+
+Example usage::
+
+    #!/usr/bin/python
+
+    import gentorrent as GT
+
+    uri = 'https://some-server/path/'
+    cred = 'my credentials'
+
+    try:
+        gtio = GT.GTIO(uri, cred)
+	try:
+	    data = gtio.read(4096)
+	finally:
+	    gtio.close()
+
+    except GT.GTIO_Error, exc
+        print exc
+
+Other Bindings
+++++++++++++++
+
+One advantage of using SWIG_ to generate the Python bindings is the
+ability to easily generate bindings for other langauges supported by
+SWIG_. Once the Python bindings have reached maturity, bindings to
+other langauges can be added on a as needed/requested basis.
+
+Initially, only C/C++ and Python bindings will be supported.
+
+.. _SWIG: http://www.swig.org/
+.. _Sphinx: http://sphinx.pocoo.org/
 
 Userspace Filesystem
 --------------------

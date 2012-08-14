@@ -19,4 +19,4 @@ pdf: $(PDF)
 	rst2html --time $< $@
 
 clean:
-	rm -rf $(PDF) $(HTM)
+	rm -rf $(PDF) $(HTML)
