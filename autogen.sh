@@ -8,10 +8,10 @@ echo "Running autoheader -f"
 autoheader -f
 echo "Running autoconf -f"
 autoconf -f
-echo "Running automake --foreign"
-automake --foreign
 echo "Running libtoolize"
 libtoolize
+echo "Running automake --foreign"
+automake --foreign --add-missing
 echo "Running libtorrent/autotool.sh"
 pushd libtorrent > /dev/null
 ./autotool.sh
