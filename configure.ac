@@ -74,12 +74,12 @@ AX_BOOST_BASE([1.48.0])
 AX_BOOST_REGEX()
 AS_IF([test -z "$BOOST_REGEX_LIB"],
    [AC_MSG_ERROR([Boost regex library not found.])])
-AX_BOOST_FILESYSTEM()
-AS_IF([test -z "$BOOST_FILESYSTEM_LIB"],
-   [AC_MSG_ERROR([Boost filesystem library not found.])])
 AX_BOOST_SYSTEM()
 AS_IF([test -z "$BOOST_SYSTEM_LIB"],
    [AC_MSG_ERROR([Boost system library not found.])])
+AX_BOOST_FILESYSTEM()
+AS_IF([test -z "$BOOST_FILESYSTEM_LIB"],
+   [AC_MSG_ERROR([Boost filesystem library not found.])])
 AX_BOOST_PROGRAM_OPTIONS()
 AS_IF([test -z "$BOOST_PROGRAM_OPTIONS_LIB"],
    [AC_MSG_ERROR([Boost program_options library not found.])])

@@ -62,9 +62,7 @@ boost/buildGeneTorrentBoost.sh
 openssl/buildGeneTorrentOpenSSL.sh
 %endif
 
-# LD_LIBRARY_PATH so that configure script can resolve dependent links when
-# testing boost support
-LD_LIBRARY_PATH=${PWD}/boost/lib ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost --with-openssl=${PWD}/openssl
+./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost --with-openssl=${PWD}/openssl
 
 make %{?_smp_mflags}
 
