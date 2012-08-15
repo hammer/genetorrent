@@ -816,7 +816,7 @@ def main():
                       help='Add or modify the SSL certificate. SSL_CERT should be a file containing an SSL certificate in PEM format.')
 
     parser.add_option('--remove-ssl-cert', action='store_true',
-                      default="", dest='remove_ssl_cert',
+                      default=False, dest='remove_ssl_cert',
                       help='Remove the SSL certificate.')
 
     parser.add_option('', '--set-key', action='store', nargs=2,
