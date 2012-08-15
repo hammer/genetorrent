@@ -104,18 +104,18 @@ GTdatadir = $(datadir)/GeneTorrent
 
 dist_GTdata_DATA = dhparam.pem
 
-GeneTorrent_CPPFLAGS = $(BOOST_CPPFLAGS)
+GeneTorrent_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                       $(OPENSSL_INCLUDES)
 
 GeneTorrent_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
-                       -I$(top_srcdir)/libtorrent/include -I$(top_srcdir)/boost/include \
-                       -I$(top_srcdir)/openssl/include \
+                       -I$(top_srcdir)/libtorrent/include \
                        -DGENETORRENT_ALL
 
 GeneTorrent_LDFLAGS = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath=$(libdir)/GeneTorrent \
+                      -L../libtorrent/src/.libs \
                       $(BOOST_LDFLAGS) \
-                      -L../libtorrent/src/.libs -L../boost/lib \
-                      -L../openssl/lib
+                      $(OPEENSSL_LDFLAGS)
 
 GeneTorrent_LDADD =  -lboost_system \
                      -lboost_filesystem \
