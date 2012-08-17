@@ -36,6 +36,9 @@ AC_CONFIG_SRCDIR([src/gtBase.cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
+# Silencing build output (automake-1.11)
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
 # Set compiler flag defaults
 : ${CFLAGS="-g -O2 -Wall"}
 : ${CXXFLAGS="-g -O2 -Wall"}
