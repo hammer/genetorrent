@@ -1071,7 +1071,6 @@ namespace libtorrent
 		int ret = cache_piece(j, p, hit, ignore_cache_size, l);
 		if (ret < 0) return ret;
 
-		if (!m_settings.disable_hash_checks)
 		{
 			hasher ctx;
 
@@ -1905,8 +1904,10 @@ namespace libtorrent
 						test_error(j);
 						break;
 					}
-					if (!m_settings.disable_hash_checks)
-						ret = (j.storage->info()->hash_for_piece(j.piece) == h)?ret:-3;
+
+					ret = (j.storage->info()->hash_for_piece(j.piece) == h)?ret:-3;
+					if (m_settings.disable_hash_checks) ret = 0;
+
 					if (ret == -3)
 					{
 						j.storage->mark_failed(j.piece);
@@ -2170,11 +2171,6 @@ namespace libtorrent
 						}
 					}
 					l.unlock();
-					if (m_settings.disable_hash_checks)
-					{
-						ret = 0;
-						break;
-					}
 
 					ptime hash_start = time_now_hires();
 
@@ -2190,6 +2186,9 @@ namespace libtorrent
 					m_cache_stats.total_read_back += readback / m_block_size;
 
 					ret = (j.storage->info()->hash_for_piece(j.piece) == h)?0:-2;
+
+					if (m_settings.disable_hash_checks) ret = 0;
+
 					if (ret == -2) j.storage->mark_failed(j.piece);
 
 					ptime done = time_now_hires();
