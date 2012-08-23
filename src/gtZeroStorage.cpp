@@ -35,7 +35,7 @@ using namespace libtorrent;
 class zero_storage : public storage_interface
 {
 public:
-  bool has_any_file() { return true; }
+  bool has_any_file() { return false; }
   bool rename_file(int index, std::string const& new_filename) { return false; }
   bool release_files() { return false; }
   bool delete_files() { return false; }

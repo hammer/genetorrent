@@ -70,6 +70,7 @@
 #include "loggingmask.h"
 #include "gtDownload.h"
 #include "gtNullStorage.h"
+#include "gtZeroStorage.h"
 
 static char const* download_state_str[] = {
    "checking (q)",            // queued_for_checking,
@@ -745,11 +746,19 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    torrentParams.allow_rfc1918_connections = true;
    torrentParams.auto_managed = false;
 
-   if (_use_null_storage || _use_zero_storage)
+   if (_use_zero_storage)
    {
-      // On the download side, both null and zero storage are effectively the
-      // same, so just use null storage.
+      torrentParams.storage = zero_storage_constructor;
+   }
+   else if (_use_null_storage)
+   {
       torrentParams.storage = null_storage_constructor;
+
+      libtorrent::session_settings settings = torrentSession->settings ();
+      settings.disable_hash_checks = true;
+      torrentSession->set_settings (settings);
+
+      screenOutput ("Hash checks disabled due to null-storage enabled.");
    }
 
    if (statDirectory ("./" + uuid) == 0)

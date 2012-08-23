@@ -168,9 +168,20 @@ data received (rather than writing to disk).  Of course this means a receive
 peer running in this mode cannot turn around and share any blocks it has
 received.
 
+This mode disables hash checking of the downloaded pieces so there is
+no handling of currupt pieces, every piece downloaded is assumed
+correct.
+
 This mode can not be used to transmit files.
 
-Can not be used in conjunction with \fB\-\^\-zero\-storage\fP.
+Use this mode when performance testing the client side of download
+transfers.
+
+Can not be used in conjunction with \fB\-\^\-zero\-storage\fP for a
+given invocation of GeneTorrent.
+
+In some cases it makes sense to use \fB\-\^\-zero\-storage\fP on the
+server side and \fB\-\^\-null\-storage\fP on the download client side.
 .TP
 .BR \-\^\-zero\-storage
 Enable zero storage implementation. This is a command line only option
@@ -185,7 +196,9 @@ The transmitter of the data must have a precomputed torrent file which hashes
 properly since GeneTorrent will not be able to create a torrent file (.gto
 file) when run in zero storage mode.
 
-Can not be used in conjunction with \fB\-\^\-null\-storage\fP.
+Can not be used in conjunction with \fB\-\^\-null\-storage\fP for a
+given invocation of GeneTorrent.
+
 .SS "Upload Mode Command Line Arguments:"
 .TP
 .BI \-u " manifest-file" "\fR,\fP \-\^\-upload" " manifest-file"  
