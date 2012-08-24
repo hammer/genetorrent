@@ -92,6 +92,7 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
    pcfacliDownloadList (vm);
    pcfacliRateLimit (vm);
    pcfacliInactiveTimeout (vm);
+   pcfacliSecurityAPI (vm);
 
    Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
 
@@ -166,6 +167,26 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
    {
       startUpMessage << " --" << DOWNLOAD_CLI_OPT << "=" << *vectIter;
       vectIter++;
+   }
+}
+
+void gtDownload::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
+{
+   if (vm.count (SECURITY_API_CLI_OPT))
+   {
+      _downloadModeCsrSigningUrl = vm[SECURITY_API_CLI_OPT].as<std::string>();
+
+      if (_downloadModeCsrSigningUrl.size() == 0)
+      {
+         commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
+      }
+
+      if (std::string::npos == _downloadModeCsrSigningUrl.find ("http") || std::string::npos == _downloadModeCsrSigningUrl.find ("://"))
+      {
+         commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
+      }
+
+      startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _downloadModeCsrSigningUrl;
    }
 }
 
@@ -410,22 +431,9 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
       gtError (".gto processing problem with " + torrFile, 87, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
    }
 
-   if (torrentInfo.ssl_cert().size() > 0 && _devMode == false)
-   {
-      std::string pathToKeep = "/cghub/data/";
+   initiateCSR (torrUUID, torrFile, torrentInfo, uri);
 
-      std::size_t foundPos;
-
-      if (std::string::npos == (foundPos = uri.find (pathToKeep)))
-      {
-         gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
-      }
-
-      std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
-
-      generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
-   }
-
+   // FIXME: Does this also need to be moved into the performSingleTorrentDownload() function?
    if (global_gtAgentMode)
    {
       std::vector<libtorrent::announce_entry> const trackers = torrentInfo.trackers();
@@ -476,6 +484,42 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    catch (...)
    {
       gtError ("Encountered an error attempting to process the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
+   }
+}
+
+void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
+                             libtorrent::torrent_info &torrentInfo, std::string uri)
+{
+   if (torrentInfo.ssl_cert().size() > 0 && _devMode == false)
+   {
+      std::string certSignURL;
+
+      // If no URI is passed, we're downloading from a GTO file
+      // Use --security-api to sign our CSR
+      if (uri.size () == 0)
+      {
+         if (_downloadModeCsrSigningUrl.size () == 0)
+         {
+            gtError ("No security API URI given for SSL-enabled GTO download:  " + torrFile, 214, gtBase::DEFAULT_ERROR);
+         }
+
+         certSignURL = _downloadModeCsrSigningUrl;
+      }
+      else
+      {
+         std::string pathToKeep = "/cghub/data/";
+
+         std::size_t foundPos;
+
+         if (std::string::npos == (foundPos = uri.find (pathToKeep)))
+         {
+            gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
+         }
+
+         std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
+      }
+
+      generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
    }
 }
 
@@ -699,6 +743,26 @@ void gtDownload::performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFi
    while (iter != _torrentListToDownload.end ())
    {
       std::string torrentName = *iter;
+
+      // Capture analysis object UUID from torrent file name
+      size_t offset = torrentName.find_last_of('/');
+      if (std::string::npos == offset)
+         offset = 0;
+      else
+         offset++;
+
+      std::string basename = torrentName.substr (offset);
+      std::string uuid = basename.substr (0, basename.find_first_of ('.'));
+
+      libtorrent::error_code torrentError;
+      libtorrent::torrent_info torrentInfo (torrentName, torrentError);
+
+      if (torrentError)
+      {
+         gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+      }
+
+      initiateCSR (uuid, torrentName, torrentInfo);
 
       performSingleTorrentDownload (torrentName, totalBytes, totalFiles);
       totalGtos++;

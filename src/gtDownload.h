@@ -54,10 +54,14 @@ class gtDownload : public gtBase
       int _maxChildren;
       vectOfStr _torrentListToDownload;
       vectOfStr _uriListToDownload;
+      std::string _downloadModeCsrSigningUrl;
 
       void runDownloadMode (std::string startupDir);
       void prepareDownloadList ();
       std::string downloadGtoFileByURI (std::string uri);
+      void initiateCSR (std::string torrUUID, std::string torrFile,
+                        libtorrent::torrent_info &torrentInfo,
+                        std::string uri = "");
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
       void performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles);
       void performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFiles, int &totalGtos);
@@ -67,6 +71,7 @@ class gtDownload : public gtBase
 
       void pcfacliDownloadList (boost::program_options::variables_map &vm);
       void pcfacliMaxChildren (boost::program_options::variables_map &vm);
+      void pcfacliSecurityAPI (boost::program_options::variables_map &vm);
 };
 
 #endif
