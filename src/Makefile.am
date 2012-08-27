@@ -49,7 +49,7 @@ noinst_HEADERS =                 \
    stringTokenizer.h
 
 torrentrasterbar_CXXFLAGS =  $(shell $(PKG_CONFIG) --cflags ../libtorrent/libtorrent-rasterbar.pc)
-torrentrasterbar_LIBS = $(shell $(PKG_CONFIG) --libs ../libtorrent/libtorrent-rasterbar.pc)
+torrentrasterbar_LIBS = -L../libtorrent/src/.libs $(shell $(PKG_CONFIG) --libs-only-l ../libtorrent/libtorrent-rasterbar.pc)
 
 # lib_LTLIBRARIES = libgenetorrent.la
 #
@@ -113,7 +113,6 @@ GeneTorrent_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
 
 GeneTorrent_LDFLAGS = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath=$(libdir)/GeneTorrent \
-                      -L../libtorrent/src/.libs \
                       $(BOOST_LDFLAGS) \
                       $(OPEENSSL_LDFLAGS)
 
