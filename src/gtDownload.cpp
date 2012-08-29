@@ -516,7 +516,7 @@ void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
             gtError ("Unable to find " + pathToKeep + " in the URL:  " + uri, 214, gtBase::DEFAULT_ERROR);
          }
 
-         std::string certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
+         certSignURL = uri.substr(0, foundPos + pathToKeep.size()) + GT_CERT_SIGN_TAIL;
       }
 
       generateSSLcertAndGetSigned(torrFile, certSignURL, torrUUID);
