@@ -86,6 +86,7 @@ import os
 import sys
 import shutil
 import time
+import errno
 
 # hashlib came along in Python 2.5, and we want to support 2.4.  
 try:
