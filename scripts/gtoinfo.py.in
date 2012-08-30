@@ -389,16 +389,21 @@ def emit_gto(gtodict, filename, backup):
     f.write(encoded_text)
     f.close()
 
-    stat = os.stat(filename)
-    os.chmod(tmp_file, stat.st_mode)
     try:
+        stat = os.stat(filename)
+        os.chmod(tmp_file, stat.st_mode)
         os.chown(tmp_file, -1, stat.st_gid)  # maybe we can preserve the original group?
     except Exception:
         sys.exc_clear()
 
-    # move the filename to a backup location
+    # move the filename to a backup location, if it exists
     if (backup):
-        shutil.move(filename, filename+"~")
+        try:
+            shutil.move(filename, filename+"~")
+        except IOError, e:
+            # if e.errno is ENOENT, filename didn't exist
+            if e.errno != errno.ENOENT:
+                raise
 
     # move the tmp file into place
     shutil.move(tmp_file, filename)
