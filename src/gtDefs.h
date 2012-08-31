@@ -153,6 +153,7 @@ const std::string UPLOAD_FILE_CLI_OPT = "upload";                  // -u short o
 const std::string UPLOAD_FILE_CLI_OPT_LEGACY = "manifestFile";
 
 const std::string UPLOAD_GTO_PATH_CLI_OPT = "upload-gto-path";     // no short option
+const std::string UPLOAD_GTO_ONLY_CLI_OPT = "gto-only";            // no short option
 
 // Download Mode
 const std::string DOWNLOAD_CLI_OPT = "download";                   // -d short option

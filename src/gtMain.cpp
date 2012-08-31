@@ -87,6 +87,8 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       // Upload
       (makeOpt (UPLOAD_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "uuid/manifest.xml")
       (UPLOAD_GTO_PATH_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "writable path for .GTO file during creation and transmission")
+      (UPLOAD_GTO_ONLY_CLI_OPT.c_str(),
+         "only generate GTO, don't start upload")
 
       // Server Mode
       (makeOpt (SERVER_CLI_OPT).c_str(), boost::program_options::value< std::string >(),"server data path")

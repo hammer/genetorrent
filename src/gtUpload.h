@@ -62,6 +62,8 @@ class gtUpload : public gtBase
       std::string _dataFilePath;
       std::string _uploadGTODir;  //  This directory is used to store the upload GTO and upload progress state when set (otherwise the uuid directory is used)
       int _piecesInTorrent;       // Used by the hash callback function to display progress
+      bool _uploadGTOOnly;        // Use upload client to generate GTO only,
+                                  // don't start upload
 
       void submitTorrentToGTExecutive (std::string torrentFileName, bool);
       void findDataAndSetWorkingDirectory ();
@@ -77,6 +79,7 @@ class gtUpload : public gtBase
 
       void pcfacliUpload (boost::program_options::variables_map &vm);
       void pcfacliUploadGTODir (boost::program_options::variables_map &vm);
+      void pcfacliUploadGTOOnly (boost::program_options::variables_map &vm);
       static void hashCallback (int piece);
 };
 

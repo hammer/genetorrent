@@ -88,13 +88,14 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath (""), _uploadGTODir (""), _piecesInTorrent (0)
+gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath (""), _uploadGTODir (""), _piecesInTorrent (0), _uploadGTOOnly(false)
 {
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);
    pcfacliUploadGTODir (vm);
    pcfacliRateLimit (vm);
    pcfacliInactiveTimeout (vm);
+   pcfacliUploadGTOOnly (vm);
 
    checkCredentials ();
 
@@ -152,6 +153,16 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
    if (statFile (_manifestFile) != 0)
    {
       commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
+   }
+}
+
+void gtUpload::pcfacliUploadGTOOnly (boost::program_options::variables_map &vm)
+{
+   if (vm.count (UPLOAD_GTO_ONLY_CLI_OPT))
+   {
+      _uploadGTOOnly = true;
+
+      startUpMessage << " --" << UPLOAD_GTO_ONLY_CLI_OPT << "=" << _uploadGTODir;
    }
 }
 
@@ -215,26 +226,39 @@ void gtUpload::run ()
       }
    }
 
-   performGtoUpload (_uploadGTODir + torrentFileName, resumeProgress, inResumeMode);
-
-   message.str("");
-  
-   if (!inResumeMode)              // This message will not be accurate in dev mode
+   if (!_uploadGTOOnly)
    {
-      time_t duration = time(NULL) - startTime;
+      performGtoUpload (_uploadGTODir + torrentFileName, resumeProgress, inResumeMode);
 
-      message << "Uploaded " << add_suffix (totalBytes) << " in " << durationToStr (duration) << ".  Overall Rate " << add_suffix (totalBytes/duration) << "/s";
+      message.str("");
+
+      if (!inResumeMode)     // This message will not be accurate in dev mode
+      {
+         time_t duration = time(NULL) - startTime;
+
+         message << "Uploaded " << add_suffix (totalBytes) << " in " <<
+            durationToStr (duration) << ".  Overall Rate " <<
+            add_suffix (totalBytes/duration) << "/s";
+      }
+      else
+      {
+         message << "Resumed upload completed.  Total of " <<
+            add_suffix (totalBytes) << " uploaded over multiple sessions.";
+      }
+
+      Log (PRIORITY_NORMAL, "%s", message.str().c_str());
+
+      if (_verbosityLevel > VERBOSE_1)
+      {
+         screenOutput (message.str());
+      }
    }
    else
    {
-      message << "Resumed upload completed.  Total of " << add_suffix (totalBytes) << " uploaded over multiple sessions.";
-   }
-
-   Log (PRIORITY_NORMAL, "%s", message.str().c_str());
-
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput (message.str()); 
+      // in gto-only mode
+      std::string message = "GTO has been generated, but upload will be skipped";
+      screenOutput (message)
+      Log (PRIORITY_NORMAL, "%s", message.c_str());
    }
 
    if (chdir (saveDir.c_str ()))
