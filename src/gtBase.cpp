@@ -520,6 +520,9 @@ void  gtBase::pcfacliRateLimit (boost::program_options::variables_map &vm)
    {
       commandLineError ("Configured rate limit is too low.  Please specify a value larger than 0.01 for '" + RATE_LIMIT_CLI_OPT + "'");
    }
+
+   startUpMessage << " --" << RATE_LIMIT_CLI_OPT << "="
+      << inRate;
 }
 
 // Used by download and upload
@@ -559,6 +562,8 @@ void  gtBase::pcfacliInactiveTimeout (boost::program_options::variables_map &vm)
    int inactiveTimeout = vm[INACTIVE_TIMEOUT_CLI_OPT].as<int>();      // As minutes
 
    _inactiveTimeout = inactiveTimeout;      // in minutes
+
+   startUpMessage << " --" << INACTIVE_TIMEOUT_CLI_OPT << "=" << _inactiveTimeout;
 }
 
 void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
@@ -569,6 +574,8 @@ void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
    }
 
    _curlVerifySSL = false;
+
+   startUpMessage << " --" << CURL_NO_VERIFY_SSL_CLI_OPT;
 }
 
 
@@ -581,11 +588,13 @@ void gtBase::pcfacliStorageFlags (boost::program_options::variables_map &vm)
    if (vm.count (NULL_STORAGE_OPT))
    {
       _use_null_storage = true;
+      startUpMessage << " --" << NULL_STORAGE_OPT;
    }
 
    if (vm.count (ZERO_STORAGE_OPT))
    {
       _use_zero_storage = true;
+      startUpMessage << " --" << ZERO_STORAGE_OPT;
    }
 
    if (_use_null_storage && _use_zero_storage)
