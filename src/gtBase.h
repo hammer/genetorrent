@@ -62,6 +62,8 @@
 #include "accumulator.hpp"
 
 extern bool global_gtAgentMode;
+extern int global_verbosity;
+extern std::string global_startup_message;
 
 typedef struct attributeEntry_
 {

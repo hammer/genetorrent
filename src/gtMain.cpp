@@ -48,10 +48,6 @@
 #include "gtServer.h"
 #include "gtDownload.h"
 
-int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
-bool global_gtAgentMode;
-std::string global_startup_message = "";
-
 std::string makeOpt (std::string baseName, const char secondName = SPACE)
 {
    if (secondName != SPACE)

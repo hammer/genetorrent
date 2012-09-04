@@ -83,8 +83,9 @@ void *geneTorrCallBackPtr;
 // at the saem time another thread is trying to add to a buffer
 static pthread_mutex_t callBackLoggerLock;
 
-extern int global_verbosity;
-extern std::string global_startup_message;
+int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
+bool global_gtAgentMode = false;
+std::string global_startup_message = "";
 
 void commandLineError (std::string errMessage)
 {
