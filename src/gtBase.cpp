@@ -86,6 +86,23 @@ static pthread_mutex_t callBackLoggerLock;
 extern int global_verbosity;
 extern std::string global_startup_message;
 
+void commandLineError (std::string errMessage)
+{
+   if (errMessage.size())
+   {
+      if (global_gtAgentMode)
+      {
+         std::cout << "error:  " << errMessage << std::endl;
+         std::cout.flush();
+      }
+      else
+      {
+         std::cerr << "error:  " << errMessage << std::endl;
+      }
+   }
+   exit (COMMAND_LINE_OR_CONFIG_FILE_ERROR);
+}
+
 gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode) : 
    _verbosityLevel (VERBOSE_1), 
    _logToStdErr (false),

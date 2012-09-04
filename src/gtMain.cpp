@@ -107,23 +107,6 @@ void configureConfigFileOptions (boost::program_options::options_description &op
    ;
 }
 
-void commandLineError (std::string errMessage)
-{
-   if (errMessage.size())
-   {
-      if (global_gtAgentMode)
-      {
-         std::cout << "error:  " << errMessage << std::endl;
-         std::cout.flush();
-      }
-      else
-      {
-         std::cerr << "error:  " << errMessage << std::endl;
-      }
-   }
-   exit (COMMAND_LINE_OR_CONFIG_FILE_ERROR);
-}
-
 void configureCommandLineOptions (boost::program_options::options_description &options)
 {
    // The descriptions below are not used in the help message.
