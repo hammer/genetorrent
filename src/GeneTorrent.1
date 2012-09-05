@@ -79,11 +79,16 @@ in all bug reports.
 The IP address for GeneTorrent to bind.  Default is to bind all
 addresses on the system.
 .TP
-.BI \-c " credential-file" "\fR,\fP \-\^\-credential-file" " credential-file"  
+.BI \-c " credential" "\fR,\fP \-\^\-credential-file" " credential"
 Required for all modes, unless you are directly passing a .gto file to
-the -d option.  The absolute or relative path to the file containing the
+the -d option.
+.I credential
+is the absolute or relative path to the file containing the
 access credentials (security token) previously received from the
-repository.
+repository.  Alternatively,
+.I credential
+may be a  valid URI indicating where the credential resides on a server
+accessible via HTTP, HTTPS, FTP, or FTPS.
 .TP
 .BI \-C " confdir" "\fR,\fP \-\^\-config-dir" " confdir"
 Specify an absolute or relative path to the GeneTorrent configuration

@@ -147,11 +147,11 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
 
    startUpMessage << "Starting version " << VERSION << " with options: " << global_startup_message;  // Begin building the startup message, completed and logged in inherited classes
 
+   _verbosityLevel = global_verbosity;
+
    processConfigFileAndCLI (commandLine);
 
    _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination);
-
-   _verbosityLevel = global_verbosity;
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    if (statFile (_dhParamsFile) != 0)
@@ -218,6 +218,7 @@ void gtBase::initSSLattributes ()
 void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
 {
    pcfacliConfDir (vm);
+   pcfacliCurlNoVerifySSL (vm);
    pcfacliCredentialFile (vm);
    pcfacliBindIP (vm);
    pcfacliInternalPort (vm);    // Internal ports must be processed before the Advertised port
@@ -225,7 +226,6 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliAdvertisedPort (vm);
    pcfacliLog (vm);
    pcfacliTimestamps (vm);
-   pcfacliCurlNoVerifySSL (vm);
    pcfacliStorageFlags (vm);
 }
 
@@ -333,6 +333,15 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
    else   // Option not present
    {
       return;    
+   }
+
+   if (credsPathAndFile.find("http://")  == 0 ||
+       credsPathAndFile.find("https://") == 0 ||
+       credsPathAndFile.find("ftp://")   == 0 ||
+       credsPathAndFile.find("ftps://")  == 0)
+   {
+      _authToken = authTokenFromURI (credsPathAndFile);
+      return;
    }
 
    std::ifstream credFile;
@@ -1746,5 +1755,76 @@ bool gtBase::timeout_check_expired (time_t *timer)
       return true;
 
    return false;
+}
+
+std::string gtBase::authTokenFromURI (std::string url)
+{
+
+   char errorBuffer[CURL_ERROR_SIZE + 1] = {'\0'};
+
+   std::string curlResponseHeaders = "";
+   std::string curlResponseData = "";
+
+   CURL *curl;
+   curl = curl_easy_init ();
+
+   if (!curl)
+      gtError ("libCurl initialization failure", 201);
+
+   if (!_curlVerifySSL)
+   {
+      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYHOST, 0);
+   }
+
+   curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, errorBuffer);
+   curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, &curlCallBackHeadersWriter);
+   curl_easy_setopt (curl, CURLOPT_HEADERFUNCTION, &curlCallBackHeadersWriter);
+   curl_easy_setopt (curl, CURLOPT_MAXREDIRS, 15);
+   curl_easy_setopt (curl, CURLOPT_WRITEDATA, &curlResponseData);
+   curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
+   curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
+   curl_easy_setopt (curl, CURLOPT_HTTPGET, (long)1);
+
+   // CGHUBDEV-22: Set CURL timeouts to 20 seconds
+   int timeoutVal = 20;
+   int connTime = 20;
+
+   curl_easy_setopt (curl, CURLOPT_URL, url.c_str());
+   curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
+   curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
+
+   if (_verbosityLevel > VERBOSE_2)
+   {
+       curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+   }
+
+   CURLcode res;
+   long code = -1;
+
+   res = curl_easy_perform (curl);
+   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+
+   if (res != CURLE_OK || code < 200 || code >= 300 ||
+      curlResponseData.size() < 1)
+   {
+      // No logger exists here
+      std::ostringstream errormsg;
+      errormsg << "Failed to download authentication token from provided URI.";
+      if (code != 0)
+         errormsg << " Response code = " << code << ".";
+      if (strlen(errorBuffer))
+         errormsg << " Error = " << errorBuffer;
+      commandLineError (errormsg.str());
+   }
+
+   if (_verbosityLevel > VERBOSE_2)
+   {
+      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
+   }
+
+   curl_easy_cleanup (curl);
+
+   return curlResponseData;
 }
 

@@ -208,6 +208,7 @@ class gtBase
       void initSSLattributes ();
       std::string loadCSRfile (std::string csrFileName);
       std::string getInfoHash (libtorrent::torrent_info *torrentInfo);
+      std::string authTokenFromURI (std::string url);
 
       void cleanupTmpDir();
       void setTempDir ();
