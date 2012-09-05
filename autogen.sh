@@ -4,11 +4,5 @@
 # autoconf/automake/libtool/etc.
 #
 
-set -e # bail out on any error
-
 autoreconf -ifv
-
-# Drop down into libtorrent and run their equivalent script.
-
-(cd libtorrent && ./autotool.sh)
 
