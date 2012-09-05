@@ -44,7 +44,6 @@ noinst_HEADERS =                 \
    gtUtils.h                     \
    gtNullStorage.h               \
    gtZeroStorage.h               \
-   gtBlockIO.h                   \
    loggingmask.h                 \
    stringTokenizer.h
 
