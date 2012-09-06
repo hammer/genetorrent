@@ -336,7 +336,7 @@ int main (int argc, char **argv)
 #ifdef GENETORRENT_UPLOAD
    app = new gtUpload (commandLine);
 #endif
-#ifdef GENETORRNET_SERVER
+#ifdef GENETORRENT_SERVER
    app = new gtServer (commandLine);
 #endif
 
