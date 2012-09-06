@@ -13,24 +13,21 @@
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
 Release:        1%{?gt_dist}.CP
-Summary:        GeneTorrent
+Summary:        Transfer genomic data reliably across a network
 
-Group:          Development/Libraries
-License:        Unknown
+Group:          Applications/Internet
+License:        BSD
 URL:            http://annaisystems.com/
-Source0:        GeneTorrent-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-%if "%{dist}" == ".el5.centos"
-Requires:       xqilla curl
-%else
-Requires:       xqilla libcurl
-%endif
+Requires:       xqilla %{name}-common
+Requires(pre):  shadow-utils
 
 %if "%{dist}" == ".el5.centos"
-BuildRequires:  xqilla-devel curl-devel gcc-c++
+BuildRequires:  xqilla-devel curl-devel
 %else
-BuildRequires:  xqilla-devel libcurl-devel gcc-c++ openssl-devel
+BuildRequires:  xqilla-devel libcurl-devel openssl-devel
 %endif
 
 # This prevents binaries from being stripped of their debug bits by rpmbuild
@@ -41,14 +38,49 @@ BuildRequires:  xqilla-devel libcurl-devel gcc-c++ openssl-devel
 %define gt_python_sitelib  %(%{__python} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
 
 %description
-GeneTorrent
+%{name}
 
-%package devel
-Summary:  Development files for GeneTorrent
-Group: Development/Libraries
+%package common
+Summary:  Libraries and common files for %{name}
+Group:    Applications/Internet
+License:  BSD
+Requires: xqilla xerces-c
+Provides: libboost_system.so
+Provides: libboost_filesystem.so
+Provides: libboost_regex.so
+Provides: libboost_program_options.so
+Provides: libtorrent-rasterbar.so
+Provides: libgenetorrent.so
 
-%description devel
-GeneTorrent development files
+%description common
+%{name} libraries and common files
+
+%package download
+Summary:  %{name} download client
+Group:    Applications/Internet
+License:  BSD
+Requires: %{name}-common
+
+%description download
+%{name} download client
+
+%package upload
+Summary:  %{name} upload client
+Group:    Applications/Internet
+License:  BSD
+Requires: %{name}-common
+
+%description upload
+%{name} upload Client
+
+%package server
+Summary:  %{name} server daemon and associated files
+Group:    Applications/Internet
+License:  BSD
+Requires: %{name}-common
+
+%description server
+%{name} server daemon and associated files
 
 %prep
 %setup -q
@@ -62,14 +94,22 @@ boost/buildGeneTorrentBoost.sh
 openssl/buildGeneTorrentOpenSSL.sh
 %endif
 
-./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost --with-openssl=${PWD}/openssl
+./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost \
+    --with-openssl=${PWD}/openssl
 
 make %{?_smp_mflags}
+
+%check
+make check
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
 make install DESTDIR=%{buildroot}
+
+rm -f %{buildroot}/%{_libdir}/%{name}/libtorrent-rasterbar.la
+rm -f %{buildroot}/%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
+rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -77,15 +117,16 @@ make install DESTDIR=%{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
+%{_mandir}/man1/%{name}*
+
+%files common
+%defattr(-,root,root,-)
 %{_bindir}/gtoinfo
 %{_bindir}/gtocheck
-%{_bindir}/GTLoadBalancer
-%{_mandir}/man1/%{name}*
 %{_datadir}/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}.conf
-%config(noreplace) %{_sysconfdir}/GTLoadBalancer.conf
-%config(noreplace) %{_sysconfdir}/rc.d/init.d/%{name}
-%config(noreplace) %{_sysconfdir}/rc.d/init.d/GTLoadBalancer
+%{_libdir}/libgenetorrent.so.0
+%{_libdir}/libgenetorrent.so.0.0.0
+%{_libdir}/libgenetorrent.so
 %{_libdir}/%{name}/libtorrent-rasterbar.so.6
 %{_libdir}/%{name}/libtorrent-rasterbar.so.6.0.0
 %{_libdir}/%{name}/libtorrent-rasterbar.so
@@ -109,12 +150,50 @@ make install DESTDIR=%{buildroot}
 %{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/README
 
-%files devel
+%files upload
 %defattr(-,root,root,-)
-%{_libdir}/%{name}/libtorrent-rasterbar.la
-%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
+%{_bindir}/gtupload
+%{_mandir}/man1/gtupload*
+
+%files download
+%defattr(-,root,root,-)
+%{_bindir}/gtdownload
+%{_mandir}/man1/gtdownload*
+
+%files server
+%defattr(-,root,root,-)
+%{_bindir}/gtserver
+%config(noreplace) %{_sysconfdir}/gnos.d/%{name}.conf
+%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
+%{_sysconfdir}/rc.d/init.d/%{name}
+%{_sysconfdir}/rc.d/init.d/GTLoadBalancer
+%{_bindir}/GTLoadBalancer
+%{_mandir}/man1/gtserver*
+
+%pre common -p /sbin/ldconfig
+
+%postun common -p /sbin/ldconfig
+
+%pre server
+/usr/bin/getent group gtorrent >/dev/null || /usr/sbin/groupadd \
+   -r gtorrent >/dev/null
+/usr/bin/getent passwd gtorrent >/dev/null || /usr/sbin/useradd \
+   -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent >/dev/null
+exit 0
+
+%post server
+/sbin/chkconfig --add %{name}
+/sbin/chkconfig --add GTLoadBalancer
+
+%preun server
+/sbin/service GeneTorrent stop > /dev/null
+/sbin/service GTLoadBalancer stop > /dev/null
+/sbin/chkconfig --del %{name}
+/sbin/chkconfig --del GTLoadBalancer
 
 %changelog
+* Fri Aug 24 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
+- Split GeneTorrent into common, upload, download, and server packages
 * Fri Aug 10 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
 - Reorganize source layout, improve RPM build process
 * Mon Jul 16 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.2.2-1

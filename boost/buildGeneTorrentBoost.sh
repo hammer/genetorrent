@@ -77,7 +77,7 @@ else
    fi
 fi
 
-tar xzvf ${BOOST_VER}.tar.gz
+tar xzf ${BOOST_VER}.tar.gz
 if [ $? -ne 0 ]; then
    errexit "untar operation failed"
 fi

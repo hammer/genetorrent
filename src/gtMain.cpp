@@ -61,6 +61,9 @@ void configureConfigFileOptions (boost::program_options::options_description &op
 {
    // The descriptions below are not used in the help message.
    options.add_options() 
+      (POSITIONAL_CLI_OPT.c_str(),
+         boost::program_options::value< std::vector< std::string > >(),
+         "Positional arguments")
       (makeOpt (BIND_IP_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "Bind IP")        // long and short option using first letter of long option
       (makeOpt (CRED_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to credentials file")          
       (makeOpt (CONF_DIR_CLI_OPT, CONF_DIR_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")    // long option with alternate short option
@@ -127,11 +130,14 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       boost::program_options::options_description commandLineOpts ("Command Line Only Options");
       configureCommandLineOptions (commandLineOpts);
 
+      boost::program_options::positional_options_description p;
+      p.add(POSITIONAL_CLI_OPT.c_str(), -1);
+
       boost::program_options::options_description allOpts ("All Options");
       allOpts.add(configFileOpts).add(commandLineOpts);
 
       boost::program_options::variables_map cli;
-      boost::program_options::store (boost::program_options::parse_command_line (argc, argv, allOpts), cli);
+      boost::program_options::store (boost::program_options::command_line_parser(argc, argv).options(allOpts).positional(p).run(), cli);
 
       // Check if help was requested
       if (cli.count (HELP_CLI_OPT))
@@ -183,19 +189,49 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          global_gtAgentMode = true;
       }
 
-      if (cli.count (SERVER_CLI_OPT) == 0 && cli.count (DOWNLOAD_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT) == 0 && cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
+      boost::program_options::notify (cli);
+
+#ifdef GENETORRENT_ALL
+      if (cli.count (SERVER_CLI_OPT) == 0 &&
+            cli.count (DOWNLOAD_CLI_OPT) == 0 &&
+            cli.count (UPLOAD_FILE_CLI_OPT) == 0 &&
+            cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
       {
-         commandLineError ("Command line or config file must include one of -d (download), -s (server), or -u (upload).");
+         commandLineError ("Command line or config file must include one "
+            "of -d (download), -s (server), or -u (upload).");
       }
+#elif GENETORRENT_SERVER
+      if (cli.count (SERVER_CLI_OPT) == 0 &&
+         !cli.count (POSITIONAL_CLI_OPT))
+      {
+         commandLineError ("Server command line or config file must "
+            "include a path argument.");
+      }
+#elif GENETORRENT_UPLOAD
+      if (cli.count (UPLOAD_FILE_CLI_OPT) == 0 &&
+         cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0 &&
+         !cli.count (POSITIONAL_CLI_OPT))
+      {
+         commandLineError ("Upload command line or config file must "
+            "include a manifest-file argument.");
+      }
+#elif GENETORRENT_DOWNLOAD
+      if (cli.count (DOWNLOAD_CLI_OPT) == 0 &&
+         !cli.count (POSITIONAL_CLI_OPT))
+      {
+         commandLineError ("Download command line or config file must "
+            "include a content-specifier argument.");
+      }
+#endif
 
       if ((cli.count (SERVER_CLI_OPT) > 0 && cli.count (DOWNLOAD_CLI_OPT) > 0 ) || 
           ((cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) > 0 || cli.count (UPLOAD_FILE_CLI_OPT)) > 0 && cli.count (SERVER_CLI_OPT) > 0 ) ||
           (cli.count (DOWNLOAD_CLI_OPT) > 0 && (cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) > 0 || cli.count (UPLOAD_FILE_CLI_OPT) > 0))) 
       { 
-         commandLineError ("Command line or config file may only specifiy one of -d (download), -s (server), or -u (upload).");
+         commandLineError ("Command line or config file may only specify "
+            "one of -d (download), -s (server), or -u (upload).");
       } 
 
-      boost::program_options::notify (cli); 
 
       // Verify and configure global_verbosity level here
       std::ostringstream shortVerboseFlag;

@@ -50,54 +50,56 @@ noinst_HEADERS =                 \
 torrentrasterbar_CXXFLAGS =  $(shell $(PKG_CONFIG) --cflags ../libtorrent/libtorrent-rasterbar.pc)
 torrentrasterbar_LIBS = -L../libtorrent/src/.libs $(shell $(PKG_CONFIG) --libs-only-l ../libtorrent/libtorrent-rasterbar.pc)
 
-# lib_LTLIBRARIES = libgenetorrent.la
-#
-# libgenetorrent_la_SOURCES = gtBase.cpp \
-#                             gtUtils.cpp \
-#                             gtLog.cpp \
-#                             gtAlerts.cpp \
-#                             geneTorrentUtils.cpp \
-#                             stringTokenizer.cpp
-#
-# libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS)
-#
-# libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
-#                             $(torrentrasterbar_LIBS) \
-#                             -R $(libdir)/GeneTorrent
-#
-# libgenetorrent_la_LIBADD = -lboost_system \
-#                            -lboost_filesystem \
-#                            -lboost_regex \
-#                            -lboost_program_options
+lib_LTLIBRARIES = libgenetorrent.la
 
-bin_PROGRAMS = GeneTorrent
-#              GeneTorrent_Upload \
-#              GeneTorrent_Download \
-#              GeneTorrent_Server
+libgenetorrent_la_SOURCES = gtBase.cpp \
+                            gtUtils.cpp \
+                            gtLog.cpp \
+                            gtAlerts.cpp \
+                            geneTorrentUtils.cpp \
+                            stringTokenizer.cpp \
+                            gtNullStorage.cpp \
+                            gtZeroStorage.cpp
+
+libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                             $(OPENSSL_INCLUDES)
+
+libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
+                             -I$(top_srcdir)/libtorrent/include
+
+libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
+                            -shared \
+                            $(torrentrasterbar_LIBS) \
+                            -R $(libdir)/GeneTorrent \
+                            -L../libtorrent/src/.libs \
+                            $(BOOST_LDFLAGS) \
+                            $(OPEENSSL_LDFLAGS)
+
+libgenetorrent_la_LIBADD = -lboost_system \
+                           -lboost_filesystem \
+                           -lboost_regex \
+                           -lboost_program_options
+
+bin_PROGRAMS = GeneTorrent \
+               gtupload    \
+               gtdownload  \
+               gtserver
 
 GeneTorrent_Common_SOURCES = gtMain.cpp
 
 GeneTorrent_SOURCES = $(GeneTorrent_Common_SOURCES) \
                       gtUpload.cpp                  \
                       gtDownload.cpp                \
-                      gtServer.cpp                  \
-                      gtBase.cpp                    \
-                      gtUtils.cpp                   \
-                      gtLog.cpp                     \
-                      gtAlerts.cpp                  \
-                      geneTorrentUtils.cpp          \
-                      gtNullStorage.cpp             \
-                      gtZeroStorage.cpp				\
-                      stringTokenizer.cpp
+                      gtServer.cpp
 
-# GeneTorrent_Upload_SOURCES = $(GeneTorrent_Common_SOURCES) \
-#                              gtUpload.cpp
-#
-# GeneTorrent_Download_SOURCES = $(GeneTorrent_Common_SOURCES) \
-#                                gtDownload.cpp
-#
-# GeneTorrent_Server_SOURCES = $(GeneTorrent_Common_SOURCES) \
-#                              gtServer.cpp
+gtupload_SOURCES = $(GeneTorrent_Common_SOURCES) \
+                   gtUpload.cpp
+
+gtdownload_SOURCES = $(GeneTorrent_Common_SOURCES) \
+                   gtDownload.cpp
+
+gtserver_SOURCES = $(GeneTorrent_Common_SOURCES) \
+                   gtServer.cpp
 
 GTdatadir = $(datadir)/GeneTorrent
 
@@ -120,29 +122,57 @@ GeneTorrent_LDADD =  -lboost_system \
                      -lboost_regex \
                      -lboost_program_options \
                      -lssl \
-                     -lcrypto
-#                    libgenetorrent.la
+                     -lcrypto \
+                     libgenetorrent.la
 
-# GeneTorrent_Upload_CXXPFLAGS = $(torrentrasterbar_CXXFLAGS) \
-#                               -DGENETORRENT_UPLOAD
-#
-# GeneTorrent_Upload_LDFLAGS = $(GeneTorrent_LDFLAGS)
-#
-# GeneTorrent_Upload_LDADD = $(GeneTorrent_LDADD)
-#
-# GeneTorrent_Download_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
-#                                 -DGENETORRENT_DOWNLOAD
-#
-# GeneTorrent_Download_LDFLAGS = $(GeneTorrent_LDFLAGS)
-#
-# GeneTorrent_Download_LDADD = $(GeneTorrent_LDADD)
-#
-# GeneTorrent_Server_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
-#                               -DGENETORRNET_SERVER
-#
-# GeneTorrent_Server_LDFLAGS = $(GeneTorrent_LDFLAGS)
-#
-# GeneTorrent_Server_LDADD = $(GeneTorrent_LDADD)
+gtupload_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                    $(OPENSSL_INCLUDES)
 
-dist_man_MANS = GeneTorrent.1
+gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
+                    -I$(top_srcdir)/libtorrent/include \
+                    -DGENETORRENT_UPLOAD
+
+gtupload_LDFLAGS = $(GeneTorrent_LDFLAGS)
+
+gtupload_LDADD = $(GeneTorrent_LDADD)
+
+gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                      $(OPENSSL_INCLUDES)
+
+gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
+                      -I$(top_srcdir)/libtorrent/include \
+                      -DGENETORRENT_DOWNLOAD
+
+gtdownload_LDFLAGS = $(GeneTorrent_LDFLAGS)
+
+gtdownload_LDADD = $(GeneTorrent_LDADD)
+
+gtserver_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                    $(OPENSSL_INCLUDES)
+
+gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
+                   -I$(top_srcdir)/libtorrent/include \
+                   -DGENETORRENT_SERVER
+
+gtserver_LDFLAGS = $(GeneTorrent_LDFLAGS)
+
+gtserver_LDADD = $(GeneTorrent_LDADD)
+
+dist_man_MANS = GeneTorrent.1 \
+                gtdownload.1  \
+                gtserver.1    \
+                gtupload.1
+
+CLEANFILES = gtdownload.1  \
+             gtserver.1    \
+             gtupload.1
+
+gtdownload.1:
+	cat man_gtdownload.1 man_gtcommon.1 > gtdownload.1
+
+gtserver.1:
+	cat man_gtserver.1   man_gtcommon.1 > gtserver.1
+
+gtupload.1:
+	cat man_gtupload.1   man_gtcommon.1 > gtupload.1
 

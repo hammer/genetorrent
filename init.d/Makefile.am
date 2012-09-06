@@ -39,4 +39,6 @@ init_ddir = $(sysconfdir)/rc.d/init.d
 
 dist_init_d_SCRIPTS = ${LIST_OF_SCRIPTS_INIT}
 
-dist_sysconf_DATA = GeneTorrent.conf GTLoadBalancer.conf
+gnosdir = $(sysconfdir)/gnos.d
+dist_gnos_SCRIPTS =  GeneTorrent.conf GTLoadBalancer.conf
+

@@ -120,6 +120,8 @@ const std::string NO_LONG_CLI_OPT = "";                            //
 
 const std::string CURL_NO_VERIFY_SSL_CLI_OPT = "ssl-no-verify-ca";         // NO short option
 
+const std::string POSITIONAL_CLI_OPT = "positional";               // NO short option
+
 // verbosity conversation, two different verbose settings are available
 // Single letter -v with increasing count or --verbose=level
 // this is a rather ugly hack, but due to shortcomings in boost program_options

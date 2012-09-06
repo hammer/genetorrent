@@ -1,4 +1,4 @@
-.\" GeneTorrent man page
+.\" gtserver man page
 .if !\n(.g \{\
 .	if !\w|\*(lq| \{\
 .		ds lq ``
@@ -21,28 +21,12 @@
 . \" ISO 8601 date, complete format, extended representation
 . ds Dt \\*(Yr-\\*(Mn-\\*(Dy
 ..
-.TH GeneTorrent 1 
+.TH gtserver 1 
 .hy 0
 .
 .SH NAME 
-GeneTorrent \- transfer genomic data reliably across a network
+gtserver \- transfer genomic data reliably across a network
 .SH SYNOPSIS
-.B gtupload 
-.I manifest-file
-.B -c 
-.I cred
-.B \fR[\fP -p 
-.I path
-.R ]
-.br
-.B gtdownload 
-.I \fR<\fP URI \fR|\fP UUID \fR|\fP .xml \fR|\fP .gto \fR>\fP
-.B -c 
-.I cred
-.B \fR[\fP -p 
-.I path
-.RB ] 
-.br
 .B gtserver 
 .I path
 .B -q
@@ -63,19 +47,30 @@ Upload mode is used to send files to the repository.  Download mode is
 used to retrieve files from the repository.  Server mode is used
 within the repository to create GeneTorrent server instances that
 deliver data to download actors.
-.SH OPTIONS
-See the man page of each application for usage information.
-.SH SEE ALSO
-.BR gtdownload(1),
-.BR gtserver(1),
-.BR gtupload(1).
-.SH COPYRIGHT
-Copyright \(co
-2011-2012
-Annai Systems, Inc.
 .PP
-This is free software;
-see the source for copying conditions.
-There is NO warranty;
-not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+This man page describes 
+.B gtserver 
+(the GeneTorrent server mode application).
+.SH OPTIONS
+.SS "Server Mode Command Line Arguments:"
+.TP
+.BI "path"
+Required.  Indicates server mode.  
+.I path
+is the absolute or relative path to the directory under which the data
+files being shared are to be found.  Note that UUID is always be added
+to
+.I path\fR,\fP
+so data files will be found at 
+.I path\fR/\fPUUID\fR.\fP
+.TP
+.BI \-q " work-queue" "\fR,\fP \-\^\-queue" " work-queue"
+Required.  
+.I work-queue
+is the absolute or relative path to a directory where this server
+instance will look for .gto files to begin sharing content.
+.TP
+.BI \-\^\-security-api " signing-URI"
+Required.  
+.I signing-URI
+is a fully-qualified URI which will sign CSRs for this server instance.
