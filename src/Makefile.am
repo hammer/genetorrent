@@ -167,12 +167,12 @@ CLEANFILES = gtdownload.1  \
              gtserver.1    \
              gtupload.1
 
-gtdownload.1:
-	cat man_gtdownload.1 man_gtcommon.1 > gtdownload.1
+gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
+	cat $^ > $@
 
-gtserver.1:
-	cat man_gtserver.1   man_gtcommon.1 > gtserver.1
+gtserver.1: $(srcdir)/man_gtserver.1 $(srcdir)/man_gtcommon.1
+	cat $^ > $@
 
-gtupload.1:
-	cat man_gtupload.1   man_gtcommon.1 > gtupload.1
+gtupload.1: $(srcdir)/man_gtupload.1 $(srcdir)/man_gtcommon.1
+	cat $^ > $@
 
