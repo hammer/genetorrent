@@ -63,6 +63,7 @@ class gtDownload : public gtBase
                         libtorrent::torrent_info &torrentInfo,
                         std::string uri = "");
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
+      void spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces);
       void performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles);
       void performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);

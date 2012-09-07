@@ -537,31 +537,8 @@ void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
    }
 }
 
-void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles)
+void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces)
 {
-   libtorrent::error_code torrentError;
-   libtorrent::torrent_info torrentInfo (torrentName, torrentError);
-
-   if (torrentError)
-   {
-      gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
-   }
-
-   int64_t totalSizeOfDownload = torrentInfo.total_size ();
-   int64_t totalDataDownloaded = 0;
-
-   int numFilesDownloaded = torrentInfo.num_files ();
-
-   if (totalSizeOfDownload < 1)
-   {
-      gtError("Size of torrent data is zero bytes: " + torrentName, NO_EXIT);
-   }
-
-   if (numFilesDownloaded < 1)
-   {
-      gtError("Torrent contains no files: " + torrentName, NO_EXIT);
-   }
-
     // TODO: It would be good to use a system call to determine how
     // many cores this machine has.  There shouldn't be more children
     // than cores, so set
@@ -571,10 +548,9 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
    int maxChildren = _maxChildren;
    int pipes[maxChildren+1][2];
 
-   int childrenThisGTO = torrentInfo.num_pieces() >= maxChildren ? maxChildren : torrentInfo.num_pieces();
-   int childID=1;
+   int childrenThisGTO = num_pieces >= maxChildren ? maxChildren : num_pieces;
 
-   childMap pidList;
+   int childID=1;
    pid_t pid;
 
    while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
@@ -637,6 +613,36 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
          pidListIter++;
       }
    }
+}
+
+void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles)
+{
+   libtorrent::error_code torrentError;
+   libtorrent::torrent_info torrentInfo (torrentName, torrentError);
+
+   if (torrentError)
+   {
+      gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
+   }
+
+   int64_t totalSizeOfDownload = torrentInfo.total_size ();
+   int64_t totalDataDownloaded = 0;
+
+   int numFilesDownloaded = torrentInfo.num_files ();
+
+   if (totalSizeOfDownload < 1)
+   {
+      gtError("Size of torrent data is zero bytes: " + torrentName, NO_EXIT);
+   }
+
+   if (numFilesDownloaded < 1)
+   {
+      gtError("Torrent contains no files: " + torrentName, NO_EXIT);
+   }
+
+   childMap pidList;
+
+   spawnDownloadChildren(pidList, torrentName, torrentInfo.num_pieces());
 
    int64_t xfer = 0;
    int64_t childXfer = 0;
