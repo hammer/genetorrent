@@ -163,6 +163,11 @@ dist_man_MANS = GeneTorrent.1 \
                 gtserver.1    \
                 gtupload.1
 
+EXTRA_DIST = man_gtcommon.1   \
+             man_gtdownload.1 \
+             man_gtserver.1   \
+             man_gtupload.1
+
 CLEANFILES = gtdownload.1  \
              gtserver.1    \
              gtupload.1
