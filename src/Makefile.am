@@ -47,6 +47,11 @@ noinst_HEADERS =                 \
    loggingmask.h                 \
    stringTokenizer.h
 
+boost_LIBS = $(BOOST_SYSTEM_LIB)          \
+             $(BOOST_FILESYSTEM_LIB)      \
+             $(BOOST_REGEX_LIB)           \
+             $(BOOST_PROGRAM_OPTIONS_LIB)
+
 torrentrasterbar_CXXFLAGS =  $(shell $(PKG_CONFIG) --cflags ../libtorrent/libtorrent-rasterbar.pc)
 torrentrasterbar_LIBS = -L../libtorrent/src/.libs $(shell $(PKG_CONFIG) --libs-only-l ../libtorrent/libtorrent-rasterbar.pc)
 
@@ -75,10 +80,7 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             $(BOOST_LDFLAGS) \
                             $(OPEENSSL_LDFLAGS)
 
-libgenetorrent_la_LIBADD = -lboost_system \
-                           -lboost_filesystem \
-                           -lboost_regex \
-                           -lboost_program_options
+libgenetorrent_la_LIBADD = $(boost_LIBS)
 
 bin_PROGRAMS = GeneTorrent \
                gtupload    \
@@ -117,12 +119,9 @@ GeneTorrent_LDFLAGS = $(torrentrasterbar_LIBS) \
                       $(BOOST_LDFLAGS) \
                       $(OPEENSSL_LDFLAGS)
 
-GeneTorrent_LDADD =  -lboost_system \
-                     -lboost_filesystem \
-                     -lboost_regex \
-                     -lboost_program_options \
-                     -lssl \
-                     -lcrypto \
+GeneTorrent_LDADD =  $(boost_LIBS)     \
+                     -lssl             \
+                     -lcrypto          \
                      libgenetorrent.la
 
 gtupload_CPPFLAGS = $(BOOST_CPPFLAGS) \
