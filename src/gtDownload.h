@@ -48,9 +48,10 @@ class gtDownload : public gtBase
 
    protected:
 
+      std::string _downloadSavePath;
+
    private:
       vectOfStr _cliArgsDownloadList;
-      std::string _downloadSavePath;
       int _maxChildren;
       vectOfStr _torrentListToDownload;
       vectOfStr _uriListToDownload;
