@@ -503,8 +503,6 @@ namespace libtorrent {
 		return msg;
 	}
 
-	cache_flushed_alert::cache_flushed_alert(torrent_handle const& h): torrent_alert(h) {}
-
 	std::string anonymous_mode_alert::message() const
 	{
 		char msg[200];

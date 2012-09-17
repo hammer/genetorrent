@@ -1158,11 +1158,16 @@ namespace libtorrent
 
 	struct TORRENT_EXPORT cache_flushed_alert: torrent_alert
 	{
-		cache_flushed_alert(torrent_handle const& h);
+		cache_flushed_alert(torrent_handle const& h)
+			: torrent_alert(h)
+		{}
 
 		TORRENT_DEFINE_ALERT(cache_flushed_alert);
 
 		const static int static_category = alert::storage_notification;
+		virtual std::string message() const
+		{ return torrent_alert::message() + " cache flushed"; }
+
 	};
 
 	struct TORRENT_EXPORT anonymous_mode_alert: torrent_alert
