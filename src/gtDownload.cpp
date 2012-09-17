@@ -85,7 +85,7 @@ static char const* download_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _cliArgsDownloadList (), _downloadSavePath (""), _maxChildren (8), _torrentListToDownload (), _uriListToDownload ()
+gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _downloadSavePath (""), _cliArgsDownloadList (), _maxChildren (8), _torrentListToDownload (), _uriListToDownload ()
 {
    pcfacliMaxChildren (vm);
    _downloadSavePath = pcfacliPath(vm);
