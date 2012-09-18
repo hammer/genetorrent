@@ -58,6 +58,7 @@ torrentrasterbar_LIBS = -L../libtorrent/src/.libs $(shell $(PKG_CONFIG) --libs-o
 lib_LTLIBRARIES = libgenetorrent.la
 
 libgenetorrent_la_SOURCES = gtBase.cpp \
+                            gtDownload.cpp \
                             gtUtils.cpp \
                             gtLog.cpp \
                             gtAlerts.cpp \
@@ -91,14 +92,12 @@ GeneTorrent_Common_SOURCES = gtMain.cpp
 
 GeneTorrent_SOURCES = $(GeneTorrent_Common_SOURCES) \
                       gtUpload.cpp                  \
-                      gtDownload.cpp                \
                       gtServer.cpp
 
 gtupload_SOURCES = $(GeneTorrent_Common_SOURCES) \
                    gtUpload.cpp
 
-gtdownload_SOURCES = $(GeneTorrent_Common_SOURCES) \
-                   gtDownload.cpp
+gtdownload_SOURCES = $(GeneTorrent_Common_SOURCES)
 
 gtserver_SOURCES = $(GeneTorrent_Common_SOURCES) \
                    gtServer.cpp
