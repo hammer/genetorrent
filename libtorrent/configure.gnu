@@ -9,7 +9,7 @@ prefix_regex="^--prefix=(.*)$"
 libdir_regex="^--libdir=(.*)$"
 srcdir_regex="^--srcdir=(.*)$"
 
-for arg in ${*}
+for arg in "${@}"
 do
    if [[ "${arg}" =~ $prefix_regex ]]; then
       prefix=${BASH_REMATCH[1]}
@@ -30,7 +30,7 @@ if [[ -z "${libdir}" ]]; then
    libdir=${prefix}/lib
 fi
 
-${srcdir}/configure ${*} --with-boost-system=boost_system --disable-geoip \
+${srcdir}/configure "${@}" --with-boost-system=boost_system --disable-geoip \
    --disable-dht --enable-callbacklogger --enable-logging=minimal \
    --libdir=${libdir}/GeneTorrent --includedir=${prefix}/include/GeneTorrent \
    --enable-shared --disable-static
