@@ -1,46 +1,136 @@
-.*.swp
-.*.swo
-.fullbuild
 
-obj*
-TAGS
-tags
-local-*
-cscope*
-files.list
+# /
+/GeneTorrent.spec
+/GeneTorrent-*.tar.gz
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache
+/configure
+/config.log
+/config.status
+/libtool
+/obj*
 
-Makefile.in
-aclocal.m4
-autom4te.cache
-configure
-config.h.in*
-install-sh
-missing
-config.log
-config.report
+# /autotools/
+/autotools/config.guess
+/autotools/ltmain.sh
+/autotools/config.sub
+/autotools/py-compile
+/autotools/install-sh
+/autotools/depcomp
+/autotools/missing
 
-autotools/config.guess
-autotools/config.sub
-autotools/depcomp
-autotools/install-sh
-autotools/ltmain.sh
-autotools/missing
-autotools/py-compile
+# /boost/
+/boost/Makefile.in
+/boost/include
+/boost/lib
+/boost/Makefile
+/boost/boost_*
 
-m4/libtool.m4
-m4/ltoptions.m4
-m4/ltsugar.m4
-m4/ltversion.m4
-m4/lt~obsolete.m4
-build-aux/
+# /init.d/
+/init.d/Makefile
+/init.d/Makefile.in
 
-libtorrent/m4/libtool.m4
-libtorrent/m4/ltoptions.m4
-libtorrent/m4/ltsugar.m4
-libtorrent/m4/ltversion.m4
-libtorrent/m4/lt~obsolete.m4
+# /libtorrent/
+/libtorrent/configure.lineno
+/libtorrent/autom4te.cache
+/libtorrent/aclocal.m4
+/libtorrent/config.log
+/libtorrent/config.status
+/libtorrent/build-aux
+/libtorrent/libtool
+/libtorrent/libtorrent-rasterbar.pc
+/libtorrent/Makefile
+/libtorrent/config.report
+/libtorrent/configure
+/libtorrent/Makefile.in
+/libtorrent/libtorrent-rasterbar-cmake.pc
 
-scripts/py-compile
+# /libtorrent/bindings/
+/libtorrent/bindings/Makefile.in
+/libtorrent/bindings/Makefile
 
-docs/*.pdf
-docs/*.html
+# /libtorrent/bindings/python/
+/libtorrent/bindings/python/Makefile
+/libtorrent/bindings/python/Makefile.in
+/libtorrent/bindings/python/setup.py
+
+# /libtorrent/examples/
+/libtorrent/examples/.deps
+/libtorrent/examples/Makefile
+/libtorrent/examples/Makefile.in
+
+# /libtorrent/include/libtorrent/
+/libtorrent/include/libtorrent/Makefile.in
+/libtorrent/include/libtorrent/Makefile
+
+# /libtorrent/m4/
+/libtorrent/m4/ltsugar.m4
+/libtorrent/m4/libtool.m4
+/libtorrent/m4/ltversion.m4
+/libtorrent/m4/lt~obsolete.m4
+/libtorrent/m4/ltoptions.m4
+
+# /libtorrent/src/
+/libtorrent/src/.deps
+/libtorrent/src/.libs
+/libtorrent/src/Makefile
+/libtorrent/src/Makefile.in
+/libtorrent/src/*.o
+/libtorrent/src/*.lo
+/libtorrent/src/*.la
+
+# /libtorrent/test/
+/libtorrent/test/Makefile.in
+/libtorrent/test/.deps
+/libtorrent/test/Makefile
+
+# /m4/
+/m4/ltversion.m4
+/m4/lt~obsolete.m4
+/m4/ltoptions.m4
+/m4/ltsugar.m4
+/m4/libtool.m4
+
+# /openssl/
+/openssl/Makefile.in
+/openssl/include
+/openssl/lib
+/openssl/Makefile
+/openssl/bin
+/openssl/openssl.cnf
+/openssl/private
+/openssl/misc
+/openssl/man
+/openssl/certs
+/openssl/openssl-*
+
+# /scripts/
+/scripts/gtocheck
+/scripts/gtoinfo.py
+/scripts/GTLoadBalancer
+/scripts/gtoinfo
+/scripts/Makefile
+/scripts/python_wrapper
+/scripts/Makefile.in
+
+# /src/
+/src/.deps
+/src/.libs
+/src/GeneTorrent
+/src/Makefile
+/src/Makefile.in
+/src/config.h
+/src/config.h.in
+/src/config.h.in~
+/src/gtdownload
+/src/gtdownload.1
+/src/gtserver
+/src/gtserver.1
+/src/gtupload
+/src/gtupload.1
+/src/stamp-h1
+/src/*.o
+/src/*.lo
+/src/*.la
