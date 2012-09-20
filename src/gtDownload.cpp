@@ -926,11 +926,6 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
          }
       }
 
-      if (currentState == libtorrent::torrent_status::seeding || getppid() == 1)
-      {
-         break;
-      }
-
       checkAlerts (torrentSession);
 
       // libtorrent::session_status sessionStatus = torrentSession->status ();
@@ -939,6 +934,11 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       fprintf (fd, "%lld\n", (long long) torrentStatus.total_wanted_done);
       fprintf (fd, "%d\n", torrentStatus.download_payload_rate);
       fflush (fd);
+
+      if (currentState == libtorrent::torrent_status::seeding || getppid() == 1)
+      {
+         break;
+      }
 
       if (_verbosityLevel > VERBOSE_2)
       {
