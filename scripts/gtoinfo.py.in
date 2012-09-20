@@ -289,8 +289,8 @@ def inspect_key(data, key, params):
 # Outputs:
 # - the bencoded string
 def encode_int(num):
-    if (not isinstance(num, int)):
-        raise ValueError('Expected integer, got %s' % type(data))
+    if (not isinstance(num, int) and not isinstance(num, long)):
+        raise ValueError('Expected integer or long, got %s' % type(data))
     return ("i%de" % num)
 
 
@@ -329,7 +329,7 @@ def encode_list(data):
             text += encode_list(v)
         elif isinstance(v, str):
             text += encode_string(v)
-        elif isinstance(v, int):
+        elif isinstance(v, int) or isinstance(v, long):
             text += encode_int(v)
         else:
             raise ValueError('Unsupported type: %s' % type(v))
@@ -358,7 +358,7 @@ def encode_dict(data):
             text += encode_list(v)
         elif isinstance(v, str):
             text += encode_string(v)
-        elif isinstance(v, int):
+        elif isinstance(v, int) or isinstance(v, long):
             text += encode_int(v)
         else:
             raise ValueError('Unsupported type: %s' % type(v))
