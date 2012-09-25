@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # gtoinfo -- a GeneTorrent Secret Decoder Ring,
 # based in part on "A Simple BitTorrent 'bencode' Decoder" by Fredrik Lundh.
 #
