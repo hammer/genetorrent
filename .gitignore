@@ -134,3 +134,7 @@
 /src/*.o
 /src/*.lo
 /src/*.la
+
+# /tests/
+/tests/Makefile
+/tests/Makefile.in

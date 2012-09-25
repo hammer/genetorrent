@@ -49,9 +49,9 @@ dhparam.pem:
 
 all: web certs gtoinfo dhparam.pem
 
+CLEANFILES = dhparam.pem gtoinfo web
+
 clean-local:
 	rm -rf web.py-*/
 	rm -rf certs/
-	rm -f web
-	rm -f gtoinfo
 
