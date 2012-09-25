@@ -34,7 +34,7 @@ OPENSSL_VER=openssl-1.0.1c
 OPENSSL_MD5=ae412727c8c15b67880aef7bd2999b2e
 
 WGET="$(which wget) --tries 3"
-CURL="$(which curl) -o ${OPENSSL_VER}.tar.gz"
+CURL="$(which curl) -o ${OPENSSL_VER}.tar.gz -L"
 
 function errexit
 {
@@ -90,7 +90,7 @@ if [ $? -ne 0 ]; then
    errexit "openssl bootstrap operation failed"
 fi
 
-make install
+make install "$@"
 
 if [ $? -ne 0 ]; then
    errexit "openssl build operation failed"

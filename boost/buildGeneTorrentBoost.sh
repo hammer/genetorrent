@@ -34,7 +34,7 @@ BOOST_VER=boost_1_48_0
 BOOST_MD5=313a11e97eb56eb7efd18325354631be
 
 WGET="$(which wget) --tries 3"
-CURL="$(which curl) -o ${BOOST_VER}.tar.gz"
+CURL="$(which curl) -o ${BOOST_VER}.tar.gz -L"
 
 function errexit
 {
@@ -90,7 +90,7 @@ if [ $? -ne 0 ]; then
    errexit "boost bootstrap operation failed"
 fi
 
-./b2 link=shared warnings=all warnings-as-errors=on debug-symbols=on install
+./b2 link=shared warnings=all warnings-as-errors=on debug-symbols=on install "$@"
 
 if [ $? -ne 0 ]; then
    errexit "boost build operation failed"
