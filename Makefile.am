@@ -27,7 +27,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = boost openssl libtorrent src scripts init.d
+SUBDIRS = boost openssl libtorrent src scripts init.d tests
 
 EXTRA_DIST =                     \
    LICENSE                       \

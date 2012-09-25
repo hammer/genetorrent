@@ -1,0 +1,93 @@
+GeneTorrent Test Suite
+======================
+
+This directory contains the test suite for the GeneTorrent distribution.
+GeneTorrent's tests are designed to exercise and detect errors in
+individual system components as well as test the functionality of the
+system as a whole.  To achieve this, a test harness has been developed
+to provide the minimal necessary interfaces to facilitate testing.
+
+This README covers test suite usage, the test framework components,
+and lists the individual items tested.
+
+Test Suite Usage
+================
+
+To execute the default GeneTorrent test suite, run the following
+from the base directory of the distribution:
+
+./configure
+make check
+
+This will compile GeneTorrent and execute the default test suite.
+
+To execute a subset of the tests, or to execute a test not included
+in the default test suite, run:
+
+./configure
+make check TESTS="gt_foo_test.py gt_bar_test.py ..."
+
+This will execute only those test files listed in the TESTS variable.
+
+Test Suite Components
+=====================
+
+Testing GeneTorrent's upload, download, and server mode require some
+infrastructure that is not included in the binaries themselves.  Therefore,
+GeneTorrent's test harness contains some components to facilitate end-to-end
+testing of GeneTorrent in its various operating modes.
+
+The tests are written in Python and called by the 'check' target in
+the GeneTorrent Makefiles.  As of this writing, the test scripts require
+Python 2.6 or Python 2.7.
+
+MockHub
+-------
+
+MockHub is a small python script which provides a number of web services
+vital to GeneTorrent's operation.  These services include those related
+to SSL certificate signing, upload-mode GTO file generation, download-mode
+GTO file transfer, and an extremely basic BitTorrent tracker.
+
+MockHub uses web.py, a web services framework written in Python.
+
+http://webpy.org/
+
+GTTestCase
+----------
+
+GTTestCase is a Python TestCase subclass that adds functionality to
+facilitate GeneTorrent testing.  This includes the generation of random
+data files to transfer, the creation of credential files, setup/teardown
+methods, and flexible methods to perform upload and download operations.
+
+GeneTorrentInstance/MockHubControl
+----------------------------------
+
+These Python files provide subprocess Popen wrappers around MockHub and
+GeneTorrent.
+
+Unit Test Files
+---------------
+
+Default test suite:
+gt_download_tests.py
+      download mode tests
+gt_upload_tests.py
+      upload mode tests
+gt_argument_tests.py
+      tests various GeneTorrent command line arguments
+gt_cred_as_uri_tests.py
+      tests the feature allowing a credential file to be
+      supplied via URI
+gt_curl_ssl_verify_tests.py
+      tests the --ssl-no-verify-ca option
+gt_inactivity_tests.py
+      upload and download inactivity timeout tests
+gt_script_tests.py
+   tests gtoinfo and gtocheck scripts
+
+Additional tests:
+gt_20gb_download_test.py
+      a single, 20GB download operation from server
+

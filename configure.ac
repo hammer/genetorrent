@@ -159,6 +159,7 @@ AC_CONFIG_FILES(
    [init.d/Makefile]
    [boost/Makefile]
    [openssl/Makefile]
+   [tests/Makefile]
 )
 
 AC_CONFIG_SUBDIRS(
