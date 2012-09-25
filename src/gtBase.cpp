@@ -300,11 +300,6 @@ void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
       return;    
    }
 
-   if ((_confDir.size () == 0) || (_confDir[0] != '/'))
-   {
-      commandLineError ("configuration directory '" + _confDir + "' must be an absolute path");
-   }
-
    if (statDirectory (_confDir) != 0)
    {
       commandLineError ("unable to opening configuration directory '" + _confDir + "'");
