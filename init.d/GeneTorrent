@@ -40,7 +40,7 @@
 #
 # chkconfig:   345 22 02
 # description: GeneTorrent server process
-# processname: GeneTorrent
+# processname: gtserver
 # pidfile:     /var/run/GeneTorrent.pid
 #
 # IMPORTANT NOTES: 
@@ -79,7 +79,7 @@ get_configvar() {
 # GT_ROOT    - where to find the GTO and data files
 # GT_QUEUE   - location of the GeneTorrent download queue
 #
-GT_BIN=/usr/bin/GeneTorrent
+GT_BIN=/usr/bin/gtserver
 GT_CONFIG=/etc/gnos.d/GeneTorrent.conf
 GT_STOP=/tmp/GeneTorrent.stop
 GT_USER="gtorrent"
