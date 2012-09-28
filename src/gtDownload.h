@@ -48,6 +48,8 @@ class gtDownload : public gtBase
 
    protected:
 
+      std::string downloadGtoFileByURI (std::string uri);
+
       std::string _downloadSavePath;
 
    private:
@@ -59,7 +61,6 @@ class gtDownload : public gtBase
 
       void runDownloadMode (std::string startupDir);
       void prepareDownloadList ();
-      std::string downloadGtoFileByURI (std::string uri);
       void initiateCSR (std::string torrUUID, std::string torrFile,
                         libtorrent::torrent_info &torrentInfo,
                         std::string uri = "");
