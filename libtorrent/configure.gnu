@@ -30,7 +30,7 @@ if [[ -z "${libdir}" ]]; then
    libdir=${prefix}/lib
 fi
 
-${srcdir}/configure "${@}" --with-boost-system=boost_system --disable-geoip \
+${srcdir}/configure "${@}" --disable-geoip \
    --disable-dht --enable-callbacklogger --enable-logging=minimal \
    --libdir=${libdir}/GeneTorrent --includedir=${prefix}/include/GeneTorrent \
    --enable-shared --disable-static
