@@ -50,7 +50,10 @@ class gtUpload : public gtBase
       static bool file_filter (boost::filesystem::path const& filename);
       bool fileFilter (std::string const filename);
 
+      const std::string getUploadUUID () { return _uploadUUID; };
+
       void hashCallbackImpl (int piece);
+
    protected:
 
    private:

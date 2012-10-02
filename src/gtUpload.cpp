@@ -440,11 +440,16 @@ bool gtUpload::verifyDataFilesExist (vectOfStr &missingFileList)
    bool missingFiles = false;
    std::string workingDataPath = _uploadUUID + "/";
 
+   vectOfStr::iterator dupeIter = std::unique (_filesToUpload.begin(), _filesToUpload.end());
+
+   _filesToUpload.resize (dupeIter - _filesToUpload.begin());
+
+
    vectOfStr::iterator vectIter = _filesToUpload.begin ();
 
    while (vectIter != _filesToUpload.end ())
    {
-      if (statFile (workingDataPath + *vectIter) != 0)
+      if (statFile (workingDataPath + *vectIter) != 0 && statDirectory (workingDataPath + *vectIter) != 0)
       {
          missingFileList.push_back (*vectIter);
          missingFiles = true;
@@ -583,7 +588,8 @@ void gtUpload::makeTorrent (std::string uuid)
 
       libtorrent::add_files (fileStore, dataPath, file_filter, flags);
 
-      libtorrent::create_torrent torrent (fileStore, _pieceSize, -1, 0);
+      libtorrent::create_torrent torrent (fileStore, _pieceSize, -1, flags);
+
       torrent.add_tracker (DEFAULT_TRACKER_URL);
 
       _piecesInTorrent = torrent.num_pieces();
@@ -593,7 +599,7 @@ void gtUpload::makeTorrent (std::string uuid)
 
       std::vector <char> finishedTorrent;
       bencode (back_inserter (finishedTorrent), torrent.generate ());
-std::cerr << "_uploadGTODir = " << _uploadGTODir << std::endl;
+
       FILE *output = fopen ((_uploadGTODir + torrentNameBuilding ).c_str (), "wb+");
 
       if (output == NULL)
@@ -711,6 +717,15 @@ void gtUpload::processManifestFile ()
          }
          else if (token1 == "filename")
          {
+            std::string pathFileName = strToken.getToken (2);
+ 
+            std::size_t foundPos = pathFileName.rfind ('/');
+             
+            if (std::string::npos != foundPos)
+            { 
+               std::string directory = pathFileName.substr (0, foundPos);
+               _filesToUpload.push_back (directory);
+            }
             _filesToUpload.push_back (strToken.getToken (2));
          }
          else
@@ -867,7 +882,6 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
          usleep(ALERT_CHECK_PAUSE_INTERVAL);
       }
 
-
       // Warning - Asynchronous call does below not update our torrentStatus struct
       torrentHandle.scrape_tracker();
 
@@ -942,33 +956,43 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
 }
 
 // do not include files that are not present in _filesToUpload
-bool gtUpload::fileFilter (std::string const fileName)
+bool gtUpload::fileFilter (std::string const objectName)
 {
    vectOfStr::iterator vectIter = _filesToUpload.begin ();
 
-   if (fileName == _uploadUUID) // Include the UUID directory
-   {
-      return true;
-   }
-
    while (vectIter != _filesToUpload.end ())
    {
-      if (*vectIter == fileName)
+      if (*vectIter == objectName)
       {
          return true;
       }
       vectIter++;
    }
+
    return false;
 }
 
 // do not include files and folders whose name starts with a ., based on file_filter from libtorrent
 bool gtUpload::file_filter (boost::filesystem::path const& filename)
 {
-   std::string fileName = filename.filename().string();
+   static std::string workingDir = ((gtUpload *)geneTorrCallBackPtr)->getWorkingDirectory () + "/" + ((gtUpload *)geneTorrCallBackPtr)->getUploadUUID();
 
-   if (fileName[0] == '.')
+   if (filename.string().size() == workingDir.size() && filename.string() == workingDir)  // this is the root of the data, e.g., the UUID directory
+   {
+      return true;
+   }
+
+   if (filename.string().size() < workingDir.size() + 1)
+   {
       return false;
+   }
 
-   return ((gtUpload *)geneTorrCallBackPtr)->fileFilter (fileName);
+   std::string targetObject = std::string (filename.string()).erase(0, workingDir.size() + 1);   // removes extra /
+
+   if (targetObject[0] == '.')
+   {
+      return false;
+   }
+
+   return ((gtUpload *)geneTorrCallBackPtr)->fileFilter (targetObject);
 }
