@@ -100,7 +100,7 @@ openssl/buildGeneTorrentOpenSSL.sh
 make %{?_smp_mflags}
 
 %check
-make check
+LD_LIBRARY_PATH="${PWD}/boost/lib:${PWD}/openssl/lib" make check
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
