@@ -30,35 +30,22 @@ EXTRA_DIST = buildGeneTorrentBoost.sh
 BOOSTVER = 1.48.0
 LEXT = .so.$(BOOSTVER)
 
+BOOST_INST_LIBS = filesystem program_options regex system thread
+
 all:
 	mkdir -p lib include
 
 install:
 	@echo "Installing boost libraries into $(DESTDIR)$(pkglibdir)"
-	test ! -f $(srcdir)/lib/libboost_filesystem$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_filesystem$(LEXT) \
-		$(DESTDIR)$(pkglibdir)/libboost_filesystem$(LEXT)
-	test ! -f $(srcdir)/lib/libboost_filesystem$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_filesystem.so && \
-			$(LN_S) libboost_filesystem$(LEXT) libboost_filesystem.so)
-	test ! -f $(srcdir)/lib/libboost_program_options$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_program_options$(LEXT) \
-		$(DESTDIR)$(pkglibdir)/libboost_program_options$(LEXT)
-	test ! -f $(srcdir)/lib/libboost_program_options$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_program_options.so && \
-			$(LN_S) libboost_program_options$(LEXT) libboost_program_options.so)
-	test ! -f $(srcdir)/lib/libboost_regex$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_regex$(LEXT) \
-		$(DESTDIR)$(pkglibdir)/libboost_regex$(LEXT)
-	test ! -f $(srcdir)/lib/libboost_regex$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_regex.so && \
-			$(LN_S) libboost_regex$(LEXT) libboost_regex.so)
-	test ! -f $(srcdir)/lib/libboost_system$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_system$(LEXT) \
-		$(DESTDIR)$(pkglibdir)/libboost_system$(LEXT)
-	test ! -f $(srcdir)/lib/libboost_system$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_system.so && \
-			$(LN_S) libboost_system$(LEXT) libboost_system.so)
+	@set -e; for lib in $(BOOST_INST_LIBS); do \
+		echo "  INSTALL -> $${lib}"; \
+		test ! -f $(srcdir)/lib/libboost_$${lib}$(LEXT) || \
+			$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_$${lib}$(LEXT) \
+			$(DESTDIR)$(pkglibdir)/libboost_$${lib}$(LEXT); \
+		test ! -f $(srcdir)/lib/libboost_$${lib}$(LEXT) || \
+			(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_$${lib}.so && \
+				$(LN_S) libboost_filesystem$(LEXT) libboost_$${lib}.so); \
+	done
 
 clean:
 	rm -rf boost_1_48_0 include lib *.tar.gz

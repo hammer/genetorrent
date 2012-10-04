@@ -138,6 +138,8 @@ rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
 %{_libdir}/%{name}/libboost_regex.so.1.48.0
 %{_libdir}/%{name}/libboost_system.so
 %{_libdir}/%{name}/libboost_system.so.1.48.0
+%{_libdir}/%{name}/libboost_thread.so
+%{_libdir}/%{name}/libboost_thread.so.1.48.0
 %if "%{dist}" == ".el5.centos"
 %{_libdir}/%{name}/libssl.so
 %{_libdir}/%{name}/libssl.so.1.0.0
