@@ -21,7 +21,7 @@ URL:            http://annaisystems.com/
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Requires:       xqilla %{name}-common
+Requires:       xqilla, %{name}-common = @PACKAGE_VERSION@
 Requires(pre):  shadow-utils
 
 %if "%{dist}" == ".el5.centos"
@@ -60,7 +60,7 @@ Obsoletes: GeneTorrent < 3.7.0
 Summary:  %{name} download client
 Group:    Applications/Internet
 License:  BSD
-Requires: %{name}-common
+Requires: %{name}-common = @PACKAGE_VERSION@
 
 %description download
 %{name} download client
@@ -69,7 +69,7 @@ Requires: %{name}-common
 Summary:  %{name} upload client
 Group:    Applications/Internet
 License:  BSD
-Requires: %{name}-common
+Requires: %{name}-common = @PACKAGE_VERSION@
 
 %description upload
 %{name} upload Client
@@ -78,7 +78,7 @@ Requires: %{name}-common
 Summary:  %{name} server daemon and associated files
 Group:    Applications/Internet
 License:  BSD
-Requires: %{name}-common
+Requires: %{name}-common = @PACKAGE_VERSION@
 
 %description server
 %{name} server daemon and associated files
