@@ -12,7 +12,7 @@
 
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        1%{?gt_dist}.CP
+Release:        2%{?gt_dist}.CP
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
@@ -51,6 +51,7 @@ Provides: libboost_regex.so
 Provides: libboost_program_options.so
 Provides: libtorrent-rasterbar.so
 Provides: libgenetorrent.so
+Obsoletes: GeneTorrent < 3.7.0
 
 %description common
 %{name} libraries and common files
@@ -194,6 +195,9 @@ exit 0
 /sbin/chkconfig --del GTLoadBalancer
 
 %changelog
+* Thu Oct 04 2012 Theodore A. Roth <troth@cardinalpeak.com> 3.7.0-2
+- Add boost_thread library.
+- Add obsoletes tag to common package.
 * Fri Aug 24 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
 - Split GeneTorrent into common, upload, download, and server packages
 * Fri Aug 10 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
