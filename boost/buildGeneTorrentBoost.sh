@@ -84,7 +84,7 @@ fi
 
 pushd ${BOOST_VER} > /dev/null
 
-./bootstrap.sh --prefix=${depsDir} --with-libraries=system,regex,filesystem,program_options --without-icu
+./bootstrap.sh --prefix=${depsDir} --with-libraries=system,regex,filesystem,program_options,thread --without-icu
 
 if [ $? -ne 0 ]; then
    errexit "boost bootstrap operation failed"
