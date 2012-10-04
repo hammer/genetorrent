@@ -44,8 +44,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <syslog.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <iostream>

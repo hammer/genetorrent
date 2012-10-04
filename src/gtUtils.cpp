@@ -36,13 +36,11 @@
  *      Author: donavan
  */
 
-#include <sys/statvfs.h>
-#include <sys/types.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+
 #include <cstdio>
 
 #include "gtUtils.h"

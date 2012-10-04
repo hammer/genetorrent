@@ -40,10 +40,6 @@
 
 #include <config.h>
 
-#include <sys/statvfs.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
