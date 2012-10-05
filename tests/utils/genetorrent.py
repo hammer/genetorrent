@@ -64,10 +64,6 @@ class GeneTorrentInstance(subprocess.Popen):
     using supplied arguments.  The default instance type, GT_ALL,
     uses the all-in-one binary and supplies NO default arguments.
     '''
-    running = False
-
-    stdout_buffer = tempfile.TemporaryFile()
-    stderr_buffer = tempfile.TemporaryFile()
 
     def log_thread(self, pipe, logger, buffer):
         def log_output(out, logger, buffer):
@@ -84,6 +80,8 @@ class GeneTorrentInstance(subprocess.Popen):
         ssl_no_verify_ca=True):
         self.args = arguments
         self.instance_type = instance_type
+        self.stdout_buffer = tempfile.TemporaryFile()
+        self.stderr_buffer = tempfile.TemporaryFile()
 
         self.args += defaultArgs[instance_type]
         self.LOG = getLogger(gtBinaries[self.instance_type])
