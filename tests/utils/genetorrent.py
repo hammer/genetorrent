@@ -78,6 +78,7 @@ class GeneTorrentInstance(subprocess.Popen):
         t = threading.Thread(target=log_output, args=(pipe, logger, buffer))
         t.daemon = True
         t.start()
+        return t
 
     def __init__(self, arguments, instance_type=InstanceType.GT_ALL,
         ssl_no_verify_ca=True):
@@ -103,13 +104,15 @@ class GeneTorrentInstance(subprocess.Popen):
 
         super(GeneTorrentInstance, self).__init__(command,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE,
-            close_fds=True, bufsize=1)
+            bufsize=1)
 
         self.LOG.debug('Started GeneTorrent instance, pid %s' % self.pid)
         self.LOG.debug('Command: %s', ' '.join(command))
 
-        self.log_thread(self.stdout, self.LOG.info, self.stdout_buffer)
-        self.log_thread(self.stderr, self.LOG.warn, self.stderr_buffer)
+        self.stdout_thread = self.log_thread(self.stdout, self.LOG.info,
+            self.stdout_buffer)
+        self.stderr_thread = self.log_thread(self.stderr, self.LOG.warn,
+            self.stderr_buffer)
 
     def running(self):
         if self.returncode:
@@ -119,6 +122,9 @@ class GeneTorrentInstance(subprocess.Popen):
     def communicate(self, input=None):
         # sets return code
         self.wait()
+
+        self.stdout_thread.join()
+        self.stderr_thread.join()
 
         self.stdout_buffer.seek(0)
         self.stderr_buffer.seek(0)

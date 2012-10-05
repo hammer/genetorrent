@@ -189,5 +189,7 @@ if __name__ == '__main__':
     sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
     sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
     suite = unittest.TestLoader().loadTestsFromTestCase(TestGtoScripts)
-    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
+    result = unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
+    if not result.wasSuccessful():
+        sys.exit(1)
 
