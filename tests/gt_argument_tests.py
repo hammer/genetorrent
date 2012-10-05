@@ -26,12 +26,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+''' Unit tests for command line arguments feature '''
+
 import unittest
 import sys
 import os
 import time
+import logging
+import sys
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.genetorrent import GeneTorrentInstance
 
 class TestGeneTorrentArguments(GTTestCase):
@@ -240,5 +244,8 @@ class TestGeneTorrentArguments(GTTestCase):
         self.assertEqual(gt.returncode, 9)
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentArguments)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 

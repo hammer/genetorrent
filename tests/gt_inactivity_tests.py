@@ -31,11 +31,13 @@
 import unittest
 import time
 import os
+import logging
+import sys
 
 from uuid import uuid4
 from shutil import copy2
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.genetorrent  import GeneTorrentInstance, InstanceType
 from utils.config import TestConfig
 
@@ -109,5 +111,8 @@ class TestGeneTorrentInactivityTimeout(GTTestCase):
             'Two inactivity timeouts took longer than two minutes')
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentInactivityTimeout)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 

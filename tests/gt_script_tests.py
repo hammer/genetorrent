@@ -31,12 +31,14 @@
 import unittest
 import time
 import os
+import logging
+import sys
 
 from uuid import uuid4
 from shutil import copy2
 from subprocess import Popen, PIPE
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.genetorrent  import GeneTorrentInstance
 
 class TestGtoScripts(GTTestCase):
@@ -184,5 +186,8 @@ class TestGtoScripts(GTTestCase):
         os.remove(client_bam + '.backup')
 
 if __name__ == '__main__':
-        unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGtoScripts)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 

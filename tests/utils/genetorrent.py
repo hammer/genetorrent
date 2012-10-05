@@ -27,8 +27,13 @@
 #
 
 import os
+import subprocess
+import threading
+import time
+import tempfile
 
-from subprocess import Popen, PIPE
+from logging import getLogger
+
 
 class InstanceType:
     GT_ALL = 0
@@ -50,17 +55,29 @@ defaultArgs = [
                               # NO default arguments
     ' -vv -l stdout:full -C . ',
     ' -vv -l stdout:full -C . ',
-    ' -l server%sgtserver.log:full -C . ' % (os.path.sep),
+    ' -l stdout:full -C . ',
 ]
 
-class GeneTorrentInstance:
+class GeneTorrentInstance(subprocess.Popen):
     '''
     This class spawns and runs a GeneTorrent instance,
     using supplied arguments.  The default instance type, GT_ALL,
     uses the all-in-one binary and supplies NO default arguments.
     '''
     running = False
-    returncode = None
+
+    stdout_buffer = tempfile.TemporaryFile()
+    stderr_buffer = tempfile.TemporaryFile()
+
+    def log_thread(self, pipe, logger, buffer):
+        def log_output(out, logger, buffer):
+            for line in iter(out.readline, b''):
+                buffer.write(line)
+                logger(line.rstrip('\n'))
+
+        t = threading.Thread(target=log_output, args=(pipe, logger, buffer))
+        t.daemon = True
+        t.start()
 
     def __init__(self, arguments, instance_type=InstanceType.GT_ALL,
         ssl_no_verify_ca=True):
@@ -68,14 +85,12 @@ class GeneTorrentInstance:
         self.instance_type = instance_type
 
         self.args += defaultArgs[instance_type]
+        self.LOG = getLogger(gtBinaries[self.instance_type])
 
         # GT_ALL has NO default arguments
         if ssl_no_verify_ca and self.instance_type != InstanceType.GT_ALL:
             self.args += ' --ssl-no-verify-ca '
 
-        self.start()
-
-    def start(self):
         gt_bin = os.path.join(
             os.getcwd(),
             os.path.pardir,
@@ -86,20 +101,27 @@ class GeneTorrentInstance:
         command = [gt_bin]
         command.extend(self.args.split(' '))
 
-        print 'GeneTorrentInstance starting: ' + ' '.join(command)
-        self.process = Popen(command,
-            stderr=PIPE, stdout=PIPE)
+        super(GeneTorrentInstance, self).__init__(command,
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE,
+            close_fds=True, bufsize=1)
 
-    def communicate(self, input=None):
-        ret = self.process.communicate(input)
-        self.returncode = self.process.returncode
-        return ret
+        self.LOG.debug('Started GeneTorrent instance, pid %s' % self.pid)
+        self.LOG.debug('Command: %s', ' '.join(command))
+
+        self.log_thread(self.stdout, self.LOG.info, self.stdout_buffer)
+        self.log_thread(self.stderr, self.LOG.warn, self.stderr_buffer)
 
     def running(self):
         if self.returncode:
             return False
         return True
 
-    def kill(self):
-        self.process.kill()
+    def communicate(self, input=None):
+        # sets return code
+        self.wait()
+
+        self.stdout_buffer.seek(0)
+        self.stderr_buffer.seek(0)
+
+        return (self.stdout_buffer.read(), self.stderr_buffer.read())
 

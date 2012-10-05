@@ -31,11 +31,13 @@
 import unittest
 import time
 import os
+import logging
+import sys
 
 from uuid import uuid4
 from shutil import copy2
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.genetorrent  import GeneTorrentInstance, InstanceType
 from utils.config import TestConfig
 from gtoinfo import read_gto, emit_gto
@@ -123,11 +125,15 @@ class TestGeneTorrentCurlVerifyCA(GTTestCase):
         server.kill()
 
         # check for SSL signing error
-        server_sout = server.process.stdout.read()
+        server.stdout_buffer.seek(0)
+        server_sout = server.stdout_buffer.read()
         print server_sout
         self.assertTrue('while attempting a CSR signing transaction' in \
             server_sout)
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentCurlVerifyCA)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 

@@ -29,6 +29,9 @@ make check TESTS="gt_foo_test.py gt_bar_test.py ..."
 
 This will execute only those test files listed in the TESTS variable.
 
+Diagnostic and log data is written to the screen and also appended
+to gttest.log in the 'tests' directory.
+
 Test Suite Components
 =====================
 

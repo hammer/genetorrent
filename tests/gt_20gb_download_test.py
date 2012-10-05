@@ -31,13 +31,15 @@
 import unittest
 import time
 import os
+import logging
+import sys
 
 from uuid import uuid4
 from shutil import copy2
 from xml.etree.cElementTree import Element, ElementTree, SubElement
 from tempfile import NamedTemporaryFile
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.cgdata.datagen import write_zero_data, write_random_data
 from utils.config import TestConfig
 
@@ -56,5 +58,8 @@ class TestGeneTorrentLargeDownload(GTTestCase):
             check_sha1=False)
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentLargeDownload)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 

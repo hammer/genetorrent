@@ -30,6 +30,9 @@ import unittest
 import os
 import time
 import errno
+import logging
+import io
+import sys
 
 from uuid import uuid4
 from shutil import copy2, rmtree
@@ -46,6 +49,32 @@ from utils.mockhubcontrol import MockHub
 from utils.config import TestConfig
 from gtoinfo import read_gto, emit_gto, set_key
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - (%(levelname)s) %(message)s',
+    '%m/%d/%Y %H:%M:%S')
+
+if TestConfig.VERBOSE:
+    sh = logging.StreamHandler()
+    sh.setFormatter(formatter)
+    logger.addHandler(sh)
+
+fh = logging.FileHandler('gttest.log')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
+class StreamToLogger(object):
+    def __init__(self, logger, log_level=logging.INFO):
+        self.logger = logger
+        self.log_level = log_level
+
+    def flush(self):
+        pass
+
+    def write(self, buf):
+        for line in buf.rstrip().splitlines():
+            self.logger.log(self.log_level, line.rstrip())
+
 class GTTestCase(unittest.TestCase):
     ''' This class is the test harness for GeneTorrent
     unit tests. '''
@@ -53,6 +82,13 @@ class GTTestCase(unittest.TestCase):
     create_credential = False
 
     def setUp(self):
+        logger.info('\n')
+        logger.info('=' * 80)
+        logger.info('TEST: ' + self._testMethodName)
+        if self.shortDescription():
+            logger.info(self.shortDescription())
+        logger.info('=' * 80 + '\n')
+
         if self.create_credential and not TestConfig.CREDENTIAL:
             self.make_dummy_credential()
         if TestConfig.CREDENTIAL:
@@ -244,10 +280,6 @@ class GTTestCase(unittest.TestCase):
         if server:
             server.kill()
 
-        if TestConfig.VERBOSE:
-            print 'Client stdout: ' + client_sout
-            print 'Client stderr: ' + client_serr
-
         # check upload client return code
         self.assertEqual(client.returncode, 0)
 
@@ -304,10 +336,6 @@ class GTTestCase(unittest.TestCase):
 
         # wait for download client to exit
         client_sout, client_serr = client.communicate()
-
-        if TestConfig.VERBOSE:
-            print 'Client stdout: ' + client_sout
-            print 'Client stderr: ' + client_serr
 
         if server:
             server.kill()
@@ -368,10 +396,6 @@ class GTTestCase(unittest.TestCase):
 
         # wait for download client to exit
         client_sout, client_serr = client.communicate()
-
-        if TestConfig.VERBOSE:
-            print 'Client stdout: ' + client_sout
-            print 'Client stderr: ' + client_serr
 
         if server:
             server.kill()
@@ -438,10 +462,6 @@ class GTTestCase(unittest.TestCase):
         # wait for download client to exit
         client_sout, client_serr = client.communicate()
 
-        if TestConfig.VERBOSE:
-            print 'Client stdout: ' + client_sout
-            print 'Client stderr: ' + client_serr
-
         if server:
             server.kill()
 
@@ -476,10 +496,6 @@ class GTTestCase(unittest.TestCase):
 
         # wait for upload client to exit
         client_sout, client_serr = client.communicate()
-
-        if TestConfig.VERBOSE:
-            print 'Client stdout: ' + client_sout
-            print 'Client stderr: ' + client_serr
 
         self.assertEqual(client.returncode, 0)
         self.assertTrue('upload will be skipped' in str.lower(client_sout))

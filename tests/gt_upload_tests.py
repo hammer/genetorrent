@@ -31,6 +31,8 @@
 import unittest
 import time
 import os
+import logging
+import sys
 
 from uuid import uuid4
 from shutil import copy2
@@ -39,7 +41,7 @@ try:
 except ImportError:
     from sha import new as hash_sha1
 
-from utils.gttestcase import GTTestCase
+from utils.gttestcase import GTTestCase, StreamToLogger
 from utils.genetorrent  import GeneTorrentInstance
 from utils.cgdata.datagen import create_data, write_random_data
 from utils.config import TestConfig
@@ -63,5 +65,8 @@ class TestGeneTorrentUpload(GTTestCase):
         self.data_upload_test(1024 * 1024 * 1, ssl=False)
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
+    sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentUpload)
+    unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
 
