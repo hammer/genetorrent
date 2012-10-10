@@ -40,7 +40,6 @@ from xml.etree.cElementTree import Element, ElementTree, SubElement
 from tempfile import NamedTemporaryFile
 
 from utils.gttestcase import GTTestCase, StreamToLogger
-from utils.genetorrent  import GeneTorrentInstance
 from utils.cgdata.datagen import write_zero_data
 from utils.config import TestConfig
 

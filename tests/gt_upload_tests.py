@@ -42,7 +42,6 @@ except ImportError:
     from sha import new as hash_sha1
 
 from utils.gttestcase import GTTestCase, StreamToLogger
-from utils.genetorrent  import GeneTorrentInstance
 from utils.cgdata.datagen import create_data, write_random_data
 from utils.config import TestConfig
 

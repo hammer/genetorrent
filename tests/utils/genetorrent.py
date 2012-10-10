@@ -36,14 +36,14 @@ from logging import getLogger
 
 
 class InstanceType:
-    GT_ALL = 0
+    GT_ALL = 0       # no longer provided
     GT_DOWNLOAD = 1
     GT_UPLOAD = 2
     GT_SERVER = 3
 
 # map to binary name indexed by InstanceType
 gtBinaries = [
-    'GeneTorrent',
+    '',              # GeneTorrent all-in-one binary is obsolete
     'gtdownload',    # gtdownload
     'gtupload',      # gtupload
     'gtserver',      # gtserver
@@ -51,8 +51,7 @@ gtBinaries = [
 
 # map to default args indexed by InstanceType
 defaultArgs = [
-    '',                       # GT_ALL instance is documented to have
-                              # NO default arguments
+    '',                       # GT_ALL
     ' -vv -l stdout:full -C . ',
     ' -vv -l stdout:full -C . ',
     ' -l stdout:full -C . ',
@@ -61,8 +60,8 @@ defaultArgs = [
 class GeneTorrentInstance(subprocess.Popen):
     '''
     This class spawns and runs a GeneTorrent instance,
-    using supplied arguments.  The default instance type, GT_ALL,
-    uses the all-in-one binary and supplies NO default arguments.
+    using supplied arguments.  The default instance type is
+    GT_DOWNLOAD
     '''
 
     def log_thread(self, pipe, logger, buffer):
@@ -76,18 +75,18 @@ class GeneTorrentInstance(subprocess.Popen):
         t.start()
         return t
 
-    def __init__(self, arguments, instance_type=InstanceType.GT_ALL,
-        ssl_no_verify_ca=True):
+    def __init__(self, arguments, instance_type=InstanceType.GT_DOWNLOAD,
+        ssl_no_verify_ca=True, add_defaults=True):
         self.args = arguments
         self.instance_type = instance_type
         self.stdout_buffer = tempfile.TemporaryFile()
         self.stderr_buffer = tempfile.TemporaryFile()
 
-        self.args += defaultArgs[instance_type]
+        if add_defaults:
+            self.args += defaultArgs[instance_type]
         self.LOG = getLogger(gtBinaries[self.instance_type])
 
-        # GT_ALL has NO default arguments
-        if ssl_no_verify_ca and self.instance_type != InstanceType.GT_ALL:
+        if ssl_no_verify_ca and add_defaults:
             self.args += ' --ssl-no-verify-ca '
 
         gt_bin = os.path.join(

@@ -39,7 +39,6 @@ from shutil import copy2
 from subprocess import Popen, PIPE
 
 from utils.gttestcase import GTTestCase, StreamToLogger
-from utils.genetorrent  import GeneTorrentInstance
 
 class TestGtoScripts(GTTestCase):
     create_mockhub = True

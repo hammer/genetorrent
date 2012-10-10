@@ -51,7 +51,7 @@ Provides: libboost_regex.so
 Provides: libboost_program_options.so
 Provides: libtorrent-rasterbar.so
 Provides: libgenetorrent.so
-Obsoletes: GeneTorrent < 3.7.0
+Obsoletes: GeneTorrent
 
 %description common
 %{name} libraries and common files
@@ -115,15 +115,12 @@ rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-%files
-%defattr(-,root,root,-)
-%{_bindir}/%{name}
-%{_mandir}/man1/%{name}*
-
 %files common
 %defattr(-,root,root,-)
 %{_bindir}/gtoinfo
 %{_bindir}/gtocheck
+%{_bindir}/%{name}
+%{_mandir}/man1/%{name}*
 %{_datadir}/%{name}
 %{_libdir}/libgenetorrent.so.0
 %{_libdir}/libgenetorrent.so.0.0.0

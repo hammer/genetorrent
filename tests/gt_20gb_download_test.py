@@ -48,7 +48,7 @@ class TestGeneTorrentLargeDownload(GTTestCase):
     create_credential = True
 
     def test_20gb_download_from_uuid(self):
-        '''Download a 100MB zero-data file from a GT server.'''
+        '''Download a 20GB zero-data file from a GT server.'''
         uuid = self.data_upload_test(1024 * 1024 * 1024 * 20,
             data_generator=write_zero_data,
             server_options='--zero-storage',

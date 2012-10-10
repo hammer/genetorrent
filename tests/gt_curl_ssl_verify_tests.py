@@ -109,7 +109,8 @@ class TestGeneTorrentCurlVerifyCA(GTTestCase):
                 'server' + os.path.sep + 'workdir',
                 self.cred_filename,
                 TestConfig.SECURITY_API
-                ), ssl_no_verify_ca=False)
+                ), ssl_no_verify_ca=False, instance_type=InstanceType.GT_SERVER,
+                add_defaults=False)
 
         # copy gto to server
         client_gto = self.client_gto(uuid)
