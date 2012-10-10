@@ -1023,10 +1023,10 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
       settings.inhibit_keepalives = true;
    }
 
+   settings.alert_queue_size = 10000;
+
    if (_operatingMode == SERVER_MODE)
    {
-      settings.alert_queue_size = 10000;
-
       settings.send_buffer_watermark = 256 * 1024 * 1024;
 
       // put 1.5 seconds worth of data in the send buffer this gives the disk I/O more heads-up on disk reads, and can maximize throughput
