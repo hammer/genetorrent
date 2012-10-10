@@ -138,3 +138,11 @@
 # /tests/
 /tests/Makefile
 /tests/Makefile.in
+
+# /tests/utils/
+/tests/utils/*.pyc
+/tests/utils/*.pyo
+
+# /tests/utils/cgdata/
+/tests/utils/cgdata/*.pyc
+/tests/utils/cgdata/*.pyo
