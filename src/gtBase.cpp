@@ -336,6 +336,7 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
        credsPathAndFile.find("ftps://")  == 0)
    {
       _authToken = authTokenFromURI (credsPathAndFile);
+      startUpMessage << " --" << CRED_FILE_CLI_OPT << "=" << credsPathAndFile.c_str();
       return;
    }
 
