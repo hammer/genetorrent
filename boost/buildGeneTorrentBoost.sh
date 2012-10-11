@@ -33,8 +33,10 @@ BOOST_SRC_URL=http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_
 BOOST_VER=boost_1_48_0
 BOOST_MD5=313a11e97eb56eb7efd18325354631be
 
-WGET="$(which wget) --tries 3"
-CURL="$(which curl) -o ${BOOST_VER}.tar.gz -L"
+BOOST_TARBALL="/tmp/${BOOST_VER}.tar.gz"
+
+WGET="$(which wget) --tries 3 -O ${BOOST_TARBALL}"
+CURL="$(which curl) -o ${BOOST_TARBALL} -L"
 
 function errexit
 {
@@ -47,17 +49,17 @@ if [ "$(which wget)" == "" -a "$(which curl)" == "" ]; then
 fi
 
 if [ ! -z "$(which wget)" ]; then
-   DLTOOL=${WGET}
+   DLTOOL="${WGET}"
 else
-   DLTOOL=${CURL}
+   DLTOOL="${CURL}"
 fi
 
 mkdir -p "${depsDir}"
 pushd "${depsDir}" > /dev/null
 
-if [ -e ${BOOST_VER}.tar.gz ]; then
+if [ -e ${BOOST_TARBALL} ]; then
    echo "Checking MD5 hash of existing file..."
-   FILE_MD5=$(md5sum ${BOOST_VER}.tar.gz | cut -f 1 -d" ")
+   FILE_MD5=$(md5sum ${BOOST_TARBALL} | cut -f 1 -d" ")
 
    if [ "${FILE_MD5}" != "${BOOST_MD5}" ]; then
       errexit "file md5 sum is incorrect -  please delete it and run the script again"
@@ -70,14 +72,14 @@ else
    fi
 
    echo "Checking MD5 hash of downloaded file..."
-   FILE_MD5=$(md5sum ${BOOST_VER}.tar.gz | cut -f 1 -d" ")
+   FILE_MD5=$(md5sum ${BOOST_TARBALL} | cut -f 1 -d" ")
 
    if [ "${FILE_MD5}" != "${BOOST_MD5}" ]; then
       errexit "file md5 sum is incorrect -  please delete it and run the script again"
    fi
 fi
 
-tar xzf ${BOOST_VER}.tar.gz
+tar xzf ${BOOST_TARBALL}
 if [ $? -ne 0 ]; then
    errexit "untar operation failed"
 fi
