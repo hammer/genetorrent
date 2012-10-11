@@ -2131,8 +2131,14 @@ while (certBeginPos != std::string::npos)
 
 		TORRENT_ASSERT(m_allow_peers || e == tracker_request::stopped);
 
+#ifdef TORRENT_USE_BEP_21
+		// NOTE: The legacy Annai tracker returns an error if we send
+		// a paused event in the tracker announcement. This error
+		// causes libtorrent to quietly stop downloading which appears
+		// to the user that GeneTorrent is hung.
 		if (e == tracker_request::none && is_finished() && !is_seed())
 			e = tracker_request::paused;
+#endif
 
 		tracker_request req;
 		req.apply_ip_filter = m_apply_ip_filter && m_ses.m_settings.apply_ip_filter_to_trackers;
