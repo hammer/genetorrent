@@ -35,6 +35,7 @@ AM_INIT_AUTOMAKE([1.11 foreign])
 AC_CONFIG_SRCDIR([src/gtBase.cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
+AC_SYS_LARGEFILE()
 
 # Silencing build output (automake-1.11)
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -145,12 +146,15 @@ AC_TYPE_UINT64_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([getcwd gettimeofday localtime_r mkdir pathconf strdup strerror strndup strrchr strtol strtoul])
+AC_CHECK_FUNCS([getcwd gettimeofday localtime_r mkdir pathconf])
+AC_CHECK_FUNCS([strdup strerror strndup strrchr strtol strtoul])
+AC_CHECK_FUNCS([getrlimit setrlimit])
 
 AC_CONFIG_FILES(
    [Makefile]
    [src/Makefile]
    [GeneTorrent.spec]
+   [GeneTorrent.nsi]
    [scripts/Makefile]
    [scripts/GTLoadBalancer]
    [scripts/python_wrapper]

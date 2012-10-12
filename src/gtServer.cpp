@@ -88,6 +88,7 @@ gtServer::gtServer (boost::program_options::variables_map &vm) :
                _serverQueuePath (""), 
                _serverDataPath (""), 
                _serverModeCsrSigningUrl (""), 
+               _serverForceDownload(false),
                _activeSessions (), 
                _maxActiveSessions ((_portEnd - _portStart + 1) / 2)    // 1 port for SSL and 1 port for None SSL per session
                                                                        // maximum sessions is 1/2 the allowed port range
@@ -95,6 +96,7 @@ gtServer::gtServer (boost::program_options::variables_map &vm) :
    pcfacliServer (vm);
    pcfacliQueue (vm);
    pcfacliSecurityAPI (vm);
+   pcfacliServerForceDownload (vm);
 
    checkCredentials ();
 
@@ -186,6 +188,15 @@ void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
    }
 
    startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _serverModeCsrSigningUrl;
+}
+
+void gtServer::pcfacliServerForceDownload (boost::program_options::variables_map &vm)
+{
+   if (vm.count (SERVER_FORCE_DOWNLOAD_OPT) > 0)
+   {
+      _serverForceDownload = true;
+      startUpMessage << " --" << SERVER_FORCE_DOWNLOAD_OPT;
+   }
 }
 
 void gtServer::getFilesInQueueDirectory (vectOfStr &files)
@@ -474,6 +485,9 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
 bool gtServer::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
 {
    bool dlMode = false;
+
+   if (_serverForceDownload)
+      return true;
 
    FILE *data = popen (("gtoinfo --get-key gt_download_mode " + torrentPathAndFileName).c_str(), "r");
 

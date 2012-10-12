@@ -191,6 +191,7 @@ void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const cha
       va_list ap;
       va_start (ap, fmt);
       vfprintf(stderr, format.c_str(), ap);
+      fflush(stderr);
       va_end(ap);
    }
 

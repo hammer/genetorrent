@@ -170,6 +170,10 @@ class gtBase
       void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
       std::string getWorkingDirectory();
+#ifdef __CYGWIN__
+      std::string getWinInstallDirectory();
+#endif /* _CYGWIN_ */
+
       std::string getFileName (std::string fileName);
       std::string getInfoHash (std::string torrentFile);
 

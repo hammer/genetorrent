@@ -33,7 +33,8 @@ EXTRA_DIST =                     \
    LICENSE                       \
    libtorrent/configure.gnu      \
    GeneTorrent.spec              \
-   autogen.sh
+   autogen.sh                    \
+   GeneTorrent.nsi
 
 dist_doc_DATA =                  \
    LICENSE                       \
@@ -47,4 +48,8 @@ rpmcheck: distcheck
 
 rpmbuild-internal:
 	rpmbuild -ta $(distdir).tar.gz
+
+windows-installer: all
+	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
+			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
 

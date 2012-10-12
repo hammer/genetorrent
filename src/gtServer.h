@@ -54,6 +54,7 @@ class gtServer : public gtBase
       std::string _serverQueuePath;
       std::string _serverDataPath;
       std::string _serverModeCsrSigningUrl;
+      bool _serverForceDownload;
       std::list <activeSessionRec *> _activeSessions;
       unsigned int _maxActiveSessions;
 
@@ -72,6 +73,7 @@ class gtServer : public gtBase
       void pcfacliSecurityAPI (boost::program_options::variables_map &vm);
       void pcfacliQueue (boost::program_options::variables_map &vm);
       void pcfacliServer (boost::program_options::variables_map &vm);
+      void pcfacliServerForceDownload (boost::program_options::variables_map &vm);
 };
 
 #endif

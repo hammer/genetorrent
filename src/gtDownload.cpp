@@ -45,6 +45,7 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <signal.h>
 
 #include <iostream>
 #include <fstream>
@@ -206,11 +207,13 @@ void gtDownload::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
 
 void gtDownload::run ()
 {
+#if defined HAVE_GETRLIMIT && defined HAVE_SETRLIMIT && defined RLIMIT_NPROC
    // check system resources
    // GeneTorrent downloads are thread/process intensive
    // If possible, set the soft process limit for user to at
    // least PROCESS_MIN for this process.
    struct rlimit r;
+
    if (!getrlimit (RLIMIT_NPROC, &r))
    {
       if (r.rlim_cur < PROCESS_MIN &&
@@ -230,6 +233,7 @@ void gtDownload::run ()
          }
       }
    }
+#endif
 
    time_t startTime = time(NULL);
    std::string saveDir = getWorkingDirectory ();
@@ -381,6 +385,10 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
    curl_easy_setopt (curl, CURLOPT_WRITEDATA, gtoFile);
    curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
    curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
+#ifdef __CYGWIN__
+   std::string winInst = getWinInstallDirectory () + "/cacert.pem";
+   curl_easy_setopt (curl, CURLOPT_CAINFO, winInst.c_str ());
+#endif /* __CYGWIN__ */
 
    curl_easy_setopt (curl, CURLOPT_POST, (long)1);
 
@@ -707,7 +715,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
             {
                char buffer[256];
                snprintf(buffer, sizeof(buffer), "Child %d terminated with signal %d", pidListIter->first, WTERMSIG(retValue));
-               gtError (buffer, -1, DEFAULT_ERROR);
+               gtError (buffer, 207, DEFAULT_ERROR);
             }
 
             totalDataDownloaded += pidListIter->second->dataDownloaded;
@@ -730,7 +738,8 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
 
       int64_t freeSpace = getFreeDiskSpace();
 
-      if (totalSizeOfDownload > totalDataDownloaded + xfer + freeSpace)
+      if (freeSpace > 0 && totalSizeOfDownload > totalDataDownloaded +
+         xfer + freeSpace)
       {
          if (freeSpace > DISK_FREE_WARN_LEVEL)
          {
@@ -765,7 +774,7 @@ void gtDownload::performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFi
       std::string torrentName = *iter;
 
       // Capture analysis object UUID from torrent file name
-      size_t offset = torrentName.find_last_of('/');
+      size_t offset = torrentName.find_last_of("/\\");
       if (std::string::npos == offset)
          offset = 0;
       else
@@ -811,6 +820,16 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
 {
    gtLogger::delete_globallog();
    _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination, childID);
+
+#if __CYGWIN__
+   // Ignore SIGPIPE on Windows to prevent download child from being killed
+   // by signal when accept returns ECONNABORTED in libtorrent
+   struct sigaction action;
+   action.sa_handler = SIG_IGN;
+   sigemptyset(&action.sa_mask);
+   action.sa_flags = 0;
+   sigaction(SIGPIPE, &action, NULL);
+#endif
 
    libtorrent::session *torrentSession = makeTorrentSession ();
 
@@ -994,10 +1013,13 @@ int64_t gtDownload::getFreeDiskSpace ()
 
    if (!statvfs (workingDir.c_str (), &buf))
    {
-      return buf.f_bsize * buf.f_bavail;
+      int64_t bsize = buf.f_bsize;
+      int64_t bavail = buf.f_bavail;
+      return bsize * bavail;
    }
    else
    {
+      gtError ("statvfs call failed", ERROR_NO_EXIT, gtBase::ERRNO_ERROR, errno);
       return -1;
    }
 }

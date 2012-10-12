@@ -93,6 +93,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (SERVER_CLI_OPT).c_str(), boost::program_options::value< std::string >(),"server data path")
       (makeOpt (QUEUE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "input GTO directory")    
       (SECURITY_API_CLI_OPT.c_str(), boost::program_options::value< std::string >(), "SSL Key Signing URL")    
+      (SERVER_FORCE_DOWNLOAD_OPT.c_str(), "force added GTOs to download mode")
 
       // Legacy long option names
       (BIND_IP_CLI_OPT_LEGACY.c_str(), boost::program_options::value< std::string >(), "Bind IP")        

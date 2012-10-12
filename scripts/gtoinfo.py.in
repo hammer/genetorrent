@@ -82,6 +82,7 @@ revlevel = '@PACKAGE_VERSION@'
 import re
 from optparse import OptionParser
 from collections import deque
+from socket import gethostname
 import binascii
 import os
 import sys
@@ -384,7 +385,7 @@ def emit_gto(gtodict, filename, backup):
     # in order to make the writing of the file atomic, we write into a
     # tmp file and then move it to the real deal.
     procid = os.getpid()
-    hostname = os.uname()[2]
+    hostname = gethostname()
     tmp_file = "%s.%s.%s.tmp" % (filename, hostname, procid)
 
     f = open(tmp_file, "wb")

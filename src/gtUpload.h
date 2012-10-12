@@ -71,7 +71,7 @@ class gtUpload : public gtBase
       void submitTorrentToGTExecutive (std::string torrentFileName, bool);
       void findDataAndSetWorkingDirectory ();
       bool verifyDataFilesExist (vectOfStr &);
-      unsigned long setPieceSize (unsigned &);
+      int64_t setPieceSize (unsigned &);
       void displayMissingFilesAndExit (vectOfStr &missingFiles);
       void makeTorrent(std::string);
       void processManifestFile();

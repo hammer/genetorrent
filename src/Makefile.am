@@ -75,6 +75,7 @@ libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
 
 libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -shared \
+                            -no-undefined \
                             $(torrentrasterbar_LIBS) \
                             -R $(libdir)/GeneTorrent \
                             -L../libtorrent/src/.libs \
@@ -149,22 +150,39 @@ dist_man_MANS = GeneTorrent.1 \
                 gtserver.1    \
                 gtupload.1
 
-EXTRA_DIST = man_gtcommon.1   \
-             man_gtdownload.1 \
-             man_gtserver.1   \
-             man_gtupload.1   \
+EXTRA_DIST = man_gtcommon.1         \
+             man_gtdownload.1       \
+             man_gtserver.1         \
+             man_gtupload.1         \
+             man_GeneTorrent.1      \
+             GeneTorrent_manual.txt \
+             gtdownload_manual.txt  \
+             gtserver_manual.txt    \
+             gtupload_manual.txt    \
              GeneTorrent
 
-CLEANFILES = gtdownload.1  \
-             gtserver.1    \
-             gtupload.1
+CLEANFILES = gtdownload.1           \
+             gtserver.1             \
+             gtupload.1             \
+             GeneTorrent.1          \
+             GeneTorrent_manual.txt \
+             gtdownload_manual.txt  \
+             gtserver_manual.txt    \
+             gtupload_manual.txt
 
 gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtdownload_manual.txt
 
 gtserver.1: $(srcdir)/man_gtserver.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtserver_manual.txt
 
 gtupload.1: $(srcdir)/man_gtupload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtupload_manual.txt
+
+GeneTorrent.1: man_GeneTorrent.1
+	cat $^ > $@
+	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > GeneTorrent_manual.txt
 

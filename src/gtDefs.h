@@ -170,6 +170,7 @@ const std::string QUEUE_CLI_OPT = "queue";                         // -q short o
 
 const std::string SECURITY_API_CLI_OPT = "security-api";           // NO short option
 
+const std::string SERVER_FORCE_DOWNLOAD_OPT = "force-download-mode";           // NO short option
 // Storage Options
 const std::string NULL_STORAGE_OPT = "null-storage";               // NO short option
 const std::string ZERO_STORAGE_OPT = "zero-storage";               // NO short option
@@ -191,17 +192,19 @@ void commandLineError (std::string errMessage);
    if (_logToStdErr)                                       \
    {                                                       \
       std::cout << timeStamp << x << std::endl;            \
+      std::cout.flush ();                                  \
    }                                                       \
    else                                                    \
    {                                                       \
       if (global_gtAgentMode)                              \
       {                                                    \
          std::cout << timeStamp << x << std::endl;         \
-         std::cout.flush();                                \
+         std::cout.flush ();                               \
       }                                                    \
       else                                                 \
       {                                                    \
          std::cerr << timeStamp << x << std::endl;         \
+         std::cerr.flush ();                               \
       }                                                    \
    }                                                       \
 }

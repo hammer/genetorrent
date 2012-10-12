@@ -40,6 +40,7 @@
 
 #include <config.h>
 
+#include <sys/statvfs.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -199,7 +200,7 @@ void gtUpload::run ()
    std::string saveDir = getWorkingDirectory ();
    processManifestFile ();
 
-   unsigned long totalBytes = 0;
+   int64_t totalBytes = 0;
    unsigned totalFiles = 0;
    std::string torrentFileName = _uploadUUID + GTO_FILE_EXTENSION;
    bool inResumeMode = false;
@@ -327,6 +328,10 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
    curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
    curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
    curl_easy_setopt (curl, CURLOPT_POST, (long)1);
+#ifdef __CYGWIN__
+   std::string winInst = getWinInstallDirectory () + "/cacert.pem";
+   curl_easy_setopt (curl, CURLOPT_CAINFO, winInst.c_str ());
+#endif /* __CYGWIN__ */
 
    std::string data = "token=" + _authToken;
 
@@ -460,10 +465,10 @@ bool gtUpload::verifyDataFilesExist (vectOfStr &missingFileList)
    return missingFiles ? false : true;
 }
 
-unsigned long gtUpload::setPieceSize (unsigned &fileCount)
+int64_t gtUpload::setPieceSize (unsigned &fileCount)
 {
    struct stat fileStatus;
-   unsigned long totalDataSize = 0;
+   int64_t totalDataSize = 0;
 
    vectOfStr::iterator vectIter = _filesToUpload.begin ();
 

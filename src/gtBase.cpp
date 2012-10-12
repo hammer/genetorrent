@@ -45,6 +45,7 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdio>
+#include <algorithm>
 
 #include <openssl/err.h>
 #include <openssl/pem.h>
@@ -63,7 +64,6 @@
 #include "libtorrent/alert_types.hpp"
 
 #include <xqilla/xqilla-simple.hpp>
-
 #include <curl/curl.h>
 
 #include "gtBase.h"
@@ -72,6 +72,11 @@
 #include "geneTorrentUtils.h"
 #include "gtLog.h"
 #include "loggingmask.h"
+
+#ifdef __CYGWIN__
+#include <w32api/windows.h>
+#include <sys/cygwin.h>
+#endif /* __CYGWIN__ */
 
 // global variable that used to point to GeneTorrent to allow
 // libtorrent callback for file inclusion and logging.
@@ -287,6 +292,10 @@ void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
       commandLineError ("duplicate config options:  " + CONF_DIR_CLI_OPT + " and " + CONF_DIR_CLI_OPT_LEGACY + " are not permitted at the same time");
    }
 
+#ifdef __CYGWIN__
+   _confDir = getWinInstallDirectory ();
+#endif /* __CYGWIN__ */
+
    if (vm.count (CONF_DIR_CLI_OPT) == 1)
    { 
       _confDir = sanitizePath (vm[CONF_DIR_CLI_OPT].as<std::string>());
@@ -497,11 +506,28 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
       return;    
    }
 
-   strTokenize strToken (vm[LOGGING_CLI_OPT].as<std::string>(), ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+   std::string logArgument = vm[LOGGING_CLI_OPT].as<std::string>();
 
+   strTokenize strToken (logArgument, ":",
+      strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
+
+   std::string level;
+
+#ifdef __CYGWIN__
+   if (std::count(logArgument.begin(), logArgument.end(), ':') > 1)
+   {
+      _logDestination = strToken.getToken(1) + ":" + strToken.getToken(2);
+      level = strToken.getToken(3);
+   }
+   else
+   {
+      _logDestination = strToken.getToken(1);
+      level = strToken.getToken(2);
+   }
+#else
    _logDestination = strToken.getToken(1);
-
-   std::string level = strToken.getToken(2);
+   level = strToken.getToken(2);
+#endif
 
    if ("verbose" == level)
    {
@@ -633,16 +659,28 @@ void gtBase::setTempDir ()
    std::ostringstream pathPart;
    pathPart << "/GeneTorrent-" << getuid() << "-" << std::setfill('0') << std::setw(6) << getpid() << "-" << time(NULL);
 
-   char *envValue = getenv ("TMPDIR");
+   // On Uniux, returns environment's TMPDIR, TMP, TEMP, or TEMPDIR,
+   //    or, failing that, /tmp
+   // On Windows, return windows temp directory
+   boost::filesystem::path p;
+   try
+   {
+      p = boost::filesystem::temp_directory_path();
+   }
+   catch (boost::filesystem::filesystem_error e)
+   {
+      std::ostringstream errorStr;
+      errorStr << "Could not find temp directory.  Set the TMPDIR "
+         "environment variable to specify a temp directory for GeneTorrent. "
+         "Error: ";
+      errorStr << e.what ();
 
-   if (envValue != NULL)
-   {
-      _tmpDir = sanitizePath(envValue) + pathPart.str();
+      commandLineError (errorStr.str ());
    }
-   else
-   {
-      _tmpDir = "/tmp" + pathPart.str();
-   }
+
+   std::string tempPath = p.string();
+
+   _tmpDir = sanitizePath (tempPath + pathPart.str ());
 }
 
 // 
@@ -711,16 +749,45 @@ std::string gtBase::loadCSRfile (std::string csrFileName)
 
 void gtBase::relativizePath (std::string &inPath)
 {
+#ifdef __CYGWIN__
+   if (inPath[1] == ':')
+   {
+      // Convert windows path to posix-style path
+      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         inPath.c_str (), NULL, 0);
+      char *posixabspath = (char *) malloc (size);
+
+      if (posixabspath &&
+          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+          inPath.c_str (), posixabspath, size) == 0)
+      {
+         inPath = posixabspath;
+      }
+
+      free (posixabspath);
+   }
+   else if (inPath[0] != '/')
+   {
+      std::string wd = getWorkingDirectory();
+
+      if (wd == "/")
+        inPath = wd + inPath;
+      else
+        inPath = wd + "/" + inPath;
+   }
+#else /* __CYGWIN__ */
    if (inPath[0] != '/')
    {
       inPath = getWorkingDirectory() + "/" + inPath;
    }
+#endif /* __CYGWIN__ */
 }
 
 // 
 std::string gtBase::sanitizePath (std::string inPath)
 {
-   if (inPath[inPath.size () - 1] == '/')
+   if (inPath[inPath.size () - 1] == '/' ||
+       inPath[inPath.size () - 1] == '\\')
    {
       inPath.erase (inPath.size () - 1);
    }
@@ -909,7 +976,11 @@ void gtBase::cleanupTmpDir()
 {
    if (!_devMode)
    {
-      if (system (("rm -rf " + _tmpDir.substr(0,_tmpDir.size()-1)).c_str()))
+      try
+      {
+         boost::filesystem::remove_all(_tmpDir);
+      }
+      catch (boost::filesystem::filesystem_error e)
       {
          Log (PRIORITY_NORMAL, "Failed to clean up temp directory");
       }
@@ -1121,14 +1192,86 @@ void gtBase::loggingCallBack (std::string message)
    pthread_mutex_unlock (&callBackLoggerLock);
 }
 
+#ifdef __CYGWIN__
+std::string gtBase::getWinInstallDirectory ()
+{
+   // by default, look for dhparam.pem in the install dir on Windows
+   char exeDir[MAX_PATH];
+   std::string result;
+   result = ".";
+
+   if (GetModuleFileNameA (NULL, exeDir, MAX_PATH))
+   {
+      // Convert windows path to posix-style path
+      std::string dirName = std::string (exeDir);
+      dirName = dirName.substr (0, dirName.find_last_of ('\\'));
+
+      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         dirName.c_str (), NULL, 0);
+      char *posixabspath = (char *) malloc (size);
+
+      if (posixabspath &&
+          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+             dirName.c_str (), posixabspath, size) == 0)
+      {
+         result = posixabspath;
+      }
+
+      free (posixabspath);
+   }
+
+   return result;
+}
+#endif /* __CYGWIN__ */
+
+
 std::string gtBase::getWorkingDirectory ()
 {
-   long size;
+   std::string result = ".";
+
+#ifdef __CYGWIN__
+   // In cygwin, getcwd is broken if called from outside of the
+   // cygwin environment.  Work around this by converting
+   // the path returned by getcwd to an absolute posix path
+   // via the cygwin library.
+   char *getcwdpath;
+   getcwdpath = (char *) malloc (MAX_PATH);
+
+   if (!getcwdpath)
+      return result;
+
+   if (GetCurrentDirectoryA (MAX_PATH, getcwdpath))
+   {
+
+      ssize_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         getcwdpath, NULL, 0);
+      if (size > 0)
+      {
+         char *posixabspath = (char *) malloc (size);
+         if (!posixabspath)
+         {
+            free (getcwdpath);
+            return result;
+         }
+
+         if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, getcwdpath,
+            posixabspath, size) == 0)
+         {
+            result = posixabspath;
+         }
+
+         free (posixabspath);
+      }
+   }
+
+   free (getcwdpath);
+#else /* __CYGWIN__ */
+   size_t size;
+
+   size = (size_t) pathconf (".", _PC_PATH_MAX);
+
    char *buf;
    char *ptr;
-   std::string result;
-
-   size = pathconf (".", _PC_PATH_MAX);
 
    if ((buf = (char *) malloc ((size_t) size)) != NULL)
    {
@@ -1139,6 +1282,8 @@ std::string gtBase::getWorkingDirectory ()
    }
 
    free (buf);
+#endif /* __CYGWIN__ */
+
    return result;
 }
 
@@ -1467,6 +1612,10 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
    curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
    curl_easy_setopt (curl, CURLOPT_POST, (long)1);
+#ifdef __CYGWIN__
+	std::string winInst = getWinInstallDirectory () + "/cacert.pem";
+	curl_easy_setopt (curl, CURLOPT_CAINFO, winInst.c_str ());
+#endif /* __CYGWIN__ */
 
    struct curl_httppost *post=NULL;
    struct curl_httppost *last=NULL;
@@ -1652,10 +1801,17 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
          std::ostringstream logMessage;
          logMessage << "error processing failure with file:  " << newFileName <<  ", review the contents of the file.";
          Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
-         if (system (("cat " + newFileName).c_str()))
+
+         std::ifstream errorFile;
+         errorFile.open (newFileName.c_str ());
+         while (errorFile.good ())
          {
-            Log (PRIORITY_NORMAL, "Failed to display error XML file");  
+            char line[200];
+             errorFile.getline (line, sizeof (line) - 1);
+            std::cerr << line << std::endl;
          }
+         errorFile.close ();
+
       }
       return false;
    }
@@ -1781,6 +1937,10 @@ std::string gtBase::authTokenFromURI (std::string url)
    curl_easy_setopt (curl, CURLOPT_WRITEHEADER, &curlResponseHeaders);
    curl_easy_setopt (curl, CURLOPT_NOSIGNAL, (long)1);
    curl_easy_setopt (curl, CURLOPT_HTTPGET, (long)1);
+#ifdef __CYGWIN__
+	std::string winInst = getWinInstallDirectory () + "/cacert.pem";
+	curl_easy_setopt (curl, CURLOPT_CAINFO, winInst.c_str ());
+#endif /* __CYGWIN__ */
 
    // CGHUBDEV-22: Set CURL timeouts to 20 seconds
    int timeoutVal = 20;
