@@ -44,47 +44,63 @@ class TestGtoScripts(GTTestCase):
     create_mockhub = True
     create_credential = True
 
-    gtoinfo_bin = os.path.join(
-        str(os.getenv('srcdir')),
-        os.path.pardir,
-        'scripts',
-        'gtoinfo.py',
-    )
-
-    gtocheck_bin = os.path.join(
-        os.path.pardir,
-        'scripts',
-        'gtocheck',
-    )
-
     def run_gtoinfo(self, args='', returncode=0):
+        self.gtoinfo_bin = os.path.join(
+            str(os.getenv('srcdir')),
+            os.path.pardir,
+            'scripts',
+            'gtoinfo.py',
+        )
+
+        if os.name == "nt":
+            self.gtoinfo_bin = os.path.join(
+                '..',
+                'gtoinfo.py',
+            )
+
         arg_list = ['python', self.gtoinfo_bin]
 
         if args:
             arg_list.extend(args.split(' '))
 
         self.process = Popen(arg_list,
-            stdout=PIPE)
+            stdout=PIPE, stderr=PIPE)
 
         stdout, stderr = self.process.communicate()
 
         if self.process.returncode != returncode:
+            print "stdout: " + stdout
+            print "stderr: " + stderr
             raise Exception('gtoinfo failed unexpectedly')
 
         return stdout
 
     def run_gtocheck(self, args='', returncode=0):
+        self.gtocheck_bin = os.path.join(
+            os.path.pardir,
+            'scripts',
+            'gtocheck',
+        )
+
+        if os.name == "nt":
+            self.gtocheck_bin = os.path.join(
+                '..',
+                'gtocheck',
+            )
+
         arg_list = ['python', self.gtocheck_bin]
 
         if args:
             arg_list.extend(args.split(' '))
 
         self.process = Popen(arg_list,
-            stdout=PIPE)
+            stdout=PIPE, stderr=PIPE)
 
         stdout, stderr = self.process.communicate()
 
         if self.process.returncode != returncode:
+            print "stdout: " + stdout
+            print "stderr: " + stderr
             raise Exception('gtocheck failed unexpectedly')
 
         return stdout

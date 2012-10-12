@@ -107,7 +107,7 @@ class TestGeneTorrentInactivityTimeout(GTTestCase):
 
         # that should take a little more than 2 minutes,
         # allowing for two 60-second timeouts
-        self.assertTrue(end_time - start_time < 140,
+        self.assertTrue(end_time - start_time < 200,
             'Two inactivity timeouts took longer than two minutes')
 
 if __name__ == '__main__':

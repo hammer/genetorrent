@@ -67,7 +67,9 @@ class Analysis(object):
                 name,
                 name + '.gto'
             )
-            torrent = open(gto_file, 'r')
+
+            # open torrent file in binary mode on Windows
+            torrent = open(gto_file, 'rb')
             try:
                 torrent_data = torrent.read()
             finally:

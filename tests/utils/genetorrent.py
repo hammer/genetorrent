@@ -96,6 +96,13 @@ class GeneTorrentInstance(subprocess.Popen):
             gtBinaries[self.instance_type],
         )
 
+        if os.name == 'nt':
+            gt_bin = os.path.join(
+                os.getcwd(),
+                os.path.pardir,
+                gtBinaries[self.instance_type],
+            )
+
         command = [gt_bin]
         command.extend(self.args.split(' '))
 
