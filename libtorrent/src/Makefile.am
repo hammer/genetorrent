@@ -98,7 +98,8 @@ libtorrent_rasterbar_la_SOURCES = \
   $(GEOIP_SOURCES)
 
 #libtorrent_rasterbar_la_LDFLAGS = $(LDFLAGS) -version-info $(INTERFACE_VERSION_INFO)
-libtorrent_rasterbar_la_LDFLAGS = -version-info $(INTERFACE_VERSION_INFO)
+libtorrent_rasterbar_la_LDFLAGS = -version-info $(INTERFACE_VERSION_INFO) \
+                                  -no-undefined
 
 #libtorrent_rasterbar_la_LIBADD =  @BOOST_SYSTEM_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_THREAD_LIB@ @OPENSSL_LIBS@
 libtorrent_rasterbar_la_LIBADD = @BOOST_SYSTEM_LIB@ @OPENSSL_LIBS@

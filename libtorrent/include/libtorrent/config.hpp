@@ -162,6 +162,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define TORRENT_USE_IFCONF 1
 #define TORRENT_HAS_SALEN 0
 
+// ==== CYGWIN ===
+#elif defined __CYGWIN__
+#define TORRENT_USE_IFADDRS 1
+#define TORRENT_HAS_SALEN 0
+
 // ==== MINGW ===
 #elif defined __MINGW32__
 #define TORRENT_MINGW
