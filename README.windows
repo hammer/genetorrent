@@ -1,0 +1,84 @@
+Building GeneTorrent for Windows
+================================
+
+GeneTorrent's gtupload and gtdownload utilities have been ported to Cygwin.  The
+test suite has been modified to run under the Windows version of Python.  The
+gtserver utility builds for Windows, but it is not recommended for any use other
+than testing the upload and download clients with the GeneTorrent test suite.
+
+GeneTorrent/Installer Build Requirements:
+
+Windows 7 32-bit
+Cygwin 1.7.16+ Full Install
+Nullsoft Scriptable Install System 2.46+ installed to C:\Program Files\NSIS or
+C:\Program Files (x86)\NSIS
+
+Dependencies:
+
+XQilla 2.3.0+
+(Cygwin contains appropriate versions of all GeneTorrent dependencies except for
+XQilla)
+
+Build instructions
+------------------
+
+1. Build XQilla from a Cygwin terminal and install it to /usr
+
+cd XQilla-2.3.0
+./configure --prefix=/usr
+make install
+
+2. Configure and make GeneTorrent
+
+cd GeneTorrent-3.4.0
+./configure --prefix=/usr
+make
+
+3. Due to a Cygwin limitation, the new binaries need to be "rebased" along with
+the rest of the Cygwin installation.  Read about this limitation here:
+http://cygwin.com/faq-nochunks.html#faq.using.fixing-fork-failures
+
+Create a file /rebase.txt and add, replacing the path as appropriate:
+/path/to/GeneTorrent/build/src/.libs/gtdownload.exe
+/path/to/GeneTorrent/build/src/.libs/gtupload.exe
+/path/to/GeneTorrent/build/src/.libs/gtserver.exe
+/path/to/GeneTorrent/build/src/.libs/cyggenetorrent-0.dll
+/path/to/GeneTorrent/build/libtorrent/src/.libs/cygtorrent-rasterbar-6.dll
+
+Exit all Cygwin processes and terminals.
+
+Open a cmd.exe prompt and enter:
+
+C:\cygwin\bin\dash.exe
+/usr/bin/rebaseall -v -T /rebase.txt
+
+The binaries are now rebased.
+
+4. Generate Windows installer
+make windows-installer
+
+Running test suite on Windows
+-----------------------------
+
+Requires Python 2.7.3 for Windows - 
+http://www.python.org/download/releases/2.7.3/
+ - The 32-bit version of Python is recommended because PyOpenSSL is easy to find
+   precompiled for x86 (32-bit) Python.
+ OpenSSL for Windows 1.0.1c - http://slproweb.com/products/Win32OpenSSL.html
+ PyOpenSSL for Windows 0.11 - https://launchpad.net/pyopenssl/+download
+
+If OpenSSL or Python are installed to custom paths, you must edit run_windows.bat
+in the tests subdirectory with the proper paths.
+
+ 1. Run installer and select the optional "Test suite" component
+
+ 2. Open a cmd.exe window and change directory to C:\Program
+ Files\GeneTorrent\tests
+
+ 3. Run run_windows.bat
+
+ Because users will run GeneTorrent outside of the Cygwin terminal, it follows
+ that the test suite should be run in a Windows command prompt environment.  To
+ facilitate this testing, the GeneTorrent test suite is included with the
+ installer on Windows.
+

@@ -1,0 +1,66 @@
+Generic Installation Instructions for Unix Platforms
+====================================================
+
+Prerequisites
+-------------
+
+GeneTorrent requires the following libraries:
+   - xerces-c 2.7.0+
+   - xqilla 2.0.0+
+   - curl/libcurl 7.15.5+
+   - boost 1.48.0+
+   - openssl 1.0.1a+
+
+Most modern Linux distributions package the suitable versions of xerces-c,
+xqilla, and curl/libcurl.  Refer to your package manager documentation to
+install these prerequisites and their development packages.
+
+Many distributions also package suitable versions of boost and openssl.
+It is recommended that you use your distribution's packages, if available.
+
+For your convenience, scripts are provided to build the required versions
+of boost and openssl.  They are:
+
+   boost/buildGeneTorrentBoost.sh
+   openssl/buildGeneTorrentOpenSSL.sh
+
+These scripts will connect to a mirror, download the source, configure,
+and install the software into the respective subdirectory of the GeneTorrent
+source tree.  If you use this option for either or both packages, you
+must add the respective "with" argument to the configure script.  So,
+if your system provides all of the prerequisites except for boost,
+you may run boost/buildGeneTorrentBoost.sh to build the required boost
+libraries, and then configure with "--with-boost=...".  For example,
+from the top of the GeneTorrent source tree:
+
+boost/buildGeneTorrentBoost.sh
+./configure --with-boost=$PWD/boost
+
+This will cause the configure script to recognize the local installation
+of Boost.  The required libraries and headers will be found at compile time,
+and the required libraries will be installed into /usr/lib/GeneTorrent
+at install time.  The OpenSSL case is analogous.
+
+Building for a local install
+----------------------------
+
+Most users of the source distribution will build the software and install
+it locally.  GeneTorrent source distributions follow the standard configure/
+make/make install paradigm familiar to Unix users.
+
+To build and install with the default options:
+./configure --prefix=/path/to/install/GeneTorrent
+make
+make install
+
+Building GeneTorrent RPMs
+-------------------------
+
+Users wishing to build GeneTorrent RPMs from source may do so.  Building
+the RPM has the same prerequisites as building the source distribution.
+
+To build a GeneTorrent binary RPM:
+./configure
+make dist
+rpmbuild -ta GeneTorrent-x.y.z.tar.gz
+
