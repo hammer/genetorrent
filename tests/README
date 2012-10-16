@@ -1,5 +1,8 @@
-GeneTorrent Test Suite
-======================
+.. -*- mode: rst -*-
+
+========================
+ GeneTorrent Test Suite
+========================
 
 This directory contains the test suite for the GeneTorrent distribution.
 GeneTorrent's tests are designed to exercise and detect errors in
@@ -14,18 +17,18 @@ Test Suite Usage
 ================
 
 To execute the default GeneTorrent test suite, run the following
-from the base directory of the distribution:
+from the base directory of the distribution::
 
-./configure
-make check
+    $ ./configure
+    $ make check
 
 This will compile GeneTorrent and execute the default test suite.
 
 To execute a subset of the tests, or to execute a test not included
-in the default test suite, run:
+in the default test suite, run::
 
-./configure
-make check TESTS="gt_foo_test.py gt_bar_test.py ..."
+    $ ./configure
+    $ make check TESTS="gt_foo_test.py gt_bar_test.py ..."
 
 This will execute only those test files listed in the TESTS variable.
 
@@ -74,23 +77,25 @@ Unit Test Files
 ---------------
 
 Default test suite:
-gt_download_tests.py
-      download mode tests
-gt_upload_tests.py
-      upload mode tests
-gt_argument_tests.py
-      tests various GeneTorrent command line arguments
-gt_cred_as_uri_tests.py
-      tests the feature allowing a credential file to be
-      supplied via URI
-gt_curl_ssl_verify_tests.py
-      tests the --ssl-no-verify-ca option
-gt_inactivity_tests.py
-      upload and download inactivity timeout tests
-gt_script_tests.py
-   tests gtoinfo and gtocheck scripts
+
+    gt_download_tests.py
+        download mode tests
+    gt_upload_tests.py
+        upload mode tests
+    gt_argument_tests.py
+        tests various GeneTorrent command line arguments
+    gt_cred_as_uri_tests.py
+        tests the feature allowing a credential file to be
+        supplied via URI
+    gt_curl_ssl_verify_tests.py
+        tests the --ssl-no-verify-ca option
+    gt_inactivity_tests.py
+        upload and download inactivity timeout tests
+    gt_script_tests.py
+        tests gtoinfo and gtocheck scripts
 
 Additional tests:
-gt_20gb_download_test.py
-      a single, 20GB download operation from server
+
+    gt_20gb_download_test.py
+        a single, 20GB download operation from server
 
