@@ -41,6 +41,7 @@ import os
 import sys
 import time
 import hashlib
+import logging
 import random
 from uuid import uuid4
 
@@ -48,6 +49,8 @@ import analysis
 import experiment
 import run
 import manifest
+
+log = logging.getLogger (__name__)
 
 xml_file = ('<FILE checksum="%(bam_md5sum)s" checksum_method="MD5" '
             'filetype="bam" filename="%(bam_filename)s"/>')
@@ -73,7 +76,7 @@ class DataGenBase (object):
                 raise Exception ('accumulated data size does not match requested size',
                                  'accum=%d' % total_size, 'req=%d' % data_size)
 
-        print 'Creating data dir: %s' % uuid
+        log.info ('Creating data dir: %s' % uuid)
 
         self.timestamp = time.strftime('%Y%m%d-%H:%M:%S', time.gmtime())
 
@@ -83,14 +86,14 @@ class DataGenBase (object):
         file_entries = []
         offset = 0
         for bam_filename, sz in self.file_list:
-            print '  FILE: %-32s: %d bytes at %d' % (bam_filename, sz, offset)
+            log.debug ('  FILE: %-32s: %d bytes at %d' % (bam_filename, sz, offset))
             path = os.path.join(self.path, self.uuid)
 
             bam_path = os.path.join(path, bam_filename)
 
             d_path = os.path.dirname (bam_path)
             if not os.path.isdir(d_path):
-                #print '    mkdir', d_path
+                log.debug ('    mkdir %s' % d_path)
                 os.makedirs (d_path, 0755)
 
             # Create the bam file.
@@ -189,7 +192,7 @@ class DataGenSequential (DataGenBase):
         blk_start = (offset % self.PIECE_SZ) / self.BLK_SZ
         datum_start = (offset % self.PIECE_SZ) % (self.BLK_SZ) / self.DATUM_SZ
 
-        #print '  P=%d, B=%d, D=%s' % (piece, blk_start, datum_start)
+        log.debug ('    P=%d, B=%d, D=%s' % (piece, blk_start, datum_start))
 
         while data_size > 0:
             for chunk in range (blk_start, self.BLK_RANGE):
