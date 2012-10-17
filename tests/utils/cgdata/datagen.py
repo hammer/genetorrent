@@ -56,10 +56,11 @@ class DataGenBase (object):
     '''Class for data file generation.
     '''
 
-    def __init__ (self, uuid, data_size, upload_server_uri='', file_list=None):
+    def __init__ (self, uuid, data_size, upload_server_uri='', file_list=None, path=''):
         self.uuid = uuid
         self.data_size = data_size
         self.upload_server_uri = upload_server_uri
+        self.path = path
         if file_list is None:
             self.file_list = [ ('%s.bam' % (uuid), data_size) ]
         else:
@@ -83,9 +84,9 @@ class DataGenBase (object):
         offset = 0
         for bam_filename, sz in self.file_list:
             print '  FILE: %-32s: %d bytes at %d' % (bam_filename, sz, offset)
-            path = '%s' % (self.uuid)
+            path = os.path.join(self.path, self.uuid)
 
-            bam_path = '%s/%s' % (path, bam_filename)
+            bam_path = os.path.join(path, bam_filename)
 
             d_path = os.path.dirname (bam_path)
             if not os.path.isdir(d_path):
@@ -113,17 +114,18 @@ class DataGenBase (object):
             'server': self.upload_server_uri,
             }
 
-        with open('%s/analysis.xml' % (self.uuid), 'wb') as fp:
+        with open(os.path.join(self.path, self.uuid, 'analysis.xml'), 'wb') as fp:
             fp.write(analysis.xml_template % bam_info)
 
-        with open('%s/experiment.xml' % (self.uuid), 'wb') as fp:
+        with open(os.path.join(self.path, self.uuid, 'experiment.xml'), 'wb') as fp:
             fp.write(experiment.xml_template % bam_info)
 
-        with open('%s/run.xml' % (self.uuid), 'wb') as fp:
+        with open(os.path.join(self.path, self.uuid, 'run.xml'), 'wb') as fp:
             fp.write(run.xml_template % bam_info)
 
         if bam_info['server']:
-            with open('%s/manifest-generated.xml' % (self.uuid), 'wb') as fp:
+            with open(os.path.join(self.path, self.uuid, 'manifest-generated.xml'),
+                      'wb') as fp:
                 fp.write(manifest.xml_template % bam_info)
 
 
@@ -217,9 +219,10 @@ if __name__ == '__main__':
 
     DataGenSequential ('uuid-1', D_SZ)
     DataGenSequential ('uuid-2', D_SZ, file_list=[ ('test-1.bam', D_SZ ) ])
-    DataGenSequential ('uuid-3', D_SZ, 'dummy-server', file_list=D_FILES)
+    DataGenSequential ('uuid-3', D_SZ, 'dummy-server', file_list=D_FILES,
+                       path='tmp-1')
 
-    DataGenRandom ('uuid-4', D_SZ)
+    DataGenRandom ('uuid-4', D_SZ, path='tmp-1')
     DataGenRandom ('uuid-5', D_SZ, file_list=[ ('test-1.bam', D_SZ ) ])
     DataGenRandom ('uuid-6', D_SZ, file_list=D_FILES)
 
