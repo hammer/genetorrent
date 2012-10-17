@@ -49,76 +49,180 @@ import experiment
 import run
 import manifest
 
-def write_random_data(fp, uuid, seed, data_size):
-    fp.write('# Generated BAM from Random Data: (%s) with seed = %s\n' % (uuid, seed))
-    random.seed(seed)
-    blk_size = 4096
-    while data_size > 0:
-        if data_size < blk_size:
-            blk_size = data_size
+xml_file = ('<FILE checksum="%(bam_md5sum)s" checksum_method="MD5" '
+            'filetype="bam" filename="%(bam_filename)s"/>')
 
-        blk = []
-        for i in range(blk_size):
-            d = random.randrange(0, 256)
-            blk.append(chr(d))
+class DataGenBase (object):
+    '''Class for data file generation.
+    '''
 
-        fp.write(''.join(blk))
-        data_size -= blk_size
+    def __init__ (self, uuid, data_size, upload_server_uri='', file_list=None):
+        self.uuid = uuid
+        self.data_size = data_size
+        self.upload_server_uri = upload_server_uri
+        if file_list is None:
+            self.file_list = [ ('%s.bam' % (uuid), data_size) ]
+        else:
+            total_size = 0
+            self.file_list = list(file_list)
+            for f,sz in self.file_list:
+                total_size += sz
 
-def write_zero_data(fp, uuid, seed, data_size):
-    blk_size = 4096
-    while data_size > 0:
-        if data_size < blk_size:
-            blk_size = data_size
+            if total_size != data_size:
+                raise Exception ('accumulated data size does not match requested size',
+                                 'accum=%d' % total_size, 'req=%d' % data_size)
 
-        fp.write(''.join([chr(0)] * blk_size))
-        data_size -= blk_size
+        print 'Creating data dir: %s' % uuid
 
-def get_md5(path):
-    md5sum = hashlib.md5()
-    with open(path, 'rb') as fp:
-        while True:
-            d = fp.read(4096)
-            if not d:
-                break
-            md5sum.update(d)
-    return md5sum.hexdigest()
+        self.timestamp = time.strftime('%Y%m%d-%H:%M:%S', time.gmtime())
 
-def create_data(uuid, data_size, data_writer, upload_server_uri=""):
-    path = '%s' % (uuid)
-    print 'Creating: %s' % path
+        self.create_data ()
 
-    os.mkdir(path)
+    def create_data (self):
+        file_entries = []
+        offset = 0
+        for bam_filename, sz in self.file_list:
+            print '  FILE: %-32s: %d bytes at %d' % (bam_filename, sz, offset)
+            path = '%s' % (self.uuid)
 
-    bam_filename = '%s.bam' % (uuid)
-    bam_path = '%s/%s' % (path, bam_filename)
+            bam_path = '%s/%s' % (path, bam_filename)
 
-    timestamp = time.strftime('%Y%m%d-%H:%M:%S', time.gmtime())
+            d_path = os.path.dirname (bam_path)
+            if not os.path.isdir(d_path):
+                #print '    mkdir', d_path
+                os.makedirs (d_path, 0755)
 
-    # Create the bam file.
-    with open(bam_path, 'wb') as fp:
-        data_writer(fp, uuid, timestamp, data_size)
+            # Create the bam file.
+            md5sum = hashlib.md5 ()
+            with open (bam_path, 'wb') as fp:
+                self.write_data(fp, md5sum, sz, offset)
 
-    bam_info = {
-        'alias': 'Random test data: %s' % (timestamp),
-        'title': 'Random test data (%s) %s' % (uuid, timestamp),
-        'bam_md5sum': get_md5(bam_path),
-        'bam_filename': bam_filename,
-        'bam_path': bam_path,
-        'uuid': uuid,
-        'server': upload_server_uri,
-        }
+            fentry = {
+                'bam_md5sum': md5sum.hexdigest (),
+                'bam_filename': bam_filename,
+                }
 
-    with open('%s/analysis.xml' % (uuid), 'wb') as fp:
-        fp.write(analysis.xml_template % bam_info)
+            file_entries.append (xml_file % fentry)
+            offset += sz
 
-    with open('%s/experiment.xml' % (uuid), 'wb') as fp:
-        fp.write(experiment.xml_template % bam_info)
+        bam_info = {
+            'alias': 'Generated test data: %s' % (self.timestamp),
+            'title': 'Generated test data (%s) %s' % (self.uuid, self.timestamp),
+            'file_entries': '\n        '.join(file_entries),
+            'uuid': self.uuid,
+            'server': self.upload_server_uri,
+            }
 
-    with open('%s/run.xml' % (uuid), 'wb') as fp:
-        fp.write(run.xml_template % bam_info)
+        with open('%s/analysis.xml' % (self.uuid), 'wb') as fp:
+            fp.write(analysis.xml_template % bam_info)
 
-    if bam_info['server']:
-        with open('%s/manifest-generated.xml' % (uuid), 'wb') as fp:
-            fp.write(manifest.xml_template % bam_info)
+        with open('%s/experiment.xml' % (self.uuid), 'wb') as fp:
+            fp.write(experiment.xml_template % bam_info)
 
+        with open('%s/run.xml' % (self.uuid), 'wb') as fp:
+            fp.write(run.xml_template % bam_info)
+
+        if bam_info['server']:
+            with open('%s/manifest-generated.xml' % (self.uuid), 'wb') as fp:
+                fp.write(manifest.xml_template % bam_info)
+
+
+class DataGenRandom (DataGenBase):
+    '''Class for generating files with random data.
+    '''
+
+    def write_data (self, fp, md5sum, data_size, offset):
+        seed = '%s-%d' % (self.timestamp, offset)
+        fp.write('# Generated BAM from Random Data: (%s) with seed = %s\n'
+                 % (self.uuid, seed))
+        random.seed(seed)
+        blk_size = 4096
+        while data_size > 0:
+            if data_size < blk_size:
+                blk_size = data_size
+
+            blk = []
+            for i in range (blk_size):
+                d = random.randrange (0, 256)
+                blk.append (chr (d))
+
+            d_blk = ''.join (blk)
+            md5sum.update (d_blk)
+            fp.write (d_blk)
+            data_size -= blk_size
+
+
+class DataGenZero (DataGenBase):
+    '''Class for generating files with zero data.
+    '''
+
+    def write_data (self, fp, md5sum, data_size, offset):
+        blk_size = 4096
+        while data_size > 0:
+            if data_size < blk_size:
+                blk_size = data_size
+
+            d_blk = ''.join([chr(0)] * blk_size)
+            md5sum.update (d_blk)
+            fp.write (d_blk)
+            data_size -= blk_size
+
+
+class DataGenSequential (DataGenBase):
+    '''Class for generating files with sequential data.
+    '''
+    PIECE_SZ = 4 * 1024 * 1024
+    BLK_SZ = 16 * 1024
+    DATUM_SZ = 16
+
+    BLK_RANGE = PIECE_SZ / BLK_SZ
+    DATUM_RANGE = BLK_SZ / DATUM_SZ
+
+    def write_data (self, fp, md5sum, data_size, offset):
+        if (offset % self.DATUM_SZ) != 0:
+            raise Exception ("Offset is not a multiple of %d" % self.DATUM_SZ,
+                             offset)
+
+        piece = offset / self.PIECE_SZ
+        blk_start = (offset % self.PIECE_SZ) / self.BLK_SZ
+        datum_start = (offset % self.PIECE_SZ) % (self.BLK_SZ) / self.DATUM_SZ
+
+        #print '  P=%d, B=%d, D=%s' % (piece, blk_start, datum_start)
+
+        while data_size > 0:
+            for chunk in range (blk_start, self.BLK_RANGE):
+                for datum in range (datum_start, self.DATUM_RANGE):
+                    data_size -= 16
+                    if data_size < 0:
+                        return
+
+                    d_blk = '%08x:%02x:%03x\n' % (piece, chunk, datum)
+                    md5sum.update (d_blk)
+                    fp.write (d_blk)
+                datum_start = 0
+            blk_start = 0
+            piece += 1
+
+if __name__ == '__main__':
+    D_SZ    = 6 * 4096 * 1024
+    BASE_SZ = 4096 * 1024 + 128
+
+    D_FILES = [
+        ('test-1.bam',           BASE_SZ),
+        ('test-2.bam',           BASE_SZ),
+        ('dir1/test-3.bam',      BASE_SZ),
+        ('dir1/dir2/test-4.bam', BASE_SZ),
+        ('dir3/test-5.bam',      D_SZ - 4 * BASE_SZ),
+    ]
+
+    DataGenSequential ('uuid-1', D_SZ)
+    DataGenSequential ('uuid-2', D_SZ, file_list=[ ('test-1.bam', D_SZ ) ])
+    DataGenSequential ('uuid-3', D_SZ, 'dummy-server', file_list=D_FILES)
+
+    DataGenRandom ('uuid-4', D_SZ)
+    DataGenRandom ('uuid-5', D_SZ, file_list=[ ('test-1.bam', D_SZ ) ])
+    DataGenRandom ('uuid-6', D_SZ, file_list=D_FILES)
+
+    DataGenZero ('uuid-7', D_SZ)
+    DataGenZero ('uuid-8', D_SZ, file_list=[ ('test-1.bam', D_SZ ) ])
+    DataGenZero ('uuid-9', D_SZ, file_list=D_FILES)

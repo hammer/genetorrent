@@ -40,7 +40,7 @@ from xml.etree.cElementTree import Element, ElementTree, SubElement
 from tempfile import NamedTemporaryFile
 
 from utils.gttestcase import GTTestCase, StreamToLogger
-from utils.cgdata.datagen import write_zero_data, write_random_data
+from utils.cgdata.datagen import DataGenZero
 from utils.config import TestConfig
 
 class TestGeneTorrentDownload(GTTestCase):
@@ -50,7 +50,7 @@ class TestGeneTorrentDownload(GTTestCase):
     def test_100mb_download_from_uuid(self):
         '''Download a 100MB zero-data file from a GT server.'''
         uuid = self.data_upload_test(1024 * 1024 * 100,
-            data_generator=write_zero_data)
+            data_generator=DataGenZero)
         self.data_download_test_uuid(uuid, client_options='--max-children=4')
 
     def test_1mb_download_from_uuid(self):

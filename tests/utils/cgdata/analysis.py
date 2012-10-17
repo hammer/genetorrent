@@ -4,12 +4,20 @@ Template for analysis.xml.
 Usage::
 
     import cgdata.analysis
+    from cgdata.datagen import xml_file
+
+    file_entries = [
+        {
+            'bam_md5sum':   '3fd013ebe4b4d80602b520b41ea75f3e',     # md5 checksum of bam file.
+            'bam_filename': 'foo-bar.bam',                          # name of bam file.
+        },
+    ]
+    my_file_entries = [ xml_file % fe for fe in file_entries ]
 
     bam_info = {
         'alias':        'Description of test data file',
         'title':        'Title description of bam information',
-        'bam_md5sum':   '3fd013ebe4b4d80602b520b41ea75f3e',     # md5 checksum of bam file.
-        'bam_filename': 'foo-bar.bam',                          # name of bam file.
+        'file_entries': '\n'.join (my_file_entries),
     }
 
     with open('analysis.xml', 'wb') as fp:
@@ -170,7 +178,7 @@ xml_template = '''\
     </TARGETS>
     <DATA_BLOCK name="HCC1143_2011_12_07">
       <FILES>
-        <FILE checksum="%(bam_md5sum)s" filetype="bam" filename="%(bam_filename)s" checksum_method="MD5"/>
+        %(file_entries)s
       </FILES>
     </DATA_BLOCK>
   </ANALYSIS>

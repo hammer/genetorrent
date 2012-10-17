@@ -43,7 +43,7 @@ except ImportError:
 from tempfile import NamedTemporaryFile
 from subprocess import Popen, PIPE
 
-from utils.cgdata.datagen import create_data, write_random_data
+from utils.cgdata.datagen import DataGenRandom
 from utils.genetorrent import GeneTorrentInstance, InstanceType
 from utils.mockhubcontrol import MockHub
 from utils.config import TestConfig
@@ -178,12 +178,11 @@ class GTTestCase(unittest.TestCase):
 
         return h1.digest() == h2.digest()
 
-    def generate_bam_data(self, uuid, size, data_generator=write_random_data):
+    def generate_bam_data(self, uuid, size, data_generator=DataGenRandom):
         ''' Generate random or zero BAM data using datagen module. '''
         basedir = os.getcwd()
         os.chdir('client')
-        create_data(uuid, size, data_generator,
-            TestConfig.HUB_SERVER)
+        data_generator(uuid, size, TestConfig.HUB_SERVER)
         os.chdir(basedir)
 
     def upload_sleep(self, minutes):
@@ -195,7 +194,7 @@ class GTTestCase(unittest.TestCase):
             minutes -= 1
         print 'Proceeding...'
 
-    def data_upload_test(self, size, data_generator=write_random_data,
+    def data_upload_test(self, size, data_generator=DataGenRandom,
         ssl=True, client_options='', server_options='', check_sha1=True):
         server = None
         uuid = uuid4()

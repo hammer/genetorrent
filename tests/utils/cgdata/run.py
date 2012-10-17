@@ -4,10 +4,18 @@ Template for run.xml file.
 Usage::
 
     import cgdata.run
+    from cgdata.datagen import xml_file
+
+    file_entries = [
+        {
+            'bam_md5sum':   '3fd013ebe4b4d80602b520b41ea75f3e',     # md5 checksum of bam file.
+            'bam_filename': 'foo-bar.bam',                          # name of bam file.
+        },
+    ]
+    my_file_entries = [ xml_file % fe for fe in file_entries ]
 
     bam_info = {
-        'bam_md5sum': '3fd013ebe4b4d80602b520b41ea75f3e',
-        'bam_filename': '40-byte-bam.bam',
+        'file_entries': '\n'.join (my_file_entries),
     }
 
     with open('run.xml', 'wb') as fp:
@@ -21,7 +29,7 @@ xml_template = '''\
     <EXPERIMENT_REF refname="HCC1143.mix1.n5t95" refcenter="CGHUB" />
     <DATA_BLOCK name="D0ENMACXX111207">
       <FILES>
-        <FILE checksum="%(bam_md5sum)s" checksum_method="MD5" filetype="bam" filename="%(bam_filename)s"/>
+        %(file_entries)s
       </FILES>
     </DATA_BLOCK>
   </RUN>
