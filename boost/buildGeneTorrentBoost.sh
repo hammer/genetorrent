@@ -27,7 +27,6 @@
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
 baseDir=$(pushd $(dirname $0) > /dev/null; pwd -P; popd > /dev/null)
-depsDir=${baseDir}
 
 BOOST_SRC_URL=http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz
 BOOST_VER=boost_1_48_0
@@ -54,8 +53,7 @@ else
    DLTOOL="${CURL}"
 fi
 
-mkdir -p "${depsDir}"
-pushd "${depsDir}" > /dev/null
+pushd "${baseDir}" > /dev/null
 
 if [ -e ${BOOST_TARBALL} ]; then
    echo "Checking MD5 hash of existing file..."
@@ -86,7 +84,7 @@ fi
 
 pushd ${BOOST_VER} > /dev/null
 
-./bootstrap.sh --prefix=${depsDir} --with-libraries=system,regex,filesystem,program_options,thread --without-icu
+./bootstrap.sh --prefix=${baseDir} --with-libraries=system,regex,filesystem,program_options,thread --without-icu
 
 if [ $? -ne 0 ]; then
    errexit "boost bootstrap operation failed"

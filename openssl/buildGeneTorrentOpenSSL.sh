@@ -27,14 +27,15 @@
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
 baseDir=$(pushd $(dirname $0) > /dev/null; pwd -P; popd > /dev/null)
-depsDir=${baseDir}
 
 OPENSSL_SRC_URL=http://www.openssl.org/source/openssl-1.0.1c.tar.gz
 OPENSSL_VER=openssl-1.0.1c
 OPENSSL_MD5=ae412727c8c15b67880aef7bd2999b2e
 
-WGET="$(which wget) --tries 3"
-CURL="$(which curl) -o ${OPENSSL_VER}.tar.gz -L"
+OPENSSL_TARBALL="/tmp/${OPENSSL_VER}.tar.gz"
+
+WGET="$(which wget) --tries 3 -O ${OPENSSL_TARBALL}"
+CURL="$(which curl) -o ${OPENSSL_TARBALL} -L"
 
 function errexit
 {
@@ -47,17 +48,16 @@ if [ "$(which wget)" == "" -a "$(which curl)" == "" ]; then
 fi
 
 if [ ! -z "$(which wget)" ]; then
-   DLTOOL=${WGET}
+   DLTOOL="${WGET}"
 else
-   DLTOOL=${CURL}
+   DLTOOL="${CURL}"
 fi
 
-mkdir -p "${depsDir}"
-pushd "${depsDir}" > /dev/null
+pushd "${baseDir}" > /dev/null
 
-if [ -e ${OPENSSL_VER}.tar.gz ]; then
+if [ -e ${OPENSSL_TARBALL} ]; then
    echo "Checking MD5 hash of existing file..."
-   FILE_MD5=$(md5sum ${OPENSSL_VER}.tar.gz | cut -f 1 -d" ")
+   FILE_MD5=$(md5sum ${OPENSSL_TARBALL} | cut -f 1 -d" ")
 
    if [ "${FILE_MD5}" != "${OPENSSL_MD5}" ]; then
       errexit "file md5 sum is incorrect -  please delete it and run the script again"
@@ -70,21 +70,21 @@ else
    fi
 
    echo "Checking MD5 hash of downloaded file..."
-   FILE_MD5=$(md5sum ${OPENSSL_VER}.tar.gz | cut -f 1 -d" ")
+   FILE_MD5=$(md5sum ${OPENSSL_TARBALL} | cut -f 1 -d" ")
 
    if [ "${FILE_MD5}" != "${OPENSSL_MD5}" ]; then
       errexit "file md5 sum is incorrect -  please delete it and run the script again"
    fi
 fi
 
-tar xzvf ${OPENSSL_VER}.tar.gz
+tar xzf ${OPENSSL_TARBALL}
 if [ $? -ne 0 ]; then
    errexit "untar operation failed"
 fi
 
 pushd ${OPENSSL_VER} > /dev/null
 
-./config --openssldir=${depsDir} shared
+./config --openssldir=${baseDir} shared
 
 if [ $? -ne 0 ]; then
    errexit "openssl bootstrap operation failed"
