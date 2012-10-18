@@ -1,0 +1,10 @@
+usr/bin/GeneTorrent
+usr/bin/gtoinfo
+usr/bin/gtocheck
+usr/lib/python2.7/dist-packages/gtoinfo.*
+usr/lib/GeneTorrent/libtorrent-rasterbar.so*
+usr/lib/libgenetorrent.so*
+usr/share/doc/GeneTorrent/LICENSE
+usr/share/doc/GeneTorrent/README
+usr/share/GeneTorrent/dhparam.pem
+

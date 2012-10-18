@@ -1,0 +1,5 @@
+genetorrent (@VERSION@-@DEB_DISTRO_TAG@) @DEB_CODENAME@; urgency=low
+
+  * Initial release
+
+ -- Matt Lupfer <mlupfer@cardinalpeak.com>  Tue, 16 Oct 2012 09:34:58 -0600

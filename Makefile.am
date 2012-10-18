@@ -27,7 +27,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = boost openssl libtorrent src scripts init.d tests
+SUBDIRS = boost openssl libtorrent src scripts init.d tests dpkg
 
 EXTRA_DIST =                     \
    LICENSE                       \
@@ -52,4 +52,33 @@ rpmbuild-internal:
 windows-installer: all
 	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
 			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
+
+DEB_CODENAME := $(shell lsb_release -cs)
+
+.PHONY: deb deb-builder deb-precise deb-squeeze
+deb-precise:
+	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
+
+deb-squeeze:
+	$(MAKE) DEB_DISTRO_TAG=1 deb-builder
+
+deb: deb-$(DEB_CODENAME)
+
+REPLACE_VARS = \
+		-e 's|[@]DEB_DISTRO_TAG@|$(DEB_DISTRO_TAG)|g' \
+		-e 's|[@]DEB_CODENAME@|$(DEB_CODENAME)|g' \
+		-e 's|[@]VERSION@|$(VERSION)|g'
+
+deb-builder:
+	$(MAKE) dist
+	tar xzf $(PACKAGE)-$(VERSION).tar.gz
+	mv $(PACKAGE)-$(VERSION) $(PACKAGE)-$(VERSION).orig
+	tar xzf $(PACKAGE)-$(VERSION).tar.gz
+	mv $(PACKAGE)-$(VERSION).tar.gz genetorrent_$(VERSION).orig.tar.gz
+	mkdir $(PACKAGE)-$(VERSION)/debian
+	cp -a $(top_srcdir)/dpkg/common/* $(PACKAGE)-$(VERSION)/debian
+	cp -a $(top_srcdir)/dpkg/$(DEB_CODENAME)/* $(PACKAGE)-$(VERSION)/debian
+	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control
+	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/changelog
+	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc
 

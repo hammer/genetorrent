@@ -145,3 +145,7 @@
 # /tests/utils/cgdata/
 /tests/utils/cgdata/*.pyc
 /tests/utils/cgdata/*.pyo
+
+# /dpkg/
+/dpkg/Makefile.in
+
