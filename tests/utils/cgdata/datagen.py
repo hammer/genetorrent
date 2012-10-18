@@ -60,7 +60,7 @@ class DataGenBase (object):
     '''
 
     def __init__ (self, uuid, data_size, upload_server_uri='', file_list=None, path=''):
-        self.uuid = uuid
+        self.uuid = str(uuid)
         self.data_size = data_size
         self.upload_server_uri = upload_server_uri
         self.path = path
