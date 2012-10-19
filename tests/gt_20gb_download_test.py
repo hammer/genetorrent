@@ -53,7 +53,8 @@ class TestGeneTorrentLargeDownload(GTTestCase):
             data_generator=DataGenZero,
             server_options='--zero-storage',
             check_sha1=False)
-        self.data_download_test_uuid(uuid, client_options='--max-children=4 --zero-storage',
+        self.data_download_test_uuid(uuid,
+            client_options='--max-children=4 --zero-storage',
             server_options='--zero-storage',
             check_sha1=False)
 

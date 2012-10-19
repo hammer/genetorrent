@@ -53,48 +53,28 @@ class TestGeneTorrentDownload(GTTestCase):
             data_generator=DataGenZero)
         self.data_download_test_uuid(uuid, client_options='--max-children=4')
 
-    def test_1mb_download_from_uuid(self):
-        '''Download a randomly-generated 1MB file from a GT server.'''
-        uuid = self.data_upload_test(1024 * 1024 * 1)
+    def test_32mb_download_from_uuid(self):
+        '''Download a randomly-generated 32MB file from a GT server.'''
+        uuid = self.data_upload_test(1024 * 1024 * 32)
 
         self.data_download_test_uuid(uuid)
 
-    def test_1mb_download_from_gto(self):
-        '''Download a randomly-generated 1MB file from a GT server.'''
+    def test_32mb_download_from_gto(self):
+        '''Download a randomly-generated 32MB file from a GT server.'''
         # GTO downloads must be manually added to server workqueue
         # therefore, this test will not work remotely
         if not TestConfig.MOCKHUB:
             return
-        uuid = self.data_upload_test(1024 * 1024 * 1)
+        uuid = self.data_upload_test(1024 * 1024 * 32)
 
         self.data_download_test_gto(uuid)
 
-    def test_1mb_download_from_uuid_nossl(self):
-        '''Download a randomly-generated 1MB file from a GT server
-           without SSL'''
-        if not TestConfig.MOCKHUB:
-            return
-
-        uuid = self.data_upload_test(1024 * 1024 * 1, ssl=False)
-
-        self.data_download_test_uuid(uuid)
-
-    def test_1mb_download_from_gto_nossl(self):
-        '''Download a randomly-generated 1MB file from a GT server
-           without SSL'''
-        if not TestConfig.MOCKHUB:
-            return
-
-        uuid = self.data_upload_test(1024 * 1024 * 1, ssl=False)
-
-        self.data_download_test_gto(uuid)
-
-    def test_3x1mb_download_from_xml(self):
-        '''Download three randomly-generated 1MB files from a GT server
+    def test_3x32mb_download_from_xml(self):
+        '''Download three randomly-generated 32MB files from a GT server
            via an XML manifest'''
-        uuid1 = self.data_upload_test(1024 * 1024 * 1)
-        uuid2 = self.data_upload_test(1024 * 1024 * 1)
-        uuid3 = self.data_upload_test(1024 * 1024 * 1)
+        uuid1 = self.data_upload_test(1024 * 1024 * 32)
+        uuid2 = self.data_upload_test(1024 * 1024 * 32)
+        uuid3 = self.data_upload_test(1024 * 1024 * 32)
 
         uuids = [uuid1, uuid2, uuid3]
 
@@ -122,45 +102,6 @@ class TestGeneTorrentDownload(GTTestCase):
         self.data_download_test_xml(f.name, uuids)
 
         os.remove(f.name)
-
-    def test_1mb_download_from_uuid_null_storage(self):
-        '''Download a randomly-generated 1MB file from a GT server
-           with null-storage option.'''
-        uuid = self.data_upload_test(1024 * 1024 * 1)
-
-        self.data_download_test_uuid(uuid,
-            client_options='--null-storage', check_sha1=False)
-
-        # client BAM should not exist
-        client_bam = os.path.join(
-            'client',
-            str(uuid),
-            str(uuid) + '.bam',
-        )
-
-        self.assertTrue(not os.path.isfile(client_bam))
-
-    def test_1mb_download_from_uuid_zero_storage(self):
-        '''Download a randomly-generated 1MB file from a GT server
-           with zero-storage option.'''
-
-        # if this test was large and fast enough, it would be an
-        # expected fail scenario
-        # if libtorrent's disk cache doesn't keep up with the data
-        # transfer, piece hash checks will begin to fail
-        uuid = self.data_upload_test(1024 * 1024 * 1)
-
-        self.data_download_test_uuid(uuid,
-            client_options='--zero-storage', check_sha1=False)
-
-        # client BAM should not exist
-        client_bam = os.path.join(
-            'client',
-            str(uuid),
-            str(uuid) + '.bam',
-        )
-
-        self.assertTrue(not os.path.isfile(client_bam))
 
 if __name__ == '__main__':
     sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)

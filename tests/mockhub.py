@@ -31,6 +31,7 @@ import tempfile
 import os
 import subprocess
 import web
+import time
 
 from web.wsgiserver import CherryPyWSGIServer
 
@@ -122,7 +123,7 @@ class Tracker(object):
 
     def announce(self, user_data):
         infohash = user_data.info_hash
-        ip = web.ctx.ip
+        ip = web.ctx.ip if not 'ip' in user_data else user_data.ip
 
         # add torrent to dicts, if new
         if not infohash in self.torrents:
@@ -132,6 +133,10 @@ class Tracker(object):
         # set completed flag when completed event arrives
         if 'event' in user_data and user_data.event == 'completed':
             self.torrents_completed[infohash] = True
+
+        # TODO only remove peer-id
+        #if 'event' in user_data and user_data.event == 'stopped':
+        #    del self.torrents[infohash]
 
         # create a peer dict entry for requester
         # webpy is giving us unicode strings, so coerce into legacy strings
@@ -158,7 +163,7 @@ class Tracker(object):
             filtered_swarm = [x for x in swarm if GT_CLIENT_TAG in x['peer id']]
 
         # assemble response dict
-        response_dict = {'interval': 2, 'peers': filtered_swarm}
+        response_dict = {'interval': 5, 'min interval': 5, 'peers': filtered_swarm}
 
         # bencode response
         return encode_dict(response_dict)

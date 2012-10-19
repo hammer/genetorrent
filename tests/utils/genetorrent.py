@@ -54,7 +54,7 @@ defaultArgs = [
     '',                       # GT_ALL
     ' -vv -l stdout:full -C . ',
     ' -vv -l stdout:full -C . ',
-    ' -l stdout:full -C . ',
+    ' -l stdout:full -C . --peer-timeout=5',
 ]
 
 class GeneTorrentInstance(subprocess.Popen):

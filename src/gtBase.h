@@ -202,6 +202,8 @@ class gtBase
 
       bool _successfulTrackerComms;
 
+      int _peerTimeout;           // peer timeout in seconds for libtorrent session settings
+
       static void loggingCallBack (std::string);
 
       std::string getHttpErrorMessage (int code);
@@ -241,5 +243,6 @@ class gtBase
       void pcfacliGTAgentMode (boost::program_options::variables_map &vm);
       void pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm);
       void pcfacliStorageFlags (boost::program_options::variables_map &vm);
+      void pcfacliPeerTimeout (boost::program_options::variables_map &vm);
 };
 #endif /* GT_BASE_H_ */

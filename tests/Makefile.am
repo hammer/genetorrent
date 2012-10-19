@@ -1,10 +1,13 @@
 test_scripts = gt_argument_tests.py       \
-               gt_upload_tests.py         \
                gt_download_tests.py       \
                gt_inactivity_tests.py     \
                gt_curl_ssl_verify_tests.py\
                gt_script_tests.py         \
                gt_cred_as_uri_tests.py
+
+extra_test_scripts = gt_20gb_download_test.py   \
+                     gt_upload_tests.py         \
+                     gt_download_extra_tests.py
 
 TESTS = $(test_scripts)
 TESTS_ENVIRONMENT = PYTHONPATH="$(top_srcdir)/scripts:." PATH="$(PATH):$(PWD)"
@@ -25,7 +28,8 @@ EXTRA_DIST = $(test_scripts)              \
              utils/cgdata/manifest.py     \
              utils/cgdata/run.py          \
              utils/config.py              \
-             cgsubmit
+             cgsubmit                     \
+             $(extra_test_scripts)
 
 # FIXME: linking with LN_S may not work on Windows
 

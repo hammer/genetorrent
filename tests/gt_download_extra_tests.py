@@ -26,7 +26,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-''' Unit tests for upload client '''
+''' Unit tests for download client '''
 
 import unittest
 import time
@@ -36,36 +36,80 @@ import sys
 
 from uuid import uuid4
 from shutil import copy2
-try:
-    from hashlib import sha1 as hash_sha1
-except ImportError:
-    from sha import new as hash_sha1
+from xml.etree.cElementTree import Element, ElementTree, SubElement
+from tempfile import NamedTemporaryFile
 
 from utils.gttestcase import GTTestCase, StreamToLogger
+from utils.cgdata.datagen import DataGenZero
 from utils.config import TestConfig
 
-class TestGeneTorrentUpload(GTTestCase):
+class TestGeneTorrentDownload(GTTestCase):
     create_mockhub = True
     create_credential = True
 
-    def test_32mb_upload_from_analysis_file(self):
-        '''Upload a randomly-generated 32MB file to a GT server.'''
-        self.data_upload_test(1024 * 1024 * 32)
-
-    def test_32mb_upload_from_analysis_file_nossl(self):
-        '''Upload a randomly-generated 32MB file to a GT server
+    def test_32mb_download_from_uuid_nossl(self):
+        '''Download a randomly-generated 32MB file from a GT server
            without SSL'''
-
-        # Only mockhub has no-ssl capabilities
         if not TestConfig.MOCKHUB:
             return
 
-        self.data_upload_test(1024 * 1024 * 32, ssl=False)
+        uuid = self.data_upload_test(1024 * 1024 * 32, ssl=False)
+
+        self.data_download_test_uuid(uuid)
+
+    def test_32mb_download_from_gto_nossl(self):
+        '''Download a randomly-generated 32MB file from a GT server
+           without SSL'''
+        if not TestConfig.MOCKHUB:
+            return
+
+        uuid = self.data_upload_test(1024 * 1024 * 32, ssl=False)
+
+        self.data_download_test_gto(uuid)
+
+    def test_32mb_download_from_uuid_null_storage(self):
+        '''Download a randomly-generated 1MB file from a GT server
+           with null-storage option.'''
+        uuid = self.data_upload_test(1024 * 1024 * 32)
+
+        self.data_download_test_uuid(uuid,
+            client_options='--null-storage', check_sha1=False)
+
+        # client BAM should not exist
+        client_bam = os.path.join(
+            'client',
+            str(uuid),
+            str(uuid) + '.bam',
+        )
+
+        self.assertTrue(not os.path.isfile(client_bam))
+
+    def test_32mb_download_from_uuid_zero_storage(self):
+        '''Download a randomly-generated 32MB file from a GT server
+           with zero-storage option.'''
+
+        # if this test was large and fast enough, it would be an
+        # expected fail scenario
+        # if libtorrent's disk cache doesn't keep up with the data
+        # transfer, piece hash checks will begin to fail
+        uuid = self.data_upload_test(1024 * 1024 * 32)
+
+        self.data_download_test_uuid(uuid,
+            client_options='--zero-storage', check_sha1=False)
+
+        # client BAM should not exist
+        client_bam = os.path.join(
+            'client',
+            str(uuid),
+            str(uuid) + '.bam',
+        )
+
+        self.assertTrue(not os.path.isfile(client_bam))
 
 if __name__ == '__main__':
     sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
     sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentUpload)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGeneTorrentDownload)
     result = unittest.TextTestRunner(stream=sys.stderr, verbosity=2).run(suite)
     if not result.wasSuccessful():
         sys.exit(1)

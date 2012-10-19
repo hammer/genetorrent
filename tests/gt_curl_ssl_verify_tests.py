@@ -104,7 +104,7 @@ class TestGeneTorrentCurlVerifyCA(GTTestCase):
         server = GeneTorrentInstance( \
             '-s %s -q %s -c %s --security-api ' \
             '%s ' \
-            '-l stdout:full' \
+            '-l stdout:full -C .' \
             %  ('server' + os.path.sep + 'root',
                 'server' + os.path.sep + 'workdir',
                 self.cred_filename,

@@ -131,7 +131,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _operatingMode (mode), 
    _confDir (CONF_DIR_DEFAULT), 
    _logMask (0),                 // set all bits to 0
-   _successfulTrackerComms (false)
+   _successfulTrackerComms (false),
+   _peerTimeout (0)
    //_gtAgentMode (false)
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
@@ -232,6 +233,7 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliLog (vm);
    pcfacliTimestamps (vm);
    pcfacliStorageFlags (vm);
+   pcfacliPeerTimeout (vm);
 }
 
 void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
@@ -652,6 +654,15 @@ void gtBase::pcfacliStorageFlags (boost::program_options::variables_map &vm)
    }
 }
 
+void gtBase::pcfacliPeerTimeout (boost::program_options::variables_map &vm)
+{
+   if (vm.count (PEER_TIMEOUT_OPT))
+   {
+      _peerTimeout = vm[PEER_TIMEOUT_OPT].as<int> ();
+      startUpMessage << " --" << PEER_TIMEOUT_OPT << "=" << _peerTimeout;
+   }
+}
+
 // 
 void gtBase::setTempDir ()     
 {
@@ -1044,6 +1055,9 @@ void gtBase::bindSession (libtorrent::session *torrentSession)
    {
       settings.announce_ip = _exposedIP;
    }
+
+   if (_peerTimeout > 0)
+      settings.peer_timeout = _peerTimeout;
 
    torrentSession->set_settings (settings);
 }

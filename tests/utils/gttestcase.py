@@ -256,17 +256,16 @@ class GTTestCase(unittest.TestCase):
 
         # add new upload GTO to server work queue
         gto_file = False
+        ssl_cert = False
 
-        while not gto_file:
+        while not gto_file or (not ssl_cert and ssl):
             try:
                 os.stat(self.client_gto(uuid))
                 gto_file = True
+                gtodata = read_gto(self.client_gto(uuid))
+                ssl_cert = True if 'ssl-cert' in gtodata['info'] else False
             except:
-                time.sleep(5)
-                pass
-
-        # wait for SSL cert
-        time.sleep(20)
+                time.sleep(1)
 
         copy2(self.client_gto(uuid), os.path.join(
             'server',
@@ -277,7 +276,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.kill()
+            server.terminate()
 
         # check upload client return code
         self.assertEqual(client.returncode, 0)
@@ -337,7 +336,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.kill()
+            server.terminate()
 
         # check download client return code
         self.assertEqual(client.returncode, 0)
@@ -397,7 +396,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.kill()
+            server.terminate()
 
         # check download client return code
         self.assertEqual(client.returncode, assert_rc)
@@ -462,7 +461,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.kill()
+            server.terminate()
 
         # check download client return code
         self.assertEqual(client.returncode, 0)
