@@ -155,10 +155,6 @@ EXTRA_DIST = man_gtcommon.1         \
              man_gtserver.1         \
              man_gtupload.1         \
              man_GeneTorrent.1      \
-             GeneTorrent_manual.txt \
-             gtdownload_manual.txt  \
-             gtserver_manual.txt    \
-             gtupload_manual.txt    \
              GeneTorrent
 
 CLEANFILES = gtdownload.1           \
