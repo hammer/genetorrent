@@ -145,17 +145,38 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       if (cli.count (HELP_CLI_OPT))
       {
          std::cout << "Usage:" << std::endl;
-         std::cout << "   GeneTorrent -u manifest-file -c cred [ -p path ]" << std::endl;
-         std::cout << "   GeneTorrent -d < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
-         std::cout << "   GeneTorrent -s path -q work-queue -c cred --security-api signing-URI" << std::endl;
+#ifdef GENETORRENT_UPLOAD
+         std::cout << "   gtupload manifest-file -c cred [ -p path ]" << std::endl;
          std::cout << std::endl;
-         std::cout << "Additional options are available.  Type 'man GeneTorrent' for more information." << std::endl;
+         std::cout << "Additional options are available.  Type 'man gtupload' for more information." << std::endl;
+#endif
+#ifdef GENETORRENT_DOWNLOAD
+         std::cout << "   gtdownload < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
+         std::cout << std::endl;
+         std::cout << "Additional options are available.  Type 'man gtdownload' for more information." << std::endl;
+#endif
+#ifdef GENETORRENT_SERVER
+         std::cout << "   gtserver path -q work-queue -c cred --security-api signing-URI" << std::endl;
+         std::cout << std::endl;
+         std::cout << "Additional options are available.  Type 'man gtserver' for more information." << std::endl;
+#endif
          exit (0);
       }
 
       if (cli.count (VERSION_CLI_OPT))
       {
-         std::cout << "GeneTorrent release " << VERSION << std::endl;
+#ifdef GENETORRENT_UPLOAD
+         std::cout << "GeneTorrent gtupload release " <<
+            VERSION << std::endl;
+#endif
+#ifdef GENETORRENT_DOWNLOAD
+         std::cout << "GeneTorrent gtdownload release " <<
+            VERSION << std::endl;
+#endif
+#ifdef GENETORRENT_SERVER
+         std::cout << "GeneTorrent gtserver release "
+            << VERSION << std::endl;
+#endif
          exit (0);
       }
 

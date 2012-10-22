@@ -33,6 +33,19 @@
 #
 ################################################################################
 
+function printOpt {
+   commands="gtdownload gtupload gtserver"
+
+   for cmd in $commands; do
+      gt_bin=$(which $cmd 2>/dev/null)
+      if [ ! -z "${gt_bin}" ]; then
+         echo ${gt_bin} $1
+         ${gt_bin} $1
+         echo
+      fi
+   done
+}
+
 for arg in "$@"
 do
    if [[ "${arg}" = "-d" || "${arg}" =~ "--download" ]]; then
@@ -47,6 +60,14 @@ do
       command="gtserver"
       break
    fi
+   if [[ "${arg}" = "-h" || "${arg}" = "--help" ]]; then
+      printOpt "--help"
+      exit 0
+   fi
+   if [[ "${arg}" = "--version" ]]; then
+      printOpt "--version"
+      exit 0
+   fi
 done
 
 if [ -z "${command}" ]; then
@@ -55,7 +76,7 @@ if [ -z "${command}" ]; then
    exit 1
 fi
 
-if [ -z "$(which ${command})" ]; then
+if [ -z "$(which ${command} 2>/dev/null)" ]; then
    echo -n "Command ${command} was not found. Please verify that you have "
    echo    "installed it and that it is in your PATH."
    exit 1
