@@ -40,8 +40,9 @@ class MockHub():
     ''' A wrapper class for interaction with MockHub instances. '''
     running = False
 
-    def __init__(self):
-        srcdir = os.getenv('srcdir')
+    def __init__(self, srcdir=None):
+        if srcdir is None:
+            srcdir = os.getenv('srcdir')
         mockhub_bin = os.path.join(srcdir, 'mockhub.py')
         self.process = Popen(['python', mockhub_bin])
 
