@@ -259,7 +259,7 @@ class TestGeneTorrentArguments(GTTestCase):
         gt = GeneTorrentInstance(self.confdir + "--help",
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertTrue("Usage" in sout and "man GeneTorrent" in sout)
+        self.assertTrue("Usage" in sout and "man gtdownload" in sout)
         self.assertEqual(gt.returncode, 0)
 
         gt = GeneTorrentInstance(self.confdir + "--this-option-does-not-exist",
