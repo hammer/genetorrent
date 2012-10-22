@@ -18,22 +18,19 @@ if ERRORLEVEL 1 goto commandfail
 
 echo Running tests
 
-python gt_argument_tests.py
+python tests-default\gt_argument_tests.py
 if ERRORLEVEL 1 goto fail
 
-python gt_upload_tests.py
+python tests-default\gt_download_tests.py
 if ERRORLEVEL 1 goto fail
 
-python gt_download_tests.py
+python tests-default\gt_inactivity_tests.py
 if ERRORLEVEL 1 goto fail
 
-python gt_inactivity_tests.py
+python tests-default\gt_curl_ssl_verify_tests.py
 if ERRORLEVEL 1 goto fail
 
-python gt_curl_ssl_verify_tests.py
-if ERRORLEVEL 1 goto fail
-
-python gt_cred_as_uri_tests.py
+python tests-default\gt_cred_as_uri_tests.py
 if ERRORLEVEL 1 goto fail
 
 goto success

@@ -1,15 +1,15 @@
-test_scripts = gt_argument_tests.py       \
-               gt_download_tests.py       \
-               gt_inactivity_tests.py     \
-               gt_curl_ssl_verify_tests.py\
-               gt_script_tests.py         \
-               gt_cred_as_uri_tests.py
+test_scripts = tests-default/gt_argument_tests.py       \
+               tests-default/gt_download_tests.py       \
+               tests-default/gt_inactivity_tests.py     \
+               tests-default/gt_curl_ssl_verify_tests.py\
+               tests-default/gt_script_tests.py         \
+               tests-default/gt_cred_as_uri_tests.py
 
-extra_test_scripts = gt_20gb_download_test.py   \
-                     gt_upload_tests.py         \
-                     gt_download_extra_tests.py
+extra_test_scripts = tests-extra/gt_20gb_download_test.py   \
+                     tests-extra/gt_upload_tests.py         \
+                     tests-extra/gt_download_extra_tests.py
 
-TESTS = $(test_scripts)
+TESTS = run_tests.py
 TESTS_ENVIRONMENT = PYTHONPATH="$(top_srcdir)/scripts:." PATH="$(PATH):$(PWD)"
 
 EXTRA_DIST = $(test_scripts)              \
@@ -28,10 +28,24 @@ EXTRA_DIST = $(test_scripts)              \
              utils/cgdata/manifest.py     \
              utils/cgdata/run.py          \
              utils/config.py              \
+             unittest2/case.py            \
+             unittest2/collector.py       \
+             unittest2/compatibility.py   \
+             unittest2/__init__.py        \
+             unittest2/loader.py          \
+             unittest2/__main__.py        \
+             unittest2/main.py            \
+             unittest2/result.py          \
+             unittest2/runner.py          \
+             unittest2/signals.py         \
+             unittest2/suite.py           \
+             unittest2/util.py            \
              cgsubmit                     \
+             run_tests.py                 \
+             tests-default/__init__.py    \
+             tests-extra/__init__.py      \
+             $(test_scripts)              \
              $(extra_test_scripts)
-
-# FIXME: linking with LN_S may not work on Windows
 
 certs:
 	mkdir -p certs/
@@ -51,9 +65,12 @@ gtoinfo:
 dhparam.pem:
 	$(LN_S) $(srcdir)/../src/dhparam.pem dhparam.pem
 
-all: web certs gtoinfo dhparam.pem
+check: web certs gtoinfo dhparam.pem
+	$(MAKE) check-TESTS
 
 CLEANFILES = dhparam.pem gtoinfo web
+
+DISTCLEANFILES = gttest.log
 
 clean-local:
 	rm -rf web.py-*/

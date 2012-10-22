@@ -24,13 +24,10 @@ from the base directory of the distribution::
 
 This will compile GeneTorrent and execute the default test suite.
 
-To execute a subset of the tests, or to execute a test not included
-in the default test suite, run::
+To also execute the "extra" test suite, run::
 
     $ ./configure
-    $ make check TESTS="gt_foo_test.py gt_bar_test.py ..."
-
-This will execute only those test files listed in the TESTS variable.
+    $ make check TESTS="run_tests.py run_extra_tests.py"
 
 Diagnostic and log data is written to the screen and also appended
 to gttest.log in the 'tests' directory.
