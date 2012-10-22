@@ -90,7 +90,7 @@ if [ $? -ne 0 ]; then
    errexit "boost bootstrap operation failed"
 fi
 
-./b2 link=shared warnings=all warnings-as-errors=on debug-symbols=on install "$@"
+./b2 link=shared warnings=all debug-symbols=on install "$@"
 
 if [ $? -ne 0 ]; then
    errexit "boost build operation failed"
