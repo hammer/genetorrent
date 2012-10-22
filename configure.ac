@@ -36,6 +36,7 @@ AC_CONFIG_SRCDIR([src/gtBase.cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_SYS_LARGEFILE()
+AC_CANONICAL_HOST
 
 # Silencing build output (automake-1.11)
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -122,6 +123,9 @@ AC_CHECK_HEADER([xqilla/xqilla-simple.hpp], [],
    [AC_MSG_ERROR([xqilla headers required but not found])])
 AC_CHECK_HEADER([xercesc/parsers/XercesDOMParser.hpp], [],
    [AC_MSG_ERROR([xercesc headers required but not found])])
+
+AM_CONDITIONAL([CYGWIN],
+    [case $host_os in *cygwin*) true;; *) false;; esac])
 
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])

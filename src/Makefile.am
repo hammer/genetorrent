@@ -172,17 +172,25 @@ CLEANFILES = gtdownload.1           \
 
 gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtdownload_manual.txt
+endif
 
 gtserver.1: $(srcdir)/man_gtserver.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtserver_manual.txt
+endif
 
 gtupload.1: $(srcdir)/man_gtupload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
+if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > gtupload_manual.txt
+endif
 
 GeneTorrent.1: man_GeneTorrent.1
 	cat $^ > $@
+if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > GeneTorrent_manual.txt
+endif
 
