@@ -28,23 +28,30 @@
 
 import httplib
 import os
+import sys
 import errno
 import socket
 
-from subprocess import Popen
+import subprocess
 from time import sleep
 
 from utils.config import TestConfig
 
-class MockHub():
+class MockHub(object):
     ''' A wrapper class for interaction with MockHub instances. '''
     running = False
 
-    def __init__(self, srcdir=None):
+    def __init__(self, srcdir=None, stream=sys.stderr, gto_base_path=None):
         if srcdir is None:
             srcdir = os.getenv('srcdir')
         mockhub_bin = os.path.join(srcdir, 'mockhub.py')
-        self.process = Popen(['python', mockhub_bin])
+
+        env = dict(os.environ)
+        if gto_base_path:
+            env['MOCK_GTO_BASE_PATH'] = gto_base_path
+
+        self.process = subprocess.Popen(['python', mockhub_bin], stdout=stream,
+                                        stderr=subprocess.STDOUT, env=env)
 
         h = httplib.HTTPSConnection(TestConfig.HUB_HOST,
             int(TestConfig.HUB_PORT), timeout=2)
@@ -70,6 +77,9 @@ class MockHub():
             raise Exception("Mockhub never came up")
 
         self.running = True
+
+    def is_running (self):
+        return self.process.poll () is None
 
     def close(self):
 

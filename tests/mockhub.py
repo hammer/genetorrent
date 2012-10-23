@@ -50,6 +50,9 @@ CERT_BASE = os.environ.get ('CERT_BASE', '')
 CA_CERT = os.path.join (CERT_BASE, 'certs', 'cacert.pem')
 CA_KEY  = os.path.join (CERT_BASE, 'certs', 'cakey.pem')
 
+# Base path to find GTO files.
+GTO_BASE_PATH = os.environ.get ('MOCK_GTO_BASE_PATH', 'client')
+
 # peer ID '-GT' is client, '-Gt' is Server
 GT_CLIENT_TAG = '-GT'
 GT_SERVER_TAG = '-Gt'
@@ -65,7 +68,7 @@ class Analysis(object):
         # GTO request (URI download)
         if 'token' in  user_data and len(user_data) == 1:
             gto_file = os.path.join(
-                'client',
+                GTO_BASE_PATH,
                 name,
                 name + '.gto'
             )
