@@ -65,7 +65,10 @@ gtoinfo:
 dhparam.pem:
 	$(LN_S) $(srcdir)/../src/dhparam.pem dhparam.pem
 
-check: web certs gtoinfo dhparam.pem
+.PHONY: check-setup
+check-setup: web certs gtoinfo dhparam.pem
+
+check: check-setup
 	$(MAKE) check-TESTS
 
 CLEANFILES = dhparam.pem gtoinfo web
