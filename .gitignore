@@ -28,6 +28,10 @@
 /boost/Makefile
 /boost/boost_*
 
+# /dpkg/
+/dpkg/Makefile
+/dpkg/Makefile.in
+
 # /init.d/
 /init.d/Makefile
 /init.d/Makefile.in
@@ -137,6 +141,16 @@
 # /tests/
 /tests/Makefile
 /tests/Makefile.in
+/tests/*.pyc
+
+# /tests/tests-default/
+/tests/tests-default/*.pyc
+
+# /tests/tests-extra/
+/tests/tests-extra/*.pyc
+
+# /tests/unittest2/
+/tests/unittest2/*.pyc
 
 # /tests/utils/
 /tests/utils/*.pyc
@@ -145,7 +159,3 @@
 # /tests/utils/cgdata/
 /tests/utils/cgdata/*.pyc
 /tests/utils/cgdata/*.pyo
-
-# /dpkg/
-/dpkg/Makefile.in
-
