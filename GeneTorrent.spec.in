@@ -10,9 +10,15 @@
    %global gt_dist %{dist}
 %endif
 
+%if "%{?_disable_check}" == "yes"
+   %global _enable_check 0
+%else
+   %global _enable_check 1
+%endif
+
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        1%{?gt_dist}.CP
+Release:        1%{?gt_dist}.CP%{?build_version}
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
@@ -101,7 +107,9 @@ openssl/buildGeneTorrentOpenSSL.sh
 make %{?_smp_mflags}
 
 %check
+%if %{_enable_check}
 LD_LIBRARY_PATH="${PWD}/boost/lib:${PWD}/openssl/lib" make check
+%endif
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}

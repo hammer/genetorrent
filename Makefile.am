@@ -40,6 +40,15 @@ dist_doc_DATA =                  \
    LICENSE                       \
    README
 
+# These can be overridden on the make command line.
+DISABLE_RPM_CHECK = no
+BUILD_VERSION =
+RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
+
+RPMBUILD_DEFINES = \
+	-D '_topdir $(RPMBUILDDIR)' \
+	-D '_disable_check $(DISABLE_RPM_CHECK)'
+
 rpm: dist
 	$(MAKE) rpmbuild-internal
 
@@ -47,7 +56,15 @@ rpmcheck: distcheck
 	$(MAKE) rpmbuild-internal
 
 rpmbuild-internal:
-	rpmbuild -ta $(distdir).tar.gz
+	mkdir -p $(RPMBUILDDIR)/SRPMS
+	mkdir -p $(RPMBUILDDIR)/RPMS
+	mkdir -p $(RPMBUILDDIR)/SPECS
+	mkdir -p $(RPMBUILDDIR)/BUILD
+	mkdir -p $(RPMBUILDDIR)/SOURCES
+	IFS=$$'\n'; if [ -n "$(BUILD_VERSION)" ]; then DEF_BLD_VER="-D build_version $(BUILD_VERSION)"; fi; \
+		set -x; \
+		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} --showrc > $(RPMBUILDDIR)/gt-rpmrc.out; \
+		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} -ta $(distdir).tar.gz
 
 windows-installer: all
 	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
