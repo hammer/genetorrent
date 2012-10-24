@@ -8,8 +8,6 @@
 # not the build tree.
 #
 
-set -x
-
 if [ -d .git ]
 then
     SHA1="$(git rev-parse --short=10 HEAD)"
