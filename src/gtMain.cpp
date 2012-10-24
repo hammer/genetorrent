@@ -47,6 +47,17 @@
 #include "gtUpload.h"
 #include "gtServer.h"
 #include "gtDownload.h"
+#include "gt_scm_rev.h"
+
+#ifdef GENETORRENT_UPLOAD
+#  define GENETORRENT_APP_NAME "gtupload"
+#endif
+#ifdef GENETORRENT_DOWNLOAD
+#  define GENETORRENT_APP_NAME "gtdownload"
+#endif
+#ifdef GENETORRENT_SERVER
+#  define GENETORRENT_APP_NAME "gtserver"
+#endif
 
 std::string makeOpt (std::string baseName, const char secondName = SPACE)
 {
@@ -165,18 +176,8 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
 
       if (cli.count (VERSION_CLI_OPT))
       {
-#ifdef GENETORRENT_UPLOAD
-         std::cout << "GeneTorrent gtupload release " <<
-            VERSION << std::endl;
-#endif
-#ifdef GENETORRENT_DOWNLOAD
-         std::cout << "GeneTorrent gtdownload release " <<
-            VERSION << std::endl;
-#endif
-#ifdef GENETORRENT_SERVER
-         std::cout << "GeneTorrent gtserver release "
-            << VERSION << std::endl;
-#endif
+         std::cout << "GeneTorrent " << GENETORRENT_APP_NAME << " release "
+                   << VERSION << " (SCM REV: " << GT_SCM_REV_STR << ")" << std::endl;
          exit (0);
       }
 

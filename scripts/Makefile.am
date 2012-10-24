@@ -47,3 +47,6 @@ ${PYTHON_TOOLS}: python_wrapper
 BUILT_SOURCES = ${PYTHON_TOOLS}
 CLEANFILES = ${PYTHON_TOOLS} gtoinfo.pyc
 bin_SCRIPTS+= ${PYTHON_TOOLS}
+
+EXTRA_DIST = \
+	scm-rev-update

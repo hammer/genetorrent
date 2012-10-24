@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# Script to update the scm revision header file that will be compiled
+# into the final binary.
+#
+# This must be run from $(top_srcdir). Script is run automatically by
+# the build system and the generated file goes into the source tree,
+# not the build tree.
+#
+
+set -x
+
+if [ -d .git ]
+then
+    SHA1="$(git rev-parse --short=10 HEAD)"
+    HDR="src/gt_scm_rev.h"
+
+    cat >${HDR}.tmp <<EOF
+#ifndef GT_SCM_REV_H
+#define GT_SCM_REV_H
+
+#define GT_SCM_REV_STR "git ref: $SHA1"
+
+#endif /* GT_SCM_REV_H */
+EOF
+
+    if [ ! -e ${HDR} ] || [ "$(md5sum ${HDR})" != "$(md5sum ${HDR}.tmp)" ]
+    then
+	mv ${HDR}.tmp ${HDR}
+    fi
+fi

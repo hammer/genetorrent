@@ -33,6 +33,7 @@
 ################################################################################
 
 noinst_HEADERS =                 \
+   gt_scm_rev.h                  \
    accumulator.hpp               \
    geneTorrentUtils.h            \
    gtBase.h                      \
@@ -190,3 +191,6 @@ if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > GeneTorrent_manual.txt
 endif
 
+.PHONY: gt_scm_rev.h
+gt_scm_rev.h:
+	cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
