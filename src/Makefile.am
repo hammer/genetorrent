@@ -193,4 +193,7 @@ endif
 
 .PHONY: gt_scm_rev.h
 gt_scm_rev.h:
-	cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
+	@echo "  GEN    $@"
+	@cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
+
+gtMain.cpp dist: gt_scm_rev.h
