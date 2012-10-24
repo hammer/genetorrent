@@ -134,6 +134,7 @@
 /src/gtupload
 /src/gtupload.1
 /src/stamp-h1
+/src/gt_scm_rev.h
 /src/*.o
 /src/*.lo
 /src/*.la
