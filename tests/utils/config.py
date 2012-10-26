@@ -31,8 +31,8 @@ class TestConfig:
     HUB_HOST = 'localhost'
     HUB_PORT = '58080'
     HUB_SERVER = HUB_PROTO + '://' + HUB_HOST + ':' + HUB_PORT
-    TRACKER_ADDRESS = 'https://localhost:8080/announce'
-    SECURITY_API = 'https://localhost:8080/cghub/data/gtsession'
+    TRACKER_ADDRESS = 'https://localhost:58080/announce'
+    SECURITY_API = 'https://localhost:58080/cghub/data/gtsession'
     MOCKHUB = True
     CREDENTIAL = ''
     VERBOSE = True
