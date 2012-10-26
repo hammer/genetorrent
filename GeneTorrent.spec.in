@@ -99,10 +99,11 @@ boost/buildGeneTorrentBoost.sh
 # if centos5, must get and build openssl first
 %if "%{dist}" == ".el5.centos"
 openssl/buildGeneTorrentOpenSSL.sh
+WITH_OPENSSL="--with-openssl=${PWD}/openssl"
 %endif
 
-./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --with-boost=${PWD}/boost \
-    --with-openssl=${PWD}/openssl
+./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
+    --with-boost=${PWD}/boost ${WITH_OPENSSL}
 
 make %{?_smp_mflags}
 
