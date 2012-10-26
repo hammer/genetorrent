@@ -22,8 +22,12 @@ then
 #endif /* GT_SCM_REV_H */
 EOF
 
-    if [ ! -e ${HDR} ] || [ "$(md5sum ${HDR})" != "$(md5sum ${HDR}.tmp)" ]
+    old_md5=$(md5sum ${HDR} | awk '{print $1}')
+    new_md5=$(md5sum ${HDR}.tmp | awk '{print $1}')
+    if [ ! -e ${HDR} ] || [ "${old_md5}" != "${new_md5}" ]
     then
 	mv ${HDR}.tmp ${HDR}
+    else
+	rm ${HDR}.tmp
     fi
 fi

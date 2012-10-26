@@ -191,9 +191,9 @@ if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > GeneTorrent_manual.txt
 endif
 
-.PHONY: gt_scm_rev.h
-gt_scm_rev.h:
+.PHONY: gt_scm_rev
+gt_scm_rev:
 	@echo "  GEN    $@"
 	@cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
 
-gtMain.cpp dist: gt_scm_rev.h
+all distdir: gt_scm_rev
