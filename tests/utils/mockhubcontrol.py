@@ -41,7 +41,7 @@ class MockHub(object):
     ''' A wrapper class for interaction with MockHub instances. '''
     running = False
 
-    def __init__(self, srcdir=None, stream=sys.stderr, gto_base_path=None):
+    def __init__(self, srcdir=None, stream=None, gto_base_path=None):
         if srcdir is None:
             srcdir = os.getenv('srcdir')
         mockhub_bin = os.path.join(srcdir, 'mockhub.py')
@@ -50,8 +50,13 @@ class MockHub(object):
         if gto_base_path:
             env['MOCK_GTO_BASE_PATH'] = gto_base_path
 
+        if stream is None:
+            stderr = None
+        else:
+            stderr = subprocess.STDOUT
+
         self.process = subprocess.Popen(['python', mockhub_bin], stdout=stream,
-                                        stderr=subprocess.STDOUT, env=env)
+                                        stderr=stderr, env=env)
 
         h = httplib.HTTPSConnection(TestConfig.HUB_HOST,
             int(TestConfig.HUB_PORT), timeout=2)
@@ -63,6 +68,8 @@ class MockHub(object):
             try:
                 h.request('GET', '/control')
                 resp = h.getresponse()
+                print "MockHub HTTP response: " + resp.read()
+                print "MockHub HTTP status code: " + str(resp.status)
 
                 if resp.status == httplib.OK:
                     break
