@@ -34,6 +34,7 @@ import web
 import time
 
 from web.wsgiserver import CherryPyWSGIServer
+from web.httpserver import runsimple
 
 from gtoinfo import encode_dict, decode
 from utils.config import TestConfig
@@ -239,5 +240,6 @@ CherryPyWSGIServer.ssl_certificate = CA_CERT
 CherryPyWSGIServer.ssl_private_key = CA_KEY
 
 if __name__ == '__main__':
-    app.run()
+    runsimple(app.wsgifunc(), server_address=(str(TestConfig.HUB_HOST),
+        int(TestConfig.HUB_PORT)))
 
