@@ -45,8 +45,9 @@ DISABLE_RPM_CHECK = no
 BUILD_VERSION =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
 
+# Some systems don't handle -D for _topdir (AmazonAMI???)
 RPMBUILD_DEFINES = \
-	-D '_topdir $(RPMBUILDDIR)' \
+	--define '_topdir $(RPMBUILDDIR)' \
 	-D '_disable_check $(DISABLE_RPM_CHECK)'
 
 rpm: dist
