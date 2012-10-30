@@ -43,6 +43,7 @@ dist_doc_DATA =                  \
 # These can be overridden on the make command line.
 DISABLE_RPM_CHECK = no
 BUILD_VERSION =
+WITH_BOOST =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
 
 # Some systems don't handle -D for _topdir (AmazonAMI???)
@@ -62,10 +63,16 @@ rpmbuild-internal:
 	mkdir -p $(RPMBUILDDIR)/SPECS
 	mkdir -p $(RPMBUILDDIR)/BUILD
 	mkdir -p $(RPMBUILDDIR)/SOURCES
-	IFS=$$'\n'; if [ -n "$(BUILD_VERSION)" ]; then DEF_BLD_VER="-D build_version $(BUILD_VERSION)"; fi; \
+	IFS=$$'\n'; \
+		if [ -n "$(BUILD_VERSION)" ]; then \
+			DEF_BLD_VER="-D build_version $(BUILD_VERSION)"; fi; \
+		if [ -n "$(WITH_BOOST)" ]; then \
+			DEF_WITH_BOOST="-D _with_boost $(WITH_BOOST)"; fi; \
 		set -x; \
-		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} --showrc > $(RPMBUILDDIR)/gt-rpmrc.out; \
-		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} -ta $(distdir).tar.gz
+		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} $${DEF_WITH_BOOST} \
+			--showrc > $(RPMBUILDDIR)/gt-rpmrc.out; \
+		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} $${DEF_WITH_BOOST} \
+			-ta $(distdir).tar.gz
 
 windows-installer: all
 	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \

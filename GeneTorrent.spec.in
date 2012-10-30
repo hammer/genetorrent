@@ -93,8 +93,14 @@ Requires: %{name}-common = @PACKAGE_VERSION@
 %setup -q
 
 %build
+
+%if 0%{!?_with_boost:1}
 # must get and build boost 1.48.0 first
 boost/buildGeneTorrentBoost.sh
+WITH_BOOST="--with-boost=${PWD}/boost"
+%else
+WITH_BOOST="--with-boost=%{_with_boost}"
+%endif
 
 # if centos5, must get and build openssl first
 %if "%{dist}" == ".el5.centos"
@@ -103,7 +109,7 @@ WITH_OPENSSL="--with-openssl=${PWD}/openssl"
 %endif
 
 ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
-    --with-boost=${PWD}/boost ${WITH_OPENSSL}
+    ${WITH_BOOST} ${WITH_OPENSSL}
 
 make %{?_smp_mflags}
 
@@ -120,6 +126,14 @@ make install DESTDIR=%{buildroot}
 rm -f %{buildroot}/%{_libdir}/%{name}/libtorrent-rasterbar.la
 rm -f %{buildroot}/%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
 rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
+
+%if 1%{?_with_boost:0}
+# HACK: Copy the boost libs pointed to by _with_boost into the install directory.
+for LIB in filesystem program_options regex system thread
+do
+    cp -a %{_with_boost}/lib/libboost_${LIB}.so* %{buildroot}/%{_libdir}/%{name}
+done
+%endif
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -201,15 +215,22 @@ exit 0
 /sbin/chkconfig --del GTLoadBalancer
 
 %changelog
+* Tue Oct 30 2012 Theodore A. Roth <troth@cardinalpeak.com> 3.7.1-1
+-Add WITH_BOOST configuration.
+
 * Thu Oct 04 2012 Theodore A. Roth <troth@cardinalpeak.com> 3.7.0-2
 - Add boost_thread library.
 - Add obsoletes tag to common package.
+
 * Fri Aug 24 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
 - Split GeneTorrent into common, upload, download, and server packages
+
 * Fri Aug 10 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.4.0-1
 - Reorganize source layout, improve RPM build process
+
 * Mon Jul 16 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.2.2-1
 - Add site-packages dirs and gtocheck script
+
 * Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1
 - Prevent binaires from being stripped
 
