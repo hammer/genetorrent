@@ -127,7 +127,7 @@ rm -f %{buildroot}/%{_libdir}/%{name}/libtorrent-rasterbar.la
 rm -f %{buildroot}/%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
 rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
 
-%if 1%{?_with_boost:0}
+%if 0%{?_with_boost:1}
 # HACK: Copy the boost libs pointed to by _with_boost into the install directory.
 for LIB in filesystem program_options regex system thread
 do
