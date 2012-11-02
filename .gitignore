@@ -22,6 +22,7 @@ libtool
 
 # /
 /GeneTorrent.spec
+/GeneTorrent.nsi
 /GeneTorrent-*.tar.gz
 /obj*
 
@@ -89,3 +90,10 @@ libtool
 /src/gtupload.1
 /src/stamp-h1
 /src/gt_scm_rev.h
+/src/GeneTorrent.1
+
+# /xqilla/
+/xqilla/XQilla-*
+/xqilla/bin/
+/xqilla/include/
+/xqilla/lib/

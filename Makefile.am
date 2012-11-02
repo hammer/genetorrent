@@ -27,7 +27,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = boost openssl libtorrent src scripts init.d tests dpkg
+SUBDIRS = boost openssl libtorrent src scripts init.d tests dpkg xqilla
 
 EXTRA_DIST =                     \
    LICENSE                       \
@@ -51,6 +51,7 @@ RPMBUILD_DEFINES = \
 	--define '_topdir $(RPMBUILDDIR)' \
 	-D '_disable_check $(DISABLE_RPM_CHECK)'
 
+.PHONY: rpm rpmcheck rpmbuild-internal
 rpm: dist
 	$(MAKE) rpmbuild-internal
 

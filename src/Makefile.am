@@ -69,7 +69,8 @@ libgenetorrent_la_SOURCES = gtBase.cpp \
                             gtZeroStorage.cpp
 
 libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
-                             $(OPENSSL_INCLUDES)
+                             $(OPENSSL_INCLUDES) \
+                             $(XQILLA_INCLUDES)
 
 libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                              -I$(top_srcdir)/libtorrent/include
@@ -81,9 +82,12 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -R $(libdir)/GeneTorrent \
                             -L../libtorrent/src/.libs \
                             $(BOOST_LDFLAGS) \
-                            $(OPEENSSL_LDFLAGS)
+                            $(OPENSSL_LDFLAGS) \
+                            $(XQILLA_LDFLAGS)
 
-libgenetorrent_la_LIBADD = $(boost_LIBS)
+libgenetorrent_la_LIBADD = $(boost_LIBS)           \
+                           $(PTHREAD_LIBS)         \
+                           $(XQILLA_LIBS)
 
 bin_SCRIPTS = GeneTorrent
 
@@ -106,15 +110,19 @@ dist_GTdata_DATA = dhparam.pem
 common_ldflags     = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath=$(libdir)/GeneTorrent \
                       $(BOOST_LDFLAGS) \
-                      $(OPEENSSL_LDFLAGS)
+                      $(OPENSSL_LDFLAGS) \
+                      $(XQILLA_LDFLAGS)
 
 common_ldadd      =  $(boost_LIBS)     \
+                     $(PTHREAD_LIBS)   \
                      -lssl             \
                      -lcrypto          \
-                     libgenetorrent.la
+                     libgenetorrent.la \
+                     $(XQILLA_LIBS)
 
-gtupload_CPPFLAGS = $(BOOST_CPPFLAGS) \
-                    $(OPENSSL_INCLUDES)
+gtupload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+                    $(OPENSSL_INCLUDES) \
+                    $(XQILLA_INCLUDES)
 
 gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
@@ -124,8 +132,9 @@ gtupload_LDFLAGS = $(common_ldflags)
 
 gtupload_LDADD = $(common_ldadd)
 
-gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS) \
-                      $(OPENSSL_INCLUDES)
+gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+                      $(OPENSSL_INCLUDES) \
+                      $(XQILLA_INCLUDES)
 
 gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                       -I$(top_srcdir)/libtorrent/include \
@@ -135,8 +144,9 @@ gtdownload_LDFLAGS = $(common_ldflags)
 
 gtdownload_LDADD = $(common_ldadd)
 
-gtserver_CPPFLAGS = $(BOOST_CPPFLAGS) \
-                    $(OPENSSL_INCLUDES)
+gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+                    $(OPENSSL_INCLUDES) \
+                    $(XQILLA_INCLUDES)
 
 gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                    -I$(top_srcdir)/libtorrent/include \

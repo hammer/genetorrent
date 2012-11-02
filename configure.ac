@@ -169,6 +169,7 @@ AC_CONFIG_FILES(
    [openssl/Makefile]
    [tests/Makefile]
    [dpkg/Makefile]
+   [xqilla/Makefile]
 )
 
 AC_CONFIG_SUBDIRS(
