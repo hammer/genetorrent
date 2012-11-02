@@ -95,9 +95,15 @@ Requires: %{name}-common = @PACKAGE_VERSION@
 %build
 
 %if 0%{!?_with_boost:1}
-# must get and build boost 1.48.0 first
-boost/buildGeneTorrentBoost.sh
-WITH_BOOST="--with-boost=${PWD}/boost"
+if [ -d /usr/local/boost-1.48.0 ]
+then
+    # Configure will check the /usr/local/boost-1.48.0 dir automatically.
+    WITH_BOOST=
+else
+    # must get and build boost 1.48.0 first
+    boost/buildGeneTorrentBoost.sh
+    WITH_BOOST="--with-boost=${PWD}/boost"
+fi
 %else
 WITH_BOOST="--with-boost=%{_with_boost}"
 %endif
@@ -127,13 +133,25 @@ rm -f %{buildroot}/%{_libdir}/%{name}/libtorrent-rasterbar.la
 rm -f %{buildroot}/%{_libdir}/%{name}/pkgconfig/libtorrent-rasterbar.pc
 rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
 
-%if 0%{?_with_boost:1}
-# HACK: Copy the boost libs pointed to by _with_boost into the install directory.
-for LIB in filesystem program_options regex system thread
-do
-    cp -a %{_with_boost}/lib/libboost_${LIB}.so* %{buildroot}/%{_libdir}/%{name}
-done
+%if 0%{!?_with_boost:1}
+    BOOST_BASE=
+    if [ -d /usr/local/boost-1.48.0 ]
+    then
+       BOOST_BASE="/usr/local/boost-1.48.0"
+    fi
+%else
+    BOOST_BASE="%{_with_boost}"
 %endif
+
+if [ -n "${BOOST_BASE}" ]
+then
+    # HACK: Copy the boost libs pointed to by _with_boost (or preinstalled)
+    # into the install directory.
+    for LIB in filesystem program_options regex system thread
+    do
+        cp -a ${BOOST_BASE}/lib/libboost_${LIB}.so* %{buildroot}/%{_libdir}/%{name}
+    done
+fi
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
