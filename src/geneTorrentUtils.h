@@ -15,8 +15,6 @@
 
 #include <pthread.h>
 
-#include "config.h"
-
 #include <string>
 
 #include <boost/filesystem/path.hpp>

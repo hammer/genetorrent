@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
    source code or examples.
 */
 
-#include "config.h"
+#include "gt_config.h"
 
 #include <stdio.h>
 #include <sstream>

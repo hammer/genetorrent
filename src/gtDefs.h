@@ -39,8 +39,6 @@
 #ifndef GTDEFS_H_
 #define GTDEFS_H_
 
-#include <config.h>
-
 // some constants
 const std::string SHORT_DESCRIPTION = "GeneTorrent: Genomic Data Transfer Tool";
 const std::string GTO_FILE_BUILDING_EXTENSION = ".gto-build";

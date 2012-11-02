@@ -33,7 +33,7 @@ AC_INIT([GeneTorrent], [3.7.1], [], [GeneTorrent])
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE([1.11 foreign])
 AC_CONFIG_SRCDIR([src/gtBase.cpp])
-AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_HEADERS([src/gt_config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_SYS_LARGEFILE()
 AC_CANONICAL_HOST

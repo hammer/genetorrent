@@ -33,7 +33,7 @@
 // Name        : gtMain.cpp
 //============================================================================
 
-#include <config.h>
+#include "gt_config.h"
 
 #include <iostream>
 #include <fstream>

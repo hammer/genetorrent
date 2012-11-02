@@ -79,9 +79,9 @@ libtool
 /scripts/python_wrapper
 
 # /src/
-/src/config.h
-/src/config.h.in
-/src/config.h.in~
+/src/gt_config.h
+/src/gt_config.h.in
+/src/gt_config.h.in~
 /src/gtdownload
 /src/gtdownload.1
 /src/gtserver

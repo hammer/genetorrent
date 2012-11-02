@@ -41,8 +41,6 @@
 
 #include <pthread.h>
 
-#include <config.h>
-
 #include <string>
 #include <map>
 

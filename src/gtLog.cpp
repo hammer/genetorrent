@@ -36,7 +36,7 @@
  *      Author: donavan
  */
 
-#include "config.h"
+#include "gt_config.h"
 
 #include <errno.h> 
 #include <string.h>

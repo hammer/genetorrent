@@ -36,7 +36,7 @@
  *      Author: dnelson
  */
 
-#include <config.h>
+#include "gt_config.h"
 
 #include <iostream>
 #include <string.h>

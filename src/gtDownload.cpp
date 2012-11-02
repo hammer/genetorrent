@@ -38,7 +38,7 @@
 
 #define _DARWIN_C_SOURCE 1
 
-#include <config.h>
+#include "gt_config.h"
 
 #include <sys/statvfs.h>
 #include <sys/types.h>
