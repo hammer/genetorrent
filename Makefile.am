@@ -49,7 +49,7 @@ RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
 # Some systems don't handle -D for _topdir (AmazonAMI???)
 RPMBUILD_DEFINES = \
 	--define '_topdir $(RPMBUILDDIR)' \
-	-D '_disable_check $(DISABLE_RPM_CHECK)'
+	--define '_disable_check $(DISABLE_RPM_CHECK)'
 
 rpm: dist
 	$(MAKE) rpmbuild-internal
@@ -65,9 +65,9 @@ rpmbuild-internal:
 	mkdir -p $(RPMBUILDDIR)/SOURCES
 	IFS=$$'\n'; \
 		if [ -n "$(BUILD_VERSION)" ]; then \
-			DEF_BLD_VER="-D build_version $(BUILD_VERSION)"; fi; \
+			DEF_BLD_VER=--define='build_version $(BUILD_VERSION)'; fi; \
 		if [ -n "$(WITH_BOOST)" ]; then \
-			DEF_WITH_BOOST="-D _with_boost $(WITH_BOOST)"; fi; \
+			DEF_WITH_BOOST=--define='_with_boost $(WITH_BOOST)'; fi; \
 		set -x; \
 		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} $${DEF_WITH_BOOST} \
 			--showrc > $(RPMBUILDDIR)/gt-rpmrc.out; \
