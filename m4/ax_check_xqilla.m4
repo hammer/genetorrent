@@ -16,7 +16,7 @@
 #   This macro sets XQILLA_INCLUDES such that source files should use the
 #   xqilla/ directory in include directives:
 #
-#     #include <xqilla/xqilla-dom3.hpp>
+#     #include <xqilla/xqilla-simple.hpp>
 #
 # LICENSE
 #
@@ -70,8 +70,8 @@ AC_DEFUN([AX_CHECK_XQILLA], [
     if ! $found; then
         XQILLA_INCLUDES=
         for xqilladir in $xqilladirs; do
-            AC_MSG_CHECKING([for xqilla/xqilla-dom3.hpp in $xqilladir])
-            if test -f "$xqilladir/include/xqilla/xqilla-dom3.hpp"; then
+            AC_MSG_CHECKING([for xqilla/xqilla-simple.hpp in $xqilladir])
+            if test -f "$xqilladir/include/xqilla/xqilla-simple.hpp"; then
                 XQILLA_INCLUDES="-I$xqilladir/include"
                 XQILLA_LDFLAGS="-L$xqilladir/lib"
                 XQILLA_LIBS="-lxqilla"
@@ -101,7 +101,7 @@ AC_DEFUN([AX_CHECK_XQILLA], [
     LIBS="$XQILLA_LIBS $LIBS"
     CPPFLAGS="$XQILLA_INCLUDES $CPPFLAGS"
     AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM([#include <xqilla/xqilla-dom3.hpp>], [ ; ])],
+        [AC_LANG_PROGRAM([#include <cstddef>; #include <xqilla/xqilla-simple.hpp>], [ ; ])],
         [
             AC_MSG_RESULT([yes])
             $1
