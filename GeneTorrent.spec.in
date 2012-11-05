@@ -51,6 +51,17 @@ BuildRequires:  libcurl-devel
 
 %define gt_python_sitelib  %(%{__python} -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())")
 
+%{?filter_setup:
+%filter_provides_in %{_libdir}/%{name}
+%filter_requires_in %{_libdir}/%{name}
+%filter_from_requires /libboost/d
+%filter_from_requires /libssl/d
+%filter_from_requires /libcrypto/d
+%filter_from_requires /libxqilla/d
+%filter_from_requires /libtorrent-rasterbar/d
+%filter_setup
+}
+
 %description
 %{name}
 
@@ -58,22 +69,15 @@ BuildRequires:  libcurl-devel
 Summary:  Libraries and common files for %{name}
 Group:    Applications/Internet
 License:  BSD
-Requires: xqilla xerces-c
-%if "%{dist}" == ".fc15"
-Requires: libcurl
-Provides: libboost_system.so.1.48.0()(64bit)
-Provides: libboost_filesystem.so.1.48.0()(64bit)
-Provides: libboost_regex.so.1.48.0()(64bit)
-Provides: libboost_program_options.so.1.48.0()(64bit)
-Provides: libboost_thread.so.1.48.0()(64bit)
+Requires: xerces-c openssl
+%if "%{dist}" == ".el5.centos"
+Requires: curl
 %endif
-Provides: libboost_system.so
-Provides: libboost_filesystem.so
-Provides: libboost_regex.so
-Provides: libboost_program_options.so
-Provides: libboost_thread.so
-Provides: libtorrent-rasterbar.so
-Provides: libgenetorrent.so
+%if 0%{?suse_version}
+Requires: libcurl4
+%else
+Requires: libcurl
+%endif
 Obsoletes: GeneTorrent
 
 %description common
