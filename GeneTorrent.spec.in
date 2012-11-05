@@ -122,8 +122,8 @@ then
     WITH_BOOST=
 else
     # must get and build boost 1.48.0 first
-    boost/buildGeneTorrentBoost.sh
-    WITH_BOOST="--with-boost=${PWD}/boost"
+    deps/boost/buildGeneTorrentBoost.sh
+    WITH_BOOST="--with-boost=${PWD}/deps/boost"
 fi
 %else
 WITH_BOOST="--with-boost=%{_with_boost}"
@@ -131,14 +131,14 @@ WITH_BOOST="--with-boost=%{_with_boost}"
 
 # if suse, build libxqilla first
 %if 0%{?suse_version}
-xqilla/buildGeneTorrentXQilla.sh
-WITH_XQILLA="--with-xqilla=${PWD}/xqilla"
+deps/xqilla/buildGeneTorrentXQilla.sh
+WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
 %endif
 
 # if centos5, must get and build openssl first
 %if "%{dist}" == ".el5.centos"
-openssl/buildGeneTorrentOpenSSL.sh
-WITH_OPENSSL="--with-openssl=${PWD}/openssl"
+deps/openssl/buildGeneTorrentOpenSSL.sh
+WITH_OPENSSL="--with-openssl=${PWD}/deps/openssl"
 %endif
 
 
@@ -155,7 +155,7 @@ make %{?_smp_mflags}
 
 %check
 %if %{_enable_check}
-LD_LIBRARY_PATH="${PWD}/boost/lib:${PWD}/openssl/lib:${PWD}/xqilla/lib" \
+LD_LIBRARY_PATH="${PWD}/deps/boost/lib:${PWD}/deps/openssl/lib:${PWD}/deps/xqilla/lib" \
     make check
 %endif
 

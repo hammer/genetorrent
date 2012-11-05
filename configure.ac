@@ -165,11 +165,11 @@ AC_CONFIG_FILES(
    [scripts/gtoinfo.py]
    [scripts/gtocheck]
    [init.d/Makefile]
-   [boost/Makefile]
-   [openssl/Makefile]
+   [deps/boost/Makefile]
+   [deps/openssl/Makefile]
    [tests/Makefile]
    [dpkg/Makefile]
-   [xqilla/Makefile]
+   [deps/xqilla/Makefile]
 )
 
 AC_CONFIG_SUBDIRS(

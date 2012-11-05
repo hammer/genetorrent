@@ -27,7 +27,15 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = boost openssl libtorrent src scripts init.d tests dpkg xqilla
+SUBDIRS = deps/boost     \
+          deps/openssl   \
+          deps/xqilla    \
+          libtorrent     \
+          src            \
+          scripts        \
+          init.d         \
+          tests          \
+          dpkg
 
 EXTRA_DIST =                     \
    LICENSE                       \

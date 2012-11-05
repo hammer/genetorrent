@@ -34,10 +34,10 @@ libtool
 /autotools/depcomp
 /autotools/missing
 
-# /boost/
-/boost/include
-/boost/lib
-/boost/boost_*
+# /deps/boost/
+/deps/boost/include
+/deps/boost/lib
+/deps/boost/boost_*
 
 # /libtorrent/
 /libtorrent/libtorrent-rasterbar.pc
@@ -60,16 +60,16 @@ libtool
 /m4/ltsugar.m4
 /m4/libtool.m4
 
-# /openssl/
-/openssl/include
-/openssl/lib
-/openssl/bin
-/openssl/openssl.cnf
-/openssl/private
-/openssl/misc
-/openssl/man
-/openssl/certs
-/openssl/openssl-*
+# /deps/openssl/
+/deps/openssl/include
+/deps/openssl/lib
+/deps/openssl/bin
+/deps/openssl/openssl.cnf
+/deps/openssl/private
+/deps/openssl/misc
+/deps/openssl/man
+/deps/openssl/certs
+/deps/openssl/openssl-*
 
 # /scripts/
 /scripts/gtocheck
@@ -92,8 +92,8 @@ libtool
 /src/gt_scm_rev.h
 /src/GeneTorrent.1
 
-# /xqilla/
-/xqilla/XQilla-*
-/xqilla/bin/
-/xqilla/include/
-/xqilla/lib/
+# /deps/xqilla/
+/deps/xqilla/XQilla-*
+/deps/xqilla/bin/
+/deps/xqilla/include/
+/deps/xqilla/lib/

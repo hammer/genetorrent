@@ -11,18 +11,20 @@ GeneTorrent requires the following libraries:
    - boost 1.48.0+
    - openssl 1.0.1a+
 
-Most modern Linux distributions package the suitable versions of xerces-c,
-xqilla, and curl/libcurl.  Refer to your package manager documentation to
+Most modern Linux distributions package the suitable versions of xerces-c
+curl/libcurl.  Refer to your package manager documentation to
 install these prerequisites and their development packages.
 
-Many distributions also package suitable versions of boost and openssl.
-It is recommended that you use your distribution's packages, if available.
+Many distributions also package suitable versions of boost, openssl. and
+xqilla.  It is recommended that you use your distribution's packages,
+if available.
 
 For your convenience, scripts are provided to build the required versions
-of boost and openssl.  They are:
+of boost, openssl, and xqilla.  They are:
 
-   boost/buildGeneTorrentBoost.sh
-   openssl/buildGeneTorrentOpenSSL.sh
+   deps/boost/buildGeneTorrentBoost.sh
+   deps/openssl/buildGeneTorrentOpenSSL.sh
+   deps/xqilla/buildGeneTorrentXQilla.sh
 
 These scripts will connect to a mirror, download the source, configure,
 and install the software into the respective subdirectory of the GeneTorrent
@@ -34,12 +36,12 @@ libraries, and then configure with "--with-boost=...".  For example,
 from the top of the GeneTorrent source tree:
 
 boost/buildGeneTorrentBoost.sh
-./configure --with-boost=$PWD/boost
+./configure --with-boost=$PWD/deps/boost
 
 This will cause the configure script to recognize the local installation
 of Boost.  The required libraries and headers will be found at compile time,
 and the required libraries will be installed into /usr/lib/GeneTorrent
-at install time.  The OpenSSL case is analogous.
+at install time.  The OpenSSL and xqilla cases are analogous.
 
 Building for a local install
 ----------------------------
