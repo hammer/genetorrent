@@ -101,7 +101,8 @@ AC_DEFUN([AX_CHECK_XQILLA], [
     LIBS="$XQILLA_LIBS $LIBS"
     CPPFLAGS="$XQILLA_INCLUDES $CPPFLAGS"
     AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM([#include <cstddef>; #include <xqilla/xqilla-simple.hpp>], [ ; ])],
+        [AC_LANG_PROGRAM([#include <cstddef>
+            #include <xqilla/xqilla-simple.hpp>;], [ XQilla xqilla; ])],
         [
             AC_MSG_RESULT([yes])
             $1
