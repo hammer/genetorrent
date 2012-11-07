@@ -46,7 +46,6 @@ class TestGtoScripts(GTTestCase):
 
     def run_gtoinfo(self, args='', returncode=0):
         self.gtoinfo_bin = os.path.join(
-            str(os.getenv('srcdir')),
             os.path.pardir,
             'scripts',
             'gtoinfo.py',
@@ -54,7 +53,7 @@ class TestGtoScripts(GTTestCase):
 
         if os.name == "nt":
             self.gtoinfo_bin = os.path.join(
-                '..',
+                os.path.pardir,
                 'gtoinfo.py',
             )
 
@@ -84,7 +83,7 @@ class TestGtoScripts(GTTestCase):
 
         if os.name == "nt":
             self.gtocheck_bin = os.path.join(
-                '..',
+                os.path.pardir,
                 'gtocheck',
             )
 
