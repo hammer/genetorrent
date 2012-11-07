@@ -75,7 +75,8 @@ Requires: curl
 %endif
 %if 0%{?suse_version}
 Requires: libcurl4
-%else
+%endif
+%if "%{dist}" == ".el6"
 Requires: libcurl
 %endif
 Obsoletes: GeneTorrent
