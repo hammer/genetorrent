@@ -68,14 +68,16 @@ License:  BSD
 Requires: xerces-c openssl
 %if "%{dist}" == ".el5.centos"
 Requires: curl
-%global _has_curl_requires 1
+Requires: xqilla
+%global _has_custom_requires 1
 %endif
 %if 0%{?suse_version}
 Requires: libcurl4
-%global _has_curl_requires 1
+%global _has_custom_requires 1
 %endif
-%if 0%{!?_has_curl_requires:1}
+%if 0%{!?_has_custom_requires:1}
 Requires: libcurl
+Requires: xqilla
 %endif
 Obsoletes: GeneTorrent
 
