@@ -86,7 +86,14 @@ static char const* download_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm, DOWNLOAD_MODE), _downloadSavePath (""), _cliArgsDownloadList (), _maxChildren (8), _torrentListToDownload (), _uriListToDownload ()
+gtDownload::gtDownload (boost::program_options::variables_map &vm,
+                        bool show_startup_message):
+   gtBase (vm, DOWNLOAD_MODE),
+   _downloadSavePath (""),
+   _cliArgsDownloadList (),
+   _maxChildren (8),
+   _torrentListToDownload (),
+   _uriListToDownload ()
 {
    pcfacliMaxChildren (vm);
    _downloadSavePath = pcfacliPath(vm);
@@ -95,14 +102,12 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm) : gtBase (vm,
    pcfacliInactiveTimeout (vm);
    pcfacliSecurityAPI (vm);
 
-   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+   if (show_startup_message)
+   {
+      startUpMessage ("gtdownload");
+   }
 
    _startUpComplete = true;
-
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", download mode."); 
-   }
 }
 
 void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)

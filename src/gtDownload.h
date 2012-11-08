@@ -43,7 +43,8 @@
 class gtDownload : public gtBase
 {
    public:
-      gtDownload (boost::program_options::variables_map &vm);
+      gtDownload (boost::program_options::variables_map &vm,
+                  bool show_startup_message=true);
       void run ();
 
    protected:

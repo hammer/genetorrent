@@ -112,6 +112,8 @@ class gtBase
       gtBase (boost::program_options::variables_map &vm, opMode mode);
       virtual ~gtBase ();
 
+      static std::string version_str;
+
       virtual void run () = 0;
       uint32_t getLogMask() {return _logMask;}
       gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
@@ -144,7 +146,7 @@ class gtBase
 
       bool _startUpComplete;
 
-      std::ostringstream startUpMessage;  // used to build up a startup message, version, options, tmpdir, etc.
+      void startUpMessage (std::string app_name);
 
       void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");

@@ -100,14 +100,9 @@ gtServer::gtServer (boost::program_options::variables_map &vm) :
 
    checkCredentials ();
 
-   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+   startUpMessage ("gtserver");
 
    _startUpComplete = true;
-
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", server mode."); 
-   }
 }
 
 void gtServer::pcfacliServer (boost::program_options::variables_map &vm)

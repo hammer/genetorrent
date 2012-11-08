@@ -142,15 +142,11 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    {
       _tmpDir = sanitizePath (envValue) + "/";
       _devMode = true;
-      startUpMessage << "[devModeOverride] ";
    }
    else
    {
       setTempDir();
    }
-
-   // Begin building the startup message, completed and logged in inherited classes
-   startUpMessage << "Starting version " << VERSION;
 
    _verbosityLevel = global_verbosity;
 
@@ -193,6 +189,27 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), 0);
 
    log_options_used (commandLine);
+}
+
+std::string gtBase::version_str = VERSION;
+
+void gtBase::startUpMessage (std::string app_name)
+{
+   std::ostringstream msg;
+
+   if (_devMode)
+   {
+      msg << "[devModeOverride] ";
+   }
+
+   msg << "Starting " << app_name << "-" << gtBase::version_str;
+
+   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", msg.str().c_str(), _tmpDir.c_str());
+
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".");
+   }
 }
 
 void gtBase::log_options_used (boost::program_options::variables_map &vm)

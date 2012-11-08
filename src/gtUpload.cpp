@@ -100,14 +100,9 @@ gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPL
 
    checkCredentials ();
 
-   Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", startUpMessage.str().c_str(), _tmpDir.c_str());
+   startUpMessage ("gtupload");
 
    _startUpComplete = true;
-
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Welcome to GeneTorrent version " << VERSION << ", upload mode."); 
-   }
 }
 
 void gtUpload::pcfacliUploadGTODir (boost::program_options::variables_map &vm)
