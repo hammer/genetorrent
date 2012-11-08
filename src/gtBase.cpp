@@ -836,6 +836,7 @@ std::string gtBase::sanitizePath (std::string inPath)
 // 
 gtBase::~gtBase ()
 {
+   cleanupTmpDir ();
    delete _gtFingerPrint;
    gtLogger::delete_globallog();
 }
@@ -907,10 +908,6 @@ void gtBase::gtError (std::string errorMessage, int exitValue, gtErrorType error
    {
       Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
 
-      if (_startUpComplete)
-      {
-         cleanupTmpDir();
-      }
       exit (exitValue);
    }
 }
@@ -1012,6 +1009,9 @@ int gtBase::curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, st
 // 
 void gtBase::cleanupTmpDir()
 {
+   if (! _startUpComplete)
+      return;
+
    if (!_devMode)
    {
       try
