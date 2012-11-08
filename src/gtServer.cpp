@@ -264,7 +264,7 @@ void gtServer::run ()
 
    while (1)
    {
-      if (statFile (SERVER_STOP_FILE)) //statFile returns -1 on error
+      if (!statFile (SERVER_STOP_FILE)) //statFile returns -1 on error
       {
          Log (PRIORITY_HIGH, "Exiting server due to existence of stop file %s",
             SERVER_STOP_FILE.c_str());
