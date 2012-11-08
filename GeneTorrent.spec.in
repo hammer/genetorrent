@@ -1,9 +1,5 @@
 %if "%{dist}" == ".el5.centos"
-   %global gt_dist .Centos5
-%endif
-
-%if "%{dist}" == ".el6"
-   %global gt_dist .Centos6
+   %global gt_dist .el5
 %endif
 
 %if 0%{!?gt_dist:1}
@@ -23,7 +19,7 @@ Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
 License:        BSD
-URL:            http://annaisystems.com/
+URL:            http://cghub.ucsc.edu
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -72,11 +68,13 @@ License:  BSD
 Requires: xerces-c openssl
 %if "%{dist}" == ".el5.centos"
 Requires: curl
+%global _has_curl_requires 1
 %endif
 %if 0%{?suse_version}
 Requires: libcurl4
+%global _has_curl_requires 1
 %endif
-%if "%{dist}" == ".el6"
+%if 0%{!?_has_curl_requires:1}
 Requires: libcurl
 %endif
 Obsoletes: GeneTorrent
