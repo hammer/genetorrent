@@ -1,3 +1,5 @@
+/* -*- mode: C++; c-basic-offset: 3; tab-width: 3; -*- */
+
 // accumulator.hpp header file
 //
 //  (C) Copyright benjaminwolsey.de 2010-2011. Distributed under the Boost

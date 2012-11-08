@@ -1,4 +1,5 @@
-/*
+/* -*- mode: C++; c-basic-offset: 2; tab-width: 2; -*-
+ *
  * Copyright (c) 2012, Annai Systems, Inc.
  * All rights reserved.
  *

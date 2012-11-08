@@ -1,3 +1,4 @@
+/* -*- mode: C++; c-basic-offset: 3; tab-width: 3; -*- */
 /*
 
 Copyright (c) 2003, Arvid Norberg

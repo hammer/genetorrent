@@ -1,3 +1,5 @@
+/* -*- mode: C++; c-basic-offset: 3; tab-width: 3; -*- */
+
 /*
    Contents of this header file define utility functions extracted from 
    libtorrent-raster source code or examples.

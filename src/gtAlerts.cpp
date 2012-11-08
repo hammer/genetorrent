@@ -1,5 +1,4 @@
-/*                                           -*- mode: c++; tab-width: 2; -*-
- * $Id$
+/* -*- mode: C++; c-basic-offset: 3; tab-width: 3; -*-
  *
  * Copyright (c) 2012, Annai Systems, Inc.
  * All rights reserved.
