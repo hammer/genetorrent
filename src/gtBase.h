@@ -61,7 +61,6 @@
 
 extern bool global_gtAgentMode;
 extern int global_verbosity;
-extern std::string global_startup_message;
 
 typedef struct attributeEntry_
 {
@@ -242,5 +241,8 @@ class gtBase
       void pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm);
       void pcfacliStorageFlags (boost::program_options::variables_map &vm);
       void pcfacliPeerTimeout (boost::program_options::variables_map &vm);
+
+      void log_options_used (boost::program_options::variables_map &vm);
+
 };
 #endif /* GT_BASE_H_ */

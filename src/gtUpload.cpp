@@ -122,8 +122,6 @@ void gtUpload::pcfacliUploadGTODir (boost::program_options::variables_map &vm)
       return;    
    }
 
-   startUpMessage << " --" << UPLOAD_GTO_PATH_CLI_OPT << "=" << _uploadGTODir;
-
    if (statDirectory (_uploadGTODir) != 0)
    {
       commandLineError ("Unable to access directory '" + _uploadGTODir + "'");
@@ -162,8 +160,6 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
          }
       }
    }
-
-   startUpMessage << " --" << UPLOAD_FILE_CLI_OPT << "=" << _manifestFile;
    relativizePath (_manifestFile);
 
    if (statFile (_manifestFile) != 0)
@@ -177,8 +173,6 @@ void gtUpload::pcfacliUploadGTOOnly (boost::program_options::variables_map &vm)
    if (vm.count (UPLOAD_GTO_ONLY_CLI_OPT))
    {
       _uploadGTOOnly = true;
-
-      startUpMessage << " --" << UPLOAD_GTO_ONLY_CLI_OPT << "=" << _uploadGTODir;
    }
 }
 

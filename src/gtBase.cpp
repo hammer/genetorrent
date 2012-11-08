@@ -89,7 +89,6 @@ static pthread_mutex_t callBackLoggerLock;
 
 int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
 bool global_gtAgentMode = false;
-std::string global_startup_message = "";
 
 void commandLineError (std::string errMessage)
 {
@@ -150,7 +149,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
       setTempDir();
    }
 
-   startUpMessage << "Starting version " << VERSION << " with options: " << global_startup_message;  // Begin building the startup message, completed and logged in inherited classes
+   // Begin building the startup message, completed and logged in inherited classes
+   startUpMessage << "Starting version " << VERSION;
 
    _verbosityLevel = global_verbosity;
 
@@ -191,8 +191,50 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine, opMode mode)
    strTokenize strToken (VERSION, ".", strTokenize::INDIVIDUAL_CONSECUTIVE_SEPARATORS);
 
    _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), 0);
+
+   log_options_used (commandLine);
 }
 
+void gtBase::log_options_used (boost::program_options::variables_map &vm)
+{
+   Log (PRIORITY_NORMAL, "Options:");
+
+   for (boost::program_options::variables_map::iterator it = vm.begin(); it != vm.end(); it++)
+   {
+      std::string value;
+      const char *prefix = (it->first.c_str()[0] == '-') ? "" : "--";
+
+      if (it->second.empty())
+      {
+         value = "UNSET";
+      }
+      else
+      {
+         const std::type_info &type = it->second.value().type();
+
+         // TODO: need to handle vectors of values for a given option.
+         if (type == typeid(std::string))
+            value = it->second.as<std::string>();
+         else if (type == typeid(int))
+            value = boost::lexical_cast<std::string>(it->second.as<int>());
+         else if (type == typeid(std::vector<std::string>))
+         {
+            std::vector<std::string> vect = it->second.as<std::vector<std::string> >();
+            std::vector<std::string>::iterator arg_it = vect.begin ();
+            std::vector<std::string>::iterator end = vect.end ();
+
+            while (arg_it != end)
+            {
+               Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), arg_it->c_str());
+               ++arg_it;
+            }
+            continue;
+         }
+      }
+
+      Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), value.c_str());
+   }
+}
 
 void gtBase::initSSLattributes ()
 {
@@ -254,8 +296,6 @@ void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
    {
       return;    
    }
-
-   startUpMessage << " --" << BIND_IP_CLI_OPT << "=" << _bindIP;
 }
 
 void gtBase::pcfacliGTAgentMode (boost::program_options::variables_map &vm)
@@ -268,8 +308,6 @@ void gtBase::pcfacliGTAgentMode (boost::program_options::variables_map &vm)
    {
       return;    
    }
-
-   startUpMessage << " --" << GTA_CLIENT_CLI_OPT;
 }
 
 void gtBase::pcfacliTimestamps (boost::program_options::variables_map &vm)
@@ -282,8 +320,6 @@ void gtBase::pcfacliTimestamps (boost::program_options::variables_map &vm)
    {
       return;    
    }
-
-   startUpMessage << " --" << TIMESTAMP_STD_CLI_OPT;
 }
 
 void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
@@ -314,8 +350,6 @@ void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
    {
       commandLineError ("unable to opening configuration directory '" + _confDir + "'");
    }
-
-   startUpMessage << " --" << CONF_DIR_CLI_OPT << "=" << _confDir;
 }
 
 void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
@@ -346,7 +380,6 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
        credsPathAndFile.find("ftps://")  == 0)
    {
       _authToken = authTokenFromURI (credsPathAndFile);
-      startUpMessage << " --" << CRED_FILE_CLI_OPT << "=" << credsPathAndFile.c_str();
       return;
    }
 
@@ -369,8 +402,6 @@ void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
    }
 
    credFile.close ();
-
-   startUpMessage << " --" << CRED_FILE_CLI_OPT << "=" << credsPathAndFile.c_str();
 }
 
 void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
@@ -392,8 +423,6 @@ void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
    {
       return;    
    }
-
-   startUpMessage << " --" << ADVERT_IP_CLI_OPT << "=" << _exposedIP;
 }
 
 void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
@@ -452,7 +481,6 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
       {
          commandLineError ("when using -i (--internal-port) " + strToken.getToken (1) + " must be smaller than " + strToken.getToken (2));
       }
-      startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart << ":" << _portEnd;
    }
    else
    {
@@ -464,7 +492,6 @@ void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
       }
 
       _portEnd = _portStart + 8; // default 8 ports
-      startUpMessage << " --" << INTERNAL_PORT_CLI_OPT << "=" << _portStart;
    }
 }
 
@@ -496,8 +523,6 @@ void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
    }
 
    _exposedPortDelta = exposedPort - _portStart;
-
-   startUpMessage << " --" << ADVERT_PORT_CLI_OPT << "=" << exposedPort;
 }
 
 void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
@@ -550,8 +575,6 @@ void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
          commandLineError ("Unexpected logging level encountered.");
       }
    }
-
-   startUpMessage << " --" << LOGGING_CLI_OPT << "=" << vm[LOGGING_CLI_OPT].as<std::string>();
 }
 
 // Used by download and upload
@@ -570,9 +593,6 @@ void  gtBase::pcfacliRateLimit (boost::program_options::variables_map &vm)
    {
       commandLineError ("Configured rate limit is too low.  Please specify a value larger than 0.01 for '" + RATE_LIMIT_CLI_OPT + "'");
    }
-
-   startUpMessage << " --" << RATE_LIMIT_CLI_OPT << "="
-      << inRate;
 }
 
 // Used by download and upload
@@ -590,7 +610,6 @@ std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
    }
 
-   startUpMessage << " --" << PATH_CLI_OPT << "=" << path;
    relativizePath (path);
 
    if (statDirectory (path) != 0)
@@ -612,8 +631,6 @@ void  gtBase::pcfacliInactiveTimeout (boost::program_options::variables_map &vm)
    int inactiveTimeout = vm[INACTIVE_TIMEOUT_CLI_OPT].as<int>();      // As minutes
 
    _inactiveTimeout = inactiveTimeout;      // in minutes
-
-   startUpMessage << " --" << INACTIVE_TIMEOUT_CLI_OPT << "=" << _inactiveTimeout;
 }
 
 void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
@@ -624,8 +641,6 @@ void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
    }
 
    _curlVerifySSL = false;
-
-   startUpMessage << " --" << CURL_NO_VERIFY_SSL_CLI_OPT;
 }
 
 
@@ -638,13 +653,11 @@ void gtBase::pcfacliStorageFlags (boost::program_options::variables_map &vm)
    if (vm.count (NULL_STORAGE_OPT))
    {
       _use_null_storage = true;
-      startUpMessage << " --" << NULL_STORAGE_OPT;
    }
 
    if (vm.count (ZERO_STORAGE_OPT))
    {
       _use_zero_storage = true;
-      startUpMessage << " --" << ZERO_STORAGE_OPT;
    }
 
    if (_use_null_storage && _use_zero_storage)
@@ -658,7 +671,6 @@ void gtBase::pcfacliPeerTimeout (boost::program_options::variables_map &vm)
    if (vm.count (PEER_TIMEOUT_OPT))
    {
       _peerTimeout = vm[PEER_TIMEOUT_OPT].as<int> ();
-      startUpMessage << " --" << PEER_TIMEOUT_OPT << "=" << _peerTimeout;
    }
 }
 

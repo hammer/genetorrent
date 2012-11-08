@@ -136,7 +136,6 @@ void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + SERVER_CLI_OPT + "'");
    }
 
-   startUpMessage << " --" << SERVER_CLI_OPT << "=" << _serverDataPath;
    relativizePath (_serverDataPath);
 
    if (statDirectory (_serverDataPath) != 0)
@@ -159,7 +158,6 @@ void gtServer::pcfacliQueue (boost::program_options::variables_map &vm)
       commandLineError ("command line or config file contains no value for '" + QUEUE_CLI_OPT + "'");
    }
 
-   startUpMessage << " --" << QUEUE_CLI_OPT << "=" << _serverQueuePath;
    relativizePath (_serverQueuePath);
 
    if (statDirectory (_serverQueuePath) != 0)
@@ -186,8 +184,6 @@ void gtServer::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
    {
       commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
    }
-
-   startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _serverModeCsrSigningUrl;
 }
 
 void gtServer::pcfacliServerForceDownload (boost::program_options::variables_map &vm)
@@ -195,7 +191,6 @@ void gtServer::pcfacliServerForceDownload (boost::program_options::variables_map
    if (vm.count (SERVER_FORCE_DOWNLOAD_OPT) > 0)
    {
       _serverForceDownload = true;
-      startUpMessage << " --" << SERVER_FORCE_DOWNLOAD_OPT;
    }
 }
 

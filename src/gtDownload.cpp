@@ -129,8 +129,6 @@ void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
    {
       commandLineError ("--" + MAX_CHILDREN_CLI_OPT + " must be greater than 0");
    }
-
-   startUpMessage << " --" << MAX_CHILDREN_CLI_OPT << "=" << _maxChildren;
 }
 
 void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
@@ -176,13 +174,6 @@ void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
    {
       checkCredentials ();
    }
-
-   vectIter = _cliArgsDownloadList.begin ();
-   while (vectIter != _cliArgsDownloadList.end ())
-   {
-      startUpMessage << " --" << DOWNLOAD_CLI_OPT << "=" << *vectIter;
-      vectIter++;
-   }
 }
 
 void gtDownload::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
@@ -200,8 +191,6 @@ void gtDownload::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
       {
          commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
       }
-
-      startUpMessage << " --" << SECURITY_API_CLI_OPT << "=" << _downloadModeCsrSigningUrl;
    }
 }
 

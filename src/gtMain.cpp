@@ -204,8 +204,6 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
          }
 
          boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
-
-         global_startup_message = " --" + CONFIG_FILE_CLI_OPT + "=" + cli[CONFIG_FILE_CLI_OPT].as<std::string>();
       }
 
       if (cli.count (GTA_CLIENT_CLI_OPT) == 1)
@@ -268,10 +266,8 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
 
       if (global_verbosity > 0)  // -v is present, -v overrides any possible --verbose
       {
-         global_startup_message += " -" + shortVerboseFlag.str(); 
          if (global_verbosity >= 2)  // override out of range value from legacy -vvvv or -vvv
          {
-            global_startup_message += shortVerboseFlag.str();
             global_verbosity = 2;
          }
       }
@@ -286,15 +282,6 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
                std::ostringstream errorMes;
                errorMes << "--" << VERBOSITY_CLI_OPT << "=" << global_verbosity << " is not valid, try 1 or 2";
                commandLineError (errorMes.str());
-            }
-
-            if (global_verbosity == 1)
-            {
-               global_startup_message += " --" + VERBOSITY_CLI_OPT + "=1";
-            }
-            else
-            {
-               global_startup_message += " --" + VERBOSITY_CLI_OPT + "=2";
             }
          }
       }
