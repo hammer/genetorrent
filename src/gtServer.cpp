@@ -273,8 +273,14 @@ void gtServer::run ()
                                                    // that is maintained inside the list of activeSessions.
                                                    // This list is maintained here for simplicity and speed
 
-   while (statFile ("/tmp/GeneTorrent.stop"))    // statFile returns -1 on error
+   while (1)
    {
+      if (statFile (SERVER_STOP_FILE)) //statFile returns -1 on error
+      {
+         Log (PRIORITY_HIGH, "Exiting server due to existence of stop file %s",
+            SERVER_STOP_FILE.c_str());
+         break;
+      }
       // Get the collection of .gto files in the queue directory
       vectOfStr filesInQueue;
       getFilesInQueueDirectory (filesInQueue);
