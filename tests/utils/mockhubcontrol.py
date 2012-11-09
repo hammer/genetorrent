@@ -31,11 +31,14 @@ import os
 import sys
 import errno
 import socket
+import logging
 
 import subprocess
 from time import sleep
 
 from utils.config import TestConfig
+
+log = logging.getLogger(__name__)
 
 class MockHub(object):
     ''' A wrapper class for interaction with MockHub instances. '''
@@ -68,8 +71,8 @@ class MockHub(object):
             try:
                 h.request('GET', '/control')
                 resp = h.getresponse()
-                print "MockHub HTTP response: " + resp.read()
-                print "MockHub HTTP status code: " + str(resp.status)
+                log.debug ("MockHub HTTP response: " + resp.read())
+                log.debug ("MockHub HTTP status code: " + str(resp.status))
 
                 if resp.status == httplib.OK:
                     break
@@ -108,7 +111,7 @@ class MockHub(object):
         else:
             raise Exception("Mockhub never shut down")
 
-        print "Waiting for MockHub to exit..."
+        log.debug ("Waiting for MockHub to exit...")
         self.process.wait()
         self.running = False
 
