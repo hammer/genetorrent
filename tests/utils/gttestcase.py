@@ -196,9 +196,13 @@ class GTTestCase(unittest.TestCase):
 
     def terminate_server(self, server):
         stop_file = open(SERVER_STOP_FILE, 'w')
-        stop_file.close()
-        server.wait()
-        os.unlink(SERVER_STOP_FILE)
+        try:
+            stop_file.close()
+            server_rc = server.wait()
+        finally:
+            os.unlink(SERVER_STOP_FILE)
+
+        self.assertEqual(server_rc, 0, 'Server return code was non-zero')
 
     def data_upload_test(self, size, data_generator=DataGenRandom,
         ssl=True, client_options='', server_options='', check_sha1=True):

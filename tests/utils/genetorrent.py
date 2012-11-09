@@ -53,8 +53,8 @@ gtBinaries = [
 # map to default args indexed by InstanceType
 defaultArgs = [
     '',                       # GT_ALL
-    ' -vv -l stdout:full -C . ',
-    ' -vv -l stdout:full -C . ',
+    ' -vv -l stdout:full -C . -k 3',
+    ' -vv -l stdout:full -C . -k 3',
     ' -l stdout:full -C . --peer-timeout=5',
 ]
 
