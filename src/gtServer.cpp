@@ -108,22 +108,6 @@ void gtServer::pcfacliServer (boost::program_options::variables_map &vm)
 {
    if (vm.count (SERVER_CLI_OPT))
       _serverDataPath = sanitizePath (vm[SERVER_CLI_OPT].as<std::string>());
-   else if (vm.count (POSITIONAL_CLI_OPT))
-   {
-      // take the first non-empty positional argument
-      std::vector<std::string> pos_args =
-         vm[POSITIONAL_CLI_OPT].as<std::vector<std::string> >();
-      std::vector<std::string>::iterator s;
-      for (s =  pos_args.begin(); s != pos_args.end(); s++)
-      {
-         if (s->size() > 0)
-         {
-            _serverDataPath = sanitizePath (*s);
-            break;
-         }
-      }
-   }
-
 
    if (_serverDataPath.size() == 0)
    {
