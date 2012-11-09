@@ -36,25 +36,25 @@ gtdownload \- transfer genomic data reliably across a network
 .RB ] 
 .SH DESCRIPTION
 .B GeneTorrent
-is a file transfer client application designed for the optimal
+is a suite of file transfer applications designed for the optimal
 transfer of genomic data across a computer network.  File transfers
 using GeneTorrent are designed to be authenticated, secure, reliable,
 and efficient.
 .PP
-GeneTorrent has 3 operating modes: upload, download, and server.
-Upload mode is used to send files to the repository.  Download mode is
-used to retrieve files from the repository.  Server mode is used
-within the repository to create GeneTorrent server instances that
-deliver data to download actors.
+GeneTorrent has 3 applications: gtupload, gtdownload, and gtserver.
+The upload application is used to send files to the repository.
+The download application is used to retrieve files from the repository.
+The server application is used within the repository to create GeneTorrent
+server instances that deliver data to download actors.
 .PP
 This man page describes 
 .B gtdownload 
-(the GeneTorrent download mode application).
+(the GeneTorrent download application).
 .SH OPTIONS
-.SS "Download Mode Command Line Arguments:"
+.SS "Download Command Line Arguments:"
 .TP
 .BI "content-specifier"
-Required. Indicates download mode.  
+Required.
 .I content-specifier
 should be one of the following:
 .IP

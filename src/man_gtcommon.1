@@ -14,7 +14,7 @@ The IP address for GeneTorrent to bind.  Default is to bind all
 addresses on the system.
 .TP
 .BI \-c " credential" "\fR,\fP \-\^\-credential-file" " credential"
-Required for all modes, unless you are directly passing a .gto file to
+Required for all applications, unless you are directly passing a .gto file to
 the -d option.
 .I credential
 is the absolute or relative path to the file containing the
@@ -61,7 +61,7 @@ The default is to use ports 20892 through 20900.
 .TP
 .BI \-k " minutes" "\fR,\fP \-\^\-inactivity-timeout" " minutes"
 Specifies a duration of inactivity in minutes after
-which GeneTorrent, in download or upload mode, will abort file
+which GeneTorrent, in the download or upload application, will abort file
 transfers and exit.  The activity measured to make this determination
 is actual payload data transfer over the GeneTorrent protocol.  The
 default behavior is to never timeout, which is the recommended
