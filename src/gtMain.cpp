@@ -215,16 +215,7 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
 
       boost::program_options::notify (cli);
 
-#ifdef GENETORRENT_ALL
-      if (cli.count (SERVER_CLI_OPT) == 0 &&
-            cli.count (DOWNLOAD_CLI_OPT) == 0 &&
-            cli.count (UPLOAD_FILE_CLI_OPT) == 0 &&
-            cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
-      {
-         commandLineError ("Command line or config file must include one "
-            "of -d (download), -s (server), or -u (upload).");
-      }
-#elif GENETORRENT_SERVER
+#if GENETORRENT_SERVER
       if (cli.count (SERVER_CLI_OPT) == 0)
       {
          commandLineError ("Server command line or config file must "
@@ -326,20 +317,6 @@ int main (int argc, char **argv)
 
    gtBase *app = NULL;
 
-#ifdef GENETORRENT_ALL
-   if (commandLine.count (DOWNLOAD_CLI_OPT))
-   {
-      app = new gtDownload (commandLine);
-   }
-   else if (commandLine.count (UPLOAD_FILE_CLI_OPT))
-   {
-      app = new gtUpload (commandLine);
-   }
-   else
-   {
-      app = new gtServer (commandLine);
-   }
-#endif
 #ifdef GENETORRENT_DOWNLOAD
    app = new gtDownload (commandLine);
 #endif
