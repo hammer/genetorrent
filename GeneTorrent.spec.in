@@ -12,6 +12,10 @@
    %global _enable_check 1
 %endif
 
+%if 0%{?fedora} >= 17
+   %global _with_boost distro
+%endif
+
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
 Release:        1%{?gt_dist}.CP%{?build_version}
@@ -33,7 +37,7 @@ BuildRequires:  xqilla-devel curl-devel
 %if "%{dist}" == ".el6"
 BuildRequires:  xqilla-devel libcurl-devel
 %endif
-%if "%{dist}" == ".fc15"
+%if 0%{?fedora}
 BuildRequires:  xqilla-devel libcurl-devel
 %endif
 %if 0%{?suse_version}
@@ -116,6 +120,9 @@ Requires: %{name}-common = @PACKAGE_VERSION@
 
 %build
 
+
+
+%if "%{_with_boost}" != "distro"
 %if 0%{!?_with_boost:1}
 if [ -d /usr/local/boost-1.48.0 ]
 then
@@ -128,6 +135,7 @@ else
 fi
 %else
 WITH_BOOST="--with-boost=%{_with_boost}"
+%endif
 %endif
 
 # if suse, build libxqilla first
@@ -179,7 +187,7 @@ rm -f %{buildroot}/%{_libdir}/libgenetorrent.la
     BOOST_BASE="%{_with_boost}"
 %endif
 
-if [ -n "${BOOST_BASE}" ]
+if [ -n "${BOOST_BASE}" -a "${BOOST_BASE}" != "distro" ]
 then
     # HACK: Copy the boost libs pointed to by _with_boost (or preinstalled)
     # into the install directory.
@@ -205,6 +213,7 @@ fi
 %{_libdir}/%{name}/libtorrent-rasterbar.so.6
 %{_libdir}/%{name}/libtorrent-rasterbar.so.6.0.0
 %{_libdir}/%{name}/libtorrent-rasterbar.so
+%if "%{_with_boost}" != "distro"
 %{_libdir}/%{name}/libboost_filesystem.so
 %{_libdir}/%{name}/libboost_filesystem.so.1.48.0
 %{_libdir}/%{name}/libboost_program_options.so
@@ -215,6 +224,7 @@ fi
 %{_libdir}/%{name}/libboost_system.so.1.48.0
 %{_libdir}/%{name}/libboost_thread.so
 %{_libdir}/%{name}/libboost_thread.so.1.48.0
+%endif
 %if "%{dist}" == ".el5.centos"
 %{_libdir}/%{name}/libssl.so
 %{_libdir}/%{name}/libssl.so.1.0.0
