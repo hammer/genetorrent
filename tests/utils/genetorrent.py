@@ -104,14 +104,14 @@ class GeneTorrentInstance(subprocess.Popen):
             )
 
         command = [gt_bin]
-        command.extend(self.args.split(' '))
+        command.extend(self.args.split())
 
         super(GeneTorrentInstance, self).__init__(command,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE,
             bufsize=1)
 
         self.LOG.debug('Started GeneTorrent instance, pid %s' % self.pid)
-        self.LOG.debug('Command: %s', ' '.join(command))
+        self.LOG.debug('Command: %s', command)
 
         self.stdout_thread = self.log_thread(self.stdout, self.LOG.info,
             self.stdout_buffer)

@@ -71,9 +71,6 @@ void configureConfigFileOptions (boost::program_options::options_description &op
 {
    // The descriptions below are not used in the help message.
    options.add_options() 
-      (POSITIONAL_CLI_OPT.c_str(),
-         boost::program_options::value< std::vector< std::string > >(),
-         "Positional arguments")
       (makeOpt (BIND_IP_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "Bind IP")        // long and short option using first letter of long option
       (makeOpt (CRED_FILE_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "path/file to credentials file")          
       (makeOpt (CONF_DIR_CLI_OPT, CONF_DIR_SHORT_CLI_OPT).c_str(), boost::program_options::value< std::string >(), "full path to SSL configuration files")    // long option with alternate short option
@@ -143,7 +140,13 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       configureCommandLineOptions (commandLineOpts);
 
       boost::program_options::positional_options_description p;
-      p.add(POSITIONAL_CLI_OPT.c_str(), -1);
+#if defined (GENETORRENT_DOWNLOAD)
+      p.add (DOWNLOAD_CLI_OPT.c_str(), -1);
+#elif defined (GENETORRENT_UPLOAD)
+      p.add (UPLOAD_FILE_CLI_OPT.c_str(), 1);
+#elif defined (GENETORRENT_SERVER)
+      p.add (SERVER_CLI_OPT.c_str(), 1);
+#endif
 
       boost::program_options::options_description allOpts ("All Options");
       allOpts.add(configFileOpts).add(commandLineOpts);
@@ -212,33 +215,21 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
 
       boost::program_options::notify (cli);
 
-#ifdef GENETORRENT_ALL
-      if (cli.count (SERVER_CLI_OPT) == 0 &&
-            cli.count (DOWNLOAD_CLI_OPT) == 0 &&
-            cli.count (UPLOAD_FILE_CLI_OPT) == 0 &&
-            cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
-      {
-         commandLineError ("Command line or config file must include one "
-            "of -d (download), -s (server), or -u (upload).");
-      }
-#elif GENETORRENT_SERVER
-      if (cli.count (SERVER_CLI_OPT) == 0 &&
-         !cli.count (POSITIONAL_CLI_OPT))
+#if GENETORRENT_SERVER
+      if (cli.count (SERVER_CLI_OPT) == 0)
       {
          commandLineError ("Server command line or config file must "
             "include a path argument.");
       }
 #elif GENETORRENT_UPLOAD
       if (cli.count (UPLOAD_FILE_CLI_OPT) == 0 &&
-         cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0 &&
-         !cli.count (POSITIONAL_CLI_OPT))
+          cli.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 0)
       {
          commandLineError ("Upload command line or config file must "
             "include a manifest-file argument.");
       }
 #elif GENETORRENT_DOWNLOAD
-      if (cli.count (DOWNLOAD_CLI_OPT) == 0 &&
-         !cli.count (POSITIONAL_CLI_OPT))
+      if (cli.count (DOWNLOAD_CLI_OPT) == 0)
       {
          commandLineError ("Download command line or config file must "
             "include a content-specifier argument.");
@@ -326,20 +317,6 @@ int main (int argc, char **argv)
 
    gtBase *app = NULL;
 
-#ifdef GENETORRENT_ALL
-   if (commandLine.count (DOWNLOAD_CLI_OPT))
-   {
-      app = new gtDownload (commandLine);
-   }
-   else if (commandLine.count (UPLOAD_FILE_CLI_OPT))
-   {
-      app = new gtUpload (commandLine);
-   }
-   else
-   {
-      app = new gtServer (commandLine);
-   }
-#endif
 #ifdef GENETORRENT_DOWNLOAD
    app = new gtDownload (commandLine);
 #endif

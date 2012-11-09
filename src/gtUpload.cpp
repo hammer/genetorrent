@@ -139,21 +139,7 @@ void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
    {
       _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
    }
-   else if (vm.count (POSITIONAL_CLI_OPT) )
-   {
-      // take the first non-empty positional argument
-      std::vector<std::string> pos_args =
-         vm[POSITIONAL_CLI_OPT].as<std::vector<std::string> >();
-      std::vector<std::string>::iterator s;
-      for (s =  pos_args.begin(); s != pos_args.end(); s++)
-      {
-         if (s->size() > 0)
-         {
-            _manifestFile = *s;
-            break;
-         }
-      }
-   }
+
    relativizePath (_manifestFile);
 
    if (statFile (_manifestFile) != 0)
