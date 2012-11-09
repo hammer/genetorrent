@@ -10,7 +10,7 @@ extra_test_scripts = tests-extra/gt_20gb_download_test.py   \
                      tests-extra/gt_download_extra_tests.py
 
 TESTS = run_tests.py
-TESTS_ENVIRONMENT = PYTHONPATH="$(top_srcdir)/scripts:." PATH="$(PATH):$(PWD)"
+TESTS_ENVIRONMENT = PYTHONPATH="$(top_builddir)/tests:$(top_builddir)/scripts" PATH="$(PATH):$(PWD)"
 
 EXTRA_DIST = $(test_scripts)              \
              README                       \
