@@ -1,0 +1,23 @@
+Source: genetorrent
+Section: net
+Priority: extra
+Maintainer: Matt Lupfer <mlupfer@cardinalpeak.com>
+Build-Depends: debhelper (>= 8.0.0), libboost1.49-dev, libboost-filesystem1.49-dev, libboost-system1.49-dev, libboost-program-options1.49-dev, libboost-regex1.49-dev, libxqilla-dev, libxerces-c-dev, libcurl4-openssl-dev, python-support, libssl-dev
+Standards-Version: 3.9.2
+Homepage: https://cghub.ucsc.edu/software/downloads.html
+
+Package: genetorrent-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla6, libssl1.0.0, libcurl3, ${python:Depends}
+Description: Transfer genomic data reliably across a network
+
+Package: genetorrent-upload
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla6, libssl1.0.0, libcurl3, genetorrent-core (= @VERSION@-@DEB_DISTRO_TAG@)
+Description: Transfer genomic data reliably across a network
+
+Package: genetorrent-download
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla6, libssl1.0.0, libcurl3, genetorrent-core (= @VERSION@-@DEB_DISTRO_TAG@) 
+Description: Transfer genomic data reliably across a network
+

@@ -89,8 +89,11 @@ windows-installer: all
 
 DEB_CODENAME := $(shell lsb_release -cs)
 
-.PHONY: deb deb-builder deb-precise deb-squeeze deb-oneiric
+.PHONY: deb deb-builder deb-quantal deb-precise deb-squeeze deb-oneiric
 deb-precise:
+	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
+
+deb-quantal:
 	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
 
 deb-squeeze:

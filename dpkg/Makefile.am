@@ -44,5 +44,6 @@ EXTRA_DIST =                                 \
    squeeze/genetorrent-core.install          \
    oneiric/control                           \
    oneiric/rules                             \
-   oneiric/genetorrent-core.install
+   oneiric/genetorrent-core.install          \
+   quantal/control
 
