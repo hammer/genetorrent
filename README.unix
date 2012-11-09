@@ -65,4 +65,3 @@ To build a GeneTorrent binary RPM:
 ./configure
 make dist
 rpmbuild -ta GeneTorrent-x.y.z.tar.gz
-
