@@ -44,7 +44,7 @@ from tempfile import NamedTemporaryFile
 from subprocess import Popen, PIPE
 
 from utils.cgdata.datagen import DataGenRandom
-from utils.genetorrent import GeneTorrentInstance, InstanceType
+from utils.genetorrent import GeneTorrentInstance, InstanceType, SERVER_STOP_FILE
 from utils.mockhubcontrol import MockHub
 from utils.config import TestConfig
 from gtoinfo import read_gto, emit_gto, set_key
@@ -194,6 +194,12 @@ class GTTestCase(unittest.TestCase):
             minutes -= 1
         print 'Proceeding...'
 
+    def terminate_server(self, server):
+        stop_file = open(SERVER_STOP_FILE, 'w')
+        stop_file.close()
+        server.wait()
+        os.unlink(SERVER_STOP_FILE)
+
     def data_upload_test(self, size, data_generator=DataGenRandom,
         ssl=True, client_options='', server_options='', check_sha1=True):
         server = None
@@ -276,7 +282,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.terminate()
+            self.terminate_server(server)
 
         # check upload client return code
         self.assertEqual(client.returncode, 0)
@@ -336,7 +342,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.terminate()
+            self.terminate_server(server)
 
         # check download client return code
         self.assertEqual(client.returncode, 0)
@@ -396,7 +402,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.terminate()
+            self.terminate_server(server)
 
         # check download client return code
         self.assertEqual(client.returncode, assert_rc)
@@ -461,7 +467,7 @@ class GTTestCase(unittest.TestCase):
         client_sout, client_serr = client.communicate()
 
         if server:
-            server.terminate()
+            self.terminate_server(server)
 
         # check download client return code
         self.assertEqual(client.returncode, 0)

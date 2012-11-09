@@ -34,6 +34,7 @@ import tempfile
 
 from logging import getLogger
 
+SERVER_STOP_FILE = '/tmp/GeneTorrent.stop'
 
 class InstanceType:
     GT_ALL = 0       # no longer provided
@@ -105,6 +106,12 @@ class GeneTorrentInstance(subprocess.Popen):
 
         command = [gt_bin]
         command.extend(self.args.split())
+
+        if instance_type == InstanceType.GT_SERVER:
+            try:
+                os.unlink(SERVER_STOP_FILE)
+            except OSError:  # file does not exist
+                pass
 
         super(GeneTorrentInstance, self).__init__(command,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE,
