@@ -26,14 +26,69 @@
 #
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
-baseDir=$(pushd $(dirname $0) > /dev/null; pwd -P; popd > /dev/null)
+WGET="$(which wget) --tries 3 -O ${TARBALL}"
+CURL="$(which curl) -o ${TARBALL} -L"
 
-DEP_NAME=xqilla
-SRC_URL=http://downloads.sourceforge.net/project/xqilla/xqilla/2.3.0/XQilla-2.3.0.tar.gz
-DEP_VER=XQilla-2.3.0
-EXPECTED_MD5=7261c7b4bb5a45cbf6270073976a51ce
-CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=/usr"
-BUILD_CMD="make install $@"
-TARBALL="/tmp/${DEP_VER}.tar.gz"
+function errexit
+{
+   echo "Error building ${DEP_NAME}: $1"
+   exit 1
+}
 
-. ${baseDir}/../builder_common
+if [ "$(which wget)" == "" -a "$(which curl)" == "" ]; then
+   errexit "Need curl or wget to download ${DEP_NAME} source."
+fi
+
+if [ ! -z "$(which wget)" ]; then
+   DLTOOL="${WGET}"
+else
+   DLTOOL="${CURL}"
+fi
+
+pushd "${baseDir}" > /dev/null
+
+if [ ! -e ${TARBALL} ]; then
+   ${DLTOOL} ${SRC_URL}
+
+   if [ $? -ne 0 ]; then
+      errexit "download operation failed"
+   fi
+fi
+
+if [ -z "$(which md5sum)" ]; then
+   echo "Need md5sum to check source tarball hash."
+else
+   echo "Checking MD5 hash of source tarball..."
+   FILE_MD5=$(md5sum ${TARBALL} | cut -f 1 -d" ")
+
+   if [ "${FILE_MD5}" != "${EXPECTED_MD5}" ]; then
+      errexit "file md5 sum is incorrect -  please delete it and run the script again"
+   fi
+fi
+
+tar xzf ${TARBALL}
+if [ $? -ne 0 ]; then
+   errexit "untar operation failed"
+fi
+
+pushd ${DEP_VER} > /dev/null
+
+${CONFIG_CMD}
+
+if [ $? -ne 0 ]; then
+   errexit "${DEP_NAME} configure operation failed"
+fi
+
+${BUILD_CMD}
+
+if [ $? -ne 0 ]; then
+   errexit "${DEP_NAME} build operation failed"
+fi
+
+popd > /dev/null # pops from tarball back to parent
+
+popd > /dev/null # pops from deps to original working directory
+
+echo "${DEP_NAME} build was successful"
+exit 0
+

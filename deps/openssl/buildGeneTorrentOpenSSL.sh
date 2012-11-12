@@ -1,17 +1,17 @@
 #!/bin/bash
 #  Copyright (c) 2012, Annai Systems, Inc.
 #  All rights reserved.
-#  
+#
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are met:
-#  
+#
 #  1. Redistributions of source code must retain the above copyright notice,
 #     this list of conditions and the following disclaimer.
-# 
+#
 #  2. Redistributions in binary form must reproduce the above copyright notice,
 #     this list of conditions and the following disclaimer in the documentation
 #     and/or other materials provided with the distribution.
-#  
+#
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 #  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 #  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,83 +23,17 @@
 #  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #  POSSIBILITY OF SUCH DAMAGE
-# 
+#
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
 baseDir=$(pushd $(dirname $0) > /dev/null; pwd -P; popd > /dev/null)
 
-OPENSSL_SRC_URL=http://www.openssl.org/source/openssl-1.0.1c.tar.gz
-OPENSSL_VER=openssl-1.0.1c
-OPENSSL_MD5=ae412727c8c15b67880aef7bd2999b2e
+DEP_NAME=openssl
+SRC_URL=http://www.openssl.org/source/openssl-1.0.1c.tar.gz
+DEP_VER=openssl-1.0.1c
+EXPECTED_MD5=ae412727c8c15b67880aef7bd2999b2e
+CONFIG_CMD="./config --openssldir=${baseDir} shared"
+BUILD_CMD="make install $@"
+TARBALL="/tmp/${DEP_VER}.tar.gz"
 
-OPENSSL_TARBALL="/tmp/${OPENSSL_VER}.tar.gz"
-
-WGET="$(which wget) --tries 3 -O ${OPENSSL_TARBALL}"
-CURL="$(which curl) -o ${OPENSSL_TARBALL} -L"
-
-function errexit
-{
-   echo "Error building openssl: $1"
-   exit 1
-}
-
-if [ "$(which wget)" == "" -a "$(which curl)" == "" ]; then
-   errexit "Need curl or wget to download openssl source."
-fi
-
-if [ ! -z "$(which wget)" ]; then
-   DLTOOL="${WGET}"
-else
-   DLTOOL="${CURL}"
-fi
-
-pushd "${baseDir}" > /dev/null
-
-if [ -e ${OPENSSL_TARBALL} ]; then
-   echo "Checking MD5 hash of existing file..."
-   FILE_MD5=$(md5sum ${OPENSSL_TARBALL} | cut -f 1 -d" ")
-
-   if [ "${FILE_MD5}" != "${OPENSSL_MD5}" ]; then
-      errexit "file md5 sum is incorrect -  please delete it and run the script again"
-   fi
-else
-   ${DLTOOL} ${OPENSSL_SRC_URL}
-
-   if [ $? -ne 0 ]; then
-      errexit "download operation failed"
-   fi
-
-   echo "Checking MD5 hash of downloaded file..."
-   FILE_MD5=$(md5sum ${OPENSSL_TARBALL} | cut -f 1 -d" ")
-
-   if [ "${FILE_MD5}" != "${OPENSSL_MD5}" ]; then
-      errexit "file md5 sum is incorrect -  please delete it and run the script again"
-   fi
-fi
-
-tar xzf ${OPENSSL_TARBALL}
-if [ $? -ne 0 ]; then
-   errexit "untar operation failed"
-fi
-
-pushd ${OPENSSL_VER} > /dev/null
-
-./config --openssldir=${baseDir} shared
-
-if [ $? -ne 0 ]; then
-   errexit "openssl bootstrap operation failed"
-fi
-
-make install "$@"
-
-if [ $? -ne 0 ]; then
-   errexit "openssl build operation failed"
-fi
-
-popd > /dev/null # pops from openssl tarball back to deps
-
-popd > /dev/null # pops from deps to original working directory
-
-echo "openssl build was successful"
-exit 0
-
+. ${baseDir}/../builder_common

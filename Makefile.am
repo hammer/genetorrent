@@ -42,7 +42,8 @@ EXTRA_DIST =                     \
    libtorrent/configure.gnu      \
    GeneTorrent.spec              \
    autogen.sh                    \
-   GeneTorrent.nsi
+   GeneTorrent.nsi               \
+   deps/builder_common
 
 dist_doc_DATA =                  \
    LICENSE                       \
