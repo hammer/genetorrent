@@ -12,7 +12,7 @@ else:
     import unittest
 
 top_srcdir = os.getenv('top_srcdir', '')
-test_top = os.path.join(top_srcdir, 'tests') if top_srcdir else None
+test_top = os.path.realpath(os.path.join(top_srcdir, 'tests')) if top_srcdir else None
 
 sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)
 sys.stderr = StreamToLogger(logging.getLogger('stderr'), logging.WARN)
