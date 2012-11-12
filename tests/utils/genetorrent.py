@@ -53,9 +53,9 @@ gtBinaries = [
 # map to default args indexed by InstanceType
 defaultArgs = [
     '',                       # GT_ALL
-    ' -vv -l stdout:full -C . -k 3',
-    ' -vv -l stdout:full -C . -k 3',
-    ' -l stdout:full -C . --peer-timeout=5',
+    ' -vv -l stdout:full -C . -k 3 -i 30101',
+    ' -vv -l stdout:full -C . -k 3 -i 30201',
+    ' -l stdout:full -C . --peer-timeout=5 -i 30301',
 ]
 
 class GeneTorrentInstance(subprocess.Popen):
