@@ -113,9 +113,13 @@ class Session(object):
             csr_file.write(csr)
             csr_file.close()
 
+            # Add user id so multiple users will not have a conflict.
+            caserial = '/tmp/mockhub-cacert-%d.srl' % (os.getuid())
+
             new_certificate_pem =  subprocess.Popen(['openssl', 'x509', '-req',
                 '-days', '180', '-in', csr_file.name, '-CA', CA_CERT, '-CAkey',
-                CA_KEY, '-CAcreateserial'], stdout=subprocess.PIPE).communicate()[0]
+                CA_KEY, '-CAcreateserial', '-CAserial', caserial ],
+                stdout=subprocess.PIPE).communicate()[0]
 
             os.unlink(csr_file.name)
 
