@@ -82,12 +82,12 @@ class GTTestCase(unittest.TestCase):
     create_credential = False
 
     def setUp(self):
-        logger.info('\n')
+        logger.info('')
         logger.info('=' * 80)
         logger.info('TEST: ' + self._testMethodName)
         if self.shortDescription():
             logger.info(self.shortDescription())
-        logger.info('=' * 80 + '\n')
+        logger.info('=' * 80)
 
         if self.create_credential and not TestConfig.CREDENTIAL:
             self.make_dummy_credential()
@@ -186,13 +186,13 @@ class GTTestCase(unittest.TestCase):
         os.chdir(basedir)
 
     def upload_sleep(self, minutes):
-        print 'Waiting %s minutes for remote processing of upload(s)...' % str(minutes)
+        logger.info('Waiting %s minutes for remote processing of upload(s)...' % str(minutes))
         while minutes > 0:
-            print str(minutes) + \
-                (' minutes' if minutes != 1 else ' minute')  + ' remaining'
+            logger.info(str(minutes) + \
+                (' minutes' if minutes != 1 else ' minute')  + ' remaining')
             time.sleep(60)
             minutes -= 1
-        print 'Proceeding...'
+        logger.info('Proceeding...')
 
     def terminate_server(self, server):
         stop_file = open(SERVER_STOP_FILE, 'w')
@@ -232,8 +232,8 @@ class GTTestCase(unittest.TestCase):
             cgout, cgerr = cgsubmit_process.communicate()
 
             if TestConfig.VERBOSE:
-                print 'cgsubmit stdout: ' + cgout
-                print 'cgsubmit stderr: ' + cgerr
+                logger.info('cgsubmit stdout: ' + cgout)
+                logger.info('cgsubmit stderr: ' + cgerr)
 
             self.assertEqual(cgsubmit_process.returncode, 0)
 
