@@ -244,6 +244,6 @@ CherryPyWSGIServer.ssl_certificate = CA_CERT
 CherryPyWSGIServer.ssl_private_key = CA_KEY
 
 if __name__ == '__main__':
-    runsimple(app.wsgifunc(), server_address=(str(TestConfig.HUB_HOST),
+    runsimple(app.wsgifunc(), server_address=('0.0.0.0',
         int(TestConfig.HUB_PORT)))
 
