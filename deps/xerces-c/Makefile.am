@@ -35,6 +35,7 @@ LN_LEXT = .dylib
 else
 LEXT = -$(LIBVER).so
 LN_LEXT = .so
+D_OPT = -D
 endif
 
 all:
@@ -44,7 +45,7 @@ install:
 	@echo "Installing xerces-c libraries into $(DESTDIR)$(pkglibdir)"
 	@set -e; echo "  INSTALL -> xerces-c"; \
 	test ! -f $(srcdir)/lib/libxerces-c$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libxerces-c$(LEXT) \
+		$(INSTALL_SCRIPT) $(D_OPT) -m 644 $(srcdir)/lib/libxerces-c$(LEXT) \
 		$(DESTDIR)$(pkglibdir)/libxerces-c$(LEXT); \
 	test ! -f $(srcdir)/lib/libxerces-c$(LEXT) || \
 		(cd $(DESTDIR)$(pkglibdir) && rm -f libxerces-c$(LN_LEXT) && \

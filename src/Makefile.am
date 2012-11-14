@@ -110,7 +110,7 @@ GTdatadir = $(datadir)/GeneTorrent
 dist_GTdata_DATA = dhparam.pem
 
 common_ldflags     = $(torrentrasterbar_LIBS) \
-                      -Wl,-rpath $(libdir)/GeneTorrent \
+                      -Wl,-rpath,$(libdir)/GeneTorrent \
                       $(BOOST_LDFLAGS) \
                       $(OPENSSL_LDFLAGS) \
                       $(XQILLA_LDFLAGS)
@@ -212,4 +212,13 @@ gt_scm_rev:
 	@echo "  GEN    $@"
 	@cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
 
+.PHONY: mkdir_darwin_rpath
+mkdir_darwin_rpath:
+if DARWIN
+	@echo "  MKDIR  $(libdir)/GeneTorrent"
+	$(MKDIR_P) $(libdir)/GeneTorrent
+endif
+
 all distdir: gt_scm_rev
+
+all: mkdir_darwin_rpath

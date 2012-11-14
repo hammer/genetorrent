@@ -36,6 +36,7 @@ else
 LIBVER = 6.0.0
 LEXT = .so.$(LIBVER)
 LN_LEXT = .so.6
+D_OPT = -D
 endif
 
 all:
@@ -45,7 +46,7 @@ install:
 	@echo "Installing xqilla libraries into $(DESTDIR)$(pkglibdir)"
 	@set -e; echo "  INSTALL -> xqilla"; \
 	test ! -f $(srcdir)/lib/libxqilla$(LEXT) || \
-		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libxqilla$(LEXT) \
+		$(INSTALL_SCRIPT) $(D_OPT) -m 644 $(srcdir)/lib/libxqilla$(LEXT) \
 		$(DESTDIR)$(pkglibdir)/libxqilla$(LEXT); \
 	test ! -f $(srcdir)/lib/libxqilla$(LEXT) || \
 		(cd $(DESTDIR)$(pkglibdir) && rm -f libxqilla$(LN_LEXT) && \

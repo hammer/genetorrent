@@ -33,6 +33,7 @@ LEXT = .dylib
 else
 BOOSTVER = 1.48.0
 LEXT = .so.$(BOOSTVER)
+D_OPT = -D
 endif
 
 BOOST_INST_LIBS = filesystem program_options regex system thread
@@ -46,7 +47,7 @@ if ! DARWIN
 	@set -e; for lib in $(BOOST_INST_LIBS); do \
 		echo "  INSTALL -> $${lib}"; \
 		test ! -f $(srcdir)/lib/libboost_$${lib}$(LEXT) || \
-			$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_$${lib}$(LEXT) \
+			$(INSTALL_SCRIPT) $(D_OPT) -m 644 $(srcdir)/lib/libboost_$${lib}$(LEXT) \
 			$(DESTDIR)$(pkglibdir)/libboost_$${lib}$(LEXT); \
 		test ! -f $(srcdir)/lib/libboost_$${lib}$(LEXT) || \
 			(cd $(DESTDIR)$(pkglibdir) && rm -f libboost_$${lib}.so && \
@@ -56,7 +57,7 @@ else
 	@set -e; for lib in $(BOOST_INST_LIBS); do \
 		echo "  INSTALL -> $${lib}"; \
 		test ! -f $(srcdir)/lib/libboost_$${lib}$(LEXT) || \
-			$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libboost_$${lib}$(LEXT) \
+			$(INSTALL_SCRIPT) $(D_OPT) -m 644 $(srcdir)/lib/libboost_$${lib}$(LEXT) \
 			$(DESTDIR)$(pkglibdir)/libboost_$${lib}$(LEXT); \
 	done
 endif
