@@ -86,8 +86,9 @@ static char const* download_state_str[] = {
 extern void *geneTorrCallBackPtr; 
 
 gtDownload::gtDownload (boost::program_options::variables_map &vm,
-                        bool show_startup_message):
-   gtBase (vm, DOWNLOAD_MODE),
+                        bool show_startup_message,
+                        std::string progName):
+   gtBase (vm, DOWNLOAD_MODE, progName),
    _downloadSavePath (""),
    _cliArgsDownloadList (),
    _maxChildren (8),
@@ -103,7 +104,7 @@ gtDownload::gtDownload (boost::program_options::variables_map &vm,
 
    if (show_startup_message)
    {
-      startUpMessage ("gtdownload");
+      startUpMessage (progName);
    }
 
    _startUpComplete = true;

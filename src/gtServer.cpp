@@ -83,7 +83,7 @@ static char const* server_state_str[] = {
 extern void *geneTorrCallBackPtr; 
 
 gtServer::gtServer (boost::program_options::variables_map &vm) : 
-               gtBase (vm, SERVER_MODE), 
+               gtBase (vm, SERVER_MODE, "gtserver"),
                _serverQueuePath (""), 
                _serverDataPath (""), 
                _serverModeCsrSigningUrl (""), 

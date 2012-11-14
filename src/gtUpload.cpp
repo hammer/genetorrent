@@ -88,7 +88,17 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm) : gtBase (vm, UPLOAD_MODE), _manifestFile (""), _uploadUUID (""), _uploadSubmissionURL (""), _filesToUpload (), _pieceSize (4194304), _dataFilePath (""), _uploadGTODir (""), _piecesInTorrent (0), _uploadGTOOnly(false)
+gtUpload::gtUpload (boost::program_options::variables_map &vm):
+   gtBase (vm, UPLOAD_MODE, "gtupload"),
+   _manifestFile (""),
+   _uploadUUID (""),
+   _uploadSubmissionURL (""),
+   _filesToUpload (),
+   _pieceSize (4194304),
+   _dataFilePath (""),
+   _uploadGTODir (""),
+   _piecesInTorrent (0),
+   _uploadGTOOnly(false)
 {
    _dataFilePath = pcfacliPath (vm);
    pcfacliUpload (vm);

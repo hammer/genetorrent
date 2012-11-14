@@ -108,7 +108,8 @@ class gtBase
 
       typedef std::vector <std::string> vectOfStr;
 
-      gtBase (boost::program_options::variables_map &vm, opMode mode);
+      gtBase (boost::program_options::variables_map &vm, opMode mode,
+              std::string progName);
       virtual ~gtBase ();
 
       static std::string version_str;
