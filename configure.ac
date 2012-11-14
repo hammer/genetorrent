@@ -125,6 +125,9 @@ AC_CHECK_HEADER([curl/curl.h], [],
 AM_CONDITIONAL([CYGWIN],
     [case $host_os in *cygwin*) true;; *) false;; esac])
 
+AM_CONDITIONAL([DARWIN],
+    [case $host_os in *darwin*) true;; *) false;; esac])
+
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])
 # AC_CHECK_HEADER([boost/filesystem.hpp])

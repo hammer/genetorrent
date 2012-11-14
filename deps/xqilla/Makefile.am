@@ -27,8 +27,16 @@
 
 EXTRA_DIST = buildGeneTorrentXQilla.sh
 
+
+if DARWIN
+LIBVER = 6
+LEXT = .$(LIBVER).dylib
+LN_LEXT = .dylib
+else
 LIBVER = 6.0.0
 LEXT = .so.$(LIBVER)
+LN_LEXT = .so.6
+endif
 
 all:
 	mkdir -p lib include bin
@@ -40,11 +48,8 @@ install:
 		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libxqilla$(LEXT) \
 		$(DESTDIR)$(pkglibdir)/libxqilla$(LEXT); \
 	test ! -f $(srcdir)/lib/libxqilla$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libxqilla.so && \
-			$(LN_S) libxqilla$(LEXT) libxqilla.so.6);
+		(cd $(DESTDIR)$(pkglibdir) && rm -f libxqilla$(LN_LEXT) && \
+			$(LN_S) libxqilla$(LEXT) libxqilla$(LN_LEXT));
 
-clean:
-	rm -rf XQilla-2.3.0 include lib *.tar.gz bin
-
-.PHONY: install clean
+.PHONY: install
 

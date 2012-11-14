@@ -48,8 +48,5 @@ install:
       (cd $(DESTDIR)$(pkglibdir) && rm -f libssl.so && \
          $(LN_S) libssl$(LEXT) libssl.so)
 
-clean:
-	rm -rf bin certs lib man openssl-1.0.1c* openssl.cnf include misc private
-
-.PHONY: install clean
+.PHONY: install
 

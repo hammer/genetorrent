@@ -28,7 +28,14 @@
 EXTRA_DIST = buildGeneTorrentXerces-C.sh
 
 LIBVER = 3.1
+
+if DARWIN
+LEXT = -$(LIBVER).dylib
+LN_LEXT = .dylib
+else
 LEXT = -$(LIBVER).so
+LN_LEXT = .so
+endif
 
 all:
 	mkdir -p lib include bin
@@ -40,11 +47,8 @@ install:
 		$(INSTALL_SCRIPT) -D -m 644 $(srcdir)/lib/libxerces-c$(LEXT) \
 		$(DESTDIR)$(pkglibdir)/libxerces-c$(LEXT); \
 	test ! -f $(srcdir)/lib/libxerces-c$(LEXT) || \
-		(cd $(DESTDIR)$(pkglibdir) && rm -f libxerces-c.so && \
-			$(LN_S) libxerces-c$(LEXT) libxerces-c.so);
+		(cd $(DESTDIR)$(pkglibdir) && rm -f libxerces-c$(LN_LEXT) && \
+			$(LN_S) libxerces-c$(LEXT) libxerces-c$(LN_LEXT));
 
-clean:
-	rm -rf xerces-c-3.1.1 include lib *.tar.gz bin
-
-.PHONY: install clean
+.PHONY: install
 
