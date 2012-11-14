@@ -101,7 +101,7 @@ AS_ECHO
 AS_ECHO "Checking for required libraries:"
 
 AX_LIB_XERCES()
-AS_IF([ test -z "$HAVE_XERCES" ], [AC_MSG_ERROR([xerces library required but not found])], [])
+AS_IF([ test x"$HAVE_XERCES" != xyes ], [AC_MSG_ERROR([xerces library required but not found])], [])
 AC_CHECK_LIB([curl], [curl_easy_init], [],
    [AC_MSG_ERROR([curl library required but not found])])
 AX_CHECK_XQILLA([],
