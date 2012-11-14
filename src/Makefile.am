@@ -110,7 +110,7 @@ GTdatadir = $(datadir)/GeneTorrent
 dist_GTdata_DATA = dhparam.pem
 
 common_ldflags     = $(torrentrasterbar_LIBS) \
-                      -Wl,-rpath=$(libdir)/GeneTorrent \
+                      -Wl,-rpath $(libdir)/GeneTorrent \
                       $(BOOST_LDFLAGS) \
                       $(OPENSSL_LDFLAGS) \
                       $(XQILLA_LDFLAGS)
