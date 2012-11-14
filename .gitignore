@@ -97,3 +97,9 @@ libtool
 /deps/xqilla/bin/
 /deps/xqilla/include/
 /deps/xqilla/lib/
+
+# /deps/xerces-c/
+/deps/xerces-c/bin/
+/deps/xerces-c/include/
+/deps/xerces-c/lib/
+/deps/xerces-c/xerces-c-*

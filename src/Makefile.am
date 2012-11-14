@@ -70,7 +70,8 @@ libgenetorrent_la_SOURCES = gtBase.cpp \
 
 libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
                              $(OPENSSL_INCLUDES) \
-                             $(XQILLA_INCLUDES)
+                             $(XQILLA_INCLUDES) \
+                             $(XERCES_CPPFLAGS)
 
 libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                              -I$(top_srcdir)/libtorrent/include
@@ -87,7 +88,8 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
 
 libgenetorrent_la_LIBADD = $(boost_LIBS)           \
                            $(PTHREAD_LIBS)         \
-                           $(XQILLA_LIBS)
+                           $(XQILLA_LIBS)          \
+                           $(XERCES_LIBS)
 
 bin_SCRIPTS = GeneTorrent
 
@@ -118,11 +120,13 @@ common_ldadd      =  $(boost_LIBS)     \
                      -lssl             \
                      -lcrypto          \
                      libgenetorrent.la \
-                     $(XQILLA_LIBS)
+                     $(XQILLA_LIBS)    \
+                     $(XERCES_LIBS)
 
 gtupload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
                     $(OPENSSL_INCLUDES) \
-                    $(XQILLA_INCLUDES)
+                    $(XQILLA_INCLUDES)  \
+                    $(XERCES_CPPFLAGS)
 
 gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
@@ -134,7 +138,8 @@ gtupload_LDADD = $(common_ldadd)
 
 gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
                       $(OPENSSL_INCLUDES) \
-                      $(XQILLA_INCLUDES)
+                      $(XQILLA_INCLUDES)  \
+                      $(XERCES_CPPFLAGS)
 
 gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                       -I$(top_srcdir)/libtorrent/include \
@@ -146,7 +151,8 @@ gtdownload_LDADD = $(common_ldadd)
 
 gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
                     $(OPENSSL_INCLUDES) \
-                    $(XQILLA_INCLUDES)
+                    $(XQILLA_INCLUDES)  \
+                    $(XERCES_CPPFLAGS)
 
 gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                    -I$(top_srcdir)/libtorrent/include \

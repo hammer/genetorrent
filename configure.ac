@@ -100,8 +100,8 @@ AX_PTHREAD()
 AS_ECHO
 AS_ECHO "Checking for required libraries:"
 
-AC_CHECK_LIB([xerces-c], [main], [],
-   [AC_MSG_ERROR([xerces-c library required but not found])])
+AX_LIB_XERCES()
+AS_IF([ test -z "$HAVE_XERCES" ], [AC_MSG_ERROR([xerces library required but not found])], [])
 AC_CHECK_LIB([curl], [curl_easy_init], [],
    [AC_MSG_ERROR([curl library required but not found])])
 AX_CHECK_XQILLA([],
@@ -121,8 +121,6 @@ AS_ECHO "Checking for required headers:"
 AC_CHECK_HEADERS([inttypes.h stdlib.h string.h sys/statvfs.h sys/time.h syslog.h unistd.h])
 AC_CHECK_HEADER([curl/curl.h], [],
    [AC_MSG_ERROR([curl headers required but not found])])
-AC_CHECK_HEADER([xercesc/parsers/XercesDOMParser.hpp], [],
-   [AC_MSG_ERROR([xercesc headers required but not found])])
 
 AM_CONDITIONAL([CYGWIN],
     [case $host_os in *cygwin*) true;; *) false;; esac])
@@ -170,6 +168,7 @@ AC_CONFIG_FILES(
    [tests/Makefile]
    [dpkg/Makefile]
    [deps/xqilla/Makefile]
+   [deps/xerces-c/Makefile]
 )
 
 AC_CONFIG_SUBDIRS(

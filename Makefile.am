@@ -30,6 +30,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = deps/boost     \
           deps/openssl   \
           deps/xqilla    \
+          deps/xerces-c  \
           libtorrent     \
           src            \
           scripts        \
