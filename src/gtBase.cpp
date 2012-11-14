@@ -228,7 +228,6 @@ void gtBase::log_options_used (boost::program_options::variables_map &vm)
       {
          const std::type_info &type = it->second.value().type();
 
-         // TODO: need to handle vectors of values for a given option.
          if (type == typeid(std::string))
             value = it->second.as<std::string>();
          else if (type == typeid(int))
