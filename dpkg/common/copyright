@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: genetorrent
-Source: <https://cghub.ucsc.edu/software/downloads.html>
+Source: https://cghub.ucsc.edu/software/downloads.html
 
 Files: *
 Copyright: 2011-2012 Annai Systems, Inc.
