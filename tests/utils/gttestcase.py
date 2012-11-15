@@ -26,13 +26,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import unittest
 import os
 import time
 import errno
 import logging
 import io
 import sys
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
 from uuid import uuid4
 from shutil import copy2, rmtree
