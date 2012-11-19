@@ -52,7 +52,7 @@
 // the line is prepended with the time, source file name, and source
 // file number; and (b) the text goes to wherever the log destination
 // is set to
-#define Log(b1, s1, ...) GlobalLog->__Log((b1), __FILE__, __LINE__, (s1), ## __VA_ARGS__)
+#define Log(lvl, fmt, ...) GlobalLog->__Log((lvl), __FILE__, __LINE__, (fmt), ## __VA_ARGS__)
 
 //  TODO, This is out of date
 // gtLogger parses the program's command line as follows:
@@ -76,6 +76,10 @@ enum gtLogLevel {
    PRIORITY_HIGH,
    PRIORITY_DEBUG,
 };
+
+#define LogNormal(fmt, ...) Log(PRIORITY_NORMAL, (fmt), ## __VA_ARGS__)
+#define LogHigh(fmt, ...)   Log(PRIORITY_HIGH,   (fmt), ## __VA_ARGS__)
+#define LogDebug(fmt, ...)  Log(PRIORITY_DEBUG,  (fmt), ## __VA_ARGS__)
 
 class gtLogger 
 {
