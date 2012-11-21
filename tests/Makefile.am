@@ -69,7 +69,6 @@ dhparam.pem:
 check-setup: web certs gtoinfo dhparam.pem
 
 check: check-setup
-	$(MAKE) check-TESTS
 
 CLEANFILES = dhparam.pem gtoinfo web
 
