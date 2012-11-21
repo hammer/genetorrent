@@ -69,7 +69,8 @@ class GeneTorrentInstance(subprocess.Popen):
         def log_output(out, logger, buffer):
             for line in iter(out.readline, b''):
                 buffer.write(line)
-                logger(line.rstrip('\n'))
+                if not 'block_finished' in line and not 'block_download' in line:
+                    logger(line.rstrip('\n'))
 
         t = threading.Thread(target=log_output, args=(pipe, logger, buffer))
         t.daemon = True
