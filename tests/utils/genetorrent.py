@@ -55,7 +55,7 @@ defaultArgs = [
     '',                       # GT_ALL
     ' -vv -l stdout:full -C . -k 3 -i 30101',
     ' -vv -l stdout:full -C . -k 3 -i 30201',
-    ' -l stdout:full -C . --peer-timeout=5 -i 30301',
+    ' -l stdout:full -C . -i 30301',
 ]
 
 class GeneTorrentInstance(subprocess.Popen):
@@ -78,7 +78,7 @@ class GeneTorrentInstance(subprocess.Popen):
         return t
 
     def __init__(self, arguments, instance_type=InstanceType.GT_DOWNLOAD,
-        ssl_no_verify_ca=True, add_defaults=True):
+        ssl_no_verify_ca=True, add_defaults=True, client_num=0):
         self.args = arguments
         self.instance_type = instance_type
         self.stdout_buffer = tempfile.TemporaryFile()
@@ -86,7 +86,9 @@ class GeneTorrentInstance(subprocess.Popen):
 
         if add_defaults:
             self.args += defaultArgs[instance_type]
-        self.LOG = getLogger(gtBinaries[self.instance_type])
+
+        self.LOG = getLogger("{0}({1})".format(gtBinaries[self.instance_type],
+            client_num + 1))
 
         if ssl_no_verify_ca and add_defaults:
             self.args += ' --ssl-no-verify-ca '
