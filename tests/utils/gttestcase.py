@@ -367,24 +367,29 @@ class GTTestCase(unittest.TestCase):
         return client.returncode
 
     def data_download_test_uuid(self, uuid, client_options='', server_options='',
-        check_sha1=True, assert_rc=0, assert_serr=''):
-        server = None
+        check_sha1=True, assert_rc=0, assert_serr='', server_ct=1):
         # delete the bam so we can download it
         if os.path.isfile(self.client_bam(uuid)):
             os.remove(self.client_bam(uuid))
 
+        servers = []
+
         if TestConfig.MOCKHUB:
-            # prepare server
-            server = GeneTorrentInstance(
-                '-s server%sroot -q server%sworkdir -c %s ' \
-                '--security-api %s %s' \
-                % (
-                    os.path.sep,
-                    os.path.sep,
-                    self.cred_filename,
-                    TestConfig.SECURITY_API,
-                    server_options,
-                ), instance_type=InstanceType.GT_SERVER)
+            # prepare server(s)
+            for i in range(0, server_ct):
+                server = GeneTorrentInstance(
+                    '-s server%sroot -q server%sworkdir -c %s ' \
+                    '--security-api %s %s' \
+                    % (
+                        os.path.sep,
+                        os.path.sep,
+                        self.cred_filename,
+                        TestConfig.SECURITY_API,
+                        server_options,
+                    ), instance_type=InstanceType.GT_SERVER,
+                    client_num=i)
+
+                servers.append(server)
 
             # add new download GTO to server work queue
             # add gt_download_mode flag to server gto
@@ -409,8 +414,9 @@ class GTTestCase(unittest.TestCase):
         # wait for download client to exit
         client_sout, client_serr = client.communicate()
 
-        if server:
-            self.terminate_server(server)
+        if servers:
+            for server in servers:
+                self.terminate_server(server)
 
         # check download client return code
         self.assertEqual(client.returncode, assert_rc)

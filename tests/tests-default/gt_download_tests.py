@@ -51,7 +51,7 @@ class TestGeneTorrentDownload(GTTestCase):
         '''Download a 100MB zero-data file from a GT server.'''
         uuid = self.data_upload_test(1024 * 1024 * 100,
             data_generator=DataGenZero)
-        self.data_download_test_uuid(uuid, client_options='--max-children=4')
+        self.data_download_test_uuid(uuid, client_options='--max-children=4', server_ct=2)
 
     def test_32mb_download_from_uuid(self):
         '''Download a randomly-generated 32MB file from a GT server.'''
