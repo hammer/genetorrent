@@ -361,7 +361,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
             gtError (errorMessage, 214);
          }
 
-         Log (logLevelFromBool (haveError), "%s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "Tracker error %s, gto:  %s, infohash:  %s", tea->message().c_str(), gtoName.c_str(), infoHash.c_str());
 
          if ((_operatingMode != SERVER_MODE ) && (tea->times_in_row > 2) && (_successfulTrackerComms == false))
          {
@@ -382,7 +382,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
             screenOutput (errorMessage);
          }
 
-         Log (logLevelFromBool (haveError), "%s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());
+         Log (logLevelFromBool (haveError), "Tracker warning %s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());
       } break;
 
       case libtorrent::scrape_failed_alert::alert_type:
