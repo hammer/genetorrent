@@ -68,7 +68,7 @@ dhparam.pem:
 .PHONY: check-setup
 check-setup: web certs gtoinfo dhparam.pem
 
-check: check-setup
+check-am: check-setup
 
 CLEANFILES = dhparam.pem gtoinfo web
 
