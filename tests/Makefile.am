@@ -48,7 +48,7 @@ EXTRA_DIST = $(test_scripts)              \
              $(extra_test_scripts)
 
 certs:
-	mkdir -p certs/
+	$(MKDIR_P) certs/
 	@echo "Generating SSL CA certificate..."
 	openssl req -new -x509 -days 3650 -extensions v3_ca \
 		-nodes -config $(srcdir)/openssl-ca.cnf \

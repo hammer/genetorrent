@@ -69,11 +69,11 @@ rpmcheck: distcheck
 	$(MAKE) rpmbuild-internal
 
 rpmbuild-internal:
-	mkdir -p $(RPMBUILDDIR)/SRPMS
-	mkdir -p $(RPMBUILDDIR)/RPMS
-	mkdir -p $(RPMBUILDDIR)/SPECS
-	mkdir -p $(RPMBUILDDIR)/BUILD
-	mkdir -p $(RPMBUILDDIR)/SOURCES
+	$(MKDIR_P) $(RPMBUILDDIR)/SRPMS
+	$(MKDIR_P) $(RPMBUILDDIR)/RPMS
+	$(MKDIR_P) $(RPMBUILDDIR)/SPECS
+	$(MKDIR_P) $(RPMBUILDDIR)/BUILD
+	$(MKDIR_P) $(RPMBUILDDIR)/SOURCES
 	IFS=$$'\n'; \
 		if [ -n "$(BUILD_VERSION)" ]; then \
 			DEF_BLD_VER=--define='build_version $(BUILD_VERSION)'; fi; \
@@ -117,7 +117,7 @@ deb-builder:
 	mv $(PACKAGE)-$(VERSION) $(PACKAGE)-$(VERSION).orig
 	tar xzf $(PACKAGE)-$(VERSION).tar.gz
 	mv $(PACKAGE)-$(VERSION).tar.gz genetorrent_$(VERSION).orig.tar.gz
-	mkdir $(PACKAGE)-$(VERSION)/debian
+	$(MKDIR_P) $(PACKAGE)-$(VERSION)/debian
 	cp -a $(top_srcdir)/dpkg/common/* $(PACKAGE)-$(VERSION)/debian
 	cp -a $(top_srcdir)/dpkg/$(DEB_CODENAME)/* $(PACKAGE)-$(VERSION)/debian
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control

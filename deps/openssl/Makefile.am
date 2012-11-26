@@ -31,7 +31,7 @@ OPENSSLVER = 1.0.0
 LEXT = .so.$(OPENSSLVER)
 
 all:
-	mkdir -p lib include
+	$(MKDIR_P) lib include
 
 install:
 	@echo "Installing openssl libraries into $(DESTDIR)$(pkglibdir)"

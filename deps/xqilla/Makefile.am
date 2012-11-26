@@ -40,7 +40,7 @@ D_OPT = -D
 endif
 
 all:
-	mkdir -p lib include bin
+	$(MKDIR_P) lib include bin
 
 install:
 	@echo "Installing xqilla libraries into $(DESTDIR)$(pkglibdir)"

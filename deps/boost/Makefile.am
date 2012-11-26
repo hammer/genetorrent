@@ -39,7 +39,7 @@ endif
 BOOST_INST_LIBS = filesystem program_options regex system thread
 
 all:
-	mkdir -p lib include
+	$(MKDIR_P) lib include
 
 install:
 	@echo "Installing boost libraries into $(DESTDIR)$(pkglibdir)"

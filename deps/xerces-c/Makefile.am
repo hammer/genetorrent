@@ -39,7 +39,7 @@ D_OPT = -D
 endif
 
 all:
-	mkdir -p lib include bin
+	$(MKDIR_P) lib include bin
 
 install:
 	@echo "Installing xerces-c libraries into $(DESTDIR)$(pkglibdir)"
