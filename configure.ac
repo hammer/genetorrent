@@ -131,6 +131,12 @@ AM_CONDITIONAL([DARWIN],
 AM_CONDITIONAL([LINUX],
     [case $host_os in *linux*) true;; *) false;; esac])
 
+# Override pythondir on Mac OS X to install into correct
+# site-packages directory
+if ${DARWIN_TRUE}; then
+    pythondir=/Library/Python/2.7/site-packages
+fi
+
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])
 # AC_CHECK_HEADER([boost/filesystem.hpp])
@@ -175,6 +181,7 @@ AC_CONFIG_FILES(
    [dpkg/Makefile]
    [deps/xqilla/Makefile]
    [deps/xerces-c/Makefile]
+   [macosx/Distribution.xml]
 )
 
 AC_CONFIG_SUBDIRS(

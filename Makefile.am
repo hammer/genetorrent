@@ -27,12 +27,12 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = deps/boost     \
+SUBDIRS = libtorrent     \
+          src            \
+          deps/boost     \
           deps/openssl   \
           deps/xqilla    \
           deps/xerces-c  \
-          libtorrent     \
-          src            \
           scripts        \
           init.d         \
           tests          \
@@ -44,7 +44,8 @@ EXTRA_DIST =                     \
    GeneTorrent.spec              \
    autogen.sh                    \
    GeneTorrent.nsi               \
-   deps/builder_common
+   deps/builder_common		 \
+   macosx/Distribution.xml
 
 dist_doc_DATA =                  \
    LICENSE                       \
@@ -129,5 +130,54 @@ deb-builder:
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/changelog
 	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc
+endif
+
+if DARWIN
+MACDIR = $(PWD)/macosx/_install
+MACDEPLIBS :=	libboost_filesystem.dylib	\
+		libboost_program_options.dylib	\
+		libboost_regex.dylib		\
+		libboost_system.dylib		\
+		libboost_thread.dylib		\
+		libxerces-c-3.1.dylib		\
+		libxqilla.6.dylib
+
+.PHONY: macosx
+macosx:
+	test "${prefix}" = "/usr" || (echo "Prefix must be /usr" && exit 1)
+	@echo "  Fixing library install names"
+	@set -e; for lib in $(MACDEPLIBS) 					\
+		; do								\
+		libpath=`find $(top_srcdir)/deps/*/lib -name $${lib} -type f`;	\
+		install_name_tool -id @rpath/$${lib} $${libpath}; 		\
+	done
+	install_name_tool -change libboost_system.dylib @rpath/libboost_system.dylib \
+		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib
+	install_name_tool -add_rpath /usr/lib/GeneTorrent \
+		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib || true
+	@set -e; \
+		xerces_install_name=$$(otool -L $(top_srcdir)/deps/xqilla/lib/libxqilla.dylib | \
+			$(GREP) xerces | cut -d' ' -f1 | head -1); 				\
+		install_name_tool -change $${xerces_install_name} @rpath/libxerces-c-3.1.dylib 	\
+			$(top_srcdir)/deps/xqilla/lib/libxqilla.dylib
+	@echo "  Building for Mac OS X"
+	rm -rf $(MACDIR)
+	$(MKDIR_P) $(MACDIR)
+	$(MAKE) DESTDIR=$(MACDIR) installdirs
+	$(MAKE) DESTDIR=$(MACDIR) install
+	@echo "  Removing server components"
+	rm -rf $(MACDIR)/etc
+	rm -rf $(MACDIR)/usr/bin/GTLoadBalancer
+	rm -rf $(MACDIR)/usr/bin/gtserver
+	rm -rf $(MACDIR)/usr/share/man/man1/gtserver.1
+	@echo "  Building package"
+	@set -e; cd macosx; \
+	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
+		--root $(MACDIR) "$(PACKAGE)-$(VERSION)-Internal.pkg";	\
+	productbuild --distribution Distribution.xml 			\
+		--resources=_install/usr/share/doc/GeneTorrent 		\
+		$(PACKAGE)-$(VERSION).pkg;				\
+	mv $(PACKAGE)-$(VERSION).pkg ..;				\
+	cd -
 endif
 

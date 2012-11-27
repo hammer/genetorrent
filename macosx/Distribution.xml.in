@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <pkg-ref id="edu.ucsc.cghub.genetorrent"/>
+    <license file="LICENSE" mime-type="text/plain"/>
+    <title>GeneTorrent</title>
+    <allowed-os-versions>
+        <os-version min="10.7.0"/>
+    </allowed-os-versions>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="edu.ucsc.cghub.genetorrent"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="edu.ucsc.cghub.genetorrent" visible="false">
+        <pkg-ref id="edu.ucsc.cghub.genetorrent"/>
+    </choice>
+    <pkg-ref id="edu.ucsc.cghub.genetorrent" version="@PACKAGE_VERSION@" onConclusion="none">GeneTorrent-@PACKAGE_VERSION@-Internal.pkg</pkg-ref>
+</installer-gui-script>
