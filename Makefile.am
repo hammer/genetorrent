@@ -50,6 +50,7 @@ dist_doc_DATA =                  \
    LICENSE                       \
    README
 
+if LINUX
 # These can be overridden on the make command line.
 DISABLE_RPM_CHECK = no
 BUILD_VERSION =
@@ -84,14 +85,19 @@ rpmbuild-internal:
 			--showrc > $(RPMBUILDDIR)/gt-rpmrc.out; \
 		rpmbuild $(RPMBUILD_DEFINES) $${DEF_BLD_VER} $${DEF_WITH_BOOST} \
 			-ta $(distdir).tar.gz
+endif
 
+if CYGWIN
 windows-installer: all
 	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
 			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
+endif
 
+if LINUX
 DEB_CODENAME := $(shell lsb_release -cs)
 
 .PHONY: deb deb-builder deb-quantal deb-precise deb-squeeze deb-oneiric
+
 deb-precise:
 	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
 
@@ -123,4 +129,5 @@ deb-builder:
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/changelog
 	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc
+endif
 

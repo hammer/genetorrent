@@ -128,6 +128,9 @@ AM_CONDITIONAL([CYGWIN],
 AM_CONDITIONAL([DARWIN],
     [case $host_os in *darwin*) true;; *) false;; esac])
 
+AM_CONDITIONAL([LINUX],
+    [case $host_os in *linux*) true;; *) false;; esac])
+
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])
 # AC_CHECK_HEADER([boost/filesystem.hpp])
