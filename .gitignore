@@ -103,3 +103,7 @@ libtool
 /deps/xerces-c/include/
 /deps/xerces-c/lib/
 /deps/xerces-c/xerces-c-*
+
+# /macosx/
+/macosx/Distribution.xml
+/macosx/_install
