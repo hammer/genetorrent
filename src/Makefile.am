@@ -80,7 +80,6 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -shared \
                             -no-undefined \
                             $(torrentrasterbar_LIBS) \
-                            -R $(libdir)/GeneTorrent \
                             -L../libtorrent/src/.libs \
                             $(BOOST_LDFLAGS) \
                             $(OPENSSL_LDFLAGS) \
