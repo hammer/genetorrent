@@ -203,8 +203,12 @@ namespace libtorrent
 #endif
 #if defined TORRENT_VERBOSE_LOGGING || defined TORRENT_ERROR_LOGGING
 		error_code ec;
+#ifndef TORRENT_CALLBACK_LOGGER
 		m_logger = m_ses.create_log(m_remote.address().to_string(ec) + "_"
 			+ to_string(m_remote.port()).elems, m_ses.listen_port());
+#else  /* TORRENT_CALLBACK_LOGGER */
+		m_logger = m_ses.create_log();
+#endif /* TORRENT_CALLBACK_LOGGER */
 		peer_log(">>> %s [ ep: %s transport: %s seed: %d p: %p ]"
 			, outgoing ? "OUTGOING_CONNECTION" : "INCOMING CONNECTION"
 			, print_endpoint(m_remote).c_str()
@@ -355,8 +359,12 @@ namespace libtorrent
 #if defined TORRENT_VERBOSE_LOGGING || defined TORRENT_ERROR_LOGGING
 		error_code ec;
 		TORRENT_ASSERT(m_socket->remote_endpoint(ec) == m_remote || ec);
+#ifndef TORRENT_CALLBACK_LOGGER
 		m_logger = m_ses.create_log(remote().address().to_string(ec) + "_"
 			+ to_string(remote().port()).elems, m_ses.listen_port());
+#else  /* TORRENT_CALLBACK_LOGGER */
+		m_logger = m_ses.create_log();
+#endif /* TORRENT_CALLBACK_LOGGER */
 		peer_log("<<< %s [ ep: %s transport: %s ]"
 			, outgoing ? "OUTGOING_CONNECTION" : "INCOMING CONNECTION"
 			, print_endpoint(m_remote).c_str()

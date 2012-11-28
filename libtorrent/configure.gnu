@@ -5,9 +5,12 @@
 prefix="/usr/local"
 libdir=
 srcdir="."
+logging="minimal"
+
 prefix_regex="^--prefix=(.*)$"
 libdir_regex="^--libdir=(.*)$"
 srcdir_regex="^--srcdir=(.*)$"
+logging_regex="^--enable-logging=(.*)$"
 
 for arg in "${@}"
 do
@@ -23,6 +26,10 @@ do
       srcdir=${BASH_REMATCH[1]}
       echo "found srcdir: ${srcdir}"
    fi
+   if [[ "${arg}" =~ $logging_regex ]]; then
+      logging=${BASH_REMATCH[1]}
+      echo "found logging option: ${logging}"
+   fi
    echo $arg
 done
 
@@ -31,7 +38,7 @@ if [[ -z "${libdir}" ]]; then
 fi
 
 ${srcdir}/configure "${@}" --disable-geoip \
-   --disable-dht --enable-callbacklogger --enable-logging=minimal \
+   --disable-dht --enable-callbacklogger --enable-logging=${logging} \
    --libdir=${libdir}/GeneTorrent --includedir=${prefix}/include/GeneTorrent \
    --enable-shared --disable-static
 
