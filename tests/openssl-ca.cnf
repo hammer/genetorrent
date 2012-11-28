@@ -130,7 +130,7 @@ CN=US
 OU=GeneTorrent Automated Tests
 stateOrProvinceName=CA
 localityName=Los Gatos
-emailAddress=someone@somewhere.org
+emailAddress=someone@example.org
 organizationalUnitName=GeneTorrent
 commonName=GeneTorrent
 
