@@ -197,6 +197,25 @@ void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const cha
    if (m_mode == gtLoggerOutputNone) 
       return;
 
+   const char *lvl;
+   int pri;
+
+   switch (priority)
+   {
+      case PRIORITY_HIGH:
+         lvl = "Error";
+         pri = LOG_ALERT;
+         break;
+      case PRIORITY_NORMAL:
+         lvl = "Normal";
+         pri = LOG_INFO;
+         break;
+      case PRIORITY_DEBUG:
+         lvl = "Debug";
+         pri = LOG_DEBUG;
+         break;
+   }
+
    char buffer[1024];
 
    if (m_mode != gtLoggerOutputSyslog) 
@@ -210,37 +229,12 @@ void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const cha
       localtime_r(&nowSec, &time_tm);
       strftime(timebuf, sizeof(timebuf), "%m/%d %H:%M:%S", &time_tm);
 
-      switch (priority)
-      {
-         case PRIORITY_HIGH:
-         {
-            snprintf(buffer, sizeof(buffer), "%s.%03d Error:  %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
-         } break;
-
-         case PRIORITY_NORMAL:      // fall-through
-
-         case PRIORITY_DEBUG:
-         {
-            snprintf(buffer, sizeof(buffer), "%s.%03d %s\n", timebuf, static_cast<int>(now.tv_usec/1000), fmt);
-         } break;
-      }
+      snprintf (buffer, sizeof(buffer), "%s.%03d %s:  %s\n", timebuf,
+                static_cast<int>(now.tv_usec/1000), lvl, fmt);
    }
    else
    {
-      switch (priority)
-      {
-         case PRIORITY_HIGH:
-         {
-            snprintf(buffer, sizeof(buffer), "Error:  %s", fmt);
-         } break;
-
-         case PRIORITY_NORMAL:      // fall-through
-
-         case PRIORITY_DEBUG:
-         {
-            snprintf(buffer, sizeof(buffer), "%s", fmt);
-         } break;
-      }
+      snprintf (buffer, sizeof(buffer), "%s:  %s", lvl, fmt);
    }
 
    va_list ap;
@@ -254,23 +248,7 @@ void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const cha
    {
       char sysLogBuffer[2048];
       vsnprintf(sysLogBuffer, sizeof(sysLogBuffer), buffer, ap);
-      switch (priority)
-      {
-         case PRIORITY_HIGH:
-         {
-            syslog (LOG_ALERT, "%s", sysLogBuffer);
-         } break;
-
-         case PRIORITY_NORMAL:
-         {
-            syslog (LOG_INFO, "%s", sysLogBuffer);
-         } break;
-
-         case PRIORITY_DEBUG:
-         {
-            syslog (LOG_DEBUG, "%s", sysLogBuffer);
-         } break;
-      }
+      syslog (pri, "%s", sysLogBuffer);
    }
 
    va_end(ap);
