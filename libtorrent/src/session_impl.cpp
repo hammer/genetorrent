@@ -5262,8 +5262,6 @@ namespace aux {
 		async_dec_threads();
 #endif
 
-		m_io_service.stop();
-
 		if (m_thread) m_thread->join();
 
 		TORRENT_ASSERT(m_torrents.empty());
