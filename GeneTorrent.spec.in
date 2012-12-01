@@ -240,6 +240,7 @@ fi
 %{gt_python_sitelib}/gtoinfo.pyo
 %{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/README
+%{_docdir}/%{name}/NEWS
 
 %files upload
 %defattr(-,root,root,-)

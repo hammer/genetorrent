@@ -49,7 +49,8 @@ EXTRA_DIST =                     \
 
 dist_doc_DATA =                  \
    LICENSE                       \
-   README
+   README                        \
+   NEWS
 
 if LINUX
 # These can be overridden on the make command line.

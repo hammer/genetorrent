@@ -7,5 +7,6 @@ usr/lib/GeneTorrent/libboost*
 usr/lib/libgenetorrent.so*
 usr/share/doc/GeneTorrent/LICENSE
 usr/share/doc/GeneTorrent/README
+usr/share/doc/GeneTorrent/NEWS
 usr/share/GeneTorrent/dhparam.pem
 

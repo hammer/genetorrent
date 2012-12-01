@@ -1,0 +1,87 @@
+.. -*- mode: rst -*-
+
+=============================
+Release Notes for GeneTorrent
+=============================
+
+.. This file is reStructuredText file. It can easily be converted to
+   other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
+   generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
+
+GeneTorrent 3.7.2
+*****************
+
+November 30, 2012
+
+Enhancements
+------------
+
+* Improved command line and configuration file option logging
+  at startup.  This information is now printed in a more readable
+  format, with one argument per line.
+
+* The application name in syslog is no longer GeneTorrent.  Rather,
+  it is one of gtserver, gtdownload, or gtupload.  Any automated
+  process that relies on "GeneTorrent" to exist in GeneTorrent-
+  related syslog lines must be adjusted.
+
+* Added support for uploading torrents with multiple files and
+  subdirectories.
+
+Bug Fixes
+---------
+
+* **[GTXFER-59]** GeneTorrent Client waits several minutes after
+  transfer is complete...
+
+Known Issues
+------------
+
+* **[GTXFER-67]**  Peers that are banned for sending bad data seem to
+  immediately reconnect and may send the same bad data again.  This may
+  result in excess usage of system resources and bandwidth.
+
+Build Information
+-----------------
+
+* GeneTorrent now builds shared libraries for dependencies
+  on certain platforms and distributes them in a private
+  library directory.  For CentOS 5 RPMs, the distributed libraries
+  are openssl and several required boost libraries.  For CentOS 6
+  RPMs, the distributed libraries are several required boost libraries.
+
+* Code common to the three application binaries is built as a shared
+  library called libgenetorrent.so.  This library does not have a stable
+  API, and therefore it is not versioned and no -devel package is built or
+  provided.
+
+* The RPM build process outputs four binary RPMs
+
+  * GeneTorrent-common - contains libgenetorrent, the dependency libraries,
+    and a GeneTorrent wrapper script to enable "GeneTorrent --<mode>"
+    style invocation.
+  * GeneTorrent-download - contains the download client and its man page.
+  * GeneTorrent-upload - contains the upload client and its man page.
+  * GeneTorrent-server - contains the server, init scripts, configuration
+    files, and the server man page.
+
+Installation/Upgrade Information
+--------------------------------
+
+The new GeneTorrent-common package is required by the three application
+packages.  The new GeneTorrent-common packages obsoletes the old GeneTorrent
+RPM, which means that RPM removes it before installing GeneTorrent-common
+when upgrading.
+
+Because GeneTorrent-common does not provide any of the application binaries,
+this can result in an upgrade without any of the previous functionality.
+Be sure to install the -download, -upload, and -server packages as needed.
+
+To install, as root::
+
+  rpm -ivh [[filename.rpm] ...]
+
+To upgrade::
+
+  rpm -Uvh [[fileanem.rpm] ...]
+
