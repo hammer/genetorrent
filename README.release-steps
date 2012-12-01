@@ -1,0 +1,57 @@
+=================
+ Release Process
+=================
+
+When making a release, the following steps need to be performed:
+
+1. Bring the ``NEWS`` file up to date with the release notes.
+
+2. Bump the ``GeneTorrent`` version in ``configure.ac``.
+
+3. Do the ``autogen.sh -> ./configure -> make`` dance.
+
+4. Run ``make -j5 distcheck`` to run the GeneTorrent test suite.
+
+5. Build the rpms by running ``make rpm`` on a CentOS-6.x system.
+
+6. Install RPMS and run smoke tests.
+
+7. Commit changes made for the release to git and push to GitHub.
+
+8. Tag the release in git::
+
+      $ git tag -m "GeneTorrent-<version> release" GeneTorrent-<version>
+
+    Where ``<version>`` is the version set in step 3 above.
+
+9. Push the tag to GitHub.
+
+10. Repeat tests (steps 3 thru 4 above). Preferrably from a clean git clone.
+
+11. Generate the release notes pdf::
+
+        $ rst2pdf -o genetorrent-<version>-release-notes.pdf NEWS
+
+12. Bump the version in ``configure.ac`` to a post-release value.
+
+13. Stub out section for next release in NEWS.
+
+14. Commit post-release changes to git and push to GitHub.
+
+15. Upload files to release wiki page
+    (https://annaisystems.atlassian.net/wiki/display/CGHUBDEV/GeneTorrent+Releases). The
+    following files should be uploaded:
+
+    * ``genetorrent-<version>-release-notes.pdf``
+    * ``GeneTorrent-<version>.tar.gz``
+    * ``GeneTorrent-common-<version>-1.el5.x86_64.rpm``
+    * ``GeneTorrent-upload-<version>-1.el5.x86_64.rpm``
+    * ``GeneTorrent-download-<version>-1.el5.x86_64.rpm``
+    * ``GeneTorrent-server-<version>-1.el5.x86_64.rpm``
+    * ``GeneTorrent-common-<version>-1.el6.x86_64.rpm``
+    * ``GeneTorrent-upload-<version>-1.el6.x86_64.rpm``
+    * ``GeneTorrent-download-<version>-1.el6.x86_64.rpm``
+    * ``GeneTorrent-server-<version>-1.el6.x86_64.rpm``
+
+16. Update the release wiki page.
+
