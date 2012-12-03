@@ -415,12 +415,12 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
 
    fclose (gtoFile);
 
-   processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
-
    if (_verbosityLevel > VERBOSE_2)
    {
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
+
+   processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
 
    curl_formfree(post);
    curl_easy_cleanup (curl);

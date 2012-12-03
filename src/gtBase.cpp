@@ -1707,12 +1707,12 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    fclose (signedCert);
 
-   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:");
-
    if (_verbosityLevel > VERBOSE_2)
    {
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
+
+   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:");
 
    curl_formfree (post);
    curl_easy_cleanup (curl);
