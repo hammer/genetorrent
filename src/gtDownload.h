@@ -72,6 +72,7 @@ class gtDownload : public gtBase
       void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
+      bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID);
 
       void pcfacliDownloadList (boost::program_options::variables_map &vm);
       void pcfacliMaxChildren (boost::program_options::variables_map &vm);

@@ -318,14 +318,10 @@ void gtDownload::prepareDownloadList ()
    }
 }
 
-// Returns the path to the .gto file that was downloaded.
-std::string gtDownload::downloadGtoFileByURI (std::string uri)
+bool gtDownload::downloadGTO (std::string uri, std::string fileName,
+                              std::string torrUUID)
 {
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Communicating with GT Executive ...        ");
-   }
-
+   bool curl_status;
    CURL *curl;
    curl = curl_easy_init ();
 
@@ -334,10 +330,6 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
       gtError ("libCurl initialization failure", 201);
    }
 
-   std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
-   fileName = fileName.substr (0, fileName.find_first_of ('?'));
-   std::string torrUUID = fileName;
-   fileName += GTO_FILE_EXTENSION;
    std::string tmpFileName = fileName + ".tmp";
 
    FILE *gtoFile;
@@ -377,7 +369,8 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
    struct curl_httppost *post=NULL;
    struct curl_httppost *last=NULL;
 
-   curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
+   curl_formadd (&post, &last, CURLFORM_COPYNAME, "token",
+                 CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
@@ -390,48 +383,81 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
 
    CURLcode res;
-   int retries = 5;
 
-   while (retries)
+   res = curl_easy_perform (curl);
+
+   if (res == CURLE_SSL_CONNECT_ERROR || res == CURLE_OPERATION_TIMEDOUT)
    {
-      res = curl_easy_perform (curl);
-
-      if (res != CURLE_SSL_CONNECT_ERROR && res != CURLE_OPERATION_TIMEDOUT)
-      {
-         // Only retry on SSL connect errors or timeouts in case the other end is temporarily overloaded.
-         break;
-      }
+      // Only retry on SSL connect errors or timeouts in case the
+      // other end is temporarily overloaded.
 
       // Give the other end time to become less loaded.
       sleep (2);
-
-      retries--;
-
-      if (retries && (_verbosityLevel > VERBOSE_1))
-      {
-         screenOutput ("Retrying to retrieve gto for UUID: " + torrUUID);
-      }
    }
 
    fclose (gtoFile);
 
    if (_verbosityLevel > VERBOSE_2)
    {
-      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
+      screenOutput ("Headers received from the client:  '"
+                    << curlResponseHeaders << "'" << std::endl);
    }
 
-   processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
+   curl_status = processCurlResponse (curl, res, tmpFileName, uri, torrUUID,
+                                      "Problem communicating with GeneTorrent "
+                                      "Executive while trying to retrieve GTO "
+                                      "for UUID:");
 
    curl_formfree(post);
    curl_easy_cleanup (curl);
 
-   // If we got this far, the gto file should have any chance of
-   // containing xml errors messages instead of torrent
-   // information. Rename the tmp file to the real gto file.
-   if (rename (tmpFileName.c_str(), fileName.c_str()) < 0)
+   if (curl_status)
    {
-      gtError ("Failed to rename tmp gto to gto: " + tmpFileName + " -> " + fileName,
-               88, TORRENT_ERROR, 0, "", strerror(errno));
+      // If we got this far, the gto file should not have any chance of
+      // containing xml error messages instead of torrent
+      // information. Rename the tmp file to the real gto file.
+      if (rename (tmpFileName.c_str(), fileName.c_str()) < 0)
+      {
+         gtError ("Failed to rename tmp gto to gto: " + tmpFileName + " -> "
+                  + fileName, 88, TORRENT_ERROR, 0, "", strerror(errno));
+      }
+   }
+
+   return curl_status;
+}
+
+// Returns the path to the .gto file that was downloaded.
+std::string gtDownload::downloadGtoFileByURI (std::string uri)
+{
+   if (_verbosityLevel > VERBOSE_1)
+   {
+      screenOutput ("Communicating with GT Executive ...        ");
+   }
+
+   std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
+   fileName = fileName.substr (0, fileName.find_first_of ('?'));
+   std::string torrUUID = fileName;
+   fileName += GTO_FILE_EXTENSION;
+
+   int retries = 5;
+   bool success = false;
+   while (retries > 0)
+   {
+      if (downloadGTO (uri, fileName, torrUUID))
+      {
+         success = true;
+         break;
+      }
+
+      LogNormal ("GTO download failed, retrying");
+
+      retries--;
+   }
+
+   if (!success)
+   {
+      LogHigh ("Failed to download GTO: max tries reached");
+      exit (1);
    }
 
    std::string torrFile = getWorkingDirectory () + '/' + fileName;

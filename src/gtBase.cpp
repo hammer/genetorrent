@@ -1717,6 +1717,14 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_formfree (post);
    curl_easy_cleanup (curl);
 
+   if (!successfulPerform)
+   {
+      if (_operatingMode != SERVER_MODE)
+      {
+         exit (1);
+      }
+   }
+
    return successfulPerform;
 }
 
@@ -1875,15 +1883,9 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
          removeFile (fileName);
       }
       
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError (defaultMessage + uuid, 203, gtBase::CURL_ERROR, result, "URL:  " + url);
-      }
-      else
-      {
-         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result, "URL:  " + url);
-         return false;
-      }
+      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result,
+               "URL:  " + url);
+      return false;
    }
 
    long code;
@@ -1896,33 +1898,22 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
          removeFile (fileName);
       }
       
-      if (_operatingMode != SERVER_MODE)
-      {
-         gtError (defaultMessage + uuid, 204, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
-      }
-      else
-      {
-         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
-         return false;
-      }
+      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0,
+               "URL:  " + url);
+      return false;
    }
 
 // TODO, use content type
    if (code != 200)
    {
-      if (_operatingMode != SERVER_MODE)
-      {          
-         processHTTPError (code, fileName);  // exits if successful processes XML, otherwise turn it over to GTError which exits
-         gtError (defaultMessage + uuid, 205, gtBase::HTTP_ERROR, code, "URL:  " + url);
-      }
-      else
+      // returns true if successfully used the XML in the file,
+      // otherwise log generic error with GTError
+      if (!processHTTPError (code, fileName, ERROR_NO_EXIT))
       {
-         if (!processHTTPError (code, fileName, ERROR_NO_EXIT))  // returns true if successfully used the XML in the file, otherwise log generic error with GTError
-         {
-            gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + url);
-         }
-         return false;   // return false to indicate failed curl transaction
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR,
+                  code, "URL:  " + url);
       }
+      return false;   // return false to indicate failed curl transaction
    }
    return true;    // success curl transaction
 }
