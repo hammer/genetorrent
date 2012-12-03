@@ -338,14 +338,15 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
    fileName = fileName.substr (0, fileName.find_first_of ('?'));
    std::string torrUUID = fileName;
    fileName += GTO_FILE_EXTENSION;
+   std::string tmpFileName = fileName + ".tmp";
 
    FILE *gtoFile;
 
-   gtoFile = fopen (fileName.c_str (), "wb");
+   gtoFile = fopen (tmpFileName.c_str (), "wb");
 
    if (gtoFile == NULL)
    {
-      gtError ("Failure opening " + fileName + " for output.", 202, ERRNO_ERROR, errno);
+      gtError ("Failure opening " + tmpFileName + " for output.", 202, ERRNO_ERROR, errno);
    }
 
    char errorBuffer[CURL_ERROR_SIZE + 1];
@@ -414,7 +415,7 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
 
    fclose (gtoFile);
 
-   processCurlResponse (curl, res, fileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
+   processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:");
 
    if (_verbosityLevel > VERBOSE_2)
    {
@@ -423,6 +424,15 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
 
    curl_formfree(post);
    curl_easy_cleanup (curl);
+
+   // If we got this far, the gto file should have any chance of
+   // containing xml errors messages instead of torrent
+   // information. Rename the tmp file to the real gto file.
+   if (rename (tmpFileName.c_str(), fileName.c_str()) < 0)
+   {
+      gtError ("Failed to rename tmp gto to gto: " + tmpFileName + " -> " + fileName,
+               88, TORRENT_ERROR, 0, "", strerror(errno));
+   }
 
    std::string torrFile = getWorkingDirectory () + '/' + fileName;
 
