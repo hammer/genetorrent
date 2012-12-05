@@ -204,6 +204,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define TORRENT_COMPLETE_TYPES_REQUIRED 1
 #define TORRENT_USE_IFCONF 1
 #define TORRENT_HAS_SALEN 0
+#define TORRENT_ICONV_ARG (const char**)
 
 // ==== BEOS ===
 #elif defined __BEOS__ || defined __HAIKU__
