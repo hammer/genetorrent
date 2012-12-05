@@ -42,7 +42,7 @@ python_PYTHON = \
 PYTHON_TOOLS=gtoinfo
 
 ${PYTHON_TOOLS}: python_wrapper
-	cp $< $@
+	cp python_wrapper $@
 
 BUILT_SOURCES = ${PYTHON_TOOLS}
 CLEANFILES = ${PYTHON_TOOLS} gtoinfo.pyc
