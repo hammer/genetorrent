@@ -53,8 +53,15 @@ boost_LIBS = $(BOOST_SYSTEM_LIB)          \
              $(BOOST_REGEX_LIB)           \
              $(BOOST_PROGRAM_OPTIONS_LIB)
 
+if SOLARIS
+torrentrasterbar_CXXFLAGS:sh =  /usr/bin/pkg-config --cflags ../libtorrent/libtorrent-rasterbar.pc
+torrentrasterbar_only_l:sh = /usr/bin/pkg-config --libs-only-l ../libtorrent/libtorrent-rasterbar.pc
+else
 torrentrasterbar_CXXFLAGS =  $(shell $(PKG_CONFIG) --cflags ../libtorrent/libtorrent-rasterbar.pc)
-torrentrasterbar_LIBS = -L../libtorrent/src/.libs $(shell $(PKG_CONFIG) --libs-only-l ../libtorrent/libtorrent-rasterbar.pc)
+torrentrasterbar_only_l = $(shell $(PKG_CONFIG) --libs-only-l ../libtorrent/libtorrent-rasterbar.pc)
+endif
+
+torrentrasterbar_LIBS = $(torrentrasterbar_only_l) -L../libtorrent/src/.libs
 
 lib_LTLIBRARIES = libgenetorrent.la
 

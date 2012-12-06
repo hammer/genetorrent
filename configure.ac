@@ -131,6 +131,9 @@ AM_CONDITIONAL([DARWIN],
 AM_CONDITIONAL([LINUX],
     [case $host_os in *linux*) true;; *) false;; esac])
 
+AM_CONDITIONAL([SOLARIS],
+    [case $host_os in *solaris*) true;; *) false;; esac])
+
 # Override pythondir on Mac OS X to install into correct
 # site-packages directory
 if ${DARWIN_TRUE}; then
