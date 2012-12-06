@@ -7,6 +7,8 @@ libdir=
 srcdir=.
 logging=minimal
 
+filtered=
+
 for arg in "${@}"
 do
    case ${arg} in
@@ -26,6 +28,10 @@ do
          logging=${arg##*=}
          shift 1
          ;;
+      *)
+         shift 1
+         filtered="${filtered} $arg"
+         ;;
    esac
 done
 
@@ -33,8 +39,8 @@ if test -z "${libdir}"; then
    libdir=${prefix}/lib
 fi
 
-${srcdir}/configure "${@}" --disable-geoip \
-   --prefix=${prefix} --libdir=${libdir} --srcdir=${srcdir} \
+${srcdir}/configure ${filtered} --disable-geoip \
+   --prefix=${prefix} -srcdir=${srcdir} \
    --disable-dht --enable-callbacklogger --enable-logging=${logging} \
    --libdir=${libdir}/GeneTorrent --includedir=${prefix}/include/GeneTorrent \
    --enable-shared --disable-static
