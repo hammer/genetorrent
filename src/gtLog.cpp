@@ -206,13 +206,16 @@ void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const cha
          lvl = "Error";
          pri = LOG_ALERT;
          break;
-      case PRIORITY_NORMAL:
-         lvl = "Normal";
-         pri = LOG_INFO;
-         break;
+
       case PRIORITY_DEBUG:
          lvl = "Debug";
          pri = LOG_DEBUG;
+         break;
+
+      case PRIORITY_NORMAL:
+      default:
+         lvl = "Normal";
+         pri = LOG_INFO;
          break;
    }
 
