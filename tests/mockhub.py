@@ -114,7 +114,14 @@ class Session(object):
             csr_file.close()
 
             # Add user id so multiple users will not have a conflict.
-            caserial = '/tmp/mockhub-cacert-%d.srl' % (os.getuid())
+            uid = 0
+            if os.name != 'nt':
+                uid = os.getuid()
+
+            caserial = os.path.join(
+                tempfile.gettempdir(),
+                'mockhub-cacert-%d.srl' % (uid)
+            )
 
             new_certificate_pem =  subprocess.Popen(['openssl', 'x509', '-req',
                 '-days', '180', '-in', csr_file.name, '-CA', CA_CERT, '-CAkey',
