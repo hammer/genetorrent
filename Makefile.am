@@ -145,7 +145,7 @@ MACDEPLIBS :=	libboost_filesystem.dylib	\
 
 .PHONY: macosx
 macosx:
-	test "${prefix}" = "/usr" || (echo "Prefix must be /usr" && exit 1)
+	test "${prefix}" = "/usr/local" || (echo "Prefix must be /usr/local" && exit 1)
 	@echo "  Fixing library install names"
 	@set -e; for lib in $(MACDEPLIBS) 					\
 		; do								\
@@ -154,7 +154,7 @@ macosx:
 	done
 	install_name_tool -change libboost_system.dylib @rpath/libboost_system.dylib \
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib
-	install_name_tool -add_rpath /usr/lib/GeneTorrent \
+	install_name_tool -add_rpath /usr/local/lib/GeneTorrent \
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib || true
 	@set -e; \
 		xerces_install_name=$$(otool -L $(top_srcdir)/deps/xqilla/lib/libxqilla.dylib | \
@@ -176,7 +176,7 @@ macosx:
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
 		--root $(MACDIR) "$(PACKAGE)-$(VERSION)-Internal.pkg";	\
 	productbuild --distribution Distribution.xml 			\
-		--resources=_install/usr/share/doc/GeneTorrent 		\
+		--resources=_install/usr/local/share/doc/GeneTorrent 		\
 		$(PACKAGE)-$(VERSION).pkg;				\
 	mv $(PACKAGE)-$(VERSION).pkg ..;				\
 	cd -

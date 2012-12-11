@@ -349,6 +349,9 @@ void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
 #ifdef __CYGWIN__
    _confDir = getWinInstallDirectory ();
 #endif /* __CYGWIN__ */
+#ifdef __APPLE_CC__
+   _confDir = CONF_DIR_LOCAL;
+#endif
 
    if (vm.count (CONF_DIR_CLI_OPT) == 1)
    { 
