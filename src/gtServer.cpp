@@ -246,12 +246,27 @@ void gtServer::run ()
                                                    // that is maintained inside the list of activeSessions.
                                                    // This list is maintained here for simplicity and speed
 
+   // determine location of stop file on this OS
+   libtorrent::error_code ec;
+   std::string stopPathAndFile;
+   boost::filesystem::path stopFile = boost::filesystem::temp_directory_path(ec);
+   if (!ec)
+   {
+      stopFile /= SERVER_STOP_FILE;
+      stopPathAndFile = stopFile.string();
+   }
+   else
+   {
+      // An error occurred, use a default
+      stopPathAndFile = "/tmp/" + SERVER_STOP_FILE;
+   }
+
    while (1)
    {
-      if (!statFile (SERVER_STOP_FILE)) //statFile returns -1 on error
+      if (!statFile (stopPathAndFile.c_str())) //statFile returns -1 on error
       {
          Log (PRIORITY_HIGH, "Exiting server due to existence of stop file %s",
-            SERVER_STOP_FILE.c_str());
+            stopPathAndFile.c_str());
          break;
       }
       // Get the collection of .gto files in the queue directory

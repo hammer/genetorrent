@@ -34,7 +34,9 @@ import tempfile
 
 from logging import getLogger
 
-SERVER_STOP_FILE = '/tmp/GeneTorrent.stop'
+SERVER_STOP_FILE = os.path.join(
+    tempfile.gettempdir(),
+    'GeneTorrent.stop')
 
 class InstanceType:
     GT_ALL = 0       # no longer provided
