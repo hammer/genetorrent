@@ -64,7 +64,7 @@ class TestGeneTorrentArguments(GTTestCase):
         self.assertIn("may only specify one of", serr)
         self.assertEqual(gt.returncode, 9)
 
-        gt = GeneTorrentInstance(self.confdir + "-s %s -u xxx" % (os.getcwd()),
+        gt = GeneTorrentInstance(self.confdir + "-s '%s' -u xxx" % (os.getcwd()),
             instance_type=InstanceType.GT_SERVER, add_defaults=False)
         (sout, serr) = gt.communicate()
         self.assertIn("may only specify one of", serr)
@@ -92,7 +92,7 @@ class TestGeneTorrentArguments(GTTestCase):
         self.assertIn("may only specify one of", serr)
         self.assertEqual(gt.returncode, 9)
 
-        gt = GeneTorrentInstance(self.confdir + "--server %s --upload xxx" % (os.getcwd()),
+        gt = GeneTorrentInstance(self.confdir + "--server '%s' --upload xxx" % (os.getcwd()),
             instance_type=InstanceType.GT_SERVER, add_defaults=False)
         (sout, serr) = gt.communicate()
         self.assertIn("may only specify one of", serr)
