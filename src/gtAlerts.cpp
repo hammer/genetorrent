@@ -406,7 +406,11 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
          libtorrent::tracker_reply_alert *tra = libtorrent::alert_cast<libtorrent::tracker_reply_alert> (alrt);
          getGtoNameAndInfoHash (tra, gtoName, infoHash);
-         Log (logLevelFromBool (haveError), "%s, infohash:  %s", tra->message().c_str(), infoHash.c_str());
+
+         // If in server mode, non-error tracker reply notifications should
+         // be debug level
+         gtLogLevel level = makeDebugIfServerModeUnlessError(haveError);
+         Log (level, "%s, infohash:  %s", tra->message().c_str(), infoHash.c_str());
 
       } break;
 
@@ -422,12 +426,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
 
          // If in server mode, non-error tracker announce notifications should
          // be debug level
-         gtLogLevel level = PRIORITY_NORMAL;
-         if (haveError)
-            level = PRIORITY_HIGH;
-         else if (_operatingMode == SERVER_MODE)
-            level = PRIORITY_DEBUG;
-
+         gtLogLevel level = makeDebugIfServerModeUnlessError(haveError);
          Log (level, "%s, infohash:  %s", taa->message().c_str(), infoHash.c_str());
 
       } break;
@@ -457,3 +456,14 @@ void gtBase::processStatusNotification (bool haveError, libtorrent::alert *alrt)
       } break;
    }
 }
+
+gtLogLevel gtBase::makeDebugIfServerModeUnlessError (bool haveError)
+{
+   if (haveError)
+      return PRIORITY_HIGH;
+   else if (_operatingMode == SERVER_MODE)
+      return PRIORITY_DEBUG;
+   else
+      return PRIORITY_NORMAL;
+}
+
