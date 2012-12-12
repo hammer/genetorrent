@@ -185,6 +185,7 @@ AC_CONFIG_FILES(
    [deps/xqilla/Makefile]
    [deps/xerces-c/Makefile]
    [macosx/Distribution.xml]
+   [solaris/pkginfo]
 )
 
 AC_CONFIG_SUBDIRS(

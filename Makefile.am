@@ -45,7 +45,8 @@ EXTRA_DIST =                     \
    autogen.sh                    \
    GeneTorrent.nsi               \
    deps/builder_common		 \
-   macosx/Distribution.xml
+   macosx/Distribution.xml       \
+   solaris/pkginfo
 
 dist_doc_DATA =                  \
    LICENSE                       \
@@ -180,5 +181,24 @@ macosx:
 		$(PACKAGE)-$(VERSION).pkg;				\
 	mv $(PACKAGE)-$(VERSION).pkg ..;				\
 	cd -
+endif
+
+if SOLARIS
+SOLARISDIR = $(PWD)/solaris/_install
+SOLARISARCH:sh = isainfo -n
+
+.PHONY: solaris-pkg
+solaris-pkg:
+	@test "${prefix}" = "/usr" || (echo "Prefix must be /usr" && exit 1)
+	rm -rf $(SOLARISDIR)
+	@echo "  Building for Solaris"
+	$(MAKE) DESTDIR=$(SOLARISDIR) install
+	@echo "  Removing previous package"
+	rm -rf solaris/genetorrent
+	@echo "  Building package"
+	@set -e; cd solaris; \
+		pkgmk -o -r $(SOLARISDIR) -a $(SOLARISARCH) -d . -f Prototype; \
+		tar -cfz $(PACKAGE)-$(VERSION).solaris11.$(SOLARISARCH).pkg.tgz genetorrent; \
+		cd -
 endif
 

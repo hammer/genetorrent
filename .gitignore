@@ -107,3 +107,7 @@ libtool
 # /macosx/
 /macosx/Distribution.xml
 /macosx/_install
+
+# /solaris/
+/solaris/pkginfo
+/solaris/_install
