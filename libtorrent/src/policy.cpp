@@ -969,9 +969,23 @@ namespace libtorrent
 					pp.source |= src;
 					if (!was_conn_cand && is_connect_candidate(pp, m_finished))
 						++m_num_connect_candidates;
-					p->connection->disconnect(errors::duplicate_peer_id);
-					erase_peer(p);
-					return false;
+
+					if (pp.connection->is_connecting())
+					{
+						// Accept this peer, and disconnect the one
+						// that is still trying to connect. If the one
+						// trying to connect can never complete the
+						// connection (due to a firewall dropping the
+						// connect), then it only serves to block
+						// other connections until it times out.
+						pp.connection->disconnect(errors::duplicate_peer_id);
+					}
+					else
+					{
+						p->connection->disconnect(errors::duplicate_peer_id);
+						erase_peer(p);
+						return false;
+					}
 				}
 				erase_peer(i);
 			}
