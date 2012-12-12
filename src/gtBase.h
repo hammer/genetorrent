@@ -190,6 +190,8 @@ class gtBase
       time_t timeout_update (time_t *timer = NULL);
       bool timeout_check_expired (time_t *timer);
 
+      gtLogLevel makeDebugIfServerModeUnlessError (bool haveError);
+
    private:
       attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];
       std::string _bindIP;
