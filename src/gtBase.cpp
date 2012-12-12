@@ -45,6 +45,10 @@
 #include <cstdio>
 #include <algorithm>
 
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif /* __CYGWIN__ */
+
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
@@ -71,10 +75,6 @@
 #include "gtLog.h"
 #include "loggingmask.h"
 
-#ifdef __CYGWIN__
-#include <w32api/windows.h>
-#include <sys/cygwin.h>
-#endif /* __CYGWIN__ */
 
 // global variable that used to point to GeneTorrent to allow
 // libtorrent callback for file inclusion and logging.
@@ -1237,100 +1237,7 @@ void gtBase::loggingCallBack (std::string message)
    pthread_mutex_unlock (&callBackLoggerLock);
 }
 
-#ifdef __CYGWIN__
-std::string gtBase::getWinInstallDirectory ()
-{
-   // by default, look for dhparam.pem in the install dir on Windows
-   char exeDir[MAX_PATH];
-   std::string result;
-   result = ".";
 
-   if (GetModuleFileNameA (NULL, exeDir, MAX_PATH))
-   {
-      // Convert windows path to posix-style path
-      std::string dirName = std::string (exeDir);
-      dirName = dirName.substr (0, dirName.find_last_of ('\\'));
-
-      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-         dirName.c_str (), NULL, 0);
-      char *posixabspath = (char *) malloc (size);
-
-      if (posixabspath &&
-          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-             dirName.c_str (), posixabspath, size) == 0)
-      {
-         result = posixabspath;
-      }
-
-      free (posixabspath);
-   }
-
-   return result;
-}
-#endif /* __CYGWIN__ */
-
-
-std::string gtBase::getWorkingDirectory ()
-{
-   std::string result = ".";
-
-#ifdef __CYGWIN__
-   // In cygwin, getcwd is broken if called from outside of the
-   // cygwin environment.  Work around this by converting
-   // the path returned by getcwd to an absolute posix path
-   // via the cygwin library.
-   char *getcwdpath;
-   getcwdpath = (char *) malloc (MAX_PATH);
-
-   if (!getcwdpath)
-      return result;
-
-   if (GetCurrentDirectoryA (MAX_PATH, getcwdpath))
-   {
-
-      ssize_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-         getcwdpath, NULL, 0);
-      if (size > 0)
-      {
-         char *posixabspath = (char *) malloc (size);
-         if (!posixabspath)
-         {
-            free (getcwdpath);
-            return result;
-         }
-
-         if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, getcwdpath,
-            posixabspath, size) == 0)
-         {
-            result = posixabspath;
-         }
-
-         free (posixabspath);
-      }
-   }
-
-   free (getcwdpath);
-#else /* __CYGWIN__ */
-   size_t size;
-
-   size = (size_t) pathconf (".", _PC_PATH_MAX);
-
-   char *buf;
-   char *ptr;
-
-   if ((buf = (char *) malloc ((size_t) size)) != NULL)
-   {
-      ptr = getcwd (buf, (size_t) size);
-
-      if (ptr)
-         result = buf;
-   }
-
-   free (buf);
-#endif /* __CYGWIN__ */
-
-   return result;
-}
 
 void gtBase::processSSLError (std::string message)
 {
@@ -2020,3 +1927,97 @@ std::string gtBase::authTokenFromURI (std::string url)
    return curlResponseData;
 }
 
+#ifdef __CYGWIN__
+#include <w32api/windows.h>
+std::string gtBase::getWinInstallDirectory ()
+{
+   // by default, look for dhparam.pem in the install dir on Windows
+   char exeDir[MAX_PATH];
+   std::string result;
+   result = ".";
+
+   if (GetModuleFileNameA (NULL, exeDir, MAX_PATH))
+   {
+      // Convert windows path to posix-style path
+      std::string dirName = std::string (exeDir);
+      dirName = dirName.substr (0, dirName.find_last_of ('\\'));
+
+      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         dirName.c_str (), NULL, 0);
+      char *posixabspath = (char *) malloc (size);
+
+      if (posixabspath &&
+          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+             dirName.c_str (), posixabspath, size) == 0)
+      {
+         result = posixabspath;
+      }
+
+      free (posixabspath);
+   }
+
+   return result;
+}
+#endif /* __CYGWIN__ */
+
+std::string gtBase::getWorkingDirectory ()
+{
+   std::string result = ".";
+
+#ifdef __CYGWIN__
+   // In cygwin, getcwd is broken if called from outside of the
+   // cygwin environment.  Work around this by converting
+   // the path returned by getcwd to an absolute posix path
+   // via the cygwin library.
+   char *getcwdpath;
+   getcwdpath = (char *) malloc (MAX_PATH);
+
+   if (!getcwdpath)
+      return result;
+
+   if (GetCurrentDirectoryA (MAX_PATH, getcwdpath))
+   {
+
+      ssize_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         getcwdpath, NULL, 0);
+      if (size > 0)
+      {
+         char *posixabspath = (char *) malloc (size);
+         if (!posixabspath)
+         {
+            free (getcwdpath);
+            return result;
+         }
+
+         if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, getcwdpath,
+            posixabspath, size) == 0)
+         {
+            result = posixabspath;
+         }
+
+         free (posixabspath);
+      }
+   }
+
+   free (getcwdpath);
+#else /* __CYGWIN__ */
+   size_t size;
+
+   size = (size_t) pathconf (".", _PC_PATH_MAX);
+
+   char *buf;
+   char *ptr;
+
+   if ((buf = (char *) malloc ((size_t) size)) != NULL)
+   {
+      ptr = getcwd (buf, (size_t) size);
+
+      if (ptr)
+         result = buf;
+   }
+
+   free (buf);
+#endif /* __CYGWIN__ */
+
+   return result;
+}
