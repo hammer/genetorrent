@@ -1,0 +1,50 @@
+i pkginfo
+d none /usr 0755 root sys
+d none /usr/lib 0755 root bin
+d none /usr/lib/python2.6 0755 root bin
+d none /usr/lib/python2.6/site-packages 0755 root bin
+f none /usr/lib/python2.6/site-packages/gtoinfo.py 0644 root root
+f none /usr/lib/python2.6/site-packages/gtoinfo.pyo 0644 root root
+f none /usr/lib/python2.6/site-packages/gtoinfo.pyc 0644 root root
+d none /usr/lib/64 0755 root bin
+s none /usr/lib/amd64/libgenetorrent.so.0=libgenetorrent.so.0.0.0
+s none /usr/lib/amd64/libgenetorrent.so=libgenetorrent.so.0.0.0
+f none /usr/lib/amd64/libgenetorrent.so.0.0.0 0755 root root
+d none /usr/lib/amd64/GeneTorrent 0755 root root
+f none /usr/lib/amd64/GeneTorrent/libxqilla.so.6.0.0 0644 root root
+f none /usr/lib/amd64/GeneTorrent/libboost_regex.so.1.48.0 0644 root root
+f none /usr/lib/amd64/GeneTorrent/libxerces-c-3.1.so 0644 root root
+f none /usr/lib/amd64/GeneTorrent/libboost_filesystem.so.1.48.0 0644 root root
+s none /usr/lib/amd64/GeneTorrent/libtorrent-rasterbar.so=libtorrent-rasterbar.so.6.0.0
+f none /usr/lib/amd64/GeneTorrent/libboost_thread.so.1.48.0 0644 root root
+s none /usr/lib/amd64/GeneTorrent/libboost_thread.so=libboost_filesystem.so.1.48.0
+f none /usr/lib/amd64/GeneTorrent/libtorrent-rasterbar.so.6.0.0 0755 root root
+s none /usr/lib/amd64/GeneTorrent/libboost_system.so=libboost_filesystem.so.1.48.0
+s none /usr/lib/amd64/GeneTorrent/libxerces-c.so=libxerces-c-3.1.so
+f none /usr/lib/amd64/GeneTorrent/libboost_program_options.so.1.48.0 0644 root root
+s none /usr/lib/amd64/GeneTorrent/libxqilla.so.6=libxqilla.so.6.0.0
+d none /usr/lib/amd64/GeneTorrent/pkgconfig 0755 root root
+s none /usr/lib/amd64/GeneTorrent/libboost_filesystem.so=libboost_filesystem.so.1.48.0
+s none /usr/lib/amd64/GeneTorrent/libboost_regex.so=libboost_filesystem.so.1.48.0
+s none /usr/lib/amd64/GeneTorrent/libboost_program_options.so=libboost_filesystem.so.1.48.0
+f none /usr/lib/amd64/GeneTorrent/libboost_system.so.1.48.0 0644 root root
+s none /usr/lib/amd64/GeneTorrent/libtorrent-rasterbar.so.6=libtorrent-rasterbar.so.6.0.0
+d none /usr/share 0755 root sys
+d none /usr/share/GeneTorrent 0755 root root
+f none /usr/share/GeneTorrent/dhparam.pem 0644 root root
+d none /usr/share/doc 0755 root other
+d none /usr/share/doc/GeneTorrent 0755 root root
+f none /usr/share/doc/GeneTorrent/README 0644 root root
+f none /usr/share/doc/GeneTorrent/NEWS 0644 root root
+f none /usr/share/doc/GeneTorrent/LICENSE 0644 root root
+d none /usr/share/man 0755 root bin
+d none /usr/share/man/man1 0755 root bin
+f none /usr/share/man/man1/gtupload.1 0644 root root
+f none /usr/share/man/man1/GeneTorrent.1 0644 root root
+f none /usr/share/man/man1/gtdownload.1 0644 root root
+d none /usr/bin 0755 root bin
+f none /usr/bin/gtupload 0755 root root
+f none /usr/bin/gtdownload 0755 root root
+f none /usr/bin/gtoinfo 0755 root root
+f none /usr/bin/gtocheck 0755 root root
+f none /usr/bin/GeneTorrent 0755 root root
