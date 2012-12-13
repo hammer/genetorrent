@@ -33,7 +33,12 @@ SRC_URL=http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0
 DEP_VER=boost_1_48_0
 EXPECTED_MD5=313a11e97eb56eb7efd18325354631be
 CONFIG_CMD="./bootstrap.sh --prefix=${baseDir} --with-libraries=system,regex,filesystem,program_options,thread --without-icu"
-BUILD_CMD="./b2 link=shared warnings=all debug-symbols=on install $@"
+if [ -z "${TARGET_BITS}" ];
+then
+   BUILD_CMD="./b2 link=shared warnings=all debug-symbols=on install $@"
+else
+   BUILD_CMD="./b2 link=shared warnings=all debug-symbols=on address-model=${TARGET_BITS} install $@"
+fi
 TARBALL="/tmp/${DEP_VER}.tar.gz"
 
 . ${baseDir}/../builder_common
