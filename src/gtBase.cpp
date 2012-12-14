@@ -213,43 +213,46 @@ void gtBase::startUpMessage (std::string app_name)
    }
 }
 
+std::vector<std::string> gtBase::vmValueToStrings(boost::program_options::variable_value vv)
+{
+   std::vector<std::string> value_strings;
+   std::string value;
+
+   if (vv.empty())
+   {
+      value_strings.push_back("UNSET");
+   }
+   else
+   {
+      const std::type_info &type = vv.value().type();
+
+      if (type == typeid(std::string))
+         value_strings.push_back(vv.as<std::string>());
+      else if (type == typeid(int))
+         value_strings.push_back(boost::lexical_cast<std::string>(vv.as<int>()));
+      else if (type == typeid(std::vector<std::string>))
+         value_strings = vv.as<std::vector<std::string> >();
+      else
+         assert (0);  // Need to handle new boost program_options argument type
+   }
+
+   return value_strings;
+}
+
 void gtBase::log_options_used (boost::program_options::variables_map &vm)
 {
    Log (PRIORITY_NORMAL, "Options:");
 
    for (boost::program_options::variables_map::iterator it = vm.begin(); it != vm.end(); it++)
    {
-      std::string value;
       const char *prefix = (it->first.c_str()[0] == '-') ? "" : "--";
+      std::vector<std::string> values = gtBase::vmValueToStrings(it->second);
 
-      if (it->second.empty())
+      for (std::vector<std::string>::iterator vi = values.begin(); vi !=
+         values.end(); vi++)
       {
-         value = "UNSET";
+         Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), vi->c_str());
       }
-      else
-      {
-         const std::type_info &type = it->second.value().type();
-
-         if (type == typeid(std::string))
-            value = it->second.as<std::string>();
-         else if (type == typeid(int))
-            value = boost::lexical_cast<std::string>(it->second.as<int>());
-         else if (type == typeid(std::vector<std::string>))
-         {
-            std::vector<std::string> vect = it->second.as<std::vector<std::string> >();
-            std::vector<std::string>::iterator arg_it = vect.begin ();
-            std::vector<std::string>::iterator end = vect.end ();
-
-            while (arg_it != end)
-            {
-               Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), arg_it->c_str());
-               ++arg_it;
-            }
-            continue;
-         }
-      }
-
-      Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), value.c_str());
    }
 }
 

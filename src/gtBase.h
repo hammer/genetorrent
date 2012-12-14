@@ -117,6 +117,7 @@ class gtBase
       virtual void run () = 0;
       uint32_t getLogMask() {return _logMask;}
       gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
+      static std::vector<std::string> vmValueToStrings(boost::program_options::variable_value vv);
 
    protected:
       int  _verbosityLevel;
