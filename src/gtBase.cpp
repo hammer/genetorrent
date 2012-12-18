@@ -85,55 +85,37 @@ void *geneTorrCallBackPtr;
 // at the saem time another thread is trying to add to a buffer
 static pthread_mutex_t callBackLoggerLock;
 
-int global_verbosity = 0;    // Work around for boost:program_options not supporting -vvvvv type arguments
-bool global_gtAgentMode = false;
-
-void commandLineError (std::string errMessage)
-{
-   if (errMessage.size())
-   {
-      if (global_gtAgentMode)
-      {
-         std::cout << "error:  " << errMessage << std::endl;
-         std::cout.flush();
-      }
-      else
-      {
-         std::cerr << "error:  " << errMessage << std::endl;
-      }
-   }
-   exit (COMMAND_LINE_OR_CONFIG_FILE_ERROR);
-}
-
-gtBase::gtBase (boost::program_options::variables_map &commandLine,
-                opMode mode,
-                std::string progName):
-   _progName (progName),
+gtBase::gtBase (gtBaseOpts &opts, opMode mode):
+   _progName (opts.m_progName),
    _verbosityLevel (VERBOSE_1), 
-   _logToStdErr (false),
-   _authToken (""), 
    _devMode (false),
    _tmpDir (""), 
-   _logDestination ("none"),     // default to no logging
-   _use_null_storage (false),
-   _use_zero_storage (false),
-   _portStart (20892),
-   _portEnd (20900),
-   _exposedPortDelta (0),
-   _addTimestamps (false),
-   _rateLimit (-1),
-   _inactiveTimeout (0),
-   _curlVerifySSL (true),
    _startUpComplete (false),
-   _allowedServersSet (false),
-   _bindIP (""), 
-   _exposedIP (""), 
    _operatingMode (mode), 
-   _confDir (CONF_DIR_DEFAULT), 
-   _logMask (0),                 // set all bits to 0
    _successfulTrackerComms (false),
-   _peerTimeout (0)
-   //_gtAgentMode (false)
+
+   // Protected members obtained from CLI or CFG.
+   _addTimestamps (opts.m_addTimestamps),
+   _allowedServersSet (opts.m_allowedServersSet),
+   _authToken (""),
+   _curlVerifySSL (opts.m_curlVerifySSL),
+   _exposedPortDelta (opts.m_exposedPortDelta),
+   _inactiveTimeout (opts.m_inactiveTimeout),
+   _ipFilter (opts.m_ipFilter),
+   _logDestination (opts.m_logDestination),
+   _logToStdErr (opts.m_logToStdErr),
+   _portEnd (opts.m_portEnd),
+   _portStart (opts.m_portStart),
+   _rateLimit (opts.m_rateLimit),
+   _use_null_storage (opts.m_use_null_storage),
+   _use_zero_storage (opts.m_use_zero_storage),
+
+   // Private members obtained from CLI or CFG.
+   _bindIP (opts.m_bindIP),
+   _confDir (opts.m_confDir),
+   _exposedIP (opts.m_exposedIP),
+   _logMask (opts.m_logMask),
+   _peerTimeout (opts.m_peerTimeout)
 {
    geneTorrCallBackPtr = (void *) this;          // Set the global geneTorr pointer that allows fileFilter callbacks from libtorrent
 
@@ -151,10 +133,6 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine,
    }
 
    _verbosityLevel = global_verbosity;
-
-   processConfigFileAndCLI (commandLine);
-
-   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination);
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    if (statFile (_dhParamsFile) != 0)
@@ -176,6 +154,8 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine,
       mkTempDir();
    }
 
+   loadCredentialFile (opts.m_credentialPath);
+
    std::string gtTag;
    if (_operatingMode != SERVER_MODE)
    {
@@ -189,8 +169,6 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine,
    strTokenize strToken (VERSION, ".", strTokenize::INDIVIDUAL_CONSECUTIVE_SEPARATORS);
 
    _gtFingerPrint = new libtorrent::fingerprint (gtTag.c_str(), strtol (strToken.getToken (1).c_str (), NULL, 10), strtol (strToken.getToken (2).c_str (), NULL, 10), strtol (strToken.getToken (3).c_str (), NULL, 10), 0);
-
-   log_options_used (commandLine);
 }
 
 std::string gtBase::version_str = VERSION;
@@ -211,49 +189,6 @@ void gtBase::startUpMessage (std::string app_name)
    if (_verbosityLevel > VERBOSE_1)
    {
       screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".");
-   }
-}
-
-vectOfStr gtBase::vmValueToStrings(boost::program_options::variable_value vv)
-{
-   vectOfStr value_strings;
-   std::string value;
-
-   if (vv.empty())
-   {
-      value_strings.push_back("UNSET");
-   }
-   else
-   {
-      const std::type_info &type = vv.value().type();
-
-      if (type == typeid(std::string))
-         value_strings.push_back(vv.as<std::string>());
-      else if (type == typeid(int))
-         value_strings.push_back(boost::lexical_cast<std::string>(vv.as<int>()));
-      else if (type == typeid(vectOfStr))
-         value_strings = vv.as<vectOfStr>();
-      else
-         assert (0);  // Need to handle new boost program_options argument type
-   }
-
-   return value_strings;
-}
-
-void gtBase::log_options_used (boost::program_options::variables_map &vm)
-{
-   Log (PRIORITY_NORMAL, "Options:");
-
-   for (boost::program_options::variables_map::iterator it = vm.begin(); it != vm.end(); it++)
-   {
-      const char *prefix = (it->first.c_str()[0] == '-') ? "" : "--";
-      vectOfStr values = gtBase::vmValueToStrings(it->second);
-
-      for (vectOfStr::iterator vi = values.begin(); vi !=
-         values.end(); vi++)
-      {
-         Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), vi->c_str());
-      }
    }
 }
 
@@ -283,481 +218,6 @@ void gtBase::initSSLattributes ()
    // If you add entries here you must adjust  CSR_ATTRIBUTE_ENTRY_COUNT in gtDefs.h
 }
 
-void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
-{
-   pcfacliConfDir (vm);
-   pcfacliCurlNoVerifySSL (vm);
-   pcfacliCredentialFile (vm);
-   pcfacliBindIP (vm);
-   pcfacliInternalPort (vm);    // Internal ports must be processed before the Advertised port
-   pcfacliAdvertisedIP (vm);
-   pcfacliAdvertisedPort (vm);
-   pcfacliLog (vm);
-   pcfacliTimestamps (vm);
-   pcfacliStorageFlags (vm);
-   pcfacliPeerTimeout (vm);
-   pcfacliAllowedServers (vm);
-}
-
-void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
-{
-   if (vm.count (BIND_IP_CLI_OPT) == 1 && vm.count (BIND_IP_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + BIND_IP_CLI_OPT + " and " + BIND_IP_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   if (vm.count (BIND_IP_CLI_OPT) == 1)
-   { 
-      _bindIP = vm[BIND_IP_CLI_OPT].as<std::string>();
-   }
-   else if (vm.count (BIND_IP_CLI_OPT_LEGACY) == 1)
-   { 
-      _bindIP = vm[BIND_IP_CLI_OPT_LEGACY].as<std::string>();
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-}
-
-void gtBase::pcfacliGTAgentMode (boost::program_options::variables_map &vm)
-{
-   if (vm.count (GTA_CLIENT_CLI_OPT) == 1)
-   { 
-      global_gtAgentMode = true;
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-}
-
-void gtBase::pcfacliTimestamps (boost::program_options::variables_map &vm)
-{
-   if (vm.count (TIMESTAMP_STD_CLI_OPT) == 1)
-   { 
-      _addTimestamps = true;
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-}
-
-void gtBase::pcfacliConfDir (boost::program_options::variables_map &vm)
-{
-   if (vm.count (CONF_DIR_CLI_OPT) == 1 && vm.count (CONF_DIR_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + CONF_DIR_CLI_OPT + " and " + CONF_DIR_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-#ifdef __CYGWIN__
-   _confDir = getWinInstallDirectory ();
-#endif /* __CYGWIN__ */
-#ifdef __APPLE_CC__
-   _confDir = CONF_DIR_LOCAL;
-#endif
-
-   if (vm.count (CONF_DIR_CLI_OPT) == 1)
-   { 
-      _confDir = sanitizePath (vm[CONF_DIR_CLI_OPT].as<std::string>());
-   }
-   else if (vm.count (CONF_DIR_CLI_OPT_LEGACY) == 1)
-   { 
-      _confDir = sanitizePath (vm[CONF_DIR_CLI_OPT_LEGACY].as<std::string>());
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-
-   if (statDirectory (_confDir) != 0)
-   {
-      commandLineError ("unable to opening configuration directory '" + _confDir + "'");
-   }
-}
-
-void gtBase::pcfacliCredentialFile (boost::program_options::variables_map &vm)
-{
-   if (vm.count (CRED_FILE_CLI_OPT) == 1 && vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + CRED_FILE_CLI_OPT + " and " + CRED_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   std::string credsPathAndFile;
-
-   if (vm.count (CRED_FILE_CLI_OPT) == 1)
-   { 
-      credsPathAndFile = vm[CRED_FILE_CLI_OPT].as<std::string>();
-   }
-   else if (vm.count (CRED_FILE_CLI_OPT_LEGACY) == 1)
-   { 
-      credsPathAndFile = vm[CRED_FILE_CLI_OPT_LEGACY].as<std::string>();
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-
-   if (credsPathAndFile.find("http://")  == 0 ||
-       credsPathAndFile.find("https://") == 0 ||
-       credsPathAndFile.find("ftp://")   == 0 ||
-       credsPathAndFile.find("ftps://")  == 0)
-   {
-      _authToken = authTokenFromURI (credsPathAndFile);
-      return;
-   }
-
-   std::ifstream credFile;
-
-   credFile.open (credsPathAndFile.c_str(), std::ifstream::in);
-
-   if (!credFile.good ())
-   {
-      commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
-   }
-
-   try
-   {
-      credFile >> _authToken;
-   }
-   catch (...)
-   {
-      commandLineError ("credentials file not found (or is not readable):  " + credsPathAndFile);
-   }
-
-   credFile.close ();
-}
-
-void gtBase::pcfacliAdvertisedIP (boost::program_options::variables_map &vm)
-{
-   if (vm.count (ADVERT_IP_CLI_OPT) == 1 && vm.count (ADVERT_IP_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + ADVERT_IP_CLI_OPT + " and " + ADVERT_IP_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   if (vm.count (ADVERT_IP_CLI_OPT) == 1)
-   { 
-      _exposedIP = vm[ADVERT_IP_CLI_OPT].as<std::string>();
-   }
-   else if (vm.count (ADVERT_IP_CLI_OPT_LEGACY) == 1)
-   { 
-      _exposedIP = vm[ADVERT_IP_CLI_OPT_LEGACY].as<std::string>();
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-}
-
-void gtBase::pcfacliInternalPort (boost::program_options::variables_map &vm)
-{
-   if (vm.count (INTERNAL_PORT_CLI_OPT) == 1 && vm.count (INTERNAL_PORT_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + INTERNAL_PORT_CLI_OPT + " and " + INTERNAL_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   std::string portList;
-
-   if (vm.count (INTERNAL_PORT_CLI_OPT) == 1)
-   { 
-      portList = vm[INTERNAL_PORT_CLI_OPT].as<std::string>();
-   }
-   else if (vm.count (INTERNAL_PORT_CLI_OPT_LEGACY) == 1)
-   { 
-      portList = vm[INTERNAL_PORT_CLI_OPT_LEGACY].as<std::string>();
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-
-   strTokenize strToken (portList, ":", strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
-
-   int lowPort = strtol (strToken.getToken (1).c_str (), NULL, 10);
-
-   if (lowPort < 1024 || lowPort > 65535)
-   {
-      commandLineError ("-i (--internal-port) " + strToken.getToken (1) + " out of range (1024-65535)");
-   }
-
-   int highPort;
-   bool highPortSet = false;
-
-   if (strToken.size () > 1)
-   {
-      highPort = strtol (strToken.getToken (2).c_str (), NULL, 10);
-      highPortSet = true;
-   }
-
-   if (highPortSet)
-   {
-      if (highPort < 1024 || highPort > 65535)
-      {
-         commandLineError ("-i (--internal-port) " + strToken.getToken (2) + " out of range (1024-65535)");
-      }
-
-      if (lowPort <= highPort)
-      {
-         _portStart = lowPort;
-         _portEnd = highPort;
-      }
-      else
-      {
-         commandLineError ("when using -i (--internal-port) " + strToken.getToken (1) + " must be smaller than " + strToken.getToken (2));
-      }
-   }
-   else
-   {
-      _portStart = lowPort;
-
-      if (_portStart + 8 > 65535)
-      {
-         commandLineError ("-i (--internal-port) implicit (add 8 ports) end value exceeds 65535");
-      }
-
-      _portEnd = _portStart + 8; // default 8 ports
-   }
-}
-
-void gtBase::pcfacliAdvertisedPort (boost::program_options::variables_map &vm)
-{
-   if (vm.count (ADVERT_PORT_CLI_OPT) == 1 && vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + ADVERT_PORT_CLI_OPT + " and " + ADVERT_PORT_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   int exposedPort;
-
-   if (vm.count (ADVERT_PORT_CLI_OPT) == 1)
-   { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT].as< int >();
-   }
-   else if (vm.count (ADVERT_PORT_CLI_OPT_LEGACY) == 1)
-   { 
-      exposedPort = vm[ADVERT_PORT_CLI_OPT_LEGACY].as< int >();
-   }
-   else   // Option not present
-   {
-      return;    
-   }
-
-   if (exposedPort < 1024 || exposedPort > 65535)
-   {
-      commandLineError ("-f (--advertised-port) out of range (1024-65535)");
-   }
-
-   _exposedPortDelta = exposedPort - _portStart;
-}
-
-void gtBase::pcfacliLog (boost::program_options::variables_map &vm)
-{
-   if (vm.count (LOGGING_CLI_OPT) < 1)
-   {
-      return;    
-   }
-
-   std::string logArgument = vm[LOGGING_CLI_OPT].as<std::string>();
-
-   strTokenize strToken (logArgument, ":",
-      strTokenize::MERGE_CONSECUTIVE_SEPARATORS);
-
-   std::string level;
-
-#ifdef __CYGWIN__
-   if (std::count(logArgument.begin(), logArgument.end(), ':') > 1)
-   {
-      _logDestination = strToken.getToken(1) + ":" + strToken.getToken(2);
-      level = strToken.getToken(3);
-   }
-   else
-   {
-      _logDestination = strToken.getToken(1);
-      level = strToken.getToken(2);
-   }
-#else
-   _logDestination = strToken.getToken(1);
-   level = strToken.getToken(2);
-#endif
-
-   if ("verbose" == level)
-   {
-      _logMask  = LOGMASK_VERBOSE;
-   }
-   else if ("full" == level)
-   {
-      _logMask  = LOGMASK_FULL;
-   }
-   else if ("standard" == level || level.size() == 0) // default to standard
-   {
-      _logMask  = LOGMASK_STANDARD;
-   }
-   else
-   {
-      _logMask = strtoul (level.c_str(), NULL, 0);
-      if (0 == _logMask)
-      {
-         commandLineError ("Unexpected logging level encountered.");
-      }
-   }
-}
-
-// Used by download and upload
-void  gtBase::pcfacliRateLimit (boost::program_options::variables_map &vm)
-{
-   if (vm.count (RATE_LIMIT_CLI_OPT) < 1)
-   {
-      return;    
-   }
-
-   float inRate = vm[RATE_LIMIT_CLI_OPT].as<float>();      // As MB (megabytes) per second
-
-   _rateLimit = inRate * 1000 * 1000;      // convert to bytes per second, using SI units as that is what libtorrent displays
-
-   if (_rateLimit < 10000) // 10kB
-   {
-      commandLineError ("Configured rate limit is too low.  Please specify a value larger than 0.01 for '" + RATE_LIMIT_CLI_OPT + "'");
-   }
-}
-
-// Used by download and upload
-std::string gtBase::pcfacliPath (boost::program_options::variables_map &vm)
-{
-   if (vm.count (PATH_CLI_OPT) < 1)
-   {
-      return "";    
-   }
-
-   std::string path = sanitizePath (vm[PATH_CLI_OPT].as<std::string>());
-
-   if (path.size() == 0)
-   {
-      commandLineError ("command line or config file contains no value for '" + PATH_CLI_OPT + "'");
-   }
-
-   relativizePath (path);
-
-   if (statDirectory (path) != 0)
-   {
-      commandLineError ("unable to opening directory '" + path + "'");
-   }
-
-   return path;
-}
-
-// Used by download and upload modes
-void  gtBase::pcfacliInactiveTimeout (boost::program_options::variables_map &vm)
-{
-   if (vm.count (INACTIVE_TIMEOUT_CLI_OPT) < 1)
-   {
-      return;
-   }
-
-   int inactiveTimeout = vm[INACTIVE_TIMEOUT_CLI_OPT].as<int>();      // As minutes
-
-   _inactiveTimeout = inactiveTimeout;      // in minutes
-}
-
-void gtBase::pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm)
-{
-   if (vm.count (CURL_NO_VERIFY_SSL_CLI_OPT) < 1)
-   {
-      return;
-   }
-
-   _curlVerifySSL = false;
-}
-
-
-// Check the cli args for storage flags.
-//
-// Ensure that only one flag is set at a time.
-//
-void gtBase::pcfacliStorageFlags (boost::program_options::variables_map &vm)
-{
-   if (vm.count (NULL_STORAGE_OPT))
-   {
-      _use_null_storage = true;
-   }
-
-   if (vm.count (ZERO_STORAGE_OPT))
-   {
-      _use_zero_storage = true;
-   }
-
-   if (_use_null_storage && _use_zero_storage)
-   {
-      commandLineError ("Use of both '--null-storage' and '--zero-storage' options at same time is not allowed.");
-   }
-}
-
-void gtBase::pcfacliPeerTimeout (boost::program_options::variables_map &vm)
-{
-   if (vm.count (PEER_TIMEOUT_OPT))
-   {
-      _peerTimeout = vm[PEER_TIMEOUT_OPT].as<int> ();
-   }
-}
-
-
-// If allowed-modes is given with a list of IP ranges, construct an
-// ip filter that will later be applied to the torrent session and
-// checked prior to CURL calls
-void gtBase::pcfacliAllowedServers (boost::program_options::variables_map &vm)
-{
-   if (vm.count (ALLOWED_SERVERS_OPT) < 1 ||
-       _operatingMode == SERVER_MODE)
-      return;
-
-   _allowedServersSet = true;
-
-   // By default, deny all
-   _ipFilter.add_rule (boost::asio::ip::address::from_string("0.0.0.0"),
-                       boost::asio::ip::address::from_string("255.255.255.255"),
-                       libtorrent::ip_filter::blocked);
-
-   // allow IPs provided by allowed-servers option
-   std::string serverList = vm[ALLOWED_SERVERS_OPT].as<std::string>();
-
-   // Process comma- or colon-delimited lists of IPs or IP ranges
-   // e.g., 192.168.1.1:192.168.2.1-192.168.2.255,192.168.3.1
-   vectOfStr serverVec;
-   boost::split (serverVec, serverList, boost::is_any_of (",:"));
-
-   vectOfStr::iterator it;
-
-   for (it = serverVec.begin(); it != serverVec.end(); ++it)
-   {
-      // Process range
-      vectOfStr rangeVec;
-      boost::split (rangeVec, *it, boost::is_any_of ("-"));
-
-      // If '-' character, this is a range
-      if (rangeVec.size() == 1)
-      {
-         // Check that IP string is valid
-         checkIPAddress (rangeVec[0]);
-         _ipFilter.add_rule (boost::asio::ip::address::from_string(rangeVec[0]),
-                             boost::asio::ip::address::from_string(rangeVec[0]),
-                             0);
-      }
-      else if (rangeVec.size() == 2)
-      {
-         // Check that IP string is valid
-         checkIPAddress (rangeVec[0]);
-         checkIPAddress (rangeVec[1]);
-         _ipFilter.add_rule (boost::asio::ip::address::from_string(rangeVec[0]),
-                             boost::asio::ip::address::from_string(rangeVec[1]),
-                             0);
-      }
-      else
-      {
-         commandLineError("Invalid range given for " + ALLOWED_SERVERS_OPT
-            + " argument.");
-      }
-   }
-}
-
 // 
 void gtBase::setTempDir ()     
 {
@@ -781,7 +241,7 @@ void gtBase::setTempDir ()
          "Error: ";
       errorStr << e.what ();
 
-      commandLineError (errorStr.str ());
+      gtError (errorStr.str (), 66);
    }
 
    std::string tempPath = p.string();
@@ -799,15 +259,6 @@ void gtBase::mkTempDir ()
    }
 
    _tmpDir += "/";
-}
-
-// 
-void gtBase::checkCredentials ()
-{
-   if (_authToken.size() < 1)
-   {
-      commandLineError ("Must include a credential file when attempting to communicate with CGHub, use -c or --" + CRED_FILE_CLI_OPT);
-   }
 }
 
 // 
@@ -1186,7 +637,8 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
          catch (boost::system::system_error e)
          {  
             std::ostringstream messageBuff;
-            messageBuff << "invalid --" << BIND_IP_CLI_OPT << " address of:  " << _bindIP << " caused an exception:  " << e.what();
+            messageBuff << "invalid '--bind-ip' address of:  " << _bindIP
+                        << " caused an exception:  " << e.what();
             Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
             exit(98);
          }
@@ -1201,7 +653,8 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
          catch (boost::system::system_error e)
          {  
             std::ostringstream messageBuff;
-            messageBuff << "invalid --" << ADVERT_IP_CLI_OPT << " address of:  " << _exposedIP << " caused an exception:  " << e.what();
+            messageBuff << "invalid '--advertised-ip' address of:  " << _exposedIP
+                        << " caused an exception:  " << e.what();
             Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
             exit(98);
          }
@@ -1930,14 +1383,13 @@ std::string gtBase::authTokenFromURI (std::string url)
    if (res != CURLE_OK || code < 200 || code >= 300 ||
       curlResponseData.size() < 1)
    {
-      // No logger exists here
       std::ostringstream errormsg;
       errormsg << "Failed to download authentication token from provided URI.";
       if (code != 0)
          errormsg << " Response code = " << code << ".";
       if (strlen(errorBuffer))
          errormsg << " Error = " << errorBuffer;
-      commandLineError (errormsg.str());
+      gtError (errormsg.str(), 65);
    }
 
    if (_verbosityLevel > VERBOSE_2)
@@ -1948,17 +1400,6 @@ std::string gtBase::authTokenFromURI (std::string url)
    curl_easy_cleanup (curl);
 
    return curlResponseData;
-}
-
-// Checks whether an IP address string is valid, exits with command line error
-// if it is not
-void gtBase::checkIPAddress (std::string addr_string)
-{
-   boost::system::error_code ec;
-   boost::asio::ip::address::from_string (addr_string, ec);
-   if (ec)
-      commandLineError ("Invalid IP address given on command line or in a "
-         "config file: " + addr_string + ".");
 }
 
 // Checks whether a given (WSI) URL resolves to an IP address that is allowed
@@ -1980,8 +1421,8 @@ void gtBase::checkIPFilter (std::string url)
    }
 
    if (hostName.size() == 0)
-      commandLineError ("Bad URL given for WSI call. Could not extract "
-         "hostname from URL: " + url + ".");
+      gtError ("Bad URL given for WSI call. Could not extract hostname"
+               " from URL: " + url + ".", 59);
 
    boost::system::error_code ec;
    boost::asio::io_service io_service;
@@ -1995,7 +1436,45 @@ void gtBase::checkIPFilter (std::string url)
          continue;
        boost::asio::ip::tcp::endpoint end = *i;
        if (_ipFilter.access (end.address()))
-          commandLineError("IP address of server in WSI call is outside of "
-            "the allowed server range on this system.  Host: " + hostName);
+          gtError ("IP address of server in WSI call is outside of"
+                   " the allowed server range on this system.  Host: "
+                   + hostName, 59);
    }
+}
+
+void gtBase::loadCredentialFile (std::string credsPathAndFile)
+{
+   if (credsPathAndFile.size() == 0)
+      return;
+
+   if (credsPathAndFile.find("http://")  == 0 ||
+       credsPathAndFile.find("https://") == 0 ||
+       credsPathAndFile.find("ftp://")   == 0 ||
+       credsPathAndFile.find("ftps://")  == 0)
+   {
+      _authToken = authTokenFromURI (credsPathAndFile);
+      return;
+   }
+
+   std::ifstream credFile;
+
+   credFile.open (credsPathAndFile.c_str(), std::ifstream::in);
+
+   if (!credFile.good ())
+   {
+      gtError ("credentials file not found (or is not readable):  "
+               + credsPathAndFile, 55);
+   }
+
+   try
+   {
+      credFile >> _authToken;
+   }
+   catch (...)
+   {
+      gtError ("credentials file not found (or is not readable):  "
+               + credsPathAndFile, 56);
+   }
+
+   credFile.close ();
 }

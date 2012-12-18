@@ -1,18 +1,18 @@
-/* -*- mode: C++; c-basic-offset: 3; tab-width: 3; -*-
+/* -*- mode: C++; c-basic-offset: 4; tab-width: 4; -*-
  *
- * Copyright (c) 2011-2012, Annai Systems, Inc.
+ * Copyright (c) 2012, Annai Systems, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,47 +28,39 @@
  * Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
  */
 
-/*
- * gtServer.h
- *
- *  Created on: feb 5, 2012
- *      Author: donavan
- */
+#ifndef GT_DOWNLOAD_OPTS_H
+#define GT_DOWNLOAD_OPTS_H
 
-#ifndef GT_SERVER_H_
-#define GT_SERVER_H_
+#include "gtBaseOpts.h"
 
-#include "gtBase.h"
-#include "gtServerOpts.h"
-
-class gtServer : public gtBase
+class gtDownloadOpts: public gtBaseOpts
 {
+public:
+    gtDownloadOpts ();
+    gtDownloadOpts (std::string progName, std::string usage_hdr,
+                    std::string ver_msg, std::string mode);
+    ~gtDownloadOpts () {}
 
-   public:
-      gtServer (gtServerOpts &opts);
-      void run ();
+    boost::program_options::options_description m_dl_desc;
+    boost::program_options::options_description m_dl_legacy_desc;
 
-   protected:
+    // Storage for data extracted from config/cli.
+    int m_maxChildren;
+    std::string m_downloadSavePath;
+    vectOfStr m_cliArgsDownloadList;
+    std::string m_downloadModeCsrSigningUrl;
+    bool m_gtAgentMode;
 
-   private:
-      std::string _serverQueuePath;
-      std::string _serverDataPath;
-      std::string _serverModeCsrSigningUrl;
-      bool _serverForceDownload;
-      std::list <activeSessionRec *> _activeSessions;
-      unsigned int _maxActiveSessions;
+protected:
+    virtual void add_options (bool use_legacy_opts=true);
+    virtual void add_positionals ();
+    virtual void processOptions ();
 
-      void getFilesInQueueDirectory (vectOfStr &files);
-      void checkSessions();
-      void runServerMode();
-      void processServerModeAlerts();
-      void servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents, bool shutdownFlag = false);
-      bool isDownloadModeGetFromGTO (std::string torrentPathAndFileName);
-      bool addTorrentToServingList (std::string);
-      gtBase::activeSessionRec *findSession ();
-      void deleteGTOfromQueue (std::string fileName);
-      libtorrent::session *addActiveSession ();
-      time_t getExpirationTime (std::string torrentPathAndFileName);
+    virtual void processOption_GTAgentMode ();
+
+private:
+    void processOption_MaxChildren ();
+    void processOption_DownloadList ();
 };
 
-#endif
+#endif  /* GT_DOWNLOAD_OPTS_H */

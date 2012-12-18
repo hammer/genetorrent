@@ -39,11 +39,12 @@
 #define GT_UPLOAD_H_
 
 #include "gtBase.h"
+#include "gtUploadOpts.h"
 
 class gtUpload : public gtBase
 {
    public:
-      gtUpload (boost::program_options::variables_map &vm);
+      gtUpload (gtUploadOpts &opts);
       void run ();
 
       static bool file_filter (boost::filesystem::path const& filename);

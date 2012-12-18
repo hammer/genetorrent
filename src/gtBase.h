@@ -54,21 +54,16 @@
 #include "libtorrent/alert_types.hpp"
 #include "libtorrent/ip_filter.hpp"
 
+#include "gtBaseOpts.h"
 #include "gtDefs.h"
 #include "gtUtils.h"
 #include "gtLog.h"
-#include "accumulator.hpp"
-
-extern bool global_gtAgentMode;
-extern int global_verbosity;
 
 typedef struct attributeEntry_
 {
     std::string key;
     std::string value;
 }attributeEntry;
-
-typedef std::vector <std::string> vectOfStr;
 
 class gtBase
 {
@@ -109,8 +104,7 @@ class gtBase
 
       typedef std::map<pid_t, childRec *> childMap;
 
-      gtBase (boost::program_options::variables_map &vm, opMode mode,
-              std::string progName);
+      gtBase (gtBaseOpts &opts, opMode mode);
       virtual ~gtBase ();
 
       static std::string version_str;
@@ -118,46 +112,23 @@ class gtBase
       virtual void run () = 0;
       uint32_t getLogMask() {return _logMask;}
       gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
-      static vectOfStr vmValueToStrings(boost::program_options::variable_value vv);
 
-      void checkIPAddress (std::string addr_string);
       void checkIPFilter (std::string url);
 
    protected:
       std::string _progName;
       int  _verbosityLevel;
-      bool _logToStdErr;           // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
-      std::string _authToken;
       bool _devMode;               // This flag is used to control behaviors specific specific to development testing.  This is set to true when the environment variable GENETORRENT_DEVMODE is set.
       std::string _tmpDir;
-      std::string _logDestination;
       std::string _dhParamsFile;
 
-      // Null and Zero storage are mutually exclusive. Neither should be used
-      // in production.
-      bool _use_null_storage;
-      bool _use_zero_storage;
-
-      int _portStart;              // based on --internalIP
-      int _portEnd;                // based on --internalIP
-      int _exposedPortDelta;
-      bool _addTimestamps;         // Controls the addition of timestamps to stderr/stdout screen messages.
-
-      long _rateLimit;            // limits data transfer rate of uploads and downloads (if set), this is expressed in libtorrent units of bytes per second
-                                  // The conversion from command line argument value to libtorrent value is performed in pcfacliRateLimit()
-      int _inactiveTimeout;       // amount of time (in minutes) after which downloads and uploads are terminated due to inactivity
-      bool _curlVerifySSL;
 
       libtorrent::fingerprint *_gtFingerPrint;
 
       bool _startUpComplete;
-      bool _allowedServersSet;
-
-      libtorrent::ip_filter _ipFilter;
 
       void startUpMessage (std::string app_name);
 
-      void processConfigFileAndCLI (boost::program_options::variables_map &vm);
       void gtError (std::string errorMessage, int exitValue, gtErrorType errorType = gtBase::DEFAULT_ERROR, long errorCode = 0, std::string errorMessageLine2 = "", std::string errorMessageErrorLine = "");
       void checkAlerts (libtorrent::session &torrSession);
       void checkAlerts (libtorrent::session *torrSession);
@@ -180,11 +151,6 @@ class gtBase
       std::string getFileName (std::string fileName);
       std::string getInfoHash (std::string torrentFile);
 
-      std::string pcfacliPath (boost::program_options::variables_map &vm); // Used by download and upload
-      void pcfacliRateLimit (boost::program_options::variables_map &vm);
-      void pcfacliInactiveTimeout (boost::program_options::variables_map &vm);
-      void checkCredentials ();
-
       void removeFile (std::string fileName);
 
       // inactivity timeout functions for upload and download modes
@@ -195,16 +161,9 @@ class gtBase
 
    private:
       attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];
-      std::string _bindIP;
-      std::string _exposedIP;
       opMode _operatingMode;
-      std::string _confDir;
-
-      uint32_t _logMask;      // bits are used to control which messages classes are logged; bits are number right to left, bit 0-X are for litorrent alerts and bits X-Y are GeneTorrent message classes
 
       bool _successfulTrackerComms;
-
-      int _peerTimeout;           // peer timeout in seconds for libtorrent session settings
 
       static void loggingCallBack (std::string);
 
@@ -217,6 +176,7 @@ class gtBase
       std::string loadCSRfile (std::string csrFileName);
       std::string getInfoHash (libtorrent::torrent_info *torrentInfo);
       std::string authTokenFromURI (std::string url);
+      void loadCredentialFile (std::string credsPathAndFile);
 
       void cleanupTmpDir();
       void setTempDir ();
@@ -233,22 +193,51 @@ class gtBase
       void processTrackerNotification(bool, libtorrent::alert*);
       void processStatusNotification(bool, libtorrent::alert*);
 
-      // Process command config file and command line interface
-      void pcfacliBindIP (boost::program_options::variables_map &vm);
-      void pcfacliConfDir (boost::program_options::variables_map &vm);
-      void pcfacliCredentialFile (boost::program_options::variables_map &vm);
-      void pcfacliAdvertisedIP (boost::program_options::variables_map &vm);
-      void pcfacliInternalPort (boost::program_options::variables_map &vm);
-      void pcfacliAdvertisedPort (boost::program_options::variables_map &vm);
-      void pcfacliLog (boost::program_options::variables_map &vm);
-      void pcfacliTimestamps (boost::program_options::variables_map &vm);
-      void pcfacliGTAgentMode (boost::program_options::variables_map &vm);
-      void pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm);
-      void pcfacliStorageFlags (boost::program_options::variables_map &vm);
-      void pcfacliPeerTimeout (boost::program_options::variables_map &vm);
-      void pcfacliAllowedServers (boost::program_options::variables_map &vm);
+   // Values obtained from command line options or config file.
 
-      void log_options_used (boost::program_options::variables_map &vm);
+   protected:
+      bool _addTimestamps;         // Controls the addition of
+                                   // timestamps to stderr/stdout
+                                   // screen messages.
+      bool _allowedServersSet;
+      std::string _authToken;
+      bool _curlVerifySSL;
+      int _exposedPortDelta;
+      int _inactiveTimeout;        // amount of time (in minutes) after
+                                   // which downloads and uploads are
+                                   // terminated due to inactivity
+      libtorrent::ip_filter _ipFilter;
+      std::string _logDestination;
+      bool _logToStdErr;           // Flag to track if logging is
+                                   // being done to stderr, if it is,
+                                   // -v (-vvvv) output is redirected
+                                   // to stdout.
+      int _portEnd;                // based on --internalIP
+      int _portStart;              // based on --internalIP
+      long _rateLimit;             // limits data transfer rate of
+                                   // uploads and downloads (if set),
+                                   // this is expressed in libtorrent
+                                   // units of bytes per second The
+                                   // conversion from command line
+                                   // argument value to libtorrent
+                                   // value is performed in
+                                   // processCfgCli_RateLimit()
 
+      bool _use_null_storage;      // Null and Zero storage are
+      bool _use_zero_storage;      // mutually exclusive. Neither
+                                   // should be used in production.
+
+   private:
+      std::string _bindIP;
+      std::string _confDir;
+      std::string _exposedIP;
+      uint32_t _logMask;           // bits are used to control which
+                                   // messages classes are logged; bits
+                                   // are number right to left, bit 0-X
+                                   // are for litorrent alerts and bits
+                                   // X-Y are GeneTorrent message
+                                   // classes
+      int _peerTimeout;            // peer timeout in seconds for
+                                   // libtorrent session settings
 };
 #endif /* GT_BASE_H_ */

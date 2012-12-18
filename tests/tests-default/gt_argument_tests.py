@@ -55,53 +55,53 @@ class TestGeneTorrentArguments(GTTestCase):
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
 
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
         gt = GeneTorrentInstance(self.confdir + "-d xxx -s %s" % (os.getcwd()),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
         gt = GeneTorrentInstance(self.confdir + "-s '%s' -u xxx" % (os.getcwd()),
             instance_type=InstanceType.GT_SERVER, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
         gt = GeneTorrentInstance(self.confdir + "-d xxx -u xxx",
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
     def test_long_multiple_modes(self):
         """
         Test multiple mode options to Gene Torrent (-d, -s, -u)
         """
-        gt = GeneTorrentInstance(self.confdir + "--download xxx --server %s --upload xxx" % (os.getcwd()),
+        gt = GeneTorrentInstance(self.confdir + "--download xxx --server %s --upload xxx -c %s" % (os.getcwd(), self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
-        gt = GeneTorrentInstance(self.confdir + "--download xxx --server %s" % (os.getcwd()),
+        gt = GeneTorrentInstance(self.confdir + "--download xxx --server %s -c %s" % (os.getcwd(), self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
-        self.assertEqual(gt.returncode, 9)
+        self.assertIn("too short", serr)
+        self.assertEqual(gt.returncode, 201)
 
-        gt = GeneTorrentInstance(self.confdir + "--server '%s' --upload xxx" % (os.getcwd()),
+        gt = GeneTorrentInstance(self.confdir + "--server %s -q %s --download xxx -c %s" % (os.getcwd(), os.getcwd(), self.cred_filename),
             instance_type=InstanceType.GT_SERVER, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
         gt = GeneTorrentInstance(self.confdir + "--download xxx --upload xxx",
             instance_type=InstanceType.GT_UPLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
-        self.assertIn("may only specify one of", serr)
+        self.assertIn("unknown option", serr)
         self.assertEqual(gt.returncode, 9)
 
     def test_short_upload_options(self):
@@ -198,7 +198,7 @@ class TestGeneTorrentArguments(GTTestCase):
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
         self.assertIn("credentials file not found", serr)
-        self.assertEqual(gt.returncode, 9)
+        self.assertEqual(gt.returncode, 55)
 
         gt = GeneTorrentInstance(self.confdir + "-d xxx -c %s" % (self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
@@ -234,7 +234,7 @@ class TestGeneTorrentArguments(GTTestCase):
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
         self.assertIn("credentials file not found", serr)
-        self.assertEqual(gt.returncode, 9)
+        self.assertEqual(gt.returncode, 55)
 
         gt = GeneTorrentInstance(self.confdir + "--download xxx --credential-file %s" % (self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
@@ -268,7 +268,6 @@ class TestGeneTorrentArguments(GTTestCase):
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
         (sout, serr) = gt.communicate()
         self.assertIn("Usage", sout)
-        self.assertIn("man gtdownload", sout)
         self.assertEqual(gt.returncode, 0)
 
         gt = GeneTorrentInstance(self.confdir + "--this-option-does-not-exist",

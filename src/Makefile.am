@@ -37,11 +37,16 @@ noinst_HEADERS =                 \
    accumulator.hpp               \
    geneTorrentUtils.h            \
    gtBase.h                      \
+   gtBaseOpts.h                  \
+   gtOptStrings.h                \
    gtDefs.h                      \
    gtDownload.h                  \
+   gtDownloadOpts.h              \
    gtLog.h                       \
    gtServer.h                    \
+   gtServerOpts.h                \
    gtUpload.h                    \
+   gtUploadOpts.h                \
    gtUtils.h                     \
    gtNullStorage.h               \
    gtZeroStorage.h               \
@@ -66,7 +71,9 @@ torrentrasterbar_LIBS = $(torrentrasterbar_only_l) -L../libtorrent/src/.libs
 lib_LTLIBRARIES = libgenetorrent.la
 
 libgenetorrent_la_SOURCES = gtBase.cpp \
+                            gtBaseOpts.cpp \
                             gtDownload.cpp \
+                            gtDownloadOpts.cpp \
                             gtUtils.cpp \
                             gtLog.cpp \
                             gtAlerts.cpp \
@@ -104,12 +111,14 @@ bin_PROGRAMS = gtupload    \
                gtserver
 
 gtupload_SOURCES = gtMain.cpp   \
-                   gtUpload.cpp
+                   gtUpload.cpp \
+                   gtUploadOpts.cpp
 
 gtdownload_SOURCES = gtMain.cpp
 
 gtserver_SOURCES = gtMain.cpp   \
-                   gtServer.cpp
+                   gtServer.cpp \
+                   gtServerOpts.cpp
 
 GTdatadir = $(datadir)/GeneTorrent
 

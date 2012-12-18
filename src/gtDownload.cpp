@@ -85,105 +85,21 @@ static char const* download_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtDownload::gtDownload (boost::program_options::variables_map &vm,
-                        bool show_startup_message,
-                        std::string progName):
-   gtBase (vm, DOWNLOAD_MODE, progName),
-   _downloadSavePath (""),
-   _cliArgsDownloadList (),
-   _maxChildren (8),
+gtDownload::gtDownload (gtDownloadOpts &opts, bool show_startup_message):
+   gtBase (opts, DOWNLOAD_MODE),
+   _downloadSavePath (opts.m_downloadSavePath),
+   _cliArgsDownloadList (opts.m_cliArgsDownloadList),
+   _maxChildren (opts.m_maxChildren),
    _torrentListToDownload (),
-   _uriListToDownload ()
+   _uriListToDownload (),
+   _downloadModeCsrSigningUrl (opts.m_csrSigningUrl)
 {
-   pcfacliMaxChildren (vm);
-   _downloadSavePath = pcfacliPath(vm);
-   pcfacliDownloadList (vm);
-   pcfacliRateLimit (vm);
-   pcfacliInactiveTimeout (vm);
-   pcfacliSecurityAPI (vm);
-
    if (show_startup_message)
    {
-      startUpMessage (progName);
+      startUpMessage (opts.m_progName);
    }
 
    _startUpComplete = true;
-}
-
-void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
-{
-   if (vm.count (MAX_CHILDREN_CLI_OPT) == 1 && vm.count (MAX_CHILDREN_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + MAX_CHILDREN_CLI_OPT + " and " + MAX_CHILDREN_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   if (vm.count (MAX_CHILDREN_CLI_OPT) == 1)
-   {
-      _maxChildren = vm[MAX_CHILDREN_CLI_OPT].as< int >();
-   }
-   else if (vm.count (MAX_CHILDREN_CLI_OPT_LEGACY) == 1)
-   {
-      _maxChildren = vm[MAX_CHILDREN_CLI_OPT_LEGACY].as< int >();
-   }
-   else   // Option not present
-   {
-      return;
-   }
-
-   if (_maxChildren < 1)
-   {
-      commandLineError ("--" + MAX_CHILDREN_CLI_OPT + " must be greater than 0");
-   }
-}
-
-void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
-{
-   if (vm.count (DOWNLOAD_CLI_OPT))
-      _cliArgsDownloadList = vm[DOWNLOAD_CLI_OPT].as<vectOfStr>();
-
-   vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
-
-   bool needCreds = false;
-
-   while (vectIter != _cliArgsDownloadList.end () && needCreds == false) // Check the list of -d arguments to see if any require a credential file
-   {
-      std::string inspect = *vectIter;
-
-      if (inspect.size () > 4) // Check for GTO file
-      {
-         if (inspect.substr (inspect.size () - 4) == GTO_FILE_EXTENSION)
-         {
-            vectIter++;
-            continue;
-         }
-      }
-
-      needCreds = true;
-      vectIter++;
-   }
-
-   if (needCreds)
-   {
-      checkCredentials ();
-   }
-}
-
-void gtDownload::pcfacliSecurityAPI (boost::program_options::variables_map &vm)
-{
-   if (vm.count (SECURITY_API_CLI_OPT))
-   {
-      _downloadModeCsrSigningUrl = vm[SECURITY_API_CLI_OPT].as<std::string>();
-
-      if (_downloadModeCsrSigningUrl.size() == 0)
-      {
-         commandLineError ("command line or config file contains no value for '" + SECURITY_API_CLI_OPT + "'");
-      }
-
-      if (std::string::npos == _downloadModeCsrSigningUrl.find ("http") || std::string::npos == _downloadModeCsrSigningUrl.find ("://"))
-      {
-         commandLineError ("Invalid URI for '--" + SECURITY_API_CLI_OPT + "'");
-      }
-   }
 }
 
 void gtDownload::run ()

@@ -88,82 +88,21 @@ static char const* upload_state_str[] = {
 
 extern void *geneTorrCallBackPtr; 
 
-gtUpload::gtUpload (boost::program_options::variables_map &vm):
-   gtBase (vm, UPLOAD_MODE, "gtupload"),
-   _manifestFile (""),
+gtUpload::gtUpload (gtUploadOpts &opts):
+   gtBase (opts, UPLOAD_MODE),
+   _manifestFile (opts.m_manifestFile),
    _uploadUUID (""),
    _uploadSubmissionURL (""),
    _filesToUpload (),
    _pieceSize (4194304),
-   _dataFilePath (""),
-   _uploadGTODir (""),
+   _dataFilePath (opts.m_dataFilePath),
+   _uploadGTODir (opts.m_uploadGTODir),
    _piecesInTorrent (0),
-   _uploadGTOOnly(false)
+   _uploadGTOOnly(opts.m_uploadGTOOnly)
 {
-   _dataFilePath = pcfacliPath (vm);
-   pcfacliUpload (vm);
-   pcfacliUploadGTODir (vm);
-   pcfacliRateLimit (vm);
-   pcfacliInactiveTimeout (vm);
-   pcfacliUploadGTOOnly (vm);
-
-   checkCredentials ();
-
    startUpMessage ("gtupload");
 
    _startUpComplete = true;
-}
-
-void gtUpload::pcfacliUploadGTODir (boost::program_options::variables_map &vm)
-{
-   if (vm.count (UPLOAD_GTO_PATH_CLI_OPT) == 1)
-   {
-      _uploadGTODir = sanitizePath (vm[UPLOAD_GTO_PATH_CLI_OPT].as<std::string>());
-   }
-   else   // Option not present
-   {
-      _uploadGTODir = "";   // Set to current directory
-      return;    
-   }
-
-   if (statDirectory (_uploadGTODir) != 0)
-   {
-      commandLineError ("Unable to access directory '" + _uploadGTODir + "'");
-   }
-}
-
-void gtUpload::pcfacliUpload (boost::program_options::variables_map &vm)
-{
-   if (vm.count (UPLOAD_FILE_CLI_OPT) == 1 && vm.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 1)
-   {
-      commandLineError ("duplicate config options:  " + UPLOAD_FILE_CLI_OPT + " and " + UPLOAD_FILE_CLI_OPT_LEGACY + " are not permitted at the same time");
-   }
-
-   std::string credsPathAndFile;
-
-   if (vm.count (UPLOAD_FILE_CLI_OPT) == 1)
-   {
-      _manifestFile = vm[UPLOAD_FILE_CLI_OPT].as<std::string>();
-   }
-   else if (vm.count (UPLOAD_FILE_CLI_OPT_LEGACY) == 1)
-   {
-      _manifestFile = vm[UPLOAD_FILE_CLI_OPT_LEGACY].as<std::string>();
-   }
-
-   relativizePath (_manifestFile);
-
-   if (statFile (_manifestFile) != 0)
-   {
-      commandLineError ("manifest file not found (or is not readable):  " + _manifestFile);
-   }
-}
-
-void gtUpload::pcfacliUploadGTOOnly (boost::program_options::variables_map &vm)
-{
-   if (vm.count (UPLOAD_GTO_ONLY_CLI_OPT))
-   {
-      _uploadGTOOnly = true;
-   }
 }
 
 void gtUpload::configureUploadGTOdir (std::string uuid)

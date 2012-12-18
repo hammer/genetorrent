@@ -62,19 +62,19 @@ class TestGeneTorrentCredAsURI(GTTestCase):
         # 404 error
         self.data_download_test_uuid(uuid,
             client_options='-c %s/does-not-exist.key' % hub_server,
-            assert_rc=9, assert_serr='Failed to download authentication token')
+            assert_rc=65)
 
         # wrong protocol
         http_hub = TestConfig.HUB_SERVER.replace('https', 'http')
         self.data_download_test_uuid(uuid,
             client_options='-c %s/DUMMY-CREDENTIAL.key' % http_hub,
-            assert_rc=9, assert_serr='Failed to download authentication token')
+            assert_rc=65)
 
         # wrong protocol
         ftp_hub = TestConfig.HUB_SERVER.replace('https', 'ftp')
         self.data_download_test_uuid(uuid,
             client_options='-c %s/DUMMY-CREDENTIAL.key' % ftp_hub,
-            assert_rc=9, assert_serr='Failed to download authentication token')
+            assert_rc=65)
 
 if __name__ == '__main__':
     sys.stdout = StreamToLogger(logging.getLogger('stdout'), logging.INFO)

@@ -38,13 +38,13 @@
 #define GT_DOWNLOAD_H_
 
 #include "gtBase.h"
+#include "gtDownloadOpts.h"
 
 class gtDownload : public gtBase
 {
    public:
-      gtDownload (boost::program_options::variables_map &vm,
-                  bool show_startup_message=true,
-                  std::string progName="gtdownload");
+      gtDownload (gtDownloadOpts &opts,
+                  bool show_startup_message=true);
       void run ();
 
    protected:
@@ -73,10 +73,6 @@ class gtDownload : public gtBase
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
       bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID);
-
-      void pcfacliDownloadList (boost::program_options::variables_map &vm);
-      void pcfacliMaxChildren (boost::program_options::variables_map &vm);
-      void pcfacliSecurityAPI (boost::program_options::variables_map &vm);
 };
 
 #endif
