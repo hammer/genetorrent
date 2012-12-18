@@ -36,6 +36,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 #include <curl/curl.h>
 
@@ -86,6 +88,12 @@ void configureConfigFileOptions (boost::program_options::options_description &op
       (makeOpt (INACTIVE_TIMEOUT_CLI_OPT, INACTIVE_TIMEOUT_SHORT_CLI_OPT).c_str(), boost::program_options::value< int >(), "timeout transfers after inactivity in minutes (40+ minutes is recommended)")
       (CURL_NO_VERIFY_SSL_CLI_OPT.c_str(), "do not verify SSL certificates of web services")
       (PEER_TIMEOUT_OPT.c_str(), boost::program_options::value< int >(), "libtorrent peer timeout in seconds")
+      (DISALLOW_USER_CONFIG_FILE_OPT.c_str(), "do not allow users to specify "
+         "a config file")
+      (ALLOWED_MODES_OPT.c_str(), boost::program_options::value<std::string>(), "allowed "
+         " modes in this GeneTorrent installation")
+      (ALLOWED_SERVERS_OPT.c_str(), boost::program_options::value<std::string>(), "allowed IP"
+         "address ranges for WSI, tracker, and peer traffic")
 
       // Download
       (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value< std::vector <std::string> >()->composing(), "URI | UUID | .xml | .gto")

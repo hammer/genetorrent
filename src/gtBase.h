@@ -52,6 +52,7 @@
 #include "libtorrent/session.hpp"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
+#include "libtorrent/ip_filter.hpp"
 
 #include "gtDefs.h"
 #include "gtUtils.h"
@@ -119,6 +120,9 @@ class gtBase
       gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
       static std::vector<std::string> vmValueToStrings(boost::program_options::variable_value vv);
 
+      void checkIPAddress (std::string addr_string);
+      void checkIPFilter (std::string url);
+
    protected:
       int  _verbosityLevel;
       bool _logToStdErr;           // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
@@ -146,6 +150,9 @@ class gtBase
       libtorrent::fingerprint *_gtFingerPrint;
 
       bool _startUpComplete;
+      bool _allowedServersSet;
+
+      libtorrent::ip_filter _ipFilter;
 
       void startUpMessage (std::string app_name);
 
@@ -246,6 +253,7 @@ class gtBase
       void pcfacliCurlNoVerifySSL (boost::program_options::variables_map &vm);
       void pcfacliStorageFlags (boost::program_options::variables_map &vm);
       void pcfacliPeerTimeout (boost::program_options::variables_map &vm);
+      void pcfacliAllowedServers (boost::program_options::variables_map &vm);
 
       void log_options_used (boost::program_options::variables_map &vm);
 

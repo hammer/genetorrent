@@ -119,6 +119,10 @@ const std::string NO_LONG_CLI_OPT = "";                            //
 
 const std::string CURL_NO_VERIFY_SSL_CLI_OPT = "ssl-no-verify-ca";         // NO short option
 
+const std::string DISALLOW_USER_CONFIG_FILE_OPT = "disallow-user-config";  // NO short option
+const std::string ALLOWED_MODES_OPT = "allowed-modes";             // NO short option
+const std::string ALLOWED_SERVERS_OPT = "allowed-servers";         // NO short option
+
 // verbosity conversation, two different verbose settings are available
 // Single letter -v with increasing count or --verbose=level
 // this is a rather ugly hack, but due to shortcomings in boost program_options

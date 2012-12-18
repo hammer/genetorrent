@@ -321,6 +321,8 @@ void gtDownload::prepareDownloadList ()
 bool gtDownload::downloadGTO (std::string uri, std::string fileName,
                               std::string torrUUID)
 {
+   checkIPFilter (uri);
+
    bool curl_status;
    CURL *curl;
    curl = curl_easy_init ();

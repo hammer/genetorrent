@@ -290,6 +290,8 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
 
    std::string curlResponseHeaders = "";
 
+   checkIPFilter (_uploadSubmissionURL);
+
    CURL *curl;
    curl = curl_easy_init ();
 

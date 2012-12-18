@@ -124,6 +124,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine,
    _inactiveTimeout (0),
    _curlVerifySSL (true),
    _startUpComplete (false),
+   _allowedServersSet (false),
    _bindIP (""), 
    _exposedIP (""), 
    _operatingMode (mode), 
@@ -294,6 +295,7 @@ void gtBase::processConfigFileAndCLI (boost::program_options::variables_map &vm)
    pcfacliTimestamps (vm);
    pcfacliStorageFlags (vm);
    pcfacliPeerTimeout (vm);
+   pcfacliAllowedServers (vm);
 }
 
 void gtBase::pcfacliBindIP (boost::program_options::variables_map &vm)
@@ -693,6 +695,65 @@ void gtBase::pcfacliPeerTimeout (boost::program_options::variables_map &vm)
    if (vm.count (PEER_TIMEOUT_OPT))
    {
       _peerTimeout = vm[PEER_TIMEOUT_OPT].as<int> ();
+   }
+}
+
+
+// If allowed-modes is given with a list of IP ranges, construct an
+// ip filter that will later be applied to the torrent session and
+// checked prior to CURL calls
+void gtBase::pcfacliAllowedServers (boost::program_options::variables_map &vm)
+{
+   if (vm.count (ALLOWED_SERVERS_OPT) < 1 ||
+       _operatingMode == SERVER_MODE)
+      return;
+
+   _allowedServersSet = true;
+
+   // By default, deny all
+   _ipFilter.add_rule (boost::asio::ip::address::from_string("0.0.0.0"),
+                       boost::asio::ip::address::from_string("255.255.255.255"),
+                       libtorrent::ip_filter::blocked);
+
+   // allow IPs provided by allowed-servers option
+   std::string serverList = vm[ALLOWED_SERVERS_OPT].as<std::string>();
+
+   // Process comma- or colon-delimited lists of IPs or IP ranges
+   // e.g., 192.168.1.1:192.168.2.1-192.168.2.255,192.168.3.1
+   std::vector<std::string> serverVec;
+   boost::split (serverVec, serverList, boost::is_any_of (",:"));
+
+   std::vector<std::string>::iterator it;
+
+   for (it = serverVec.begin(); it != serverVec.end(); ++it)
+   {
+      // Process range
+      std::vector<std::string> rangeVec;
+      boost::split (rangeVec, *it, boost::is_any_of ("-"));
+
+      // If '-' character, this is a range
+      if (rangeVec.size() == 1)
+      {
+         // Check that IP string is valid
+         checkIPAddress (rangeVec[0]);
+         _ipFilter.add_rule (boost::asio::ip::address::from_string(rangeVec[0]),
+                             boost::asio::ip::address::from_string(rangeVec[0]),
+                             0);
+      }
+      else if (rangeVec.size() == 2)
+      {
+         // Check that IP string is valid
+         checkIPAddress (rangeVec[0]);
+         checkIPAddress (rangeVec[1]);
+         _ipFilter.add_rule (boost::asio::ip::address::from_string(rangeVec[0]),
+                             boost::asio::ip::address::from_string(rangeVec[1]),
+                             0);
+      }
+      else
+      {
+         commandLineError("Invalid range given for " + ALLOWED_SERVERS_OPT
+            + " argument.");
+      }
    }
 }
 
@@ -1115,7 +1176,11 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
    settings.mixed_mode_algorithm = libtorrent::session_settings::prefer_tcp;
    settings.enable_outgoing_utp = false;
    settings.enable_incoming_utp = false;
-   settings.apply_ip_filter_to_trackers= false;
+
+   if (_operatingMode != SERVER_MODE && _allowedServersSet)
+      settings.apply_ip_filter_to_trackers = true;
+   else
+      settings.apply_ip_filter_to_trackers = false;
 
    settings.no_atime_storage = false;
    settings.max_queued_disk_bytes = 256 * 1024 * 1024;
@@ -1159,13 +1224,11 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
 
    if (_bindIP.size() || _exposedIP.size())
    {
-      libtorrent::ip_filter ipFilter;
-
       if (_bindIP.size())
       {
          try
          {
-            ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
+            _ipFilter.add_rule (boost::asio::ip::address::from_string(_bindIP), boost::asio::ip::address::from_string(_bindIP), libtorrent::ip_filter::blocked);
          }
          catch (boost::system::system_error e)
          {  
@@ -1180,7 +1243,7 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
       {
          try
          {
-            ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
+            _ipFilter.add_rule (boost::asio::ip::address::from_string(_exposedIP), boost::asio::ip::address::from_string(_exposedIP), libtorrent::ip_filter::blocked);
          }
          catch (boost::system::system_error e)
          {  
@@ -1191,8 +1254,9 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
          }
       }
 
-      torrentSession->set_ip_filter(ipFilter);
    }
+
+   torrentSession->set_ip_filter(_ipFilter);
 }
 
 // 
@@ -1536,6 +1600,8 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    std::string curlResponseHeaders = "";
 
+   checkIPFilter (CSRSignURL);
+
    CURL *curl;
    curl = curl_easy_init ();
 
@@ -1862,6 +1928,8 @@ std::string gtBase::authTokenFromURI (std::string url)
    std::string curlResponseHeaders = "";
    std::string curlResponseData = "";
 
+   checkIPFilter (url);
+
    CURL *curl;
    curl = curl_easy_init ();
 
@@ -1927,6 +1995,56 @@ std::string gtBase::authTokenFromURI (std::string url)
    curl_easy_cleanup (curl);
 
    return curlResponseData;
+}
+
+// Checks whether an IP address string is valid, exits with command line error
+// if it is not
+void gtBase::checkIPAddress (std::string addr_string)
+{
+   boost::system::error_code ec;
+   boost::asio::ip::address::from_string (addr_string, ec);
+   if (ec)
+      commandLineError ("Invalid IP address given on command line or in a "
+         "config file: " + addr_string + ".");
+}
+
+// Checks whether a given (WSI) URL resolves to an IP address that is allowed
+// by the filter, and exits with a command line error if not
+void gtBase::checkIPFilter (std::string url)
+{
+   if (!_allowedServersSet)
+      return;
+
+   const std::string proto = "://";
+   std::string hostName;
+   size_t hostStart, hostEnd;
+   if ((hostStart = url.find (proto)) != std::string::npos)
+   {
+      hostStart += proto.size();
+      if ((hostEnd = url.find ("/", hostStart + 1)) !=
+         std::string::npos)
+         hostName = url.substr(hostStart, hostEnd - hostStart);
+   }
+
+   if (hostName.size() == 0)
+      commandLineError ("Bad URL given for WSI call. Could not extract "
+         "hostname from URL: " + url + ".");
+
+   boost::system::error_code ec;
+   boost::asio::io_service io_service;
+   boost::asio::ip::tcp::resolver resolver(io_service);
+   boost::asio::ip::tcp::resolver::query query(hostName, "");
+   for(boost::asio::ip::tcp::resolver::iterator i = resolver.resolve(query, ec);
+                               i != boost::asio::ip::tcp::resolver::iterator();
+                               ++i)
+   {
+      if (ec)
+         continue;
+       boost::asio::ip::tcp::endpoint end = *i;
+       if (_ipFilter.access (end.address()))
+          commandLineError("IP address of server in WSI call is outside of "
+            "the allowed server range on this system.  Host: " + hostName);
+   }
 }
 
 #ifdef __CYGWIN__
