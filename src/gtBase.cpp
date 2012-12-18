@@ -75,7 +75,6 @@
 #include "gtLog.h"
 #include "loggingmask.h"
 
-
 // global variable that used to point to GeneTorrent to allow
 // libtorrent callback for file inclusion and logging.
 // initialized in geneTorrent constructor, used in the free

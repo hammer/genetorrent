@@ -128,9 +128,92 @@ void configureCommandLineOptions (boost::program_options::options_description &o
    ;
 }
 
-void processCommandLine (boost::program_options::variables_map &clOptions, int argc, char **argv)
+void displayHelp()
+{
+   std::cout << "Usage:" << std::endl;
+#ifdef GENETORRENT_UPLOAD
+   std::cout << "   gtupload manifest-file -c cred [ -p path ]" << std::endl;
+   std::cout << std::endl;
+   std::cout << "Additional options are available.  Type 'man gtupload' for more information." << std::endl;
+#endif
+#ifdef GENETORRENT_DOWNLOAD
+   std::cout << "   gtdownload < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
+   std::cout << std::endl;
+   std::cout << "Additional options are available.  Type 'man gtdownload' for more information." << std::endl;
+#endif
+#ifdef GENETORRENT_SERVER
+   std::cout << "   gtserver path -q work-queue -c cred --security-api signing-URI" << std::endl;
+   std::cout << std::endl;
+   std::cout << "Additional options are available.  Type 'man gtserver' for more information." << std::endl;
+#endif
+   exit (0);
+}
+
+void displayVersion()
+{
+   std::cout << "GeneTorrent " << GENETORRENT_APP_NAME << " release "
+             << VERSION << " (SCM REV: " << GT_SCM_REV_STR << ")" << std::endl;
+   exit (0);
+}
+
+void processConfigFile(const std::string& configFilename,
+                       const boost::program_options::options_description& desc,
+                       boost::program_options::variables_map &vm)
+{
+   if (statFile (configFilename) != 0)
+   {
+      commandLineError ("unable to open config file '" + configFilename + "'.");
+   }
+
+   std::ifstream inputFile(configFilename.c_str());
+
+   if (!inputFile)
+   {
+      commandLineError ("unable to open config file '" + configFilename + "'.");
+   }
+
+   boost::program_options::store (boost::program_options::parse_config_file (inputFile, desc), vm);
+}
+
+void checkForIllegalOverrides(boost::program_options::variables_map& restrictedConfig,
+                              boost::program_options::variables_map& finalConfig)
+{
+   // Check if there are any variables in restrictedConfig that:
+   // 1. Are in the final map (they all should be) -and-
+   // 2. Have different values in the two maps
+   // These values were overridden from the settings in the restricted
+   // config file, which is not allowed
+
+   for (boost::program_options::variables_map::iterator it =
+      restrictedConfig.begin(); it != restrictedConfig.end(); ++it)
+   {
+      std::vector<std::string> restValues = gtBase::vmValueToStrings (it->second);
+
+      // Get variable values from finalConfig map
+      boost::program_options::variable_value finalVv = finalConfig[it->first];
+      std::vector<std::string> finalValues = gtBase::vmValueToStrings (finalVv);
+
+      // We don't care about order of vector elements
+      std::sort(restValues.begin(), restValues.end());
+      std::sort(finalValues.begin(), finalValues.end());
+
+      if (restValues != finalValues)
+         commandLineError ("Configuration file or CLI options may not "
+            "override the options present in " + SYS_RESTRICT_FILE +
+            ".  Please check your settings for the program option \"" +
+            it->first + "\".  You specified \"" + finalValues[0] + "\" " +
+            "but the restricted configuration value is \"" + 
+            restValues[0] + "\".");
+   }
+}
+
+void processProgramOptions (boost::program_options::variables_map &clOptions, int argc, char **argv)
 {
    bool haveVerboseOnCli = false;
+   bool haveRestrictConfigFile = !statFile (SYS_RESTRICT_FILE.c_str ());
+   bool haveDefaultConfigFile = !statFile (SYS_CONFIG_FILE.c_str ());
+   bool haveUserConfigFile = false;
+
    try
    {
       boost::program_options::options_description configFileOpts ("Config and Command Line Options");
@@ -152,68 +235,95 @@ void processCommandLine (boost::program_options::variables_map &clOptions, int a
       allOpts.add(configFileOpts).add(commandLineOpts);
 
       boost::program_options::variables_map cli;
+      boost::program_options::variables_map restrictedConfig;
+
       boost::program_options::store (boost::program_options::command_line_parser(argc, argv).options(allOpts).positional(p).run(), cli);
 
       // Check if help was requested
       if (cli.count (HELP_CLI_OPT))
-      {
-         std::cout << "Usage:" << std::endl;
-#ifdef GENETORRENT_UPLOAD
-         std::cout << "   gtupload manifest-file -c cred [ -p path ]" << std::endl;
-         std::cout << std::endl;
-         std::cout << "Additional options are available.  Type 'man gtupload' for more information." << std::endl;
-#endif
-#ifdef GENETORRENT_DOWNLOAD
-         std::cout << "   gtdownload < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
-         std::cout << std::endl;
-         std::cout << "Additional options are available.  Type 'man gtdownload' for more information." << std::endl;
-#endif
-#ifdef GENETORRENT_SERVER
-         std::cout << "   gtserver path -q work-queue -c cred --security-api signing-URI" << std::endl;
-         std::cout << std::endl;
-         std::cout << "Additional options are available.  Type 'man gtserver' for more information." << std::endl;
-#endif
-         exit (0);
-      }
+         displayHelp();
 
       if (cli.count (VERSION_CLI_OPT))
-      {
-         std::cout << "GeneTorrent " << GENETORRENT_APP_NAME << " release "
-                   << VERSION << " (SCM REV: " << GT_SCM_REV_STR << ")" << std::endl;
-         exit (0);
-      }
+         displayVersion();
 
       if (cli.count (VERBOSITY_CLI_OPT))
-      {
          haveVerboseOnCli = true;
-      }
 
-      // Check if a config file was specified
-      if (cli.count (CONFIG_FILE_CLI_OPT) == 1)
+      if (cli.count (CONFIG_FILE_CLI_OPT))
+         haveUserConfigFile = true;
+
+      if (haveRestrictConfigFile)
+         processConfigFile (SYS_RESTRICT_FILE, configFileOpts, restrictedConfig);
+
+      // Store config file variables on cli variables map
+      if (haveRestrictConfigFile &&
+         restrictedConfig.count (DISALLOW_USER_CONFIG_FILE_OPT))
       {
-         std::string configPathAndFile = cli[CONFIG_FILE_CLI_OPT].as<std::string>();
+         // Restricted config disallows user-supplied config file
+         if (haveUserConfigFile)
+            commandLineError ("Restricted configuration file disallows the "
+               "use of the \"--config-file\" option.");
 
-         if (statFile (configPathAndFile) != 0)
-         {
-            commandLineError ("unable to open config file '" + configPathAndFile + "'.");
-         }
-         
-         std::ifstream inputFile(configPathAndFile.c_str());
-
-         if (!inputFile)
-         {
-            commandLineError ("unable to open config file '" + configPathAndFile + "'.");
-         }
-
-         boost::program_options::store (boost::program_options::parse_config_file (inputFile, configFileOpts), cli);
+         if (haveDefaultConfigFile)
+            processConfigFile (SYS_CONFIG_FILE, configFileOpts, cli);
       }
+      else
+      {
+         // Prefer user-supplied config file over default config file
+         if (haveUserConfigFile)
+         {
+            std::string configPathAndFile = cli[CONFIG_FILE_CLI_OPT].as<std::string>();
+            processConfigFile (configPathAndFile, configFileOpts, cli);
+         }
+         else if (haveDefaultConfigFile)
+         {
+            processConfigFile (SYS_CONFIG_FILE, configFileOpts, cli);
+         }
+      }
+
+      if (haveRestrictConfigFile)
+      {
+         processConfigFile (SYS_RESTRICT_FILE, configFileOpts, cli);
+         checkForIllegalOverrides(restrictedConfig, cli);
+      }
+
+      // This call signals that the variables_map is now "finalized"
+      // and calls notifiers to set variables to option values
+      // (which we don't currently use)
+      boost::program_options::notify (cli);
 
       if (cli.count (GTA_CLIENT_CLI_OPT) == 1)
-      { 
+      {
          global_gtAgentMode = true;
       }
 
-      boost::program_options::notify (cli);
+      if (cli.count (ALLOWED_MODES_OPT))
+      {
+         std::string modes = cli[ALLOWED_MODES_OPT].as<std::string>();
+         boost::to_upper(modes);
+
+         std::vector<std::string> modesVec;
+         boost::split (modesVec, modes, boost::is_any_of(",:"));
+
+         std::vector<std::string>::iterator it;
+         it = std::find (modesVec.begin(), modesVec.end(), "ALL");
+
+         if (it == modesVec.end())
+         {
+#if GENETORRENT_SERVER
+            it = std::find (modesVec.begin(), modesVec.end(), "SERVER");
+#elif GENETORRENT_UPLOAD
+            it = std::find (modesVec.begin(), modesVec.end(), "UPLOAD");
+#elif GENETORRENT_DOWNLOAD
+            it = std::find (modesVec.begin(), modesVec.end(), "DOWNLOAD");
+#endif
+            if (it == modesVec.end())
+               commandLineError ("Restricted configuration file "
+                  "does not allow this mode of operation on this "
+                  "system.");
+         }
+
+      }
 
 #if GENETORRENT_SERVER
       if (cli.count (SERVER_CLI_OPT) == 0)
@@ -312,19 +422,19 @@ int main (int argc, char **argv)
 
    curl_global_init(CURL_GLOBAL_ALL);
 
-   boost::program_options::variables_map commandLine;
-   processCommandLine (commandLine, argc, argv);
+   boost::program_options::variables_map programOpts;
+   processProgramOptions (programOpts, argc, argv);
 
    gtBase *app = NULL;
 
 #ifdef GENETORRENT_DOWNLOAD
-   app = new gtDownload (commandLine);
+   app = new gtDownload (programOpts);
 #endif
 #ifdef GENETORRENT_UPLOAD
-   app = new gtUpload (commandLine);
+   app = new gtUpload (programOpts);
 #endif
 #ifdef GENETORRENT_SERVER
-   app = new gtServer (commandLine);
+   app = new gtServer (programOpts);
 #endif
 
    if (app)

@@ -174,6 +174,9 @@ const std::string ZERO_STORAGE_OPT = "zero-storage";               // NO short o
 
 const std::string PEER_TIMEOUT_OPT = "peer-timeout";               // NO short option
 
+const std::string SYS_RESTRICT_FILE = "/etc/GeneTorrent-restricted.conf";
+const std::string SYS_CONFIG_FILE = "/etc/GeneTorrent.conf";
+
 // define one free function used in command line and config file process, implementation is in gtMain.cpp
 void commandLineError (std::string errMessage);
 
