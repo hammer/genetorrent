@@ -124,6 +124,7 @@ class gtBase
       void checkIPFilter (std::string url);
 
    protected:
+      std::string _progName;
       int  _verbosityLevel;
       bool _logToStdErr;           // flag to track if logging is being done to stderr, if it is, -v (-vvvv) output is redirected to stdout.
       std::string _authToken;

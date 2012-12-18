@@ -838,7 +838,7 @@ void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFi
 int gtDownload::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
    gtLogger::delete_globallog();
-   _logToStdErr = gtLogger::create_globallog (PACKAGE_NAME, _logDestination, childID);
+   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination, childID);
 
 #if __CYGWIN__
    // Ignore SIGPIPE on Windows to prevent download child from being killed

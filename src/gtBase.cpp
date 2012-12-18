@@ -108,6 +108,7 @@ void commandLineError (std::string errMessage)
 gtBase::gtBase (boost::program_options::variables_map &commandLine,
                 opMode mode,
                 std::string progName):
+   _progName (progName),
    _verbosityLevel (VERBOSE_1), 
    _logToStdErr (false),
    _authToken (""), 
@@ -153,7 +154,7 @@ gtBase::gtBase (boost::program_options::variables_map &commandLine,
 
    processConfigFileAndCLI (commandLine);
 
-   _logToStdErr = gtLogger::create_globallog (progName, _logDestination);
+   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination);
 
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    if (statFile (_dhParamsFile) != 0)
