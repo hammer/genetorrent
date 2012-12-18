@@ -49,4 +49,13 @@
 
       // do NOT call this directly
       int statFileOrDirectory (std::string, statType sType, time_t &fileMtime);
+
+      std::string sanitizePath (std::string inPath);
+      void relativizePath (std::string &inPath);
+
+      std::string getWorkingDirectory();
+#ifdef __CYGWIN__
+      std::string getWinInstallDirectory();
+#endif /* _CYGWIN_ */
+
 #endif

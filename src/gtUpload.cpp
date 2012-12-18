@@ -975,7 +975,7 @@ bool gtUpload::fileFilter (std::string const objectName)
 // do not include files and folders whose name starts with a ., based on file_filter from libtorrent
 bool gtUpload::file_filter (boost::filesystem::path const& filename)
 {
-   static std::string workingDir = ((gtUpload *)geneTorrCallBackPtr)->getWorkingDirectory () + "/" + ((gtUpload *)geneTorrCallBackPtr)->getUploadUUID();
+   static std::string workingDir = getWorkingDirectory () + "/" + ((gtUpload *)geneTorrCallBackPtr)->getUploadUUID();
 
    if (filename.string().size() == workingDir.size() && filename.string() == workingDir)  // this is the root of the data, e.g., the UUID directory
    {

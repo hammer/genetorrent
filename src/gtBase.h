@@ -176,11 +176,6 @@ class gtBase
       bool processHTTPError (int errorCode, std::string, int exitCode = HTTP_ERROR_EXIT_CODE);
       void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
-      std::string getWorkingDirectory();
-#ifdef __CYGWIN__
-      std::string getWinInstallDirectory();
-#endif /* _CYGWIN_ */
-
       std::string getFileName (std::string fileName);
       std::string getInfoHash (std::string torrentFile);
 
@@ -188,9 +183,6 @@ class gtBase
       void pcfacliRateLimit (boost::program_options::variables_map &vm);
       void pcfacliInactiveTimeout (boost::program_options::variables_map &vm);
       void checkCredentials ();
-
-      std::string sanitizePath (std::string inPath);
-      void relativizePath (std::string &inPath);
 
       void removeFile (std::string fileName);
 

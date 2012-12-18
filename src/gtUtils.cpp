@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include <cstdio>
 
@@ -117,4 +118,146 @@ int statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
    }
 
    return -1;
+}
+
+void relativizePath (std::string &inPath)
+{
+#ifdef __CYGWIN__
+   if (inPath[1] == ':')
+   {
+      // Convert windows path to posix-style path
+      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         inPath.c_str (), NULL, 0);
+      char *posixabspath = (char *) malloc (size);
+
+      if (posixabspath &&
+          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+          inPath.c_str (), posixabspath, size) == 0)
+      {
+         inPath = posixabspath;
+      }
+
+      free (posixabspath);
+   }
+   else if (inPath[0] != '/')
+   {
+      std::string wd = getWorkingDirectory();
+
+      if (wd == "/")
+        inPath = wd + inPath;
+      else
+        inPath = wd + "/" + inPath;
+   }
+#else /* __CYGWIN__ */
+   if (inPath[0] != '/')
+   {
+      inPath = getWorkingDirectory() + "/" + inPath;
+   }
+#endif /* __CYGWIN__ */
+}
+
+std::string sanitizePath (std::string inPath)
+{
+   if (inPath[inPath.size () - 1] == '/' ||
+       inPath[inPath.size () - 1] == '\\')
+   {
+      inPath.erase (inPath.size () - 1);
+   }
+
+   return inPath;
+}
+
+#ifdef __CYGWIN__
+#include <w32api/windows.h>
+std::string getWinInstallDirectory ()
+{
+   // by default, look for dhparam.pem in the install dir on Windows
+   char exeDir[MAX_PATH];
+   std::string result;
+   result = ".";
+
+   if (GetModuleFileNameA (NULL, exeDir, MAX_PATH))
+   {
+      // Convert windows path to posix-style path
+      std::string dirName = std::string (exeDir);
+      dirName = dirName.substr (0, dirName.find_last_of ('\\'));
+
+      size_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         dirName.c_str (), NULL, 0);
+      char *posixabspath = (char *) malloc (size);
+
+      if (posixabspath &&
+          cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+             dirName.c_str (), posixabspath, size) == 0)
+      {
+         result = posixabspath;
+      }
+
+      free (posixabspath);
+   }
+
+   return result;
+}
+#endif /* __CYGWIN__ */
+
+std::string getWorkingDirectory ()
+{
+   std::string result = ".";
+
+#ifdef __CYGWIN__
+   // In cygwin, getcwd is broken if called from outside of the
+   // cygwin environment.  Work around this by converting
+   // the path returned by getcwd to an absolute posix path
+   // via the cygwin library.
+   char *getcwdpath;
+   getcwdpath = (char *) malloc (MAX_PATH);
+
+   if (!getcwdpath)
+      return result;
+
+   if (GetCurrentDirectoryA (MAX_PATH, getcwdpath))
+   {
+
+      ssize_t size = cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+         getcwdpath, NULL, 0);
+      if (size > 0)
+      {
+         char *posixabspath = (char *) malloc (size);
+         if (!posixabspath)
+         {
+            free (getcwdpath);
+            return result;
+         }
+
+         if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, getcwdpath,
+            posixabspath, size) == 0)
+         {
+            result = posixabspath;
+         }
+
+         free (posixabspath);
+      }
+   }
+
+   free (getcwdpath);
+#else /* __CYGWIN__ */
+   size_t size;
+
+   size = (size_t) pathconf (".", _PC_PATH_MAX);
+
+   char *buf;
+   char *ptr;
+
+   if ((buf = (char *) malloc ((size_t) size)) != NULL)
+   {
+      ptr = getcwd (buf, (size_t) size);
+
+      if (ptr)
+         result = buf;
+   }
+
+   free (buf);
+#endif /* __CYGWIN__ */
+
+   return result;
 }
