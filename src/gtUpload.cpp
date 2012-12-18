@@ -765,6 +765,9 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    torrentParams.seed_mode = true;
    torrentParams.disable_seed_hash = true;
    torrentParams.allow_rfc1918_connections = true;
+   // Upload mode, combined with auto_managed = false, should keep the libtorrent
+   // session from ever requesting any pieces.
+   torrentParams.upload_mode = true;
    torrentParams.auto_managed = false;
    torrentParams.save_path = "./";
 

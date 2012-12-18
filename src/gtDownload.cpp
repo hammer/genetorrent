@@ -942,6 +942,9 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       torrentHandle.set_download_limit (_rateLimit/totalChildren);
    }
 
+   // Don't allow upload connections
+   torrentHandle.set_max_uploads(0);
+
    torrentHandle.resume();
 
    libtorrent::torrent_status::state_t currentState = torrentHandle.status().state;
