@@ -68,6 +68,8 @@ typedef struct attributeEntry_
     std::string value;
 }attributeEntry;
 
+typedef std::vector <std::string> vectOfStr;
+
 class gtBase
 {
    public:
@@ -107,8 +109,6 @@ class gtBase
 
       typedef std::map<pid_t, childRec *> childMap;
 
-      typedef std::vector <std::string> vectOfStr;
-
       gtBase (boost::program_options::variables_map &vm, opMode mode,
               std::string progName);
       virtual ~gtBase ();
@@ -118,7 +118,7 @@ class gtBase
       virtual void run () = 0;
       uint32_t getLogMask() {return _logMask;}
       gtLogLevel logLevelFromBool (bool high) {return high? PRIORITY_HIGH : PRIORITY_NORMAL;}
-      static std::vector<std::string> vmValueToStrings(boost::program_options::variable_value vv);
+      static vectOfStr vmValueToStrings(boost::program_options::variable_value vv);
 
       void checkIPAddress (std::string addr_string);
       void checkIPFilter (std::string url);

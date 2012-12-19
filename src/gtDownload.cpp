@@ -139,7 +139,7 @@ void gtDownload::pcfacliMaxChildren (boost::program_options::variables_map &vm)
 void gtDownload::pcfacliDownloadList (boost::program_options::variables_map &vm)
 {
    if (vm.count (DOWNLOAD_CLI_OPT))
-      _cliArgsDownloadList = vm[DOWNLOAD_CLI_OPT].as< std::vector <std::string> >();
+      _cliArgsDownloadList = vm[DOWNLOAD_CLI_OPT].as<vectOfStr>();
 
    vectOfStr::iterator vectIter = _cliArgsDownloadList.begin ();
 

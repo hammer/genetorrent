@@ -96,7 +96,7 @@ void configureConfigFileOptions (boost::program_options::options_description &op
          "address ranges for WSI, tracker, and peer traffic")
 
       // Download
-      (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value< std::vector <std::string> >()->composing(), "URI | UUID | .xml | .gto")
+      (makeOpt (DOWNLOAD_CLI_OPT).c_str(), boost::program_options::value<vectOfStr>()->composing(), "URI | UUID | .xml | .gto")
       (MAX_CHILDREN_CLI_OPT.c_str(), boost::program_options::value< int >(), "number of download children")
 
       // Upload
@@ -200,11 +200,11 @@ void checkForIllegalOverrides(boost::program_options::variables_map& restrictedC
    for (boost::program_options::variables_map::iterator it =
       restrictedConfig.begin(); it != restrictedConfig.end(); ++it)
    {
-      std::vector<std::string> restValues = gtBase::vmValueToStrings (it->second);
+      vectOfStr restValues = gtBase::vmValueToStrings (it->second);
 
       // Get variable values from finalConfig map
       boost::program_options::variable_value finalVv = finalConfig[it->first];
-      std::vector<std::string> finalValues = gtBase::vmValueToStrings (finalVv);
+      vectOfStr finalValues = gtBase::vmValueToStrings (finalVv);
 
       // We don't care about order of vector elements
       std::sort(restValues.begin(), restValues.end());
@@ -315,10 +315,10 @@ void processProgramOptions (boost::program_options::variables_map &clOptions, in
          std::string modes = cli[ALLOWED_MODES_OPT].as<std::string>();
          boost::to_upper(modes);
 
-         std::vector<std::string> modesVec;
+         vectOfStr modesVec;
          boost::split (modesVec, modes, boost::is_any_of(",:"));
 
-         std::vector<std::string>::iterator it;
+         vectOfStr::iterator it;
          it = std::find (modesVec.begin(), modesVec.end(), "ALL");
 
          if (it == modesVec.end())

@@ -214,9 +214,9 @@ void gtBase::startUpMessage (std::string app_name)
    }
 }
 
-std::vector<std::string> gtBase::vmValueToStrings(boost::program_options::variable_value vv)
+vectOfStr gtBase::vmValueToStrings(boost::program_options::variable_value vv)
 {
-   std::vector<std::string> value_strings;
+   vectOfStr value_strings;
    std::string value;
 
    if (vv.empty())
@@ -231,8 +231,8 @@ std::vector<std::string> gtBase::vmValueToStrings(boost::program_options::variab
          value_strings.push_back(vv.as<std::string>());
       else if (type == typeid(int))
          value_strings.push_back(boost::lexical_cast<std::string>(vv.as<int>()));
-      else if (type == typeid(std::vector<std::string>))
-         value_strings = vv.as<std::vector<std::string> >();
+      else if (type == typeid(vectOfStr))
+         value_strings = vv.as<vectOfStr>();
       else
          assert (0);  // Need to handle new boost program_options argument type
    }
@@ -247,9 +247,9 @@ void gtBase::log_options_used (boost::program_options::variables_map &vm)
    for (boost::program_options::variables_map::iterator it = vm.begin(); it != vm.end(); it++)
    {
       const char *prefix = (it->first.c_str()[0] == '-') ? "" : "--";
-      std::vector<std::string> values = gtBase::vmValueToStrings(it->second);
+      vectOfStr values = gtBase::vmValueToStrings(it->second);
 
-      for (std::vector<std::string>::iterator vi = values.begin(); vi !=
+      for (vectOfStr::iterator vi = values.begin(); vi !=
          values.end(); vi++)
       {
          Log (PRIORITY_NORMAL, "  %s%s = %s", prefix, it->first.c_str(), vi->c_str());
@@ -721,15 +721,15 @@ void gtBase::pcfacliAllowedServers (boost::program_options::variables_map &vm)
 
    // Process comma- or colon-delimited lists of IPs or IP ranges
    // e.g., 192.168.1.1:192.168.2.1-192.168.2.255,192.168.3.1
-   std::vector<std::string> serverVec;
+   vectOfStr serverVec;
    boost::split (serverVec, serverList, boost::is_any_of (",:"));
 
-   std::vector<std::string>::iterator it;
+   vectOfStr::iterator it;
 
    for (it = serverVec.begin(); it != serverVec.end(); ++it)
    {
       // Process range
-      std::vector<std::string> rangeVec;
+      vectOfStr rangeVec;
       boost::split (rangeVec, *it, boost::is_any_of ("-"));
 
       // If '-' character, this is a range
