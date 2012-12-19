@@ -69,7 +69,6 @@ Section "GeneTorrent (required)"
   File "\cygwin\bin\cygboost_system-mt-1_48.dll"
   File "\cygwin\bin\cygssl-1.0.0.dll"
   File "\cygwin\bin\cygxerces-c-3-0.dll"
-  File "\cygwin\bin\cygxqilla-5.dll"
   File "\cygwin\bin\cygxqilla-6.dll"
   File "\cygwin\bin\cygcrypto-1.0.0.dll"
   File "\cygwin\bin\cygcurl-4.dll"
@@ -121,7 +120,9 @@ Section "Start Menu Shortcuts"
   SectionIn 1
 
   CreateDirectory "$SMPROGRAMS\GeneTorrent"
-  CreateShortCut "$SMPROGRAMS\GeneTorrent\GeneTorrent Shell.lnk" "cmd.exe" "/k cd $\"$INSTDIR$\"" "cmd.exe" 0
+  CreateShortCut "$SMPROGRAMS\GeneTorrent\GeneTorrent Shell.lnk" "cmd.exe" \
+   "/k $\"@set PATH=%PATH%;$INSTDIR&&@echo Type gtdownload or gtupload to begin.  &&@cd %HOMEPATH%$\"" \
+   "cmd.exe" 0
   CreateShortCut "$SMPROGRAMS\GeneTorrent\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
 SectionEnd
