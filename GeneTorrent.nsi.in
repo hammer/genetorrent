@@ -121,6 +121,7 @@ Section "Start Menu Shortcuts"
   SectionIn 1
 
   CreateDirectory "$SMPROGRAMS\GeneTorrent"
+  CreateShortCut "$SMPROGRAMS\GeneTorrent\GeneTorrent Shell.lnk" "cmd.exe" "/k cd $\"$INSTDIR$\"" "cmd.exe" 0
   CreateShortCut "$SMPROGRAMS\GeneTorrent\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
 SectionEnd
