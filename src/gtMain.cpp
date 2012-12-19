@@ -142,18 +142,23 @@ void displayHelp()
 #ifdef GENETORRENT_UPLOAD
    std::cout << "   gtupload manifest-file -c cred [ -p path ]" << std::endl;
    std::cout << std::endl;
-   std::cout << "Additional options are available.  Type 'man gtupload' for more information." << std::endl;
 #endif
 #ifdef GENETORRENT_DOWNLOAD
    std::cout << "   gtdownload < URI | UUID | .xml | .gto > -c cred [ -p path ]" << std::endl;
    std::cout << std::endl;
-   std::cout << "Additional options are available.  Type 'man gtdownload' for more information." << std::endl;
 #endif
 #ifdef GENETORRENT_SERVER
    std::cout << "   gtserver path -q work-queue -c cred --security-api signing-URI" << std::endl;
    std::cout << std::endl;
-   std::cout << "Additional options are available.  Type 'man gtserver' for more information." << std::endl;
 #endif
+
+#if __CYGWIN__
+   std::cout << "Additional options are available.  The manual pages can be "
+      "found as text files in the install directory." << std::endl;
+#else /* __CYGWIN__ */
+   std::cout << "Additional options are available.  Type 'man " <<
+      GENETORRENT_APP_NAME << "' for more information." << std::endl;
+#endif /* __CYGWIN__ */
    exit (0);
 }
 
