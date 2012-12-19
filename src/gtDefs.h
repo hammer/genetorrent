@@ -195,23 +195,15 @@ void commandLineError (std::string errMessage);
    {                                                       \
       timeStamp = makeTimeStamp () + + " ";                \
    }                                                       \
-   if (_logToStdErr)                                       \
+   if (_logToStdErr || global_gtAgentMode)                 \
    {                                                       \
       std::cout << timeStamp << x << std::endl;            \
       std::cout.flush ();                                  \
    }                                                       \
    else                                                    \
    {                                                       \
-      if (global_gtAgentMode)                              \
-      {                                                    \
-         std::cout << timeStamp << x << std::endl;         \
-         std::cout.flush ();                               \
-      }                                                    \
-      else                                                 \
-      {                                                    \
-         std::cerr << timeStamp << x << std::endl;         \
-         std::cerr.flush ();                               \
-      }                                                    \
+      std::cerr << timeStamp << x << std::endl;            \
+      std::cerr.flush ();                                  \
    }                                                       \
 }
 
