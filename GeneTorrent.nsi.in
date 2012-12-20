@@ -50,11 +50,9 @@ Section "GeneTorrent (required)"
 
   ; GeneTorrent docs
   File "src\gtdownload_manual.txt"
-  File "src\gtupload_manual.txt"
 
   ; GeneTorrent Files  
   File "src\.libs\gtdownload.exe"
-  File "src\.libs\gtupload.exe"
   File "src\dhparam.pem"
   File "src\cacert.pem"
   File "libtorrent\src\.libs\cygtorrent-rasterbar-6.dll"
@@ -121,7 +119,7 @@ Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\GeneTorrent"
   CreateShortCut "$SMPROGRAMS\GeneTorrent\GeneTorrent Shell.lnk" "cmd.exe" \
-   "/k $\"@set PATH=%PATH%;$INSTDIR&&@echo Type gtdownload or gtupload to begin.  &&@cd %HOMEPATH%$\"" \
+   "/k $\"@set PATH=%PATH%;$INSTDIR&&@echo Type gtdownload to begin.  &&@cd %HOMEPATH%$\"" \
    "cmd.exe" 0
   CreateShortCut "$SMPROGRAMS\GeneTorrent\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
