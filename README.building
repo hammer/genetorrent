@@ -1,0 +1,549 @@
+==================================
+GeneTorrent Build VM Documentation
+==================================
+
+.. footer:: ###Section### - ###Page### of ###Total###
+
+This document details how to create a pristine build environment for GeneTorrent on various operating systems.  These build environments are used to build distributable GeneTorrent packages for each target operating system and CPU architecture.  The information provided is unique to the OS/distribution/version combination given, but will also serve as a guide to preparing GeneTorrent packages for future OS releases.
+
+The term "pristine" above refers to the state of the build system.  Ideally, these VMs should be used solely for building GeneTorrent releases.  Any other use can pollute the build environment in ways that make the build binaries or packages incompatible with target systems.  In fact, some build systems go to the extreme of building up a fresh OS instance (e.g. a Linux change root environment) for each build of each package.
+
+Creating the base virtual machines for the build environments is not covered here.  They are assumed to be default desktop OS installs of each operating system.  This document covers the modifications required to build GeneTorrent.
+
+.. contents::
+
+Source code management and source releases
+==========================================
+The GeneTorrent source code repository is hosted on GitHub. It is currently a private repository, which means that it requires a credential to 'pull' the source from the repo.  We have configured a GitHub user with read-only access for this purpose, and the pull credential is available upon request.  This credential is a public/private key pair used to authenticate with GitHub over SSH.
+
+The repository contains all of the files needed to build and package GeneTorrent on the supported target OSes, and also includes this document describing the processes for the two-stage release process.
+
+The two-stage release process is as follows.  The first stage is preparing a source distribution of the release.  This is done once per release, and the same tarball is used to build the binary packages for each OS.  This entails setting the version number, tagging the source GitHub to indicate the release point, creating a release tarball, and uploading the tarball to GitHub for distribution.  The second stage is building binary packages for the various OSes using the build VMs.  This decoupling enforces release integrity and is designed to minimize the opportunity for errors.  It enforces integrity because the binary packages are built from the same release tarball, so the versions of release packages are only make from an identifiable point in time in the source tree (in git, a git this release point is a "tagged reference").  It minimizes the chance for errors because builds are performed out of source distribution tarballs in pristine environments, and not haphazardly on non-pristine systems or out of developer's git local git repos (e.g., working directories) which may be polluted or otherwise out-of-sync with the GitHub repository.
+
+Stage 1: Source distribution
+----------------------------
+
+To maintain integrity of a particular release, it is recommended that release builds only be performed from distribution tarballs uploaded to the Downloads section of the GeneTorrent github repo.  These distributions are carefully prepared to maintain source integrity and provide a permanent link back to the snapshot of the source code that they are built from.  These tarballs correspond to the permanent tag in GitHub indicating the git reference (snapshot) from which they were generated.  This process is documented in detail in the `README.release-steps` file in the repository.
+
+Stage 2: Building binary packages
+---------------------------------
+
+Once a source distribution has been created, it should be used to build the GeneTorrent packages for the target operating systems.  This stage is covered in detail on a per-platform basis.
+
+On some platforms, all that is required to be built and packaged is GeneTorrent itself.  On others, GeneTorrent requires libraries which are not packaged by the OS vendor. In these cases, GeneTorrent is capable of building these dependencies and packaging them with GeneTorrent.
+
+The builds are done manually by executing a bash script in the deps/<dependency name>/ directory of the source distribution.  By default, these builds are installed to the same directory (deps/<dependency name>/).  The Makefiles in these directories know how to detect the installed libraries and include them in the binary distribution as needed.
+
+Currently, GeneTorrent can build and provide (on an as-needed basis):
+
+- boost 1.48.0
+- openssl 1.0.1c
+- xerces-c 3.1.1
+- xqilla 2.3.0
+
+To build boost, run::
+
+    deps/boost/buildGeneTorrentBoost.sh
+
+To build openssl, run::
+
+    deps/openssl/buildGeneTorrentOpenSSL.sh
+
+To build xerces-c, run::
+
+    deps/xerces-c/buildGeneTorrentXerces-C.sh
+
+To build XQilla, run::
+
+    deps/xqilla/buildGeneTorrentXQilla.sh
+
+To configure GeneTorrent to compile with any of these built packages, add::
+
+    --with-[boost|openssl|xerces|xqilla]=$PWD/deps/[boost|openssl|xerces|xqilla]
+
+to the configure command once for each dependency.
+ 
+Debian-based distributions
+==========================
+
+Common
+------
+Debian-based distros use binary packages produced by the Debian packaging utilities and produce .deb files.  These files contain package metadata (name, version, maintainer name, requires/provides information, build dependencies, etc.) and package payload, i.e. the compiled GeneTorrent binary distribution.  The contents of the .deb files are dictated by control files.  The control files for our Debian and Ubuntu packages are in the dpkg/ subdirectory of the GeneTorrent source distribution.
+
+The files in the dpkg/common/ subdirectory are common to all Debian-based platforms.  They can be overridden on a per-release by adding the files you wish to override with to the release folder (e.g. /dpkg/precise, for the Ubuntu 12.04 LTS “Precise Pangolin" release).
+
+The CPU architecture (x86 or x86_64) of the packages created will match the CPU architecture of the build VM.
+
+The procedure to build packages on a Debian-based system is as follows:
+
+1. Copy the release tarball to a pristine build VM running the target Debian-based distribution release.
+
+2. Unpack the tarball
+
+3. Build dependencies as needed (see above)
+
+4. ./configure [--with-boost=...] [--with-xqilla=..] [--with-openssl=..]. && make deb
+
+5. The .deb packages for genetorrent-core, genetorrent-download, and genetorrent-upload are generated and placed in the root of the GeneTorrent source distribution tree.
+
+Debian 6.0 (squeeze)
+--------------------
+
+Dependencies that must be provided::
+
+    GeneTorrent package provides libboost and openssl libraries.
+
+Min package set to build::
+
+    lsb
+    g++
+    pkg-config
+    python (or python2.6)
+    libxerces-c-dev
+    libcurl4-openssl-dev
+    libxqilla-dev
+    make
+    libssl-dev
+    devscripts
+
+Min package set to test::
+
+    python-openssl
+
+
+
+Ubuntu 11.10 (oneric)
+---------------------
+
+Dependencies that must be provided::
+
+    GeneTorrent package provides libboost libraries.
+
+Min package set to build::
+
+    g++
+    pkg-config
+    libxerces-c-dev
+    libcurl4-openssl-dev
+    libxqilla-dev
+    libssl-dev
+    make
+    devscripts
+    debhelper
+    python-support
+
+Min package set to test::
+
+    python-openssl
+
+
+Ubuntu 12.04 (precise)
+----------------------
+
+All dependencies provided by the distribution. Must add universe to apt sources for some dependencies.
+
+Min package set to build::
+
+    g++
+    pkg-config
+    libboost1.48-dev
+    libboost-filesystem1.48-dev
+    libboost-program-options1.48-dev
+    libboost-regex1.48-dev
+    libboost-system1.48-dev
+    libboost-thread1.48-dev
+    libxerces-c-dev
+    libcurl4-openssl-dev
+    libxqilla-dev
+    libssl-dev
+    make
+    devscripts
+    debhelper
+    python-support
+
+Min package set to test::
+
+    python-openssl
+
+Ubuntu 12.10 (quantal)
+----------------------
+
+All dependencies provided by the distribution.  Must add universe to apt sources for some dependencies.
+
+Min package set to build::
+
+    g++
+    pkg-config
+    libboost-dev
+    libboost-filesystem1.49-dev
+    libboost-program-options1.49-dev
+    libboost-regex1.49-dev
+    libboost-system1.49-dev
+    libboost-thread1.49-dev
+    libxerces-c-dev
+    libcurl4-openssl-dev
+    libxqilla-dev
+    libssl-dev
+    make
+    devscripts
+    debhelper
+    python-support
+
+Min package set to test::
+
+    python-openssl
+
+Red Hat-based distributions
+===========================
+
+Common
+------
+
+Red Hat-based distros use binary packages produced by the rpm packaging utilities and produce .rpm files.  These files contain package metadata (name, version, maintainer name, requires/provides information, build dependencies, etc.) and package payload, i.e. the compiled GeneTorrent binary distribution.  In GeneTorrent, the contents of the .rpm files are dictated a single unified "spec" file.  This spec file contains the logic to build binary packages for recent CentOS, RHEL, and Fedora releases.  The spec file is in the root of the GeneTorrent source distribution and is called GeneTorrent.spec(.in).
+
+The CPU architecture (x86 or x86_64) of the packages created will match the CPU architecture of the build VM.
+
+The procedure to build packages on a Red Hat-based system is as follows:
+
+1. Copy the release tarball to a pristine build VM running the target Red Hat-based distribution release.
+
+2. Unpack the tarball
+
+3. Build dependencies as needed (see above)
+
+4. ./configure [--with-boost=...] [--with-xqilla=..] [--with-openssl=..]. && make [DISABLE_RPM_CHECK=yes] rpm  (Disabling the check is optional and disables the automatic GeneTorrent unit tests.)
+
+5. The .rpm packages for GeneTorrent-common, GeneTorrent-download, and GeneTorrent-upload are generated and placed in the root of the GeneTorrent source distribution tree.
+
+
+CentOS/RHEL 5.x
+---------------
+
+Dependencies that must be provided::
+
+    GeneTorrent package provides libboost and openssl libraries.
+
+Min package set to build::
+
+    gcc-c++
+    pkgconfig
+    xerces-c-devel
+    curl-devel
+    xqilla-devel
+    openssl-devel
+    make
+    rpm-build
+    buildsys-macros
+    redhat-rpm-config
+
+Min package set to test::
+
+    pyOpenSSL
+
+CentOS/RHEL 6.x
+---------------
+
+Dependencies that must be provided::
+
+    GeneTorrent package provides libboost libraries.
+
+Min package set to build::
+
+    gcc-c++
+    pkgconfig
+    xerces-c-devel
+    libcurl-devel
+    xqilla-devel
+    openssl-devel
+    make
+    rpm-build
+    redhat-rpm-config
+
+Min package set to test::
+
+    pyOpenSSL
+
+Fedora 15/16
+------------
+
+Dependencies that must be provided::
+
+    GeneTorrent package provides libboost libraries.
+
+Min package set to build::
+
+    gcc-c++
+    pkgconfig
+    xerces-c-devel
+    libcurl-devel
+    xqilla-devel
+    openssl-devel
+    make
+    rpm-build
+    redhat-rpm-config
+
+Min package set to test::
+
+    pyOpenSSL
+
+Fedora 17+
+----------
+
+All dependencies provided by the distribution.
+
+Min package set to build::
+
+    gcc-c++
+    pkgconfig
+    xerces-c-devel
+    libcurl-devel
+    xqilla-devel
+    openssl-devel
+    boost-devel (installs all Fedora-packaged boost libs)
+    make
+    rpm-build
+    redhat-rpm-config
+
+Min package set to test::
+
+    pyOpenSSL
+
+
+openSUSE 11.4
+-------------
+
+Dependencies that must be provided::
+    
+    GeneTorrent package provides libboost and libxqilla libraries.
+
+Min package set to build::
+
+    gcc-c++
+    pkg-config
+    xerces-c
+    libxerces-c-devel
+    libcurl-devel
+    libopenssl-devel
+    make
+
+Min package set to test::
+
+    python-openssl
+    python-xml
+
+
+Windows 7/Windows Server 2008
+=============================
+
+GeneTorrent's gtupload and gtdownload applications have been ported to Cygwin.  The
+gtserver utility builds for Windows, but it is not recommended for any use other
+test suite has been modified to run under the Windows version of Python.  The
+than testing the upload and download clients with the GeneTorrent test suite.
+
+Currently, only the gtdownload application is distributed in the Windows installer.
+
+The Cygwin build process produces 32-bit binaries that will run on 32- and 64-bit
+versions of Windows.
+
+GeneTorrent/Installer Build Requirements:
+
+- Windows 7 (32 or 64 bit)
+- Cygwin 1.7.16+ Full Install (or optionally, a base install with the packages below)
+- Nullsoft Scriptable Install System 2.46+ installed to C:\\Program Files\\NSIS or C:\\Program Files (x86)\\NSIS (corresponding to a 32- or 64-bit Installation)
+- XQilla: http://xqilla.sourceforge.net/HomePage
+
+
+Add to the default Cygwin install (and all dependencies)::
+
+    libtool
+    autoconf (latest)
+    automake (latest)
+    openssh
+    git
+    libboost (1.48+)
+    libboost-devel (1.48+)
+    openssl (1.01c-2+)
+    openssl-devel (1.01c-2+)
+    libxerces-c30 (3.0.1-10+)
+    xerces-devel (3.0.1-10+)
+    g++ (latest)
+    gcc (latest)
+    make (latest)
+    python (latest but not python3)
+    python-openssl (latest)
+    curl  (latest)
+    libcurl  (latest)
+    pkg-config  (latest)
+    vim (latest)
+    util-linux (latest)
+
+Dependencies::
+
+    XQilla 2.3.0+
+    (Cygwin contains appropriate versions of all GeneTorrent dependencies except for
+    XQilla)
+
+Build instructions
+------------------
+
+* The current version of Cygwin (1.7.16) has an issue where some packages
+  include libtool archive (.la) files in their distribution and other packages
+  do not.  This confuses libtool while compiling XQilla and GeneTorrent.  For best
+  results, remove the libtool archive files from /usr/lib in your Cygwin
+  environment::
+
+      mkdir $HOME/la_files
+      mv /usr/lib/*.la $HOME/la_files
+
+  This may not be necessary in future versions of Cygwin.
+
+1. Build XQilla from a Cygwin terminal and install it to /usr::
+
+      cd XQilla-2.3.0
+      ./configure --prefix=/usr --with-xerces=/usr
+      make install
+
+2. Configure and make GeneTorrent::
+
+      cd GeneTorrent-3.4.0
+      ./configure --prefix=/usr
+      make LDFLAGS=-liconv
+
+3. Due to a Cygwin limitation, the new binaries need to be "rebased" along with
+   the rest of the Cygwin installation.  Read about this limitation here:
+   http://cygwin.com/faq-nochunks.html#faq.using.fixing-fork-failures
+
+   Create a file $HOME/rebase.txt and add, replacing the path as appropriate::
+
+      /path/to/GeneTorrent/build/src/.libs/cyggenetorrent-0.dll
+      /path/to/GeneTorrent/build/libtorrent/src/.libs/cygtorrent-rasterbar-6.dll
+      /usr/bin/cygxqilla-6.dll
+
+   Exit all Cygwin processes and terminals.
+
+   Open a cmd.exe prompt and enter::
+
+      C:\cygwin\bin\dash.exe
+      /usr/bin/rebaseall -v -T $HOME/rebase.txt
+      exit
+
+   The binaries are now rebased.
+
+4. Generate Windows installer.  From a Cygwin terminal, enter::
+
+      make windows-installer
+
+The Windows installer is created by the Nullsoft Scritable Install System.  The
+script which generates the installer is in the root of the repository, called
+GeneTorrent.nsi(.in).  Adding or removing built files and/or external Cygwin
+libraries to/from the installer package is accomplished by editing this file.
+
+Running the test suite on Windows
+---------------------------------
+
+The test suite usually runs in the build environment and not on the installed binaries. This is not desirable on Windows because the build environment (Cygwin) is very different from the typical execution environment (cmd.exe shell).  To make testing possible in the execution environment on Windows, the unit tests and gtserver binary are packaged as an optional component in the installer.
+
+gtserver.exe is unsupported on Windows, but it is used in the test suite to verify proper system behavior.
+
+Test suite requirements:
+
+-   Python 2.7.3 for Windows - http://www.python.org/download/releases/2.7.3/
+    
+    -   The 32-bit version of Python is recommended because PyOpenSSL is easy to find
+        precompiled for x86 (32-bit) Python.  This will work with the 64-bit GeneTorrent
+        binaries.
+
+-   OpenSSL for Windows 1.0.1c - http://slproweb.com/products/Win32OpenSSL.html
+
+-   PyOpenSSL for Windows 0.11 - https://launchpad.net/pyopenssl/+download
+
+If OpenSSL or Python are installed to custom paths, you must edit C:\\Program Files [(x86)]\\GeneTorrent\\tests\\run_windows.bat in the tests subdirectory with the proper paths.
+
+1.  Run installer and select the optional "Test suite" component
+
+2.  Open a cmd.exe window and change directory to C:\\Program Files [(x86)]\\GeneTorrent\\tests
+
+3.  Run run_windows.bat from a command line (cmd.exe).  It will exit as soon as a failure occurs.  Test suite logs are kept in gttest.log in the tests directory.
+
+Because users will run GeneTorrent outside of the Cygwin terminal, it follows
+that the test suite should be run in a Windows command prompt environment.  To
+facilitate this testing, the GeneTorrent test suite is included with the
+installer on Windows.
+
+Mac OS X 10.7+
+==============
+
+The Mac OS X package for the GeneTorrent clients should be built on Mac OS X 10.7 to ensure compatibility with Mac OS X 10.7 and 10.8.
+
+Currently, only the gtdownload application is distributed in the Mac OS X installer.
+
+To build GeneTorrent and the installer package, you must first install Apple's Xcode IDE and the optional command-line development tools.  They are available at http://developer.apple.com or the App Store.  If you already have Xcode, you can install the command-line tools from Xcode.  Click `Xcode -> Preferences -> Downloads -> Components`.  Then click `Install` by `Command Line Tools`.
+
+To build, some programs are required that are not included by default in Mac OS X.  We'll use brew (http://mxcl.github.com/homebrew/) to install these programs, although MacPorts may also be used.  Note that these are build dependencies, not runtime dependencies.
+
+To install brew, follow the instructions on the website, or execute in a Terminal::
+
+    ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
+
+Run "brew doctor" to make sure your brew environment is set up correctly.
+
+Install the following packages ("brew install ...")::
+
+    git
+    autoconf
+    automake
+    libtool
+    pkg-config
+
+Next, build the GeneTorrent dependencies::
+
+    deps/boost/buildGeneTorrentBoost.sh
+    deps/xerces-c/buildGeneTorrentXerces-C.sh
+    WITH_XERCES=$PWD/deps/xerces-c deps/xqilla/buildGeneTorrentXQilla.sh
+
+Finally, configure and build using the "make macosx" target::
+
+    ./configure --prefix=/usr --with-boost=$PWD/deps/boost \
+        --with-xerces=$PWD/deps/xerces-c --with-xqilla=$PWD/deps/xqilla
+    sudo mkdir /usr/lib/GeneTorrent
+    make clean
+    make macosx
+
+Note about OpenSSL deprecation warnings:  These warnings are normal.  Apple marked all of the OpenSSL API as deprecated in 10.7.  It continues to ship the OpenSSL libraries with Mac OS X as of 10.8.  Future versions may or may not include OpenSSL.  If Apple choses not to include OpenSSL in future versions, using the provided dependency build script for OpenSSL and shipping a OpenSSL library with GeneTorrent is recommended.
+
+Oracle Solaris 11 (64-bit)
+==========================
+
+Download the Solaris 11 "Express" ISO from http://hub.opensolaris.org/bin/view/Main/
+
+The full x86 iso filename is: `sol-11_1-live-x86.iso`
+
+Boot this iso. (I've found that Solaris 11 works particularly well in the Oracle VirtualBox hypervisor.)  The x86 iso provides an environment that includes 32-bit and 64-bit versions of the kernel and libraries.
+
+Solaris 11 is a hybrid 32/64 bit image and it detects the 64-bit host CPU at boot time.
+
+Also, note the preprocessor directive (CPPFLAGS) "-D_PTHREADS".  This is necessary to compile with pthreads support, which libtorrent requires.
+
+Build build the GeneTorrent dependencies (64-bit target)::
+
+    TARGET_BITS=64 deps/boost/buildGeneTorrentBoost.sh
+    CFLAGS=-m64 CXXFLAGS=-m64 deps/xerces-c/buildGeneTorrentXerces-C.sh
+    CFLAGS=-m64 CXXFLAGS=-m64 WITH_XERCES=$PWD/deps/xerces-c deps/xqilla/buildGeneTorrentXQilla.sh
+
+To configure and build (64-bit target)::
+
+    ./autogen.sh && CFLAGS=-m64 CXXFLAGS=-m64 CPPFLAGS="-D_PTHREADS" ./configure \
+    --with-boost=$PWD/deps/boost - with-xerces=$PWD/deps/xerces-c/ \
+    --with-xqilla=$PWD/deps/xqilla --with-openssl=/usr --prefix=/usr --libdir=/usr/lib/64
+    make
+
+To build packages::
+
+    make solaris-pkg
+
+The Solaris package is placed in solaris/ subdirectory.  Example file name: `GeneTorrent-x.y.z.solaris11.amd64.pkg.tgz`.
+
+Installing on Solaris (as root): `pkgadd -d <PATH_TO_PACKAGE>`
+
+Uninstalling on Solaris (as root): `pkgrm genetorrent`
+
