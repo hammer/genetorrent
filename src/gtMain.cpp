@@ -427,10 +427,10 @@ void processProgramOptions (boost::program_options::variables_map &clOptions, in
 
 int main (int argc, char **argv)
 {
-#ifdef TORRENT_DEBUG                                                                                                                                         
+#ifdef TORRENT_DEBUG
    std::cerr << "********************************************************\n" << 
-                "*** D E B U G  B U I L D  O F  G E N E T O R R E N T ***\n" << 
-                "********************************************************" << std::endl;
+             << "*** D E B U G  B U I L D  O F  G E N E T O R R E N T ***\n" << 
+             << "********************************************************" << std::endl;
 #endif
 
    curl_global_init(CURL_GLOBAL_ALL);
