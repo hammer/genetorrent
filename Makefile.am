@@ -170,6 +170,8 @@ macosx:
 	@echo "  Removing server components"
 	rm -rf $(MACDIR)/etc
 	rm -rf $(MACDIR)/usr/bin/GTLoadBalancer
+	rm -rf $(MACDIR)/usr/bin/gtupload
+	rm -rf $(MACDIR)/usr/share/man/man1/gtupload.1
 	rm -rf $(MACDIR)/usr/bin/gtserver
 	rm -rf $(MACDIR)/usr/share/man/man1/gtserver.1
 	@echo "  Building package"
