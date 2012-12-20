@@ -336,8 +336,7 @@ Windows 7/Windows Server 2008
 =============================
 
 GeneTorrent's gtupload and gtdownload applications have been ported to Cygwin.  The
-gtserver utility builds for Windows, but it is not recommended for any use other
-test suite has been modified to run under the Windows version of Python.  The
+gtserver utility builds for Windows, but it is not recommended for any use other 
 than testing the upload and download clients with the GeneTorrent test suite.
 
 Currently, only the gtdownload application is distributed in the Windows installer.
@@ -437,38 +436,6 @@ The Windows installer is created by the Nullsoft Scritable Install System.  The
 script which generates the installer is in the root of the repository, called
 GeneTorrent.nsi(.in).  Adding or removing built files and/or external Cygwin
 libraries to/from the installer package is accomplished by editing this file.
-
-Running the test suite on Windows
----------------------------------
-
-The test suite usually runs in the build environment and not on the installed binaries. This is not desirable on Windows because the build environment (Cygwin) is very different from the typical execution environment (cmd.exe shell).  To make testing possible in the execution environment on Windows, the unit tests and gtserver binary are packaged as an optional component in the installer.
-
-gtserver.exe is unsupported on Windows, but it is used in the test suite to verify proper system behavior.
-
-Test suite requirements:
-
--   Python 2.7.3 for Windows - http://www.python.org/download/releases/2.7.3/
-    
-    -   The 32-bit version of Python is recommended because PyOpenSSL is easy to find
-        precompiled for x86 (32-bit) Python.  This will work with the 64-bit GeneTorrent
-        binaries.
-
--   OpenSSL for Windows 1.0.1c - http://slproweb.com/products/Win32OpenSSL.html
-
--   PyOpenSSL for Windows 0.11 - https://launchpad.net/pyopenssl/+download
-
-If OpenSSL or Python are installed to custom paths, you must edit C:\\Program Files [(x86)]\\GeneTorrent\\tests\\run_windows.bat in the tests subdirectory with the proper paths.
-
-1.  Run installer and select the optional "Test suite" component
-
-2.  Open a cmd.exe window and change directory to C:\\Program Files [(x86)]\\GeneTorrent\\tests
-
-3.  Run run_windows.bat from a command line (cmd.exe).  It will exit as soon as a failure occurs.  Test suite logs are kept in gttest.log in the tests directory.
-
-Because users will run GeneTorrent outside of the Cygwin terminal, it follows
-that the test suite should be run in a Windows command prompt environment.  To
-facilitate this testing, the GeneTorrent test suite is included with the
-installer on Windows.
 
 Mac OS X 10.7+
 ==============

@@ -125,21 +125,6 @@ Section "Start Menu Shortcuts"
 
 SectionEnd
 
-; Optional section (can be disabled by the user)
-Section "Test suite"
-
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  
-  ; Test files
-  File "src\.libs\gtserver.exe"
-  File "src\gtserver_manual.txt"
-  File /r /x *.pyc /x *.bam /x *.gto tests
-  File /oname=tests\dhparam.pem src\dhparam.pem
-  File /oname=tests\gtoinfo.py scripts\gtoinfo.py
-  
-SectionEnd
-
 ;--------------------------------
 
 ; Uninstaller
@@ -164,7 +149,6 @@ Section "Uninstall"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\GeneTorrent"
-  RMDir /r "$INSTDIR\tests"
   RMDir "$INSTDIR"
 
 SectionEnd
