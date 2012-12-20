@@ -9,6 +9,23 @@ Print the version number of
 to the standard output stream.  This version number should be included
 in all bug reports.
 .TP
+.BI "\fR\fP \-\^\-allowed-modes" " [ALL|UPLOAD|DOWNLOAD|SERVER]"
+In a restricted config file (see CONFIGURATION FILES below), this parameter
+contains the modes in which GeneTorrent applications may operate
+on this system.  This option can take multiple modes in a comma- or
+colon-separated list.  Specifying ALL (the default) allows all
+applications to run.
+.TP
+.BI "\fR\fP \-\^\-allowed-servers" " IP ranges"
+Specify a list of IP addresses or IP address ranges that the GeneTorrent
+applications may use for external communications (actors, transactors,
+and web services).  Attempts to communicate with services outside of these
+allowed IP address ranges will be denied.
+
+IP addresses and ranges are given in dotted-decimal notation.  Entries
+in the list are delimited by colon or comma characters.  Ranges are
+given as dash-delimited IP address ranges.
+.TP
 .BI \-b " address" "\fR,\fP \-\^\-bind-ip" " address"
 The IP address for GeneTorrent to bind.  Default is to bind all
 addresses on the system.
@@ -35,6 +52,10 @@ every option that can be specified on the command line can also be
 specified in the configuration file.  Options present on the command
 line will override the contents of the configuration file.
 .TP
+.BI "\fR\fP \-\^\-disallow-user-config"
+In a restricted config file (see CONFIGURATION FILES below), this parameter
+specifies that GeneTorrent will not allow users to specify a config
+file on the command line.
 .BI \-e " address" "\fR,\fP \-\^\-advertised-ip" " address"
 The IP address to advertise to the transactor.  This option is useful
 when this actor is running behind a NAT firewall and the publicly
@@ -137,15 +158,26 @@ file) when run in zero storage mode.
 
 Can not be used in conjunction with \fB\-\^\-null\-storage\fP for a
 given invocation of GeneTorrent.
-.SH CONFIGURATION FILE
+.SH CONFIGURATION FILES
 All options that can be specified on the command line can also be
-specified in a configuration file, which is specified on the command line via the 
+specified in a user configuration file, which is specified on the command line
+via the
 .B --config-file
-option.  The configuration file is a simple flat ASCII file with lines
+option.  A configuration file is a simple flat ASCII file with lines
 of the form "parameter=value".  Except for 'help', 'version',
 and 'config-file', any long-form option from the command line may be
 used as a parameter, and the # character introduces a comment that
 spans until the end of the line.
+
+GeneTorrent applications also read two other configuration files
+(if they exist).  The first is the file at /etc/GeneTorrent-restricted.conf.
+The options given in this file express system-wide policy and are not
+overridable by other configuration files or the command line options.
+The second is the file at /etc/GeneTorrent.conf.  The options given
+in this file function as system-wide defaults, which a user may override
+with a configuration file or command line option.  Neither configuration
+file is packaged with GeneTorrent, so by default neither is a source of
+program options.
 
 Sample GeneTorrent server configuration file:
 .nf
