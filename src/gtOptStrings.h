@@ -40,17 +40,11 @@
 #define OPT_VERSION                "version"
 #define OPT_CFG_FILE               "config-file"
 #define OPT_BIND_IP                "bind-ip"
-#define OPT_BIND_IP_LEGACY         "bindIP"
 #define OPT_CFG_DIR                "config-dir"
-#define OPT_CFG_DIR_LEGACY         "configDir"
 #define OPT_CRED_FILE              "credential-file"
-#define OPT_CRED_FILE_LEGACY       "credentialFile"
 #define OPT_ADVERT_IP              "advertised-ip"
-#define OPT_ADVERT_IP_LEGACY       "advertisedIP"
 #define OPT_ADVERT_PORT            "advertised-port"
-#define OPT_ADVERT_PORT_LEGACY     "advertisedPort"
 #define OPT_INTERNAL_PORT          "internal-port"
-#define OPT_INTERNAL_PORT_LEGACY   "internalPort"
 #define OPT_PATH                   "path"
 #define OPT_RATE_LIMIT             "rate-limit"
 #define OPT_INACTIVE_TIMEOUT       "inactivity-timeout"
@@ -70,12 +64,10 @@
 // Options for gtdownload:
 #define OPT_DOWNLOAD               "download"
 #define OPT_MAX_CHILDREN           "max-children"
-#define OPT_MAX_CHILDREN_LEGACY    "maxChildren"
 #define OPT_GTA_MODE               "gta"
 
 // Options for gtupload:
 #define OPT_UPLOAD                 "upload"
-#define OPT_UPLOAD_LEGACY          "manifestFile"
 #define OPT_UPLOAD_GTO_PATH        "upload-gto-path"
 #define OPT_GTO_ONLY               "gto-only"
 

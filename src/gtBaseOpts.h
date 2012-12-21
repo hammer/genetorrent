@@ -72,7 +72,6 @@ public:
 protected:
     boost::program_options::variables_map m_vm;
     boost::program_options::options_description m_base_desc;
-    boost::program_options::options_description m_base_legacy_desc;
     boost::program_options::positional_options_description m_pos;
 
     bool m_use_security_api_opt;
@@ -83,7 +82,7 @@ protected:
     std::string m_sys_restrict_cfg_file;
 
     void add_options_hidden (const char app);
-    virtual void add_options (bool use_legacy_opts=true);
+    virtual void add_options ();
     virtual void add_positionals ();
     virtual void processOptions ();
 

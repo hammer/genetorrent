@@ -42,7 +42,6 @@ public:
     ~gtDownloadOpts () {}
 
     boost::program_options::options_description m_dl_desc;
-    boost::program_options::options_description m_dl_legacy_desc;
 
     // Storage for data extracted from config/cli.
     int m_maxChildren;
@@ -52,7 +51,7 @@ public:
     bool m_gtAgentMode;
 
 protected:
-    virtual void add_options (bool use_legacy_opts=true);
+    virtual void add_options ();
     virtual void add_positionals ();
     virtual void processOptions ();
 

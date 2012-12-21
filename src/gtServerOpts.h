@@ -41,7 +41,7 @@ public:
     ~gtServerOpts () {}
 
 protected:
-    virtual void add_options (bool use_legacy_opts=true);
+    virtual void add_options ();
     virtual void add_positionals ();
     virtual void processOptions ();
 

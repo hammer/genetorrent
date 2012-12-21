@@ -55,7 +55,6 @@ static const char version_msg[] =
 gtDownloadOpts::gtDownloadOpts ():
     gtBaseOpts ("gtdownload", usage_msg_hdr, version_msg, "DOWNLOAD"),
     m_dl_desc ("Download Options"),
-    m_dl_legacy_desc ("Legacy Download Options"),
     m_maxChildren (8),
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
@@ -69,7 +68,6 @@ gtDownloadOpts::gtDownloadOpts (std::string progName, std::string usage_hdr,
                                 std::string ver_msg, std::string mode):
     gtBaseOpts (progName, usage_hdr, ver_msg, mode),
     m_dl_desc ("Download Options"),
-    m_dl_legacy_desc ("Legacy Download Options (deprecated)"),
     m_maxChildren (8),
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
@@ -79,7 +77,7 @@ gtDownloadOpts::gtDownloadOpts (std::string progName, std::string usage_hdr,
 }
 
 void
-gtDownloadOpts::add_options (bool use_legacy_opts)
+gtDownloadOpts::add_options ()
 {
     // Download options
     m_dl_desc.add_options ()
@@ -89,15 +87,6 @@ gtDownloadOpts::add_options (bool use_legacy_opts)
         ;
     add_desc (m_dl_desc);
 
-    if (use_legacy_opts)
-    {
-        // Legacy Download long options.
-        m_dl_legacy_desc.add_options ()
-            (OPT_MAX_CHILDREN_LEGACY,  opt_int(),    "number of download children")
-            ;
-        add_desc (m_dl_legacy_desc, NOT_VISIBLE);
-    }
-
     boost::program_options::options_description gta_desc;
     gta_desc.add_options ()
         (OPT_GTA_MODE,          "Operating as a child of GTA, this option is hidden")
@@ -106,7 +95,7 @@ gtDownloadOpts::add_options (bool use_legacy_opts)
 
     add_options_hidden ('D');
 
-    gtBaseOpts::add_options (use_legacy_opts);
+    gtBaseOpts::add_options ();
 }
 
 void
@@ -137,21 +126,9 @@ gtDownloadOpts::processOptions ()
 void
 gtDownloadOpts::processOption_MaxChildren ()
 {
-    if (m_vm.count (OPT_MAX_CHILDREN)
-        && m_vm.count (OPT_MAX_CHILDREN_LEGACY))
-    {
-        commandLineError ("duplicate config options:  '--" OPT_MAX_CHILDREN
-                          "' and '--" OPT_MAX_CHILDREN_LEGACY
-                          "' are not permitted at the same time");
-    }
-
     if (m_vm.count (OPT_MAX_CHILDREN) == 1)
     {
         m_maxChildren = m_vm[OPT_MAX_CHILDREN].as< int >();
-    }
-    else if (m_vm.count (OPT_MAX_CHILDREN_LEGACY) == 1)
-    {
-        m_maxChildren = m_vm[OPT_MAX_CHILDREN_LEGACY].as< int >();
     }
 
     if (m_maxChildren < 1)

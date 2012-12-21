@@ -40,7 +40,6 @@ public:
     ~gtUploadOpts () {}
 
     boost::program_options::options_description m_ul_desc;
-    boost::program_options::options_description m_ul_legacy_desc;
 
     // Storage for data extracted from config/cli.
     std::string m_dataFilePath;
@@ -48,7 +47,7 @@ public:
     std::string m_uploadGTODir;
     bool m_uploadGTOOnly;
 
-    virtual void add_options (bool use_legacy_opts=true);
+    virtual void add_options ();
     virtual void add_positionals ();
     virtual void processOptions ();
 

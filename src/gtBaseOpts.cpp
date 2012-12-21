@@ -57,7 +57,6 @@ gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr,
     m_progName (progName),
     m_vm (),
     m_base_desc ("GeneTorrent Common Options"),
-    m_base_legacy_desc ("Legacy GeneTorrent Common Options (deprecated)"),
     m_pos (),
     m_use_security_api_opt (true),
     m_use_alt_storage_opts (true),
@@ -335,7 +334,7 @@ gtBaseOpts::add_desc (bpo::options_description &desc, bool is_visible,
 }
 
 void
-gtBaseOpts::add_options (bool use_legacy_opts)
+gtBaseOpts::add_options ()
 {
     m_cli_desc.add_options ()
         (OPT_CFG_FILE,               opt_string(), "Path/file to optional config file.")
@@ -394,20 +393,6 @@ gtBaseOpts::add_options (bool use_legacy_opts)
     }
 
     add_desc (m_base_desc);
-
-    if (use_legacy_opts)
-    {
-        // Legacy long options.
-        m_base_legacy_desc.add_options ()
-            (OPT_BIND_IP_LEGACY,       opt_string(), "Bind IP")
-            (OPT_CRED_FILE_LEGACY,     opt_string(), "path/file to credentials file")
-            (OPT_CFG_DIR_LEGACY,       opt_string(), "full path to SSL configuration files")
-            (OPT_ADVERT_IP_LEGACY,     opt_string(), "IP Address advertised")
-            (OPT_ADVERT_PORT_LEGACY,   opt_int(),    "TCP Port advertised")
-            (OPT_INTERNAL_PORT_LEGACY, opt_int(),    "local IP port to bind on")
-            ;
-        add_desc (m_base_legacy_desc, NOT_VISIBLE);
-    }
 }
 
 /**
@@ -434,7 +419,6 @@ gtBaseOpts::add_options_hidden (const char app)
     {
         hidden_desc.add_options ()
             (OPT_MAX_CHILDREN,          opt_string(), "hidden, ignored")
-            (OPT_MAX_CHILDREN_LEGACY,   opt_string(), "hidden, ignored")
             ;
     }
 
@@ -489,21 +473,9 @@ gtBaseOpts::processOptions ()
 void
 gtBaseOpts::processOption_BindIP ()
 {
-    if (m_vm.count (OPT_BIND_IP)
-        && m_vm.count (OPT_BIND_IP_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_BIND_IP
-                          " and " OPT_BIND_IP_LEGACY
-                          " are not permitted at the same time");
-    }
-
     if (m_vm.count (OPT_BIND_IP) == 1)
     { 
         m_bindIP = m_vm[OPT_BIND_IP].as<std::string>();
-    }
-    else if (m_vm.count (OPT_BIND_IP_LEGACY) == 1)
-    { 
-        m_bindIP = m_vm[OPT_BIND_IP_LEGACY].as<std::string>();
     }
 }
 
@@ -519,14 +491,6 @@ gtBaseOpts::processOption_Timestamps ()
 void
 gtBaseOpts::processOption_ConfDir ()
 {
-    if (m_vm.count (OPT_CFG_DIR)
-        && m_vm.count (OPT_CFG_DIR_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_CFG_DIR
-                          " and " OPT_CFG_DIR_LEGACY
-                          " are not permitted at the same time");
-    }
-
 #ifdef __CYGWIN__
     m_confDir = getWinInstallDirectory ();
 #endif /* __CYGWIN__ */
@@ -537,10 +501,6 @@ gtBaseOpts::processOption_ConfDir ()
     if (m_vm.count (OPT_CFG_DIR) == 1)
     {
         m_confDir = sanitizePath (m_vm[OPT_CFG_DIR].as<std::string>());
-    }
-    else if (m_vm.count (OPT_CFG_DIR_LEGACY) == 1)
-    {
-        m_confDir = sanitizePath (m_vm[OPT_CFG_DIR_LEGACY].as<std::string>());
     }
     else   // Option not present
     {
@@ -557,42 +517,18 @@ gtBaseOpts::processOption_ConfDir ()
 void
 gtBaseOpts::processOption_CredentialFile ()
 {
-    if (m_vm.count (OPT_CRED_FILE)
-        && m_vm.count (OPT_CRED_FILE_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_CRED_FILE
-                          " and " OPT_CRED_FILE_LEGACY
-                          " are not permitted at the same time");
-    }
-
     if (m_vm.count (OPT_CRED_FILE) == 1)
     { 
         m_credentialPath = m_vm[OPT_CRED_FILE].as<std::string>();
-    }
-    else if (m_vm.count (OPT_CRED_FILE_LEGACY) == 1)
-    { 
-        m_credentialPath = m_vm[OPT_CRED_FILE_LEGACY].as<std::string>();
     }
 }
 
 void
 gtBaseOpts::processOption_AdvertisedIP ()
 {
-    if (m_vm.count (OPT_ADVERT_IP)
-        && m_vm.count (OPT_ADVERT_IP_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_ADVERT_IP
-                          " and " OPT_ADVERT_IP_LEGACY
-                          " are not permitted at the same time");
-    }
-
     if (m_vm.count (OPT_ADVERT_IP) == 1)
     { 
         m_exposedIP = m_vm[OPT_ADVERT_IP].as<std::string>();
-    }
-    else if (m_vm.count (OPT_ADVERT_IP_LEGACY) == 1)
-    { 
-        m_exposedIP = m_vm[OPT_ADVERT_IP_LEGACY].as<std::string>();
     }
     else   // Option not present
     {
@@ -603,23 +539,11 @@ gtBaseOpts::processOption_AdvertisedIP ()
 void
 gtBaseOpts::processOption_InternalPort ()
 {
-    if (m_vm.count (OPT_INTERNAL_PORT)
-        && m_vm.count (OPT_INTERNAL_PORT_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_INTERNAL_PORT
-                          " and " OPT_INTERNAL_PORT_LEGACY
-                          " are not permitted at the same time");
-    }
-
     std::string portList;
 
     if (m_vm.count (OPT_INTERNAL_PORT) == 1)
     { 
         portList = m_vm[OPT_INTERNAL_PORT].as<std::string>();
-    }
-    else if (m_vm.count (OPT_INTERNAL_PORT_LEGACY) == 1)
-    { 
-        portList = m_vm[OPT_INTERNAL_PORT_LEGACY].as<std::string>();
     }
     else   // Option not present
     {
@@ -685,21 +609,11 @@ gtBaseOpts::processOption_InternalPort ()
 void
 gtBaseOpts::processOption_AdvertisedPort ()
 {
-    if (m_vm.count (OPT_ADVERT_PORT) && m_vm.count (OPT_ADVERT_PORT_LEGACY))
-    {
-        commandLineError ("duplicate config options:  " OPT_ADVERT_PORT " and "
-                          OPT_ADVERT_PORT_LEGACY " are not permitted at the same time");
-    }
-
     int exposedPort;
 
     if (m_vm.count (OPT_ADVERT_PORT) == 1)
     { 
         exposedPort = m_vm[OPT_ADVERT_PORT].as< int >();
-    }
-    else if (m_vm.count (OPT_ADVERT_PORT_LEGACY) == 1)
-    { 
-        exposedPort = m_vm[OPT_ADVERT_PORT_LEGACY].as< int >();
     }
     else   // Option not present
     {

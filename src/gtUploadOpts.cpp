@@ -56,7 +56,6 @@ static const char version_msg[] =
 gtUploadOpts::gtUploadOpts ():
     gtBaseOpts ("gtupload", usage_msg_hdr, version_msg, "UPLOAD"),
     m_ul_desc ("Upload Options"),
-    m_ul_legacy_desc ("Legacy Upload Options (deprecated)"),
     m_dataFilePath (""),
     m_manifestFile (""),
     m_uploadGTODir (""),
@@ -65,7 +64,7 @@ gtUploadOpts::gtUploadOpts ():
 }
 
 void
-gtUploadOpts::add_options (bool use_legacy_opts)
+gtUploadOpts::add_options ()
 {
     m_ul_desc.add_options ()
         (OPT_UPLOAD            ",u", opt_string(), "Path to manifest.xml file.")
@@ -75,16 +74,7 @@ gtUploadOpts::add_options (bool use_legacy_opts)
         ;
     add_desc (m_ul_desc);
 
-    if (use_legacy_opts)
-    {
-        // Legacy upload long options.
-        m_ul_legacy_desc.add_options ()
-            (OPT_UPLOAD_LEGACY,          opt_string(), "Path to manifest.xml file.")
-            ;
-        add_desc (m_ul_legacy_desc, NOT_VISIBLE);
-    }
-
-    gtBaseOpts::add_options (use_legacy_opts);
+    gtBaseOpts::add_options ();
 
     add_options_hidden ('U');
 }
@@ -112,16 +102,7 @@ gtUploadOpts::processOptions ()
 void
 gtUploadOpts::processOption_Upload ()
 {
-    if (m_vm.count (OPT_UPLOAD)
-        && m_vm.count (OPT_UPLOAD_LEGACY))
-    {
-        commandLineError ("Duplicate config options:  " OPT_UPLOAD
-                          " and " OPT_UPLOAD_LEGACY
-                          " are not permitted at the same time.");
-    }
-
-    if (m_vm.count (OPT_UPLOAD) == 0 &&
-        m_vm.count (OPT_UPLOAD_LEGACY) == 0)
+    if (m_vm.count (OPT_UPLOAD) == 0)
     {
         commandLineError ("Upload command line or config file must "
                           "include a manifest-file argument.");
@@ -130,10 +111,6 @@ gtUploadOpts::processOption_Upload ()
     if (m_vm.count (OPT_UPLOAD) == 1)
     {
         m_manifestFile = m_vm[OPT_UPLOAD].as<std::string>();
-    }
-    else if (m_vm.count (OPT_UPLOAD_LEGACY) == 1)
-    {
-        m_manifestFile = m_vm[OPT_UPLOAD_LEGACY].as<std::string>();
     }
 
     relativizePath (m_manifestFile);

@@ -63,7 +63,7 @@ gtServerOpts::gtServerOpts ():
 }
 
 void
-gtServerOpts::add_options (bool use_legacy_opts)
+gtServerOpts::add_options ()
 {
     m_server_desc.add_options ()
         (OPT_SERVER          ",s", opt_string(), "server data path")
@@ -72,7 +72,7 @@ gtServerOpts::add_options (bool use_legacy_opts)
         ;
     add_desc (m_server_desc);
 
-    gtBaseOpts::add_options (use_legacy_opts);
+    gtBaseOpts::add_options ();
 
     add_options_hidden ('S');
 }

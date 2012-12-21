@@ -33,47 +33,73 @@
 #
 ################################################################################
 
-function printOpt {
-   commands="gtdownload gtupload gtserver"
+FILTERED_ARGS=()
 
-   for cmd in $commands; do
-      gt_bin=$(which $cmd 2>/dev/null)
-      if [ ! -z "${gt_bin}" ]; then
-         echo ${gt_bin} $1
-         ${gt_bin} $1
-         echo
-      fi
-   done
+function filter_legacy_args {
+   farg="$1"
+   farg="${farg/bindIP/bind-ip}"
+   farg="${farg/configDir/config-dir}"
+   farg="${farg/credentialFile/credential-file}"
+   farg="${farg/advertisedIP/advertised-ip}"
+   farg="${farg/advertisedPort/advertised-port}"
+   farg="${farg/internalPort/internal-port}"
+   farg="${farg/maxChildren/max-children}"
+   FILTERED_ARGS+=("${farg}")
 }
+
+command=
+help=
 
 for arg in "$@"
 do
-   if [[ "${arg}" = "-d" || "${arg}" =~ "--download" ]]; then
-      command="gtdownload"
-      break
-   fi
-   if [[ "${arg}" = "-u" || "${arg}" =~ "--upload" ]]; then
-      command="gtupload"
-      break
-   fi
-   if [[ "${arg}" = "-s" || "${arg}" =~ "--server" ]]; then
-      command="gtserver"
-      break
-   fi
-   if [[ "${arg}" = "-h" || "${arg}" = "--help" ]]; then
-      printOpt "--help"
-      exit 0
-   fi
-   if [[ "${arg}" = "--version" ]]; then
-      printOpt "--version"
-      exit 0
-   fi
+   case "$arg" in
+      -d?*|--download=*)
+         command="gtdownload"
+         ;;
+
+      -d|--download)
+         command="gtdownload"
+         continue           # don't add to filtered args
+         ;;
+
+      -u?*|--upload=*)
+         command="gtupload"
+         ;;
+
+      -u|--upload)
+         command="gtupload"
+         continue           # don't add to filtered args
+         ;;
+
+      -s?*|--server=*)
+         command="gtserver"
+         ;;
+
+      -s|--server)
+         command="gtserver"
+         continue           # don't add to filtered args
+         ;;
+
+      -h|--help)
+         help="$arg"
+         ;;
+      *)
+         ;;
+   esac
+
+   filter_legacy_args "$arg"
 done
 
 if [ -z "${command}" ]; then
-   echo -n "Invoke GeneTorrent with a -d, -u, or -s argument to indicate "
-   echo    "operating mode."
-   exit 1
+   if [ -n "${help}" ]; then
+       echo -n "Invoke GeneTorrent with a '-d', '-u', or '-s' argument to indicate "
+       echo    "operating mode."
+       exit 0
+   fi
+
+   # Old behaviour of GeneTorrent was to default to server mode if no
+   # mode was given.
+   command="gtserver"
 fi
 
 if [ -z "$(which ${command} 2>/dev/null)" ]; then
@@ -82,6 +108,5 @@ if [ -z "$(which ${command} 2>/dev/null)" ]; then
    exit 1
 fi
 
-echo "GeneTorrent wrapper running: ${command} "$@""
-${command} "$@"
-
+echo "GeneTorrent wrapper running: ${command} ${FILTERED_ARGS[@]}"
+exec ${command} "${FILTERED_ARGS[@]}"
