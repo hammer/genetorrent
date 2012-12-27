@@ -59,6 +59,7 @@ Section "GeneTorrent (required)"
   File "src\.libs\cyggenetorrent-0.dll"
   File "scripts\gtocheck"
   File "scripts\gtoinfo.py"
+  File "scripts\cgquery.py"
 
   ; Cygwin Files - GeneTorrent deps
   File "\cygwin\bin\cygboost_filesystem-mt-1_48.dll"

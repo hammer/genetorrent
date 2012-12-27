@@ -204,6 +204,7 @@ fi
 %defattr(-,root,root,-)
 %{_bindir}/gtoinfo
 %{_bindir}/gtocheck
+%{_bindir}/cgquery
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}*
 %{_datadir}/%{name}
@@ -244,6 +245,7 @@ fi
 
 %files upload
 %defattr(-,root,root,-)
+%{_bindir}/cgsubmit
 %{_bindir}/gtupload
 %{_mandir}/man1/gtupload*
 

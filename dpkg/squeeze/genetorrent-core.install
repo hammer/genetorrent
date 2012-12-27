@@ -1,6 +1,7 @@
 usr/bin/GeneTorrent
 usr/bin/gtoinfo
 usr/bin/gtocheck
+usr/bin/cgquery
 usr/lib/python2.6/dist-packages/gtoinfo.*
 usr/lib/GeneTorrent/libtorrent-rasterbar.so*
 usr/lib/GeneTorrent/libboost*

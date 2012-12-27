@@ -32,21 +32,24 @@
 #
 ################################################################################
 
-bin_SCRIPTS = \
+bin_SCRIPTS =     \
 	GTLoadBalancer \
-	gtocheck
+	gtocheck       \
+	cgquery        \
+	cgsubmit
 
 python_PYTHON = \
 	gtoinfo.py
 
-PYTHON_TOOLS=gtoinfo
+gtoinfo:
+	cp $(srcdir)/gtoinfo_wrapper $@
 
-${PYTHON_TOOLS}: python_wrapper
-	cp python_wrapper $@
+BUILT_SOURCES = gtoinfo
+CLEANFILES = gtoinfo gtoinfo.pyc
+bin_SCRIPTS += gtoinfo
 
-BUILT_SOURCES = ${PYTHON_TOOLS}
-CLEANFILES = ${PYTHON_TOOLS} gtoinfo.pyc
-bin_SCRIPTS+= ${PYTHON_TOOLS}
-
-EXTRA_DIST = \
-	scm-rev-update
+EXTRA_DIST =      \
+	scm-rev-update \
+	cgquery        \
+	cgsubmit       \
+   gtoinfo_wrapper

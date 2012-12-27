@@ -174,6 +174,7 @@ macosx:
 	rm -rf $(MACDIR)/usr/share/man/man1/gtupload.1
 	rm -rf $(MACDIR)/usr/bin/gtserver
 	rm -rf $(MACDIR)/usr/share/man/man1/gtserver.1
+	rm -rf $(MACDIR)/usr/bin/cgsubmit
 	@echo "  Building package"
 	@set -e; cd macosx; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\

@@ -1,38 +1,11 @@
 #!/usr/bin/env python
 
 """
-We are licensing the GeneTorrent Client under BSD-2 (same as LibTorrent).
- 
-For any open-source files we create, the following needs to be included: 
- 
-Copyright (c) 2011-2012, Annai Systems, Inc.
-All rights reserved.
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions 
-are met:
- 
-* Redistributions of source code must retain the above copyright 
-  notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright 
-  notice, this list of conditions and the following disclaimer in the 
-  documentation and/or other materials provided with the distribution.
- 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-THE POSSIBILITY OF SUCH DAMAGE.
-"""
-
-"""
 =========================================================================
 cgsubmit
+
+    Copyright (c) 2011-2012, Annai Systems, Inc.
+    All rights reserved.
 
     cgsubmit is a cghub webservices client responsible for the 
     submission of metadata to the cghub server for validation or 
@@ -47,7 +20,7 @@ cgsubmit
 -------------------------------------------------------------------------
 """
 
-CGSUBMIT_VERSION = "3.1.0"
+CGSUBMIT_VERSION = "3.1.1"
 
 #
 # Check the python version for compatability.  Python 3 is not
@@ -336,7 +309,7 @@ class Logger:
         """
         print >> stream, L_WIDTH * char
 
-class CGObject():
+class CGObject:
     """ =================================================================
         CGObject
         
@@ -562,11 +535,11 @@ class CGError(CGObject):
     #
     rootObjectPR = [
         # TagName           Print      Heading          Indent
-        ("/usermsg",        True,       None,                1),
-        ("/subsystem",      True,       "Subsystem",         1),
-        ("/errnum",         True,       "Error Number",      1),
-        ("/effect",         True,       "Result",            1),
-        ("/remediation",    True,       "Remediation",       1),
+        ("./usermsg",        True,       None,                1),
+        ("./subsystem",      True,       "Subsystem",         1),
+        ("./errnum",         True,       "Error Number",      1),
+        ("./effect",         True,       "Result",            1),
+        ("./remediation",    True,       "Remediation",       1),
     ]
 
 
@@ -580,7 +553,7 @@ class CGError(CGObject):
         CGObject.__init__(self, xmlfile, log)
 
         root = self.tree.getroot()
-        if not root or not root.tag == "CGHUB_error":
+        if root is None or not root.tag == "CGHUB_error":
             raise ValueError("Invalid CGHUB_error tree")
         self.httpcode = httpcode
         self.opname = opname
@@ -635,9 +608,9 @@ class CGError(CGObject):
         """ -----------------------------------------------------------------
             Parses the top level status in the CGHUB_error, e.g.
                 <CGHUB_error>
-	                <submission_set>
+                    <submission_set>
                         <files>
-		                    <status>
+                            <status>
             -----------------------------------------------------------------
         """
         #
@@ -659,11 +632,11 @@ class CGError(CGObject):
         """ -----------------------------------------------------------------
             Parses the detail level status in the CBHub_error, e.g.
                 <CGHUB_error>
-	                <submission_set>
+                    <submission_set>
                         <files>
-			                <details>
-				                <analysis>
-			                        <status>
+                            <details>
+                                <analysis>
+                                    <status>
             Returns None if the status indicates success, otherwise
             returns a list of error objects to be further parsed.
             -----------------------------------------------------------------
@@ -744,7 +717,7 @@ class CGError(CGObject):
             # Path to the top node for the current error type
             # E.g. /submission_set/files
             #
-            path  = "/submission_set/%s"%errorType
+            path  = "./submission_set/%s"%errorType
 
             if self.ParseErrorSummary(indent, path, "%s Validation"%(errorDescr)):
                 # Top level status indicated no errors of this type
@@ -794,7 +767,7 @@ class CGError(CGObject):
 
         self.log.Separator("-", stream=sys.stderr)
 
-class CGMeta():
+class CGMeta:
     """ =================================================================
         CGMeta
         
@@ -849,10 +822,10 @@ class CGMeta():
         """
     
         node = self.tree.find(xpath.upper())
-        if not node:
+        if node is None:
             node = self.tree.find(xpath.lower())
     
-        if not node:
+        if node is None:
             return
     
         for attrib in attrNames:
@@ -870,7 +843,7 @@ class CGMeta():
             -----------------------------------------------------------------
         """
     
-        self.collectAttributes("/ANALYSIS", attrNames, analysisDict)
+        self.collectAttributes("./ANALYSIS", attrNames, analysisDict)
     
     def CollectFiles(self, filedict):
         """ -----------------------------------------------------------------
@@ -882,7 +855,7 @@ class CGMeta():
             -----------------------------------------------------------------
         """
     
-        xpath = "//DATA_BLOCK/FILES/FILE"
+        xpath = ".//DATA_BLOCK/FILES/FILE"
     
         #
         # Locate all of the file nodes
@@ -890,6 +863,9 @@ class CGMeta():
         files = self.tree.findall(xpath.upper())
         if not files:
             files = self.tree.findall(xpath.lower())
+
+        if not files:
+            return
         
         #
         # For each node, get the filename attribute, and use it as
@@ -929,7 +905,7 @@ class CGHubSubmit:
         =================================================================
     """
 
-    def __init__(self, opname, server, analysis_dir, metafiles, certificate=None, outxml=None):
+    def __init__(self, opname, server, analysis_dir, metafiles, certificate=None, outxml=None, insecure=False):
         """ -----------------------------------------------------------------
             Initialize the instance variables
             -----------------------------------------------------------------
@@ -940,11 +916,13 @@ class CGHubSubmit:
         self.uuid = os.path.basename(self.analysis_dir)
         self.certificate = certificate
         self.outxml = outxml
+        self.insecure = insecure
         try:
             self.myname = os.path.basename(sys.argv[0])
         except:
             self.myname = "cgsubmit"
         self.tmproot = os.path.join("/", "tmp", self.myname)
+        self.tmppid = None
         self.tmpdir = None
 
         #
@@ -964,7 +942,8 @@ class CGHubSubmit:
         # get removed by the destructor.
         #
         try:
-            self.tmpdir = os.path.join(self.tmproot, "%d"%os.getpid(), self.uuid)
+            self.tmppid = os.path.join(self.tmproot, "%d"%os.getpid())
+            self.tmpdir = os.path.join(self.tmppid, self.uuid)
             if not os.path.exists(self.tmpdir):
                 os.makedirs(self.tmpdir)
                 os.chmod(self.tmpdir, 0755)
@@ -1001,13 +980,19 @@ class CGHubSubmit:
             if self.tmpdir and os.path.exists(self.tmpdir):
                 for tmproot, dirs, files in os.walk(self.tmpdir, topdown=False):
                     for tmpf in files:
-                        os.unlink(tmpf)
+                        os.unlink(os.path.join(tmproot, tmpf))
             #
             # Then remove any empty directories all the way up to the
-            # root of our temporary tree
+            # top of our temporary tree
             #
-            for tmproot, dirs, files in os.walk(self.tmproot, topdown=False):
-                os.rmdir(tmproot)
+            if self.tmppid and os.path.exists(self.tmppid):
+                for tmproot, dirs, files in os.walk(self.tmppid, topdown=False):
+                    os.rmdir(tmproot)
+            #
+            # Finally, if the temp root is empty, remove it
+            # 
+            os.rmdir(self.tmproot)
+
         except:
             # Did our best
             pass
@@ -1043,12 +1028,13 @@ class CGHubSubmit:
             -----------------------------------------------------------------
         """
 
-
+        insecuremap = { True : "Disabled", False : "Enabled" }
         attrs = [ ("%s Version"%(self.myname),  CGSUBMIT_VERSION),
                   ("CGHub Server",              self.server),
                   ("Request Type",              self.opname.capitalize()),
                   ("Analysis Directory",        self.analysis_dir),
                   ("UUID",                      self.uuid),
+                  ("SSL Certificate Checking",  insecuremap[self.insecure]),
                   ("Output File",               self.outxml) ]
 
         if self.certificate:
@@ -1090,13 +1076,18 @@ class CGHubSubmit:
 
         #       
         # Base curl command, which:
-        #    - Doesn't validate certificates
+        #    - Validates certificates
         #    - Writes the HTTP status code to stdout
         #    - Writes the downloaded content to outfile
         curlcmd = ['curl', 
-                   '-k', 
                    '-w', '%{http_code}',
                    '-o', outfile]
+
+        #
+        # Has the user disabled SSL certificate checks?
+        #
+        if self.insecure:
+            curlcmd += ['-k']
 
         #
         # Add the meta files to the post
@@ -1161,8 +1152,19 @@ class CGHubSubmit:
             #
             # curl exitted with a non-0 status
             #
-            Log.execError("Problem posting %s request to %s" % (self.opname.lower(), self.server))
-            Log.writeE(stderrStr)
+            if retcode == 60:
+                #
+                # Peer certificate cannot be authenticated with known CA certificates.
+                # We print our own error here because the curl error is very long and
+                # specific in this case.
+                #
+                Log.execError("The SSL certificate on %s cannot be authenticated"%(self.server))
+            else:
+                #
+                # All other errors
+                #
+                Log.execError("Problem posting %s request to %s" % (self.opname.lower(), self.server))
+                Log.writeE(stderrStr)
             raise CurlException("Curl command failed")
 
     def Validate(self):
@@ -1257,9 +1259,9 @@ class CGHubSubmit:
         try:
             manifest = self.buildManifest()
 
-            with open(mfile, "w") as mfd:
-                mfd.write(manifest)
-                mfd.close()
+            mfd = open(mfile, "w")
+            mfd.write(manifest)
+            mfd.close()
             return True
         except Exception, err:
             Log.fatalExecError("Failed to create manifest '%s': %s"%(mfile, err))
@@ -1315,6 +1317,10 @@ def main():
     parser.add_option('-c', '--credential', 
                       action='store', type='string', dest="credential", 
                       help="file containing the CGHub credential; not required with the --validate-only option")
+
+    parser.add_option('-k', '--insecure', 
+                      action="store_true", default=False, dest="insecure", 
+                      help="disable certificate checking for SSL connections")
 
     parser.add_option('-v', '--verbose', 
                       action="store_true", default=False, dest="verbose", 
@@ -1407,7 +1413,7 @@ def main():
                     ('run.xml',         'runxml',           False),
                     ('experiment.xml',  'experimentxml',    False)]                                 
     
-    cs = CGHubSubmit(opname, server, analysis_dir, metafiles, options.credential, options.out_file)
+    cs = CGHubSubmit(opname, server, analysis_dir, metafiles, options.credential, options.out_file, options.insecure)
 
     try:
         cs.DumpHeader()

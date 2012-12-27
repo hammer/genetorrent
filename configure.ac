@@ -174,7 +174,6 @@ AC_CONFIG_FILES(
    [GeneTorrent.nsi]
    [scripts/Makefile]
    [scripts/GTLoadBalancer]
-   [scripts/python_wrapper]
    [scripts/gtoinfo.py]
    [scripts/gtocheck]
    [init.d/Makefile]

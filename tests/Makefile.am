@@ -65,12 +65,15 @@ gtoinfo:
 dhparam.pem:
 	$(LN_S) $(srcdir)/../src/dhparam.pem dhparam.pem
 
+cgsubmit:
+	$(LN_S) $(srcdir)/../scripts/cgsubmit cgsubmit
+
 .PHONY: check-setup
-check-setup: web certs gtoinfo dhparam.pem
+check-setup: web certs gtoinfo dhparam.pem cgsubmit
 
 check-am: check-setup
 
-CLEANFILES = dhparam.pem gtoinfo web
+CLEANFILES = dhparam.pem gtoinfo web cgsubmit
 
 DISTCLEANFILES = gttest.log
 
