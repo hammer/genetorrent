@@ -138,8 +138,11 @@ class DataGenRandom (DataGenBase):
 
     def write_data (self, fp, md5sum, data_size, offset):
         seed = '%s-%d' % (self.timestamp, offset)
-        fp.write('# Generated BAM from Random Data: (%s) with seed = %s\n'
-                 % (self.uuid, seed))
+        header = ('# Generated BAM from Random Data: (%s) with seed = %s\n'
+                  % (self.uuid, seed))
+        md5sum.update (header)
+        fp.write (header)
+
         random.seed(seed)
         blk_size = 4096
         while data_size > 0:

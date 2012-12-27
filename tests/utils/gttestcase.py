@@ -432,7 +432,7 @@ class GTTestCase(unittest.TestCase):
             self.assertTrue('state changed to: finished' in client_sout)
 
             # check file hashes on both sides of transfer
-            if server and check_sha1:
+            if servers and check_sha1:
                 self.assertTrue(self.compare_hashes(
                     self.client_bam(uuid), self.server_bam(uuid)))
 
