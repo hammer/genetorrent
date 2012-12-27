@@ -1,0 +1,4183 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ResultSet date="2012-12-06 23:15:21">
+	<Query>state:*</Query>
+	<Hits>28</Hits>
+	<Result id="1">
+		<analysis_id>f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <DATA_BLOCK sector="6" name="205CCABXX">
+      <FILES>
+        <FILE checksum="5efcd6a0c95b965589ac419769c4d2db" checksum_method="MD5" filetype="bam" filename="mini_bam.bam"/>
+      </FILES>
+    </DATA_BLOCK>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_data_uri>
+	</Result>
+	<Result id="2">
+		<analysis_id>f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_data_uri>
+	</Result>
+	<Result id="3">
+		<analysis_id>e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <DATA_BLOCK sector="6" name="205CCABXX">
+      <FILES>
+        <FILE checksum="5efcd6a0c95b965589ac419769c4d2db" checksum_method="MD5" filetype="bam" filename="mini_bam.bam"/>
+      </FILES>
+    </DATA_BLOCK>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_data_uri>
+	</Result>
+	<Result id="4">
+		<analysis_id>414a00c5-839d-44bb-9056-8e94a159767c</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET>
+    <RUN center_name="BI" alias="B01V6ACXX110826.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-26T00:00:00.000-04:00" instrument_name="SL-HAA">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01V6ACXX110826.S"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-02 17:14:49.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B01V6ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01V6ACXX110826</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110826_SL-HAA_0312_BFCB01V6ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>assembly</TAG>
+                <VALUE>HG19_Broad_variant</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01V6ACXX110826.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.1.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="1" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.1.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.2.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="2" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.2.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.1.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="1" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.1.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.2.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="2" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.2.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C01U1ACXX110903.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-09-03T00:00:00.000-04:00" instrument_name="SL-HAF">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C01U1ACXX110903.S"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-13 00:17:50.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C01U1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C01U1ACXX110903</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110903_SL-HAF_0219_AFCC01U1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C01U1ACXX110903.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C02F2ACXX110914.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-09-14T00:00:00.000-04:00" instrument_name="SL-HBL">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C02F2ACXX110914.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-22 14:40:20.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C02F2ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C02F2ACXX110914</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110914_SL-HBL_0164_BFCC02F2ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C02F2ACXX110914.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/414a00c5-839d-44bb-9056-8e94a159767c</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/414a00c5-839d-44bb-9056-8e94a159767c</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/414a00c5-839d-44bb-9056-8e94a159767c</analysis_data_uri>
+	</Result>
+	<Result id="5">
+		<analysis_id>da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_data_uri>
+	</Result>
+	<Result id="6">
+		<analysis_id>94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET>
+    <RUN center_name="BI" alias="B01V6ACXX110826.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-26T00:00:00.000-04:00" instrument_name="SL-HAA">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01V6ACXX110826.S"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-02 17:14:49.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B01V6ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01V6ACXX110826</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110826_SL-HAA_0312_BFCB01V6ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>assembly</TAG>
+                <VALUE>HG19_Broad_variant</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01V6ACXX110826.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B01W1ACXX110829.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B01W1ACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 02:10:33.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="B01W1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B01W1ACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0299_AFCB01W1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B01W1ACXX110829.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.1.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="1" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.1.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.2.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="2" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.2.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="B020DACXX110829.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-29T00:00:00.000-04:00" instrument_name="SL-HAB">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.B020DACXX110829.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-08 12:04:28.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.1</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="B020DACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>B020DACXX110829</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110829_SL-HAB_0300_BFCB020DACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>B020DACXX110829.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.1.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="1" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.1.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.2.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="2" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.2.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.3.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="3" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.3.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.5.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="5" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.5.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.6.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="6" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.6.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.7.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="7" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.7.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C00KDACXX110825.8.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-08-25T00:00:00.000-04:00" instrument_name="SL-HBQ">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C00KDACXX110825.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-03 18:58:31.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="8" name="C00KDACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C00KDACXX110825</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110825_SL-HBQ_0109_AFCC00KDACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C00KDACXX110825.8.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C01U1ACXX110903.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-09-03T00:00:00.000-04:00" instrument_name="SL-HAF">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C01U1ACXX110903.S"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-13 00:17:50.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C01U1ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C01U1ACXX110903</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110903_SL-HAF_0219_AFCC01U1ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C01U1ACXX110903.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+    <RUN center_name="BI" alias="C02F2ACXX110914.4.ACAGTTGA.C484.TCGA-76-6661-10A-01D-1845-08.2.bam" run_center="BI" run_date="2011-09-14T00:00:00.000-04:00" instrument_name="SL-HBL">
+        <EXPERIMENT_REF refcenter="BI" refname="7290.WR26090.Catch-87738.C02F2ACXX110914.P"/>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION section_name="base caller">
+                    <STEP_INDEX>2011-09-22 14:40:20.0</STEP_INDEX>
+                    <PREV_STEP_INDEX>N/A</PREV_STEP_INDEX>
+                    <PROGRAM>GAPipeline</PROGRAM>
+                    <VERSION>RTA1.12.4.2</VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+            <DIRECTIVES/>
+        </PROCESSING>
+        <DATA_BLOCK sector="4" name="C02F2ACXX">
+            <FILES>
+                <FILE checksum="59071590099d21dd439896592338bf95" checksum_method="MD5" filetype="bam" filename="C484.TCGA-76-6661-10A-01D-1845-08.2.bam"/>
+            </FILES>
+        </DATA_BLOCK>
+        <RUN_ATTRIBUTES>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample ID</TAG>
+                <VALUE>118332.0</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI GSSR sample LSID</TAG>
+                <VALUE>broadinstitute.org:bsp.prod.sample:259L1</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI molecular barcode</TAG>
+                <VALUE>ACAGTTGA [tagged_110]</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI project name</TAG>
+                <VALUE>C484</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run barcode</TAG>
+                <VALUE>C02F2ACXX110914</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI run name</TAG>
+                <VALUE>110914_SL-HBL_0164_BFCC02F2ACXX</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>BI work request ID</TAG>
+                <VALUE>26090</VALUE>
+            </RUN_ATTRIBUTE>
+            <RUN_ATTRIBUTE>
+                <TAG>read group platform unit</TAG>
+                <VALUE>C02F2ACXX110914.4.ACAGTTGA</VALUE>
+            </RUN_ATTRIBUTE>
+        </RUN_ATTRIBUTES>
+    </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_data_uri>
+	</Result>
+	<Result id="7">
+		<analysis_id>4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <DATA_BLOCK sector="6" name="205CCABXX">
+      <FILES>
+        <FILE checksum="5efcd6a0c95b965589ac419769c4d2db" checksum_method="MD5" filetype="bam" filename="mini_bam.bam"/>
+      </FILES>
+    </DATA_BLOCK>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_data_uri>
+	</Result>
+	<Result id="8">
+		<analysis_id>6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_id>
+		<state>live</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <DATA_BLOCK sector="6" name="205CCABXX">
+      <FILES>
+        <FILE checksum="5efcd6a0c95b965589ac419769c4d2db" checksum_method="MD5" filetype="bam" filename="mini_bam.bam"/>
+      </FILES>
+    </DATA_BLOCK>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_data_uri>
+	</Result>
+	<Result id="9">
+		<analysis_id>54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_data_uri>
+	</Result>
+	<Result id="10">
+		<analysis_id>c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_data_uri>
+	</Result>
+	<Result id="11">
+		<analysis_id>a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_data_uri>
+	</Result>
+	<Result id="12">
+		<analysis_id>3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_data_uri>
+	</Result>
+	<Result id="13">
+		<analysis_id>3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_data_uri>
+	</Result>
+	<Result id="14">
+		<analysis_id>57b32de4-484f-45e8-af52-a0db7abf4488</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_data_uri>
+	</Result>
+	<Result id="15">
+		<analysis_id>8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_data_uri>
+	</Result>
+	<Result id="16">
+		<analysis_id>3ebc7632-484f-4df8-a70a-be534841466e</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3ebc7632-484f-4df8-a70a-be534841466e</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3ebc7632-484f-4df8-a70a-be534841466e</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3ebc7632-484f-4df8-a70a-be534841466e</analysis_data_uri>
+	</Result>
+	<Result id="17">
+		<analysis_id>6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_data_uri>
+	</Result>
+	<Result id="18">
+		<analysis_id>7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_data_uri>
+	</Result>
+	<Result id="19">
+		<analysis_id>b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_data_uri>
+	</Result>
+	<Result id="20">
+		<analysis_id>593649dc-a641-4620-bc3e-8491629626ea</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/593649dc-a641-4620-bc3e-8491629626ea</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/593649dc-a641-4620-bc3e-8491629626ea</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/593649dc-a641-4620-bc3e-8491629626ea</analysis_data_uri>
+	</Result>
+	<Result id="21">
+		<analysis_id>1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_data_uri>
+	</Result>
+	<Result id="22">
+		<analysis_id>d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_data_uri>
+	</Result>
+	<Result id="23">
+		<analysis_id>d5645311-2589-485c-8e5a-77d40e8a6411</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_data_uri>
+	</Result>
+	<Result id="24">
+		<analysis_id>179a4f39-0e2f-4543-b81f-0ed808488912</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_data_uri>
+	</Result>
+	<Result id="25">
+		<analysis_id>88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_data_uri>
+	</Result>
+	<Result id="26">
+		<analysis_id>a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_data_uri>
+	</Result>
+	<Result id="27">
+		<analysis_id>011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_data_uri>
+	</Result>
+	<Result id="28">
+		<analysis_id>f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_id>
+		<state>submitted</state>
+		<run_xml><RUN_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <RUN center_name="CGHUB" alias="205CCABXX100806.6.C282.TCGA-27-2523-01A-01W-0837-08.1.bam" run_center="foo" run_date="2010-08-06T04:00:00Z" instrument_name="SL-HAC">
+    <EXPERIMENT_REF refcenter="CGHUB" refname="7290.WR22328.Solexa-34237.205CCABXX100806.P"/>
+    <RUN_ATTRIBUTES>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample ID</TAG>
+        <VALUE>60445.0</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI GSSR Sample LSID</TAG>
+        <VALUE>broadinstitute.org:bsp.prod.sample:1BA88</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Project Name</TAG>
+        <VALUE>C282</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Barcode</TAG>
+        <VALUE>205CCABXX100806</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Run Name</TAG>
+        <VALUE>100806_SL-HAC_0238_BFC205CCABXX</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>BI Work Request ID</TAG>
+        <VALUE>22328</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Illumina HiSeq 1000</TAG>
+        <VALUE>yes</VALUE>
+      </RUN_ATTRIBUTE>
+      <RUN_ATTRIBUTE>
+        <TAG>Read Group Platform Unit</TAG>
+        <VALUE>205CCABXX100806.6</VALUE>
+      </RUN_ATTRIBUTE>
+    </RUN_ATTRIBUTES>
+  </RUN>
+</RUN_SET>
+</run_xml>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_detail_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_data_uri>
+	</Result>
+	<ResultSummary>
+		<downloadable_file_count>9</downloadable_file_count>
+		<downloadable_file_size units="MB">9.05</downloadable_file_size>
+		<state_count>
+			<live>8</live>
+			<submitted>20</submitted>
+		</state_count>
+	</ResultSummary>
+</ResultSet>

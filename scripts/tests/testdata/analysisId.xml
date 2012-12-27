@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ResultSet date="2012-12-06 19:45:47">
+	<Query>state:*</Query>
+	<Hits>28</Hits>
+	<Result id="1">
+		<analysis_id>f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f8315556-faf2-40e8-bd03-b3613c2f0278</analysis_data_uri>
+	</Result>
+	<Result id="2">
+		<analysis_id>f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f313cb53-ef32-4532-a9c4-1794f00037b5</analysis_data_uri>
+	</Result>
+	<Result id="3">
+		<analysis_id>e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/e23f0442-ee7d-469d-8e84-764703ffe3c8</analysis_data_uri>
+	</Result>
+	<Result id="4">
+		<analysis_id>414a00c5-839d-44bb-9056-8e94a159767c</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/414a00c5-839d-44bb-9056-8e94a159767c</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/414a00c5-839d-44bb-9056-8e94a159767c</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/414a00c5-839d-44bb-9056-8e94a159767c</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/414a00c5-839d-44bb-9056-8e94a159767c</analysis_data_uri>
+	</Result>
+	<Result id="5">
+		<analysis_id>da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/da91675b-911b-4d6a-98ef-379ed6d8f083</analysis_data_uri>
+	</Result>
+	<Result id="6">
+		<analysis_id>94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/94cb7ded-1adf-4eec-8bee-eb462a85f874</analysis_data_uri>
+	</Result>
+	<Result id="7">
+		<analysis_id>4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/4c42f599-3931-4b6a-a445-0dee5a85f932</analysis_data_uri>
+	</Result>
+	<Result id="8">
+		<analysis_id>6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_id>
+		<state>live</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/6f4cceee-725a-4da1-9bc3-c1bba67913d5</analysis_data_uri>
+	</Result>
+	<Result id="9">
+		<analysis_id>54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/54ed07dd-eea0-427a-ae71-483b3543e1f6</analysis_data_uri>
+	</Result>
+	<Result id="10">
+		<analysis_id>c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/c5cc121a-225b-4213-92a5-8f4ca752cf55</analysis_data_uri>
+	</Result>
+	<Result id="11">
+		<analysis_id>a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/a05e6ce5-ac41-4984-b87d-af081ee0528a</analysis_data_uri>
+	</Result>
+	<Result id="12">
+		<analysis_id>3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3473d5f9-465f-43c4-bfec-c45609d9d597</analysis_data_uri>
+	</Result>
+	<Result id="13">
+		<analysis_id>3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3c85dfdc-359a-4e01-9a4c-1f5d72bb1629</analysis_data_uri>
+	</Result>
+	<Result id="14">
+		<analysis_id>57b32de4-484f-45e8-af52-a0db7abf4488</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/57b32de4-484f-45e8-af52-a0db7abf4488</analysis_data_uri>
+	</Result>
+	<Result id="15">
+		<analysis_id>8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/8b56eb88-1fea-4cb5-8a62-23969f24d2c8</analysis_data_uri>
+	</Result>
+	<Result id="16">
+		<analysis_id>3ebc7632-484f-4df8-a70a-be534841466e</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/3ebc7632-484f-4df8-a70a-be534841466e</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/3ebc7632-484f-4df8-a70a-be534841466e</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/3ebc7632-484f-4df8-a70a-be534841466e</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/3ebc7632-484f-4df8-a70a-be534841466e</analysis_data_uri>
+	</Result>
+	<Result id="17">
+		<analysis_id>6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/6ce6d994-ca58-4d48-a83f-4852fc580519</analysis_data_uri>
+	</Result>
+	<Result id="18">
+		<analysis_id>7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/7f3b052f-d9ca-48df-bad4-b4aa8a733c47</analysis_data_uri>
+	</Result>
+	<Result id="19">
+		<analysis_id>b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/b0bdbefc-1b53-457b-af4c-1dfa499c22c3</analysis_data_uri>
+	</Result>
+	<Result id="20">
+		<analysis_id>593649dc-a641-4620-bc3e-8491629626ea</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/593649dc-a641-4620-bc3e-8491629626ea</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/593649dc-a641-4620-bc3e-8491629626ea</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/593649dc-a641-4620-bc3e-8491629626ea</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/593649dc-a641-4620-bc3e-8491629626ea</analysis_data_uri>
+	</Result>
+	<Result id="21">
+		<analysis_id>1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/1a6f87ef-47c8-41a5-a8de-fb31c4ef6aa3</analysis_data_uri>
+	</Result>
+	<Result id="22">
+		<analysis_id>d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/d12d0ede-f38c-4d33-8c2d-880c0035844a</analysis_data_uri>
+	</Result>
+	<Result id="23">
+		<analysis_id>d5645311-2589-485c-8e5a-77d40e8a6411</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/d5645311-2589-485c-8e5a-77d40e8a6411</analysis_data_uri>
+	</Result>
+	<Result id="24">
+		<analysis_id>179a4f39-0e2f-4543-b81f-0ed808488912</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/179a4f39-0e2f-4543-b81f-0ed808488912</analysis_data_uri>
+	</Result>
+	<Result id="25">
+		<analysis_id>88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/88f839cd-4872-4557-bb68-7cda0bcca84e</analysis_data_uri>
+	</Result>
+	<Result id="26">
+		<analysis_id>a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/a8a19b01-acd7-4312-8341-9a7232ab6d06</analysis_data_uri>
+	</Result>
+	<Result id="27">
+		<analysis_id>011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/011cd182-b8ee-4e95-b741-5d8293ae59b4</analysis_data_uri>
+	</Result>
+	<Result id="28">
+		<analysis_id>f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_id>
+		<state>submitted</state>
+		<analysis_detail_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisDetail/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_detail_uri>
+		<analysis_submission_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisSubmission/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_submission_uri>
+		<analysis_full_uri>https://gtrepo-cmlatest.annailabs.com/cghub/metadata/analysisFull/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_full_uri>
+		<analysis_data_uri>https://gtrepo-cmlatest.annailabs.com/cghub/data/analysis/download/f2fde25c-8fee-4fed-bd9b-5cdd1179b48b</analysis_data_uri>
+	</Result>
+	<ResultSummary>
+		<downloadable_file_count>9</downloadable_file_count>
+		<downloadable_file_size units="MB">9.05</downloadable_file_size>
+		<state_count>
+			<live>8</live>
+			<submitted>20</submitted>
+		</state_count>
+	</ResultSummary>
+</ResultSet>
