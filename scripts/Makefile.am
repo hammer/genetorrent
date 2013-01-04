@@ -52,4 +52,5 @@ EXTRA_DIST =      \
 	scm-rev-update \
 	cgquery        \
 	cgsubmit       \
-   gtoinfo_wrapper
+	gtoinfo_wrapper\
+	gtperftest
