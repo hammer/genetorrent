@@ -58,4 +58,3 @@ Build Options:
 To enable verbose logging, configure with --enable-logging=verbose
 
 To create a debug build, configure with --enable-debug --enable-logging=verbose
-
