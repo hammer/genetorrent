@@ -8,23 +8,54 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
-GeneTorrent 3.7.5
+GeneTorrent 3.7.6
 *****************
+
+January 09, 2013
 
 Enhancements
 ------------
 
+* Add gtperftest tool
+
+* Remove legacy camel case long options.  These are filtered to new long option replacement in the GeneTorrent wrapper script.
+
+* Modularize option parsing code.
+
+* Don't use PACKAGE_NAME for syslog.  Added _progName member to gtBase to allow creating logger in a child which will use the correct program name when logging to syslog.
+
+* Add cgsubmit and cgquery scripts and package them.
+
+* Add system and restricted configuration files System configuration file at /etc/GeneTorrent.conf holds site-wide defaults.  Restricted configuration file at /etc/GeneTorrent-restricted.conf holds site-wide policy.  User may override system configuration file on the command line or via a user config file.  User may not override restricted configuration file.  Neither config file in /etc is provided by GeneTorrent packages.
+
+* Implement allowed-servers and allowed-modes configuration options:  
+
+  +  allowed-servers is a list of IP address (or ranges) given in a config file that limits the external servers (WSI, tracker, and peers) that the upload or download client will communicate with.  It has no effect on servers.
+  +  allowed-modes can be specified in the system restricted config file to limit the operating modes that are valid on that system (ALL, UPLOAD, DOWNLOAD, SERVER).  If not specified, all modes are allowed.
+
+* Man pages: add documentation for new options ( Restricted config file, System config file, allow-servers, allowed-modes, and disallow-user-config)
+
 Bug Fixes
 ---------
+
+* **[GTXFER-65]**  Disconnect peer if connect stalls.  When the server tries to make an outgoing connection to the client peer, the connection may not succeed due to firewalling or blocked ports. This blocked connection will never succeed, but it is blocking (until it times out) valid incoming connections from the client peer which slows down the creation of the peer connection.  The fix is to disconnect the peer that is stalled instead of the newer incoming connection (which is likely to succeed since it is incoming instead of outgoing).
+
+* **[GTXFER-48]**  Need to suppress "sending announce (started)" messages.  For libtorrent::tracker_reply_alert and libtorrent::tracker_announce_alert alerts, suppress by lowering syslog level to LOG_DEBUG instead of LOG_INFO.
 
 Known Issues
 ------------
 
+* **[GTXFER-67]**  Peers that are banned for sending bad data seem to immediately reconnect and may send the same bad data again.  This may result in excess usage of system resources and bandwidth. *Carried over from previous release.*
+
 Build Information
 -----------------
 
+Unchanged from previous release.
+
 Installation/Upgrade Information
 --------------------------------
+
+Unchanged from previous release.
 
 GeneTorrent 3.7.4
 *****************
@@ -137,4 +168,5 @@ To install, as root::
 To upgrade::
 
   rpm -Uvh [[fileanem.rpm] ...]
+
 
