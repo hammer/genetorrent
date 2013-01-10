@@ -164,7 +164,7 @@ make %{?_smp_mflags}
 
 %check
 %if %{_enable_check}
-LD_LIBRARY_PATH="${PWD}/deps/boost/lib:${PWD}/deps/openssl/lib:${PWD}/deps/xqilla/lib" \
+LD_LIBRARY_PATH="/usr/local/boost-1.48.0/lib:${PWD}/deps/boost/lib:${PWD}/deps/openssl/lib:${PWD}/deps/xqilla/lib" \
     make check
 %endif
 
