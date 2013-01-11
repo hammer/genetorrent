@@ -234,6 +234,6 @@ if DARWIN
 	$(MKDIR_P) $(libdir)/GeneTorrent
 endif
 
-all distdir: gt_scm_rev
+all dist distdir: gt_scm_rev
 
 all: mkdir_darwin_rpath
