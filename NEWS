@@ -8,10 +8,10 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
-GeneTorrent 3.7.6
+GeneTorrent 3.8.0
 *****************
 
-January 09, 2013
+January 17, 2013
 
 Enhancements
 ------------
