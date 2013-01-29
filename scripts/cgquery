@@ -1820,7 +1820,7 @@ def main():
 
     parser.add_option("-S", "--sort",
                       action="store", type="string", dest="sortby", 
-                      help="attribute by which results should be sorted.  May be followed by an :asc or :desc to indicate ascending or decending order.")
+                      help="attribute by which results should be sorted.  May be followed by an :asc or :desc to indicate ascending or descending order.")
 
     parser.add_option("-g", "--gt-binary",
                       action="store", type="string", dest="gtbin", default=GT_BIN,
