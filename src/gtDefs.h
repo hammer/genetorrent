@@ -90,10 +90,12 @@ const char SPACE = ' ';
 #define screenOutput(x)                                    \
 {                                                          \
    std::string timeStamp = "";                             \
+                                                           \
    if (_addTimestamps)                                     \
    {                                                       \
       timeStamp = makeTimeStamp () + + " ";                \
    }                                                       \
+                                                           \
    if (_logToStdErr || global_gtAgentMode)                 \
    {                                                       \
       std::cout << timeStamp << x << std::endl;            \
@@ -109,10 +111,12 @@ const char SPACE = ' ';
 #define screenOutputNoNewLine(x)                           \
 {                                                          \
    std::string timeStamp = "";                             \
+                                                           \
    if (_addTimestamps)                                     \
    {                                                       \
       timeStamp = makeTimeStamp () + + " ";                \
    }                                                       \
+                                                           \
    if (_logToStdErr)                                       \
    {                                                       \
       std::cout << timeStamp << x;                         \
@@ -122,47 +126,6 @@ const char SPACE = ' ';
       std::cerr << timeStamp << x;                         \
    }                                                       \
 }
-
-// TODO figure out if these are saying in the subclass or this can be 
-// refactored cleanly into something that doesn't throw compiler warnings
-
-// Torrent status text for various GeneTorrent operational modes
-//
-// these are indexed by the torrent_status::state_t enum, found in torrent_handle.hpp
-
-/*
-static char const* server_state_str[] = { 
-   "checking (q)",                   //         queued_for_checking,
-   "checking",                       //         checking_files,
-   "dl metadata",                    //         downloading_metadata,
-   "receiving",                      //         downloading,
-   "finished",                       //         finished,
-   "serving",                        //         seeding,
-   "allocating",                     //         allocating,
-   "checking (r)"                    //         checking_resume_data
-};
-
-static char const* download_state_str[] = {
-   "checking (q)",                   //         queued_for_checking,
-   "checking",                       //         checking_files,
-   "dl metadata",                    //         downloading_metadata,
-   "downloading",                    //         downloading,
-   "finished",                       //         finished,
-   "cleanup",                        //         seeding,
-   "allocating",                     //         allocating,
-   "checking (r)"                    //         checking_resume_data
-};
-
-static char const* upload_state_str[] = { 
-   "checking (q)",                   //         queued_for_checking,
-   "checking",                       //         checking_files,
-   "dl metadata",                    //         downloading_metadata,
-   "starting",                       //         downloading,
-   "finished",                       //         finished,
-   "uploading",                      //         seeding,
-   "allocating",                     //         allocating,
-   "checking (r)"                    //         checking_resume_data
-};
 
 */
 

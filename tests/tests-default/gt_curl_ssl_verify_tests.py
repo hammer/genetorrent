@@ -70,7 +70,7 @@ class TestGeneTorrentCurlVerifyCA(GTTestCase):
             print 'client stdout: ' + client_sout
             print 'client stderr: ' + client_serr
 
-        self.assertEqual(client.returncode, 1)
+        self.assertEqual(client.returncode, 203)
         self.assertTrue('Peer certificate cannot be authenticated' \
             in client_sout)
 
@@ -89,7 +89,7 @@ class TestGeneTorrentCurlVerifyCA(GTTestCase):
             print 'client stdout: ' + client_sout
             print 'client stderr: ' + client_serr
 
-        self.assertEqual(client.returncode, 1)
+        self.assertEqual(client.returncode, 87)
         self.assertTrue('Peer certificate cannot be authenticated' in \
             client_sout)
 

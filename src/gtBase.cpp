@@ -379,6 +379,10 @@ void gtBase::gtError (std::string errorMessage, int exitValue, gtErrorType error
    {
       Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
 
+      if (global_gtAgentMode)
+      {
+         std::cout << logMessage.str() << std::endl;
+      }
       exit (exitValue);
    }
 }
@@ -637,8 +641,7 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
          catch (boost::system::system_error e)
          {  
             std::ostringstream messageBuff;
-            messageBuff << "invalid '--bind-ip' address of:  " << _bindIP
-                        << " caused an exception:  " << e.what();
+            messageBuff << "invalid '--bind-ip' address of:  " << _bindIP << " caused an exception:  " << e.what();
             Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
             exit(98);
          }
@@ -653,8 +656,7 @@ void gtBase::optimizeSession (libtorrent::session *torrentSession)
          catch (boost::system::system_error e)
          {  
             std::ostringstream messageBuff;
-            messageBuff << "invalid '--advertised-ip' address of:  " << _exposedIP
-                        << " caused an exception:  " << e.what();
+            messageBuff << "invalid '--advertised-ip' address of:  " << _exposedIP << " caused an exception:  " << e.what();
             Log (PRIORITY_HIGH, "%s", messageBuff.str().c_str());
             exit(98);
          }
@@ -1096,7 +1098,7 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
-   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:");
+   bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:", retries);
 
    curl_formfree (post);
    curl_easy_cleanup (curl);
@@ -1154,7 +1156,7 @@ std::string gtBase::makeTimeStamp ()
    return buffer + std::string (secBuff) + tail;
 }
 
-bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int optionalExitCode)
+bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int retryCount, int optionalExitCode)
 {
    XQilla xqilla;
 
@@ -1210,8 +1212,17 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
       }
 
       std::ostringstream logMessage;
+
       logMessage << userMsg << "  " << effect << "  " << remediation << std::endl;
-      Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
+
+      if (retryCount > 0)
+      { 
+         Log (PRIORITY_HIGH, "%s", logMessage.str().c_str());
+      }
+      else
+      { 
+         gtError ("Error:  " + logMessage.str(), 203);
+      }
 
       if (GTO_FILE_DOWNLOAD_EXTENSION == fileWithErrorXML.substr (fileWithErrorXML.size() - 1))
       {
@@ -1258,7 +1269,7 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
    exit (optionalExitCode);
 }
  
-bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage)
+bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage, int retryCount)
 {
    if (result != CURLE_OK)
    {
@@ -1267,8 +1278,7 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
          removeFile (fileName);
       }
       
-      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result,
-               "URL:  " + url);
+      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::CURL_ERROR, result, "URL:  " + url);
       return false;
    }
 
@@ -1282,8 +1292,7 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
          removeFile (fileName);
       }
       
-      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0,
-               "URL:  " + url);
+      gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::DEFAULT_ERROR, 0, "URL:  " + url);
       return false;
    }
 
@@ -1292,10 +1301,9 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
    {
       // returns true if successfully used the XML in the file,
       // otherwise log generic error with GTError
-      if (!processHTTPError (code, fileName, ERROR_NO_EXIT))
+      if (!processHTTPError (code, fileName, retryCount, ERROR_NO_EXIT))
       {
-         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR,
-                  code, "URL:  " + url);
+         gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + url);
       }
       return false;   // return false to indicate failed curl transaction
    }

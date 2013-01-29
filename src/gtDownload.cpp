@@ -234,8 +234,7 @@ void gtDownload::prepareDownloadList ()
    }
 }
 
-bool gtDownload::downloadGTO (std::string uri, std::string fileName,
-                              std::string torrUUID)
+bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount)
 {
    checkIPFilter (uri);
 
@@ -317,14 +316,10 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName,
 
    if (_verbosityLevel > VERBOSE_2)
    {
-      screenOutput ("Headers received from the client:  '"
-                    << curlResponseHeaders << "'" << std::endl);
+      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
-   curl_status = processCurlResponse (curl, res, tmpFileName, uri, torrUUID,
-                                      "Problem communicating with GeneTorrent "
-                                      "Executive while trying to retrieve GTO "
-                                      "for UUID:");
+   curl_status = processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:", retryCount);
 
    curl_formfree(post);
    curl_easy_cleanup (curl);
@@ -336,8 +331,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName,
       // information. Rename the tmp file to the real gto file.
       if (rename (tmpFileName.c_str(), fileName.c_str()) < 0)
       {
-         gtError ("Failed to rename tmp gto to gto: " + tmpFileName + " -> "
-                  + fileName, 88, TORRENT_ERROR, 0, "", strerror(errno));
+         gtError ("Failed to rename tmp gto to gto: " + tmpFileName + " -> " + fileName, 88, TORRENT_ERROR, 0, "", strerror(errno));
       }
    }
 
@@ -358,24 +352,18 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri)
    fileName += GTO_FILE_EXTENSION;
 
    int retries = 5;
-   bool success = false;
+
    while (retries > 0)
    {
-      if (downloadGTO (uri, fileName, torrUUID))
+      retries--;
+
+      if (downloadGTO (uri, fileName, torrUUID, retries))
       {
-         success = true;
+         //success = true;
          break;
       }
 
       LogNormal ("GTO download failed, retrying");
-
-      retries--;
-   }
-
-   if (!success)
-   {
-      LogHigh ("Failed to download GTO: max tries reached");
-      exit (1);
    }
 
    std::string torrFile = getWorkingDirectory () + '/' + fileName;
@@ -606,8 +594,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
          // This is parent process, children will exit
          std::ostringstream timeLenStr;
          timeLenStr << _inactiveTimeout;
-         gtError ("Inactivity timeout triggered after " + timeLenStr.str() +
-            " minute(s).  Shutting down download client.", 206, gtBase::DEFAULT_ERROR, 0);
+         gtError ("Inactivity timeout triggered after " + timeLenStr.str() + " minute(s).  Shutting down download client.", 206, gtBase::DEFAULT_ERROR, 0);
       }
 
       childMap::iterator pidListIter = pidList.begin();

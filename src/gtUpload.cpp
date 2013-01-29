@@ -308,13 +308,7 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
       screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
    }
 
-   if (!processCurlResponse (curl, res, _uploadGTODir + torrentFileName
-                             + GTO_FILE_DOWNLOAD_EXTENSION, _uploadSubmissionURL,
-                             _uploadUUID, "Problem communicating with GeneTorrent "
-                             "Executive while trying to submit GTO for UUID:"))
-   {
-      exit (1);
-   }
+   processCurlResponse (curl, res, _uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:", 0);
 
    int result = rename ((_uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION).c_str(), (_uploadGTODir + torrentFileName).c_str());
    

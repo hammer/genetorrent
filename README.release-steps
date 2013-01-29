@@ -4,27 +4,52 @@
 
 When making a release, the following steps need to be performed:
 
+0)  Login cpbuild@c6builder
+
+1)  cd src.git/gt.git.repo
+
+2)  git clean -d -f
+
+3)  git reset --hard
+
+4)  git pull
+
 1. Bring the ``NEWS`` file up to date with the release notes.
 
 2. Bump the ``GeneTorrent`` version in ``configure.ac``.
 
-3. Do the ``autogen.sh -> ./configure -> make`` dance.
+3. Do the ``autogen.sh -> ./configure `` dance.
 
-4. Run ``make -j5 distcheck`` to run the GeneTorrent test suite.
+4.  make rpm
 
-5. Build the rpms by running ``make rpm`` on a CentOS-6.x system.
+
+# LD_LIBRARY_PATH="/usr/local/boost-1.48.0/lib" make -j5 distcheck
+
+
+#  4. Run ``make -j5 distcheck`` to run the GeneTorrent test suite.
+##
+#  5. Build the rpms by running ``make rpm`` on a CentOS-6.x system.
 
 6. Install RPMS and run smoke tests.
 
 7. Commit changes made for the release to git and push to GitHub.
 
+   git add <files>
+   git commit
+   git push
+
+
+
+
 8. Tag the release in git::
 
-      $ git tag -m "GeneTorrent-<version> release" GeneTorrent-<version>
+   git tag -m "GeneTorrent-<version> release" GeneTorrent-<version>
 
-    Where ``<version>`` is the version set in step 3 above.
+       Where ``<version>`` is the version set in step 3 above.
 
 9. Push the tag to GitHub.
+  
+    git push --tags
 
 10. Repeat tests (steps 3 thru 4 above). Preferrably from a clean git clone.
 

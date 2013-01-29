@@ -77,8 +77,8 @@ enum gtLogLevel {
    PRIORITY_DEBUG,
 };
 
+
 #define LogNormal(fmt, ...) Log(PRIORITY_NORMAL, (fmt), ## __VA_ARGS__)
-#define LogHigh(fmt, ...)   Log(PRIORITY_HIGH,   (fmt), ## __VA_ARGS__)
 #define LogDebug(fmt, ...)  Log(PRIORITY_DEBUG,  (fmt), ## __VA_ARGS__)
 
 class gtLogger 

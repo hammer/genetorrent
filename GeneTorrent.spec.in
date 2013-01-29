@@ -18,7 +18,7 @@
 
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        1%{?gt_dist}%{?build_version}
+Release:        2%{?gt_dist}%{?build_version}
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
@@ -286,6 +286,9 @@ exit 0
 /sbin/chkconfig --del GTLoadBalancer
 
 %changelog
+* Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 3.8.1-X
+- Release bumps for various build and changes related to new man page
+
 * Thu Nov 01 2012 Matt Lupfer <mlupfer@cardinalpeak.com> 3.7.1-1
 - Add support for Fedora and Open SUSE rpms
 

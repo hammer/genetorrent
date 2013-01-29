@@ -144,8 +144,8 @@ class gtBase
       bool generateSSLcertAndGetSigned (std::string torrentFile, std::string signUrl, std::string torrentUUID);
 
       static int curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, std::string *buffer);
-      bool processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage);
-      bool processHTTPError (int errorCode, std::string, int exitCode = HTTP_ERROR_EXIT_CODE);
+      bool processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage, int retryCount);
+      bool processHTTPError (int errorCode, std::string, int retryCount, int exitCode = HTTP_ERROR_EXIT_CODE);
       void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
       std::string getFileName (std::string fileName);
