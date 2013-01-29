@@ -127,6 +127,4 @@ const char SPACE = ' ';
    }                                                       \
 }
 
-*/
-
 #endif /* GTDEFS_H_ */
