@@ -972,6 +972,13 @@ FILE *gtBase::createCurlTempFile (std::string &tempFilePath)
    strncpy (tmpname, t.c_str(), t.size());
 
    int curl_stderr = mkstemp (tmpname);
+   if (curl_stderr < 0)
+   {
+      Log (PRIORITY_HIGH, "Failed to create CURL temp file.");
+      return NULL;
+   }
+
+   // fdopen Returns NULL on error
    curl_stderr_fp = fdopen (curl_stderr, "w+");
 
    tempFilePath = std::string (tmpname);
@@ -980,7 +987,18 @@ FILE *gtBase::createCurlTempFile (std::string &tempFilePath)
 
 void gtBase::finishCurlTempFile (FILE *curl_stderr_fp, std::string tempFilePath)
 {
-   fseek (curl_stderr_fp, 0, SEEK_END);
+   if (curl_stderr_fp == NULL)
+   {
+      Log (PRIORITY_HIGH, "finishCurlTempFile called with NULL file pointer.");
+      return;
+   }
+
+   if (fseek (curl_stderr_fp, 0, SEEK_END) < 0)
+   {
+      Log (PRIORITY_HIGH, "Failed to seek in CURL temp file.");
+      return;
+   }
+
    long size = ftell (curl_stderr_fp);
    rewind (curl_stderr_fp);
 
@@ -988,7 +1006,10 @@ void gtBase::finishCurlTempFile (FILE *curl_stderr_fp, std::string tempFilePath)
    if (curlMessage == NULL)
    {
       fclose (curl_stderr_fp);
-      unlink (tempFilePath.c_str());
+      if (unlink (tempFilePath.c_str()) < 0)
+      {
+         Log (PRIORITY_HIGH, "Failed to delete CURL temp file.");
+      }
    }
 
    int count = fread(curlMessage, 1, size, curl_stderr_fp);
@@ -1000,11 +1021,18 @@ void gtBase::finishCurlTempFile (FILE *curl_stderr_fp, std::string tempFilePath)
       screenOutput ("CURL library diagnostic information: " <<
          curlMessage << std::endl, VERBOSE_2);
    }
+   else
+   {
+      Log (PRIORITY_HIGH, "Failed to read CURL temp file.");
+   }
 
    free (curlMessage);
 
    fclose (curl_stderr_fp);
-   unlink (tempFilePath.c_str());
+   if (unlink (tempFilePath.c_str()) < 0)
+   {
+      Log (PRIORITY_HIGH, "Failed to delete CURL temp file.");
+   }
 }
 
 // 
@@ -1107,8 +1135,15 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    std::string tmppath;
    FILE *curl_stderr_fp = createCurlTempFile(tmppath);
 
-   curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
-   curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
+   if (curl_stderr_fp)
+   {
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+      curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
+   }
+   else if (_verbosityLevel > VERBOSE_2)
+   {
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+   }
 
    CURLcode res;
    int retries = 5;
@@ -1136,13 +1171,13 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
    fclose (signedCert);
 
-   finishCurlTempFile (curl_stderr_fp, tmppath);
-   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
-
    bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:", retries);
 
    curl_formfree (post);
    curl_easy_cleanup (curl);
+
+   finishCurlTempFile (curl_stderr_fp, tmppath);
+   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
 
    if (!successfulPerform)
    {
@@ -1421,8 +1456,15 @@ std::string gtBase::authTokenFromURI (std::string url)
    std::string tmppath;
    FILE *curl_stderr_fp = createCurlTempFile(tmppath);
 
-   curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
-   curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
+   if (curl_stderr_fp)
+   {
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+      curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
+   }
+   else if (_verbosityLevel > VERBOSE_2)
+   {
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+   }
 
    CURLcode res;
    long code = -1;
@@ -1442,10 +1484,10 @@ std::string gtBase::authTokenFromURI (std::string url)
       gtError (errormsg.str(), 65);
    }
 
+   curl_easy_cleanup (curl);
+
    finishCurlTempFile (curl_stderr_fp, tmppath);
    screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
-
-   curl_easy_cleanup (curl);
 
    return curlResponseData;
 }

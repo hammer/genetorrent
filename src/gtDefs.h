@@ -89,8 +89,8 @@ const char SPACE = ' ';
 // X is one or more stream manipulters
 #define screenOutput(x, verbosity)                                            \
 {                                                                             \
-   std::ostringstream message;                                                \
-   message << x;                                                              \
+   std::ostringstream message_mi_1;                                           \
+   message_mi_1 << x;                                                         \
    std::string timeStamp = "";                                                \
                                                                               \
    if (global_verbosity > verbosity)                                          \
@@ -102,12 +102,12 @@ const char SPACE = ' ';
                                                                               \
       if (_logToStdErr || global_gtAgentMode)                                 \
       {                                                                       \
-         std::cout << timeStamp << message.str() << std::endl;                \
+         std::cout << timeStamp << message_mi_1.str() << std::endl;           \
          std::cout.flush ();                                                  \
       }                                                                       \
       else                                                                    \
       {                                                                       \
-         std::cerr << timeStamp << message.str() << std::endl;                \
+         std::cerr << timeStamp << message_mi_1.str() << std::endl;           \
          std::cerr.flush ();                                                  \
       }                                                                       \
    }                                                                          \
@@ -116,17 +116,19 @@ const char SPACE = ' ';
          (GlobalLog->get_fd() == -1 ||                                        \
           GlobalLog->get_fd() > STDERR_FILENO))                               \
    {                                                                          \
-      Log(PRIORITY_NORMAL, "%s", message.str().c_str());                      \
+      Log(PRIORITY_NORMAL, "%s", message_mi_1.str().c_str());                 \
    }                                                                          \
 }
 
 #define screenOutputNoNewLine(x)                                              \
 {                                                                             \
    std::string timeStamp = "";                                                \
+                                                                              \
    if (_addTimestamps)                                                        \
    {                                                                          \
       timeStamp = makeTimeStamp () + + " ";                                   \
    }                                                                          \
+                                                                              \
    if (_logToStdErr)                                                          \
    {                                                                          \
       std::cout << timeStamp << x;                                            \
