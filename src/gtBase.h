@@ -70,7 +70,8 @@ class gtBase
    public:
       typedef enum opMode_ {DOWNLOAD_MODE = 77, SERVER_MODE, UPLOAD_MODE} opMode;
       typedef enum logLevelValue_ {LOG_STANDARD=10, LOG_VERBOSE, LOG_FULL} logLevelValue;
-      typedef enum verboseLevels_ {VERBOSE_1 = 0, VERBOSE_2} verboseLevels;
+      typedef enum verboseLevels_ {VERBOSE_0 = -1, VERBOSE_1 = 0, VERBOSE_2 = 1} verboseLevels;
+                            // VERBOSE_0:  Always print to screen
                             // VERBOSE_1:  Low volume debugging
                             // VERBOSE_2:  Detailed debuggin
                             // -v and -vv (or --verbose=1 or 2) sets the level, enum values are one less than the level to
@@ -158,6 +159,9 @@ class gtBase
       bool timeout_check_expired (time_t *timer);
 
       gtLogLevel makeDebugIfServerModeUnlessError (bool haveError);
+
+      FILE* createCurlTempFile (std::string& tempFilePath);
+      void finishCurlTempFile (FILE *curl_stderr_fp, std::string tempFilePath);
 
    private:
       attributeEntry attributes[CSR_ATTRIBUTE_ENTRY_COUNT];

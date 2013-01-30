@@ -159,10 +159,7 @@ void gtUpload::run ()
 
       Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-      if (_verbosityLevel > VERBOSE_1)
-      {
-         screenOutput (message.str()); 
-      }
+      screenOutput (message.str(), VERBOSE_1);
    }
 
    if (!_uploadGTOOnly)
@@ -187,16 +184,13 @@ void gtUpload::run ()
 
       Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-      if (_verbosityLevel > VERBOSE_1)
-      {
-         screenOutput (message.str());
-      }
+      screenOutput (message.str(), VERBOSE_1);
    }
    else
    {
       // in gto-only mode
       std::string message = "GTO has been generated, but upload will be skipped";
-      screenOutput (message)
+      screenOutput (message, VERBOSE_0)
       Log (PRIORITY_NORMAL, "%s", message.c_str());
    }
 
@@ -208,10 +202,7 @@ void gtUpload::run ()
 
 void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool resumedUpload)
 {
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Submitting GTO to GT Executive...");
-   }
+   screenOutput ("Submitting GTO to GT Executive...", VERBOSE_1);
 
    std::string uuidForErrors = _uploadUUID;
 
@@ -295,18 +286,15 @@ void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool res
 
       retries--;
 
-      if (retries && (_verbosityLevel > VERBOSE_1))
+      if (retries)
       {
-         screenOutput ("Retrying to submit gto for UUID: " + _uploadUUID);
+         screenOutput ("Retrying to submit gto for UUID: " + _uploadUUID, VERBOSE_1);
       }
    }
 
    fclose (gtoFile);
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
-   }
+   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
 
    processCurlResponse (curl, res, _uploadGTODir + torrentFileName + GTO_FILE_DOWNLOAD_EXTENSION, _uploadSubmissionURL, _uploadUUID, "Problem communicating with GeneTorrent Executive while trying to submit GTO for UUID:", 0);
 
@@ -423,7 +411,7 @@ void gtUpload::displayMissingFilesAndExit (vectOfStr &missingFiles)
 
    while (vectIter != missingFiles.end ())
    {
-      screenOutput ("Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter);
+      screenOutput ("Error:  " << strerror (errno) << " (errno = " << errno << ")  FileName:  " << _uploadUUID << "/" << *vectIter, VERBOSE_0);
       vectIter++;
    }
 
@@ -432,10 +420,7 @@ void gtUpload::displayMissingFilesAndExit (vectOfStr &missingFiles)
 
 long gtUpload::evaluateUploadResume (time_t gtoTimeStamp, std::string torrentName)
 {
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Evaluating " << torrentName << " for resume suitability...");
-   }
+   screenOutput ("Evaluating " << torrentName << " for resume suitability...", VERBOSE_1);
 
    time_t fileTimeStamp;
 
@@ -501,11 +486,8 @@ void gtUpload::makeTorrent (std::string uuid)
  
    std::string torrentNameBuilding = uuid + GTO_FILE_BUILDING_EXTENSION;
  
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Preparing " << torrentName << " for upload...");
-      screenOutputNoNewLine ("Computing checksums...");
-   }
+   screenOutput ("Preparing " << torrentName << " for upload...", VERBOSE_1);
+   screenOutputNoNewLine ("Computing checksums...");
 
    std::string creator = std::string ("GeneTorrent-") + VERSION;
    std::string dataPath = libtorrent::complete (uuid);
@@ -771,10 +753,10 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    torrentHandle.resume();
 
    double percentComplete = 0.0;
-   if (_verbosityLevel > VERBOSE_1 && inResumeMode && previousProgress > 0)
+   if (inResumeMode && previousProgress > 0)
    {
       percentComplete = 100.0 * previousProgress / torrentParams.ti->total_size();
-      screenOutput ("Resuming upload that is approximately:  "  << std::fixed << std::setprecision(3) << percentComplete << "% complete.");
+      screenOutput ("Resuming upload that is approximately:  "  << std::fixed << std::setprecision(3) << percentComplete << "% complete.", VERBOSE_1);
    }
 
    bool displayed100Percent = false;
@@ -845,7 +827,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
             }
             screenOutput ("Status:"  << std::setw(8) << (previousProgress + torrentStatus.total_payload_upload > 0 ? add_suffix(previousProgress + torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
                                      " uploaded (" << std::fixed << std::setprecision(3) << percentComplete <<
-                                     "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
+                                     "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"), VERBOSE_1);
          }
       }
    }
@@ -856,7 +838,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    {
       percentComplete = 100.000000;
       screenOutput ("Status:"  << std::setw(8) << (previousProgress + torrentStatus.total_payload_upload > 0 ? add_suffix(previousProgress + torrentStatus.total_payload_upload).c_str() : "0 bytes") <<
-                    " uploaded (" << std::fixed << std::setprecision(3) << percentComplete << "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"));
+                    " uploaded (" << std::fixed << std::setprecision(3) << percentComplete << "% complete) current rate:  " << add_suffix (torrentStatus.upload_rate, "/s"), 0);
    }
 
    checkAlerts (torrentSession);

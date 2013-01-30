@@ -379,7 +379,7 @@ void gtBase::processTrackerNotification (bool haveError, libtorrent::alert *alrt
         
          if (std::string::npos != errorMessage.find("[WARNING]"))
          {
-            screenOutput (errorMessage);
+            screenOutput (errorMessage, VERBOSE_0);
          }
 
          Log (logLevelFromBool (haveError), "Tracker warning %s, gto:  %s, infohash:  %s", twa->message().c_str(), gtoName.c_str(), infoHash.c_str());

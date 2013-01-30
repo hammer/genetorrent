@@ -91,6 +91,7 @@ class gtLogger
 
       const char *log_file_name() { return m_filename; }
       bool logToStdErr() { return m_mode == gtLoggerOutputStderr; }
+      int get_fd() { return m_fd ? fileno (m_fd) : -1; }
 
    private:
       enum OutputType 

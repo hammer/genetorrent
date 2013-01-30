@@ -186,10 +186,8 @@ void gtBase::startUpMessage (std::string app_name)
 
    Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", msg.str().c_str(), _tmpDir.c_str());
 
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".");
-   }
+   screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".",
+      VERBOSE_1);
 }
 
 void gtBase::initSSLattributes ()
@@ -965,6 +963,50 @@ bool gtBase::generateSSLcertAndGetSigned(std::string torrentFile, std::string si
    return acquireSignedCSR (infoHash, signUrl, torrentUUID);
 }
 
+FILE *gtBase::createCurlTempFile (std::string &tempFilePath)
+{
+   std::string t = _tmpDir + "gt-curl-response-XXXXXX";
+   char tmpname[4096];
+   FILE *curl_stderr_fp;
+
+   strncpy (tmpname, t.c_str(), t.size());
+
+   int curl_stderr = mkstemp (tmpname);
+   curl_stderr_fp = fdopen (curl_stderr, "w+");
+
+   tempFilePath = std::string (tmpname);
+   return curl_stderr_fp;
+}
+
+void gtBase::finishCurlTempFile (FILE *curl_stderr_fp, std::string tempFilePath)
+{
+   fseek (curl_stderr_fp, 0, SEEK_END);
+   long size = ftell (curl_stderr_fp);
+   rewind (curl_stderr_fp);
+
+   char *curlMessage = (char *) malloc (size + 1);
+   if (curlMessage == NULL)
+   {
+      fclose (curl_stderr_fp);
+      unlink (tempFilePath.c_str());
+   }
+
+   int count = fread(curlMessage, 1, size, curl_stderr_fp);
+   // Add null-terminator
+   curlMessage[size] = '\0';
+
+   if (count)
+   {
+      screenOutput ("CURL library diagnostic information: " <<
+         curlMessage << std::endl, VERBOSE_2);
+   }
+
+   free (curlMessage);
+
+   fclose (curl_stderr_fp);
+   unlink (tempFilePath.c_str());
+}
+
 // 
 bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, std::string uuid)
 {
@@ -1062,10 +1104,11 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-       curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
-   }
+   std::string tmppath;
+   FILE *curl_stderr_fp = createCurlTempFile(tmppath);
+
+   curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+   curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
 
    CURLcode res;
    int retries = 5;
@@ -1085,18 +1128,16 @@ bool gtBase::acquireSignedCSR (std::string info_hash, std::string CSRSignURL, st
 
       retries--;
 
-      if (retries && (_verbosityLevel > VERBOSE_1))
+      if (retries)
       {
-         screenOutput ("Retrying CSR signing for UUID: " + uuid);
+         screenOutput ("Retrying CSR signing for UUID: " + uuid, VERBOSE_1);
       }
    }
 
    fclose (signedCert);
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
-   }
+   finishCurlTempFile (curl_stderr_fp, tmppath);
+   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
 
    bool successfulPerform = processCurlResponse (curl, res, certFileName, CSRSignURL, uuid, "Problem communicating with GeneTorrent Executive while attempting a CSR signing transaction for UUID:", retries);
 
@@ -1377,10 +1418,11 @@ std::string gtBase::authTokenFromURI (std::string url)
    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeoutVal);
    curl_easy_setopt (curl, CURLOPT_CONNECTTIMEOUT, connTime);
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-       curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
-   }
+   std::string tmppath;
+   FILE *curl_stderr_fp = createCurlTempFile(tmppath);
+
+   curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+   curl_easy_setopt (curl, CURLOPT_STDERR, curl_stderr_fp);
 
    CURLcode res;
    long code = -1;
@@ -1400,10 +1442,8 @@ std::string gtBase::authTokenFromURI (std::string url)
       gtError (errormsg.str(), 65);
    }
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
-   }
+   finishCurlTempFile (curl_stderr_fp, tmppath);
+   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
 
    curl_easy_cleanup (curl);
 

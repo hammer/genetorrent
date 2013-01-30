@@ -224,10 +224,7 @@ void gtServer::run ()
 
          servedGtosMaintenance (timeNow, activeTorrentCollection);
 
-         if (_verbosityLevel > VERBOSE_1)
-         {
-            screenOutput ("");
-         }
+         screenOutput ("", VERBOSE_1);
          continue;  // completed a maintenance cycle, skip the 2 second sleep cycle
       }
 
@@ -336,10 +333,7 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
             if (!mapIter->second->overTimeAlertIssued)   // first pass set true
             {
                mapIter->second->overTimeAlertIssued = true;
-               if (_verbosityLevel > VERBOSE_1)
-               {
-                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  00:01:00.");
-               }
+               screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  00:01:00.", VERBOSE_1);
                mapIter++;
             }
             else                                         // second pass, remove the torrent from serving
@@ -383,19 +377,13 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
                   mapIter->second->overTimeAlertIssued = true;
                }
    
-               if (_verbosityLevel > VERBOSE_1)
-               {
-                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download");
-               }
+               screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expired, but an actors continue to download", VERBOSE_1);
                mapIter++;
             }
          }
          else
          {
-            if (_verbosityLevel > VERBOSE_1)
-            {
-                  screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".");
-            }
+            screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".", VERBOSE_1);
             mapIter++;
          }
       }
@@ -555,10 +543,7 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
    newTorrRec->torrentHandle.resume (delay_step_ms * (stagger_announce_step % max_steps));
    stagger_announce_step++;
 
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served");
-   }
+   screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served", VERBOSE_1);
 
    Log (PRIORITY_NORMAL, "Begin serving:  %s info hash:  %s expires:  %d (%s)", pathAndFileName.c_str(), newTorrRec->infoHash.c_str(), newTorrRec->expires, (newTorrRec->torrentParams.seed_mode == true ? "download" : "upload"));
    workSession->mapOfSessionTorrents[pathAndFileName] = newTorrRec;

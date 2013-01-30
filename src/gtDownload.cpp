@@ -156,10 +156,7 @@ void gtDownload::run ()
 
    Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput (message.str()); 
-   }
+   screenOutput (message.str(), VERBOSE_1);
 
    // First, go download any torrents that the user requested by
    // passing a .gto on the command line. The assumption here is that
@@ -182,10 +179,7 @@ void gtDownload::run ()
 
    Log (PRIORITY_NORMAL, "%s", message.str().c_str());
 
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput (message.str()); 
-   }
+   screenOutput (message.str(), VERBOSE_1);
 
    if (chdir (saveDir.c_str ())) {
       Log (PRIORITY_NORMAL, "Failed to chdir to saveDir"); 
@@ -314,10 +308,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
 
    fclose (gtoFile);
 
-   if (_verbosityLevel > VERBOSE_2)
-   {
-      screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl);
-   }
+   screenOutput ("Headers received from the client:  '" << curlResponseHeaders << "'" << std::endl, VERBOSE_2);
 
    curl_status = processCurlResponse (curl, res, tmpFileName, uri, torrUUID, "Problem communicating with GeneTorrent Executive while trying to retrieve GTO for UUID:", retryCount);
 
@@ -341,10 +332,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
 // Returns the path to the .gto file that was downloaded.
 std::string gtDownload::downloadGtoFileByURI (std::string uri)
 {
-   if (_verbosityLevel > VERBOSE_1)
-   {
-      screenOutput ("Communicating with GT Executive ...        ");
-   }
+   screenOutput ("Communicating with GT Executive ...        ", VERBOSE_1);
 
    std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
    fileName = fileName.substr (0, fileName.find_first_of ('?'));
@@ -673,10 +661,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
          }
       }
 
-      if (_verbosityLevel > VERBOSE_1)
-      {
-         screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s");
-      }
+      screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s", VERBOSE_1);
 
       if (totalDataDownloaded + xfer > totalXfer)
          timeout_update (&lastActivity);
@@ -783,7 +768,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       settings.disable_hash_checks = true;
       torrentSession->set_settings (settings);
 
-      screenOutput ("Hash checks disabled due to null-storage enabled.");
+      screenOutput ("Hash checks disabled due to null-storage enabled.", VERBOSE_0);
    }
 
    if (statDirectory ("./" + uuid) == 0)
@@ -884,12 +869,9 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
          break;
       }
 
-      if (_verbosityLevel > VERBOSE_2)
+      if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
       {
-         if (torrentStatus.state != libtorrent::torrent_status::queued_for_checking && torrentStatus.state != libtorrent::torrent_status::checking_files)
-         {
-            screenOutput ("Child " << childID << " " << download_state_str[torrentStatus.state] << "  " << add_suffix (torrentStatus.total_wanted_done).c_str () << "  (" << add_suffix (torrentStatus.download_payload_rate, "/s").c_str () << ")");
-         }
+         screenOutput ("Child " << childID << " " << download_state_str[torrentStatus.state] << "  " << add_suffix (torrentStatus.total_wanted_done).c_str () << "  (" << add_suffix (torrentStatus.download_payload_rate, "/s").c_str () << ")", VERBOSE_2);
       }
       currentState = torrentHandle.status().state;
    }

@@ -87,44 +87,54 @@ const char SPACE = ' ';
 // Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
 // send output messages to log files where users may not see them.
 // X is one or more stream manipulters
-#define screenOutput(x)                                    \
-{                                                          \
-   std::string timeStamp = "";                             \
-                                                           \
-   if (_addTimestamps)                                     \
-   {                                                       \
-      timeStamp = makeTimeStamp () + + " ";                \
-   }                                                       \
-                                                           \
-   if (_logToStdErr || global_gtAgentMode)                 \
-   {                                                       \
-      std::cout << timeStamp << x << std::endl;            \
-      std::cout.flush ();                                  \
-   }                                                       \
-   else                                                    \
-   {                                                       \
-      std::cerr << timeStamp << x << std::endl;            \
-      std::cerr.flush ();                                  \
-   }                                                       \
+#define screenOutput(x, verbosity)                                            \
+{                                                                             \
+   std::ostringstream message;                                                \
+   message << x;                                                              \
+   std::string timeStamp = "";                                                \
+                                                                              \
+   if (global_verbosity > verbosity)                                          \
+   {                                                                          \
+      if (_addTimestamps)                                                     \
+      {                                                                       \
+         timeStamp = makeTimeStamp () + + " ";                                \
+      }                                                                       \
+                                                                              \
+      if (_logToStdErr || global_gtAgentMode)                                 \
+      {                                                                       \
+         std::cout << timeStamp << message.str() << std::endl;                \
+         std::cout.flush ();                                                  \
+      }                                                                       \
+      else                                                                    \
+      {                                                                       \
+         std::cerr << timeStamp << message.str() << std::endl;                \
+         std::cerr.flush ();                                                  \
+      }                                                                       \
+   }                                                                          \
+                                                                              \
+   if (GlobalLog &&                                                           \
+         (GlobalLog->get_fd() == -1 ||                                        \
+          GlobalLog->get_fd() > STDERR_FILENO))                               \
+   {                                                                          \
+      Log(PRIORITY_NORMAL, "%s", message.str().c_str());                      \
+   }                                                                          \
 }
 
-#define screenOutputNoNewLine(x)                           \
-{                                                          \
-   std::string timeStamp = "";                             \
-                                                           \
-   if (_addTimestamps)                                     \
-   {                                                       \
-      timeStamp = makeTimeStamp () + + " ";                \
-   }                                                       \
-                                                           \
-   if (_logToStdErr)                                       \
-   {                                                       \
-      std::cout << timeStamp << x;                         \
-   }                                                       \
-   else                                                    \
-   {                                                       \
-      std::cerr << timeStamp << x;                         \
-   }                                                       \
+#define screenOutputNoNewLine(x)                                              \
+{                                                                             \
+   std::string timeStamp = "";                                                \
+   if (_addTimestamps)                                                        \
+   {                                                                          \
+      timeStamp = makeTimeStamp () + + " ";                                   \
+   }                                                                          \
+   if (_logToStdErr)                                                          \
+   {                                                                          \
+      std::cout << timeStamp << x;                                            \
+   }                                                                          \
+   else                                                                       \
+   {                                                                          \
+      std::cerr << timeStamp << x;                                            \
+   }                                                                          \
 }
 
 #endif /* GTDEFS_H_ */
