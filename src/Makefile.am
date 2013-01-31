@@ -97,6 +97,7 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -L../libtorrent/src/.libs \
                             $(BOOST_LDFLAGS) \
                             $(OPENSSL_LDFLAGS) \
+                            $(XERCES_LDFLAGS) \
                             $(XQILLA_LDFLAGS)
 
 libgenetorrent_la_LIBADD = $(boost_LIBS)           \
