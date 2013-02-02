@@ -59,7 +59,7 @@ To build XQilla, run::
 
 To configure GeneTorrent to compile with any of these built packages, add::
 
-    --with-[boost|openssl|xerces|xqilla]=$PWD/deps/[boost|openssl|xerces|xqilla]
+    --with-[boost|openssl|xerces|xqilla]=$PWD/deps/[boost|openssl|xerces-c|xqilla]
 
 to the configure command once for each dependency.
  
