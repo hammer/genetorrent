@@ -43,13 +43,12 @@
 class gtDownload : public gtBase
 {
    public:
-      gtDownload (gtDownloadOpts &opts,
-                  bool show_startup_message=true);
+      gtDownload (gtDownloadOpts &opts, bool show_startup_message=true);
       void run ();
 
    protected:
 
-      std::string downloadGtoFileByURI (std::string uri);
+      std::string downloadGtoFileByURI (std::string uri, bool exitOnMoveFailure);
 
       std::string _downloadSavePath;
 
@@ -62,9 +61,7 @@ class gtDownload : public gtBase
 
       void runDownloadMode (std::string startupDir);
       void prepareDownloadList ();
-      void initiateCSR (std::string torrUUID, std::string torrFile,
-                        libtorrent::torrent_info &torrentInfo,
-                        std::string uri = "");
+      void initiateCSR (std::string torrUUID, std::string torrFile, libtorrent::torrent_info &torrentInfo, std::string uri = "");
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
       void spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces);
       void performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles);
@@ -72,7 +69,7 @@ class gtDownload : public gtBase
       void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
-      bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount);
+      bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, bool exitOnMvError);
 };
 
 #endif
