@@ -969,12 +969,13 @@ FILE *gtBase::createCurlTempFile (std::string &tempFilePath)
    char tmpname[4096];
    FILE *curl_stderr_fp;
 
-   strncpy (tmpname, t.c_str(), t.size());
+   // bzero (tmpname, 4096);
+   strncpy (tmpname, t.c_str(), t.size() + 1);        
 
    int curl_stderr = mkstemp (tmpname);
    if (curl_stderr < 0)
    {
-      Log (PRIORITY_HIGH, "Failed to create CURL temp file.");
+      Log (PRIORITY_HIGH, "Failed to create CURL temp file:  %s [%s (%d)]", tmpname, strerror (errno), errno);
       return NULL;
    }
 

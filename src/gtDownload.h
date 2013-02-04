@@ -48,8 +48,7 @@ class gtDownload : public gtBase
 
    protected:
 
-      std::string downloadGtoFileByURI (std::string uri, bool exitOnMoveFailure);
-
+      std::string downloadGtoFileByURI (std::string uri, std::string destinationPath, bool exitOnMoveFailure);
       std::string _downloadSavePath;
 
    private:
@@ -69,7 +68,7 @@ class gtDownload : public gtBase
       void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
       int64_t getFreeDiskSpace ();
-      bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, bool exitOnMvError);
+      bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, std::string destinationPath, bool exitOnMvError);
 };
 
 #endif

@@ -228,8 +228,12 @@ void gtDownload::prepareDownloadList ()
    }
 }
 
-bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, bool exitOnMvError)
+bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, std::string destinationPath, bool exitOnMvError)
 {
+std::ostringstream message;
+message << std::endl << std::endl << "uri: " << uri << "  fileName: " << fileName << "  torrUUID: " << torrUUID << "  retryCount: " << retryCount << "  destinationPath: " << destinationPath << std::endl << std::endl;
+Log (PRIORITY_HIGH, " (ignore the error here) %s", message.str().c_str());
+
    checkIPFilter (uri);
 
    bool curl_status;
@@ -280,8 +284,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
    struct curl_httppost *post=NULL;
    struct curl_httppost *last=NULL;
 
-   curl_formadd (&post, &last, CURLFORM_COPYNAME, "token",
-                 CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
+   curl_formadd (&post, &last, CURLFORM_COPYNAME, "token", CURLFORM_COPYCONTENTS, _authToken.c_str(), CURLFORM_END);
 
    curl_easy_setopt (curl, CURLOPT_HTTPPOST, post);
 
@@ -320,29 +323,29 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
       // If we got this far, the gto file should not have any chance of
       // containing xml error messages instead of torrent
       // information. Rename the tmp file to the real gto file.
-      if (rename (tmpFileName.c_str(), fileName.c_str()) < 0)
+      if (rename (tmpFileName.c_str(), (destinationPath + fileName).c_str()) < 0)
       {
          // the rename failed, so lets try to make a copy and delete the original -- across file systems
          
-         if (statFile (fileName) == 0)                  // destination file exists in the current directory, get rid of it!
+         if (statFile (destinationPath + fileName) == 0)                  // destination file exists, get rid of it!
          {
-            int ret = unlink (fileName.c_str ());
+            int ret = unlink ((destinationPath + fileName).c_str ());
             if (ret != 0)
             {
-               gtError ("Unable to remove " + fileName, 88, ERRNO_ERROR, errno);
+               gtError ("Unable to remove " + destinationPath + fileName, 88, ERRNO_ERROR, errno);
             }
 std::cerr << "unlink existing" << std::endl;
          }
 
          try
          {
-             boost::filesystem::copy_file (tmpFileName, fileName);
+             boost::filesystem::copy_file (tmpFileName, destinationPath + fileName);
          }
          catch (...)
          {
             if (exitOnMvError)
             {
-               gtError ("Failed to move tmp gto to gto: " + tmpFileName + " -> " + fileName, 88, ERRNO_ERROR, errno, "", strerror(errno));
+               gtError ("Failed to move tmp gto to gto: " + tmpFileName + " -> " + destinationPath + fileName, 88, ERRNO_ERROR, errno, "", strerror(errno));
             }
          }
 
@@ -358,7 +361,7 @@ std::cerr << "unlink existing" << std::endl;
 }
 
 // Returns the path to the .gto file that was downloaded.
-std::string gtDownload::downloadGtoFileByURI (std::string uri, bool exitOnMoveFailure)
+std::string gtDownload::downloadGtoFileByURI (std::string uri, std::string destinationPath, bool exitOnMoveFailure)
 {
    screenOutput ("Communicating with GT Executive ...        ", VERBOSE_1);
 
@@ -373,7 +376,7 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri, bool exitOnMoveFa
    {
       retries--;
 
-      if (downloadGTO (uri, fileName, torrUUID, retries, exitOnMoveFailure))
+      if (downloadGTO (uri, fileName, torrUUID, retries, destinationPath, exitOnMoveFailure))
       {
          break;
       }
@@ -381,7 +384,7 @@ std::string gtDownload::downloadGtoFileByURI (std::string uri, bool exitOnMoveFa
       LogNormal ("GTO download failed, retrying");
    }
 
-   std::string torrFile = getWorkingDirectory () + '/' + fileName;
+   std::string torrFile = destinationPath + fileName;
 
    libtorrent::error_code torrentError;
    libtorrent::torrent_info torrentInfo (torrFile, torrentError);
@@ -742,7 +745,7 @@ void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFi
    {
       std::string uri = *iter;
 
-      std::string torrentName = downloadGtoFileByURI (uri, true);
+      std::string torrentName = downloadGtoFileByURI (uri, "./", true);
       performSingleTorrentDownload (torrentName, totalBytes, totalFiles);
       totalGtos++;
 
