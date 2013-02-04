@@ -230,10 +230,6 @@ void gtDownload::prepareDownloadList ()
 
 bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, std::string destinationPath, bool exitOnMvError)
 {
-std::ostringstream message;
-message << std::endl << std::endl << "uri: " << uri << "  fileName: " << fileName << "  torrUUID: " << torrUUID << "  retryCount: " << retryCount << "  destinationPath: " << destinationPath << std::endl << std::endl;
-Log (PRIORITY_HIGH, " (ignore the error here) %s", message.str().c_str());
-
    checkIPFilter (uri);
 
    bool curl_status;
@@ -334,7 +330,6 @@ Log (PRIORITY_HIGH, " (ignore the error here) %s", message.str().c_str());
             {
                gtError ("Unable to remove " + destinationPath + fileName, 88, ERRNO_ERROR, errno);
             }
-std::cerr << "unlink existing" << std::endl;
          }
 
          try

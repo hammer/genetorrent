@@ -969,8 +969,7 @@ FILE *gtBase::createCurlTempFile (std::string &tempFilePath)
    char tmpname[4096];
    FILE *curl_stderr_fp;
 
-   // bzero (tmpname, 4096);
-   strncpy (tmpname, t.c_str(), t.size() + 1);        
+   strncpy (tmpname, t.c_str(), t.size() + 1);        // extra byte includes the NULL which eliminates the needs to bzero (tmpname, ....)
 
    int curl_stderr = mkstemp (tmpname);
    if (curl_stderr < 0)
