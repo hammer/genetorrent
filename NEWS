@@ -8,6 +8,39 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
+GeneTorrent 3.8.1
+*****************
+
+February 4, 2013
+
+Enhancements
+------------
+
+* Log all screen output to log file or syslog.  Additionally, log screen output that was not printed due to low verbosity level regardless of screen output verbosity level.
+
+Bug Fixes
+---------
+
+* Changes to logging that improve the handling of certain error messages.  **[GTXFER-81]**
+
+* Implemented download GTO files to a temporary path prior to moving to final destination.  **[GTXFER-84]**
+
+Known Issues
+------------
+
+* **[GTXFER-67]**  Peers that are banned for sending bad data seem to immediately reconnect and may send the same bad data again.  This may result in excess usage of system resources and bandwidth. *Carried over from previous release.*
+
+Build Information
+-----------------
+
+Unchanged from previous release.
+
+Installation/Upgrade Information
+--------------------------------
+
+Unchanged from previous release.
+
+
 GeneTorrent 3.8.0
 *****************
 
