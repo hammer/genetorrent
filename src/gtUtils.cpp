@@ -44,6 +44,10 @@
 #include <cstdio>
 
 #include "gtUtils.h"
+#ifdef __CYGWIN__
+#include <w32api/windows.h>
+#include <sys/cygwin.h>
+#endif /* __CYGWIN__ */
 
 // 
 int statDirectory (std::string dirFile)
@@ -168,7 +172,6 @@ std::string sanitizePath (std::string inPath)
 }
 
 #ifdef __CYGWIN__
-#include <w32api/windows.h>
 std::string getWinInstallDirectory ()
 {
    // by default, look for dhparam.pem in the install dir on Windows

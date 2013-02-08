@@ -25,13 +25,14 @@
        28-Nov-2012 v2.1.5:    Added support for new WSI resources
        12-Dec-2012 v2.1.6:    Added --all-states flag
        13-Dec-2012 v2.1.7:    Changed --output-xml to be quiet
+       07-Feb-2013 v2.1.8:    Changed default for -g to be just gtdownload, should be in the path, if not user can submit their own
 
     When adding an entry to the revision history, be sure to update 
     the CGQUERY_VER value below.
 
 """
 
-CGQUERY_VER = '2.1.7'
+CGQUERY_VER = '2.1.8'
 
 #
 # Check the python version for compatability.  Python 3 is not
@@ -122,7 +123,7 @@ CGHUB_URI[CGHUB_VERSION_STD]    = ['analysisId',     'analysisDetail', 'analysis
 #
 # Location of the GeneTorrent binary and conf file for interactive mode
 #
-GT_BIN        = '/usr/bin/GeneTorrent' 
+GT_BIN        = 'gtdownload' 
 
 #
 # Column width (up to the :)
