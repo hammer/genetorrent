@@ -45,5 +45,9 @@ EXTRA_DIST =                                 \
    oneiric/control                           \
    oneiric/rules                             \
    oneiric/genetorrent-core.install          \
-   quantal/control
+   quantal/control                           \
+   lucid/compat                              \
+   lucid/control                             \
+   lucid/genetorrent-core.install            \
+   lucid/rules
 

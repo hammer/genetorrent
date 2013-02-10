@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):debian/genetorrent-core/usr/lib/GeneTorrent
+
+%:
+	dh $@ --parallel --with python-support --builddirectory=deb-build --destdir=debian/tmp
+
+override_dh_auto_configure:
+	deps/boost/buildGeneTorrentBoost.sh
+	deps/xerces-c/buildGeneTorrentXerces-C.sh
+	WITH_XERCES=${CURDIR}/deps/xerces-c deps/xqilla/buildGeneTorrentXQilla.sh
+	dh_auto_configure -- --with-boost=$(CURDIR)/deps/boost --with-xerces=$(CURDIR)/deps/xerces-c --with-xqilla=$(CURDIR)/deps/xqilla
+
+override_dh_builddeb:
+	dh_builddeb --destdir=..
+
+# Disable Tests
+override_dh_auto_test:
+

@@ -1,0 +1,15 @@
+usr/bin/GeneTorrent
+usr/bin/gtoinfo
+usr/bin/gtocheck
+usr/bin/cgquery
+usr/lib/python2.6/dist-packages/gtoinfo.*
+usr/lib/GeneTorrent/libtorrent-rasterbar.so*
+usr/lib/GeneTorrent/libboost*
+usr/lib/GeneTorrent/libxqilla*
+usr/lib/GeneTorrent/libxerces-c*
+usr/lib/libgenetorrent.so*
+usr/share/doc/GeneTorrent/LICENSE
+usr/share/doc/GeneTorrent/README
+usr/share/doc/GeneTorrent/NEWS
+usr/share/GeneTorrent/dhparam.pem
+
