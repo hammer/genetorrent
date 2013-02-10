@@ -97,8 +97,8 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -L../libtorrent/src/.libs \
                             $(BOOST_LDFLAGS) \
                             $(OPENSSL_LDFLAGS) \
-                            $(XERCES_LDFLAGS) \
-                            $(XQILLA_LDFLAGS)
+                            $(XQILLA_LDFLAGS) \
+                            $(XERCES_LDFLAGS)
 
 libgenetorrent_la_LIBADD = $(boost_LIBS)           \
                            $(PTHREAD_LIBS)         \
@@ -129,7 +129,8 @@ common_ldflags     = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath,$(libdir)/GeneTorrent \
                       $(BOOST_LDFLAGS) \
                       $(OPENSSL_LDFLAGS) \
-                      $(XQILLA_LDFLAGS)
+                      $(XQILLA_LDFLAGS) \
+                      $(XERCES_LDFLAGS)
 
 common_ldadd      =  $(boost_LIBS)     \
                      $(PTHREAD_LIBS)   \

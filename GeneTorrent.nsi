@@ -9,7 +9,7 @@
 Name "GeneTorrent 3.8.1"
 
 ; The file to write
-OutFile "Install-win-GeneTorrent-3.8.1.exe"
+OutFile "Install-GeneTorrent-3.8.1.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\GeneTorrent
@@ -57,6 +57,9 @@ Section "GeneTorrent (required)"
   File "src\cacert.pem"
   File "libtorrent\src\.libs\cygtorrent-rasterbar-6.dll"
   File "src\.libs\cyggenetorrent-0.dll"
+  File "scripts\gtocheck"
+  File "scripts\gtoinfo.py"
+  File "scripts\cgquery.py"
 
   ; Cygwin Files - GeneTorrent deps
   File "\cygwin\bin\cygboost_filesystem-mt-1_48.dll"
@@ -87,8 +90,8 @@ Section "GeneTorrent (required)"
   File "\cygwin\bin\cygidn-11.dll"
   File "\cygwin\bin\cygintl-8.dll"
   File "\cygwin\bin\cygkrb5-26.dll"
-  File "\cygwin\bin\cyglber-2-4-2.dll"
-  File "\cygwin\bin\cygldap-2-4-2.dll"
+  File "\cygwin\bin\cyglber-2-3-0.dll"
+  File "\cygwin\bin\cygldap-2-3-0.dll"
   File "\cygwin\bin\cygroken-18.dll"
   File "\cygwin\bin\cygsasl2-2.dll"
   File "\cygwin\bin\cygsqlite3-0.dll"
@@ -97,11 +100,6 @@ Section "GeneTorrent (required)"
   File "\cygwin\bin\cygwin1.dll"
   File "\cygwin\bin\cygwind-0.dll"
   File "\cygwin\bin\cygz.dll"
-
-
-  ;For cgquery
-  ;PyInstaller 2.0 needs to be run first outside of cygwin on cgquery FIRST
-  File "dist\cgquery.exe"
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GeneTorrent "Install_Dir" "$INSTDIR"
@@ -122,7 +120,7 @@ Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\GeneTorrent"
   CreateShortCut "$SMPROGRAMS\GeneTorrent\GeneTorrent Shell.lnk" "cmd.exe" \
-   "/k $\"@set CYGWIN=nodosfilewarning&&@set PATH=%PATH%;$INSTDIR&&@echo Type cgquery or gtdownload to begin.  &&@cd %HOMEPATH%$\"" \
+   "/k $\"@set PATH=%PATH%;$INSTDIR&&@echo Type gtdownload to begin.  &&@cd %HOMEPATH%$\"" \
    "cmd.exe" 0
   CreateShortCut "$SMPROGRAMS\GeneTorrent\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
@@ -141,7 +139,6 @@ Section "Uninstall"
   ; Remove files and uninstaller
   Delete $INSTDIR\uninstall.exe
   Delete $INSTDIR\gt*.exe
-  Delete $INSTDIR\cgquery.exe
   Delete $INSTDIR\cyg*.dll
   Delete $INSTDIR\gto*
   Delete $INSTDIR\*.pem
