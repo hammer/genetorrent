@@ -150,7 +150,7 @@ deb-builder:
 	cp -a $(top_srcdir)/dpkg/$(DEB_CODENAME)/* $(PACKAGE)-$(VERSION)/debian
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/changelog
-	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc
+	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc -b
 endif
 
 if DARWIN
