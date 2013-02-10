@@ -30,8 +30,8 @@ EXTRA_DIST =                                 \
    common/compat                             \
    common/copyright                          \
    common/docs                               \
-   common/genetorrent-core.install           \
-   common/genetorrent-core.manpages          \
+   common/genetorrent-common.install         \
+   common/genetorrent-common.manpages        \
    common/genetorrent-download.install       \
    common/genetorrent-download.manpages      \
    common/genetorrent-upload.install         \
@@ -41,13 +41,13 @@ EXTRA_DIST =                                 \
    precise/control                           \
    squeeze/control                           \
    squeeze/rules                             \
-   squeeze/genetorrent-core.install          \
+   squeeze/genetorrent-common.install        \
    oneiric/control                           \
    oneiric/rules                             \
-   oneiric/genetorrent-core.install          \
+   oneiric/genetorrent-common.install        \
    quantal/control                           \
    lucid/compat                              \
    lucid/control                             \
-   lucid/genetorrent-core.install            \
+   lucid/genetorrent-common.install          \
    lucid/rules
 
