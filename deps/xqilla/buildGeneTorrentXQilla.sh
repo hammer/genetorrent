@@ -38,6 +38,6 @@ else
    CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=${WITH_XERCES}"
 fi
 BUILD_CMD="make install $@"
-TARBALL="/tmp/${DEP_VER}.tar.gz"
+TARBALL="${DEP_VER}.tar.gz"
 
 . ${baseDir}/../builder_common
