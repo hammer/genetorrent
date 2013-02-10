@@ -470,9 +470,8 @@ Next, build the GeneTorrent dependencies::
 
 Finally, configure and build using the "make macosx" target::
 
-    ./configure --prefix=/usr --with-boost=$PWD/deps/boost \
+    ./configure --prefix=/usr/local --with-boost=$PWD/deps/boost \
         --with-xerces=$PWD/deps/xerces-c --with-xqilla=$PWD/deps/xqilla
-    sudo mkdir /usr/lib/GeneTorrent
     make clean
     make macosx
 
