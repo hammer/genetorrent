@@ -282,6 +282,8 @@ gtBaseOpts::vmValueToStrings(bpo::variable_value vv)
             value_strings.push_back(vv.as<std::string>());
         else if (type == typeid(int))
             value_strings.push_back(boost::lexical_cast<std::string>(vv.as<int>()));
+        else if (type == typeid(float))
+            value_strings.push_back(boost::lexical_cast<std::string>(vv.as<float>()));
         else if (type == typeid(vectOfStr))
             value_strings = vv.as<vectOfStr>();
         else
