@@ -83,6 +83,7 @@ libgenetorrent_la_SOURCES = gtBase.cpp \
                             gtZeroStorage.cpp
 
 libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                             $(LIBCURL_CPPFLAGS) \
                              $(OPENSSL_INCLUDES) \
                              $(XQILLA_INCLUDES) \
                              $(XERCES_CPPFLAGS)
@@ -102,6 +103,8 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
 
 libgenetorrent_la_LIBADD = $(boost_LIBS)           \
                            $(PTHREAD_LIBS)         \
+                           $(LIBCURL)              \
+                           $(OPENSSL_LIBS)         \
                            $(XQILLA_LIBS)          \
                            $(XERCES_LIBS)
 

@@ -111,8 +111,6 @@ AS_IF([test x"$enable_src_dist_only" = x"yes"], [
    AX_LIB_XERCES()
    AS_IF([ test x"$HAVE_XERCES" != xyes ], [AC_MSG_ERROR([xerces library required but not found])], [])
    LIBCURL_CHECK_CONFIG()
-#   AC_CHECK_LIB([curl], [curl_easy_init], [],
-#      [AC_MSG_ERROR([curl library required but not found])])
    AX_CHECK_XQILLA([],
       [AC_MSG_ERROR([xqilla library required but not found. Try using --with-xqilla=DIR])
       ])
