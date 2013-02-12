@@ -196,7 +196,8 @@ CLEANFILES = gtdownload.1           \
              GeneTorrent_manual.txt \
              gtdownload_manual.txt  \
              gtserver_manual.txt    \
-             gtupload_manual.txt
+             gtupload_manual.txt    \
+             gt_scm_rev.h
 
 gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
@@ -234,6 +235,8 @@ if DARWIN
 	$(MKDIR_P) $(libdir)/GeneTorrent
 endif
 
-all distdir: gt_scm_rev-h
+all: gt_scm_rev-h
+
+distdir: gt_scm_rev-h
 
 all: mkdir_darwin_rpath
