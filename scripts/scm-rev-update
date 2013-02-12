@@ -26,8 +26,9 @@ EOF
     new_md5=$(md5sum ${HDR}.tmp 2>/dev/null | awk '{print $1}')
     if [ ! -e ${HDR} ] || [ "${old_md5}" != "${new_md5}" ]
     then
-	mv ${HDR}.tmp ${HDR}
+        mv ${HDR}.tmp ${HDR}
+        echo "  GEN    gt_scm_rev.h"
     else
-	rm ${HDR}.tmp
+        rm ${HDR}.tmp
     fi
 fi
