@@ -427,10 +427,17 @@ Build instructions
       exit
 
    The binaries are now rebased.
+   
+4. (optional)
+	also run after rebase with the same rebase list of additional dlls (as
+	administrator):
+	/usr/bin/peflagsall -v -T $HOME/rebase.txt
 
-4. Generate Windows installer.  From a Cygwin terminal, enter::
 
-      make windows-installer
+5. Generate Windows installer.  From a command terminal, enter::
+	
+	cd \cysgwin\home\build\gentorrent
+	"C:\Program Files\NSIS\makensis.exe" GeneTorrent.nsi
 
 The Windows installer is created by the Nullsoft Scritable Install System.  The
 script which generates the installer is in the root of the repository, called

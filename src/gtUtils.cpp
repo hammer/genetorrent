@@ -43,6 +43,11 @@
 
 #include <cstdio>
 
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif /* __CYGWIN__ */
+
+
 #include "gtUtils.h"
 
 // 
@@ -123,6 +128,7 @@ int statFileOrDirectory (std::string dirFile, statType sType, time_t &fileMtime)
 void relativizePath (std::string &inPath)
 {
 #ifdef __CYGWIN__
+
    if (inPath[1] == ':')
    {
       // Convert windows path to posix-style path

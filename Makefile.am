@@ -90,12 +90,6 @@ rpmbuild-internal:
 			-ta $(distdir).tar.gz
 endif
 
-if CYGWIN
-windows-installer: all
-	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
-			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
-endif
-
 if LINUX
 DEB_CODENAME := $(shell lsb_release -cs)
 
