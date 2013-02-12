@@ -33,6 +33,10 @@ SRC_URL=http://mirror.sdunix.com/apache//xerces/c/3/sources/xerces-c-3.1.1.tar.g
 DEP_VER=xerces-c-3.1.1
 EXPECTED_MD5=6a8ec45d83c8cfb1584c5a5345cb51ae
 CONFIG_CMD="./configure --prefix=${baseDir}"
+if [ $(uname -s) = "Darwin" ] ; then
+    # force use of standard libraries rather than those in macports, etc"
+    CONFIG_CMD="${CONFIG_CMD} --with-curl=/usr --with-icu=/usr"
+fi
 BUILD_CMD="make install $@"
 TARBALL="${DEP_VER}.tar.gz"
 

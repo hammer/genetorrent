@@ -32,10 +32,11 @@ DEP_NAME=xqilla
 SRC_URL=http://downloads.sourceforge.net/project/xqilla/xqilla/2.3.0/XQilla-2.3.0.tar.gz
 DEP_VER=XQilla-2.3.0
 EXPECTED_MD5=7261c7b4bb5a45cbf6270073976a51ce
+# don't include tidy, picking up the wrong one brough in too much on the OS/X
 if [ -z "${WITH_XERCES}" ]; then
-   CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=/usr"
+   CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=/usr --without-tidy"
 else
-   CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=${WITH_XERCES}"
+   CONFIG_CMD="./configure --prefix=${baseDir} --with-xerces=${WITH_XERCES} --without-tidy"
 fi
 BUILD_CMD="make install $@"
 TARBALL="${DEP_VER}.tar.gz"
