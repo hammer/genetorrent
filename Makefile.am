@@ -65,11 +65,15 @@ RPMBUILD_DEFINES = \
 	--define '_topdir $(RPMBUILDDIR)' \
 	--define '_disable_check $(DISABLE_RPM_CHECK)'
 
-.PHONY: rpm rpmcheck rpmbuild-internal
-rpm: dist
+.PHONY: rpm rpmcheck rpmbuild-internal prerpm
+
+prerpm:
+	$(MAKE) -C src gt_scm_rev-h
+
+rpm: prerpm dist
 	$(MAKE) rpmbuild-internal
 
-rpmcheck: distcheck
+rpmcheck: prerpm distcheck
 	$(MAKE) rpmbuild-internal
 
 rpmbuild-internal:
