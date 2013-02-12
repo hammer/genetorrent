@@ -145,9 +145,7 @@ AM_CONDITIONAL([SOLARIS],
 
 # Override pythondir on Mac OS X to install into correct
 # site-packages directory
-if ${DARWIN_TRUE}; then
-    pythondir=/Library/Python/2.7/site-packages
-fi
+${DARWIN_TRUE} pythondir=/Library/Python/2.7/site-packages
 
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])
