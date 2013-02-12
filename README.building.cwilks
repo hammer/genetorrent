@@ -1,6 +1,0 @@
-added sys/cygwin.h to gtUtils.cpp
-double check to move all .la files out of /usr/lib (cygwin)
-run rebasell as administrator
-(probably optional) run as administrator:
-/usr/bin/peflagsall -v -T $HOME/rebase.txt
-fixed GeneTorrent.nsi to include the -2 versions of two dlls

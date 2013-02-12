@@ -92,6 +92,7 @@ endif
 
 if CYGWIN
 windows-installer: all
+	python.exe c:/pyinstaller/pyinstaller.py --onefile ./scripts/cgquery
 	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
 			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
 endif
