@@ -188,13 +188,14 @@ macosx:
 	$(MAKE) DESTDIR=$(MACDIR) installdirs
 	$(MAKE) DESTDIR=$(MACDIR) install
 	@echo "  Removing server components"
-	rm -rf $(MACDIR)/etc
-	rm -rf $(MACDIR)/usr/bin/GTLoadBalancer
-	rm -rf $(MACDIR)/usr/bin/gtupload
-	rm -rf $(MACDIR)/usr/share/man/man1/gtupload.1
-	rm -rf $(MACDIR)/usr/bin/gtserver
-	rm -rf $(MACDIR)/usr/share/man/man1/gtserver.1
-	rm -rf $(MACDIR)/usr/bin/cgsubmit
+	rm -rf $(MACDIR)${prefix}/etc
+	rm -rf $(MACDIR)${prefix}/bin/GTLoadBalancer
+	rm -rf $(MACDIR)${prefix}/bin/gtupload
+	rm -rf $(MACDIR)${prefix}/share/man/man1/gtupload.1
+	rm -rf $(MACDIR)${prefix}/bin/gtserver
+	rm -rf $(MACDIR)${prefix}/share/man/man1/gtserver.1
+	rm -rf $(MACDIR)${prefix}/bin/cgsubmit
+	rm -rf $(MACDIR)${prefix}/bin/GeneTorrent
 	@echo "  Building package"
 	@set -e; cd macosx; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
