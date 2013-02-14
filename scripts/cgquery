@@ -26,14 +26,13 @@
        12-Dec-2012 v2.1.6:    Added --all-states flag
        13-Dec-2012 v2.1.7:    Changed --output-xml to be quiet
        07-Feb-2013 v2.1.8:    Changed default for -g to be just gtdownload, should be in the path, if not user can submit their own
-       08-Feb-2013 v2.1.9:    changed default verbosity to LOW so that it will only display the results to stdout when debug is on
 
     When adding an entry to the revision history, be sure to update 
     the CGQUERY_VER value below.
 
 """
 
-CGQUERY_VER = '2.1.9'
+CGQUERY_VER = '2.1.8'
 
 #
 # Check the python version for compatability.  Python 3 is not
@@ -1910,15 +1909,11 @@ def main():
     # --interactive, # which isn't very useful without any results 
     # shown.
     #
-    #vlevel = Logger.LOG_VERBOSE_NORMAL
-    #set default to low, dont want to output anything
-    vlevel = Logger.LOG_VERBOSE_LOW
+    vlevel = Logger.LOG_VERBOSE_NORMAL
     if options.outputxml and not options.verbose and not options.interactive:
         vlevel = Logger.LOG_VERBOSE_LOW
     if options.debug:
         vlevel = Logger.LOG_VERBOSE_DEBUG
-    if options.verbose:
-    	vlevel = Logger.LOG_VERBOSE_NORMAL
     Log.setVLevel(vlevel)
 
     try:
