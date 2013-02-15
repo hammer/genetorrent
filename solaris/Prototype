@@ -40,7 +40,6 @@ f none /usr/share/doc/GeneTorrent/LICENSE 0644 root root
 d none /usr/share/man 0755 root bin
 d none /usr/share/man/man1 0755 root bin
 f none /usr/share/man/man1/gtupload.1 0644 root root
-f none /usr/share/man/man1/GeneTorrent.1 0644 root root
 f none /usr/share/man/man1/gtdownload.1 0644 root root
 d none /usr/bin 0755 root bin
 f none /usr/bin/gtupload 0755 root root
