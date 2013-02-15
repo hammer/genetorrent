@@ -108,7 +108,7 @@ libgenetorrent_la_LIBADD = $(boost_LIBS)           \
                            $(XQILLA_LIBS)          \
                            $(XERCES_LIBS)
 
-bin_SCRIPTS = GeneTorrent
+bin_SCRIPTS = 
 
 bin_PROGRAMS = gtupload    \
                gtdownload  \
@@ -182,23 +182,18 @@ gtserver_LDFLAGS = $(common_ldflags)
 
 gtserver_LDADD = $(common_ldadd)
 
-dist_man_MANS = GeneTorrent.1 \
-                gtdownload.1  \
+dist_man_MANS = gtdownload.1  \
                 gtserver.1    \
                 gtupload.1
 
 EXTRA_DIST = man_gtcommon.1         \
              man_gtdownload.1       \
              man_gtserver.1         \
-             man_gtupload.1         \
-             man_GeneTorrent.1      \
-             GeneTorrent
+             man_gtupload.1
 
 CLEANFILES = gtdownload.1           \
              gtserver.1             \
              gtupload.1             \
-             GeneTorrent.1          \
-             GeneTorrent_manual.txt \
              gtdownload_manual.txt  \
              gtserver_manual.txt    \
              gtupload_manual.txt

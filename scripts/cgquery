@@ -1825,7 +1825,7 @@ def main():
 
     parser.add_option("-g", "--gt-binary",
                       action="store", type="string", dest="gtbin", default=GT_BIN,
-                      help="the GeneTorrent binary used in interactive mode.  Use a fully qualified path if the binary is not in your PATH. e.g. /usr/bin/GeneTorrent")
+                      help="the GeneTorrent binary used in interactive mode.  Use a fully qualified path if the binary is not in your PATH. e.g. /usr/bin/gtdownload")
 
     parser.add_option("-I", "--ident",
                       action="store_true", dest="ident", default=False,
