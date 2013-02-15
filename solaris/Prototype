@@ -49,4 +49,4 @@ f none /usr/bin/gtoinfo 0755 root root
 f none /usr/bin/gtocheck 0755 root root
 f none /usr/bin/cgquery 0755 root root
 f none /usr/bin/cgsubmit 0755 root root
-f none /usr/bin/GeneTorrent 0755 root root
+

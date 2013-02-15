@@ -39,6 +39,6 @@ then
 else
    BUILD_CMD="./b2 link=shared warnings=all debug-symbols=on address-model=${TARGET_BITS} install $@"
 fi
-TARBALL="/tmp/${DEP_VER}.tar.gz"
+TARBALL="${DEP_VER}.tar.gz"
 
 . ${baseDir}/../builder_common

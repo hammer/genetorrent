@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0), libxqilla-dev, libxerces-c-dev, libcurl4-op
 Standards-Version: 3.9.2
 Homepage: https://cghub.ucsc.edu/software/downloads.html
 
-Package: genetorrent-core
+Package: genetorrent-common
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla5, libssl1.0.0, libcurl3, ${python:Depends}
 Description: Transfer genomic data reliably across a network
@@ -17,7 +17,7 @@ Description: Transfer genomic data reliably across a network
 
 Package: genetorrent-upload
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla5, libssl1.0.0, libcurl3, genetorrent-core (= @VERSION@-@DEB_DISTRO_TAG@)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla5, libssl1.0.0, libcurl3, genetorrent-common (= @VERSION@-@DEB_DISTRO_TAG@)
 Description: Transfer genomic data reliably across a network
  GeneTorrent is a suite of file transfer applications designed for the
  optimal transfer of genomic data across a computer network.  File transfers
@@ -26,7 +26,7 @@ Description: Transfer genomic data reliably across a network
 
 Package: genetorrent-download
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla5, libssl1.0.0, libcurl3, genetorrent-core (= @VERSION@-@DEB_DISTRO_TAG@) 
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxqilla5, libssl1.0.0, libcurl3, genetorrent-common (= @VERSION@-@DEB_DISTRO_TAG@) 
 Description: Transfer genomic data reliably across a network
  GeneTorrent is a suite of file transfer applications designed for the
  optimal transfer of genomic data across a computer network.  File transfers
