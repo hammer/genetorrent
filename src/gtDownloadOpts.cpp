@@ -119,6 +119,7 @@ gtDownloadOpts::processOptions ()
     processOption_DownloadList ();
     processOption_SecurityAPI ();
     processOption_InactiveTimeout ();
+    processOption_RateLimit();
 
     m_downloadSavePath = processOption_Path ();
 }

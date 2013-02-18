@@ -95,6 +95,7 @@ gtUploadOpts::processOptions ()
     processOption_UploadGTODir ();
     processOption_InactiveTimeout ();
     processOption_UploadGTOOnly ();
+    processOption_RateLimit();
 
     checkCredentials ();
 }
