@@ -8,6 +8,36 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
+GeneTorrent 3.8.3
+*****************
+
+February 17, 2013
+
+Enhancements
+------------
+
+* None
+
+Bug Fixes
+---------
+
+* **[GTXFER-89]** gtupload & gtdownload: do not have the --rate-limit option processing code in the code path. 
+
+Known Issues
+------------
+
+* **[GTXFER-67]**  Peers that are banned for sending bad data seem to immediately reconnect and may send the same bad data again.  This may result in excess usage of system resources and bandwidth. *Carried over from previous release.*
+
+Build Information
+-----------------
+
+Unchanged from previous release.
+
+Installation/Upgrade Information
+--------------------------------
+
+Unchanged from previous release.
+
 GeneTorrent 3.8.2
 *****************
 
