@@ -16,7 +16,7 @@
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):debian/genetorrent-core/usr/lib/GeneTorrent
+export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):debian/genetorrent-common/usr/lib/GeneTorrent
 
 %:
 	dh $@ --parallel --with python-support --builddirectory=deb-build --destdir=debian/tmp

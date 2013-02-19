@@ -91,22 +91,47 @@ rpmbuild-internal:
 			-ta $(distdir).tar.gz
 endif
 
+if CYGWIN
+windows-installer: all
+	python.exe c:/pyinstaller/pyinstaller.py --onefile ./scripts/cgquery
+	/cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi || \
+			/cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi
+endif
+
 if LINUX
+
+# Common debian/ubuntu package file name convention is based on Ubuntu
+# being downstream from Debian.  Named like hello_2.7-0ubuntu1_amd64.deb
+# would result in files with the same name.  Instead we use names like
+#     genetorrent-core-3.8.0-ubuntu1-12.10_amd64.deb
+#     genetorrent-core-3.8.0-debian1-6.0.6_amd64.deb
+
+
 DEB_CODENAME := $(shell lsb_release -cs)
+DEB_RELEASE := $(shell lsb_release -rs)
+DEB_PACKAGE_VER = 1
 
-.PHONY: deb deb-builder deb-quantal deb-precise deb-squeeze deb-oneiric
+.PHONY: deb deb-builder deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
 
-deb-precise:
-	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
-
+# Ubuntu quantal (12.10)
 deb-quantal:
-	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
 
-deb-squeeze:
-	$(MAKE) DEB_DISTRO_TAG=1 deb-builder
+# Ubuntu precise (12.04 LTS)
+deb-precise:
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
 
+# Ubuntu oneiric (11.10)
 deb-oneiric:
-	$(MAKE) DEB_DISTRO_TAG=0ubuntu1 deb-builder
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
+
+# Ubuntu lucid (10.04.4 LTS)
+deb-lucid:
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
+
+# Debian squeeze (6.0.6)
+deb-squeeze:
+	$(MAKE) DEB_DISTRO_TAG=debian${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
 
 deb: deb-$(DEB_CODENAME)
 
@@ -118,15 +143,16 @@ REPLACE_VARS = \
 deb-builder:
 	$(MAKE) dist
 	tar xzf $(PACKAGE)-$(VERSION).tar.gz
+	rm -rf $(PACKAGE)-$(VERSION).orig
 	mv $(PACKAGE)-$(VERSION) $(PACKAGE)-$(VERSION).orig
 	tar xzf $(PACKAGE)-$(VERSION).tar.gz
-	mv $(PACKAGE)-$(VERSION).tar.gz genetorrent_$(VERSION).orig.tar.gz
+	mv -f $(PACKAGE)-$(VERSION).tar.gz genetorrent_$(VERSION).orig.tar.gz
 	$(MKDIR_P) $(PACKAGE)-$(VERSION)/debian
 	cp -a $(top_srcdir)/dpkg/common/* $(PACKAGE)-$(VERSION)/debian
 	cp -a $(top_srcdir)/dpkg/$(DEB_CODENAME)/* $(PACKAGE)-$(VERSION)/debian
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/control
 	$(SED) -i $(REPLACE_VARS) $(PACKAGE)-$(VERSION)/debian/changelog
-	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc
+	cd $(PACKAGE)-$(VERSION) && debuild --prepend-path=/usr/lib/ccache -us -uc -b
 endif
 
 if DARWIN
@@ -163,13 +189,14 @@ macosx:
 	$(MAKE) DESTDIR=$(MACDIR) installdirs
 	$(MAKE) DESTDIR=$(MACDIR) install
 	@echo "  Removing server components"
-	rm -rf $(MACDIR)/etc
-	rm -rf $(MACDIR)/usr/bin/GTLoadBalancer
-	rm -rf $(MACDIR)/usr/bin/gtupload
-	rm -rf $(MACDIR)/usr/share/man/man1/gtupload.1
-	rm -rf $(MACDIR)/usr/bin/gtserver
-	rm -rf $(MACDIR)/usr/share/man/man1/gtserver.1
-	rm -rf $(MACDIR)/usr/bin/cgsubmit
+	rm -rf $(MACDIR)${prefix}/etc
+	rm -rf $(MACDIR)${prefix}/bin/GTLoadBalancer
+	rm -rf $(MACDIR)${prefix}/bin/gtupload
+	rm -rf $(MACDIR)${prefix}/share/man/man1/gtupload.1
+	rm -rf $(MACDIR)${prefix}/bin/gtserver
+	rm -rf $(MACDIR)${prefix}/share/man/man1/gtserver.1
+	rm -rf $(MACDIR)${prefix}/bin/cgsubmit
+	rm -rf $(MACDIR)${prefix}/bin/GeneTorrent
 	@echo "  Building package"
 	@set -e; cd macosx; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\

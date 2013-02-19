@@ -83,6 +83,7 @@ libgenetorrent_la_SOURCES = gtBase.cpp \
                             gtZeroStorage.cpp
 
 libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
+                             $(LIBCURL_CPPFLAGS) \
                              $(OPENSSL_INCLUDES) \
                              $(XQILLA_INCLUDES) \
                              $(XERCES_CPPFLAGS)
@@ -97,14 +98,17 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -L../libtorrent/src/.libs \
                             $(BOOST_LDFLAGS) \
                             $(OPENSSL_LDFLAGS) \
-                            $(XQILLA_LDFLAGS)
+                            $(XQILLA_LDFLAGS) \
+                            $(XERCES_LDFLAGS)
 
 libgenetorrent_la_LIBADD = $(boost_LIBS)           \
                            $(PTHREAD_LIBS)         \
+                           $(LIBCURL)              \
+                           $(OPENSSL_LIBS)         \
                            $(XQILLA_LIBS)          \
                            $(XERCES_LIBS)
 
-bin_SCRIPTS = GeneTorrent
+bin_SCRIPTS = 
 
 bin_PROGRAMS = gtupload    \
                gtdownload  \
@@ -128,7 +132,8 @@ common_ldflags     = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath,$(libdir)/GeneTorrent \
                       $(BOOST_LDFLAGS) \
                       $(OPENSSL_LDFLAGS) \
-                      $(XQILLA_LDFLAGS)
+                      $(XQILLA_LDFLAGS) \
+                      $(XERCES_LDFLAGS)
 
 common_ldadd      =  $(boost_LIBS)     \
                      $(PTHREAD_LIBS)   \
@@ -177,23 +182,18 @@ gtserver_LDFLAGS = $(common_ldflags)
 
 gtserver_LDADD = $(common_ldadd)
 
-dist_man_MANS = GeneTorrent.1 \
-                gtdownload.1  \
+dist_man_MANS = gtdownload.1  \
                 gtserver.1    \
                 gtupload.1
 
 EXTRA_DIST = man_gtcommon.1         \
              man_gtdownload.1       \
              man_gtserver.1         \
-             man_gtupload.1         \
-             man_GeneTorrent.1      \
-             GeneTorrent
+             man_gtupload.1
 
 CLEANFILES = gtdownload.1           \
              gtserver.1             \
              gtupload.1             \
-             GeneTorrent.1          \
-             GeneTorrent_manual.txt \
              gtdownload_manual.txt  \
              gtserver_manual.txt    \
              gtupload_manual.txt    \
