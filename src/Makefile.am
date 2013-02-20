@@ -187,7 +187,8 @@ EXTRA_DIST = man_gtcommon.1         \
              man_gtserver.1         \
              man_gtupload.1         \
              man_GeneTorrent.1      \
-             GeneTorrent
+             GeneTorrent            \
+             cacert.pem
 
 CLEANFILES = gtdownload.1           \
              gtserver.1             \
@@ -196,8 +197,7 @@ CLEANFILES = gtdownload.1           \
              GeneTorrent_manual.txt \
              gtdownload_manual.txt  \
              gtserver_manual.txt    \
-             gtupload_manual.txt    \
-             gt_scm_rev.h
+             gtupload_manual.txt
 
 gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
