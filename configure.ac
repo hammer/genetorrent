@@ -185,6 +185,7 @@ AC_CONFIG_FILES(
    [deps/xerces-c/Makefile]
    [macosx/Distribution.xml]
    [solaris/pkginfo]
+   [src/GeneTorrent]
 )
 
 AC_CONFIG_SUBDIRS(

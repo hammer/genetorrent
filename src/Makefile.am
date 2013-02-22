@@ -199,6 +199,8 @@ CLEANFILES = gtdownload.1           \
              gtserver_manual.txt    \
              gtupload_manual.txt
 
+DISTCLEANFILES = GeneTorrent
+
 gtdownload.1: $(srcdir)/man_gtdownload.1 $(srcdir)/man_gtcommon.1
 	cat $^ > $@
 if CYGWIN

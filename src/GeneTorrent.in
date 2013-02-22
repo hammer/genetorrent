@@ -49,6 +49,7 @@ function filter_legacy_args {
 
 command=
 help=
+version="@PACKAGE_VERSION@"
 
 for arg in "$@"
 do
@@ -83,6 +84,17 @@ do
       -h|--help)
          help="$arg"
          ;;
+
+      --version)
+         echo "GeneTorrent wrapper script release ${version}"
+         for command in gtserver gtdownload gtupload; do
+            if [ ! -z "$(which ${command} 2>/dev/null)" ]; then
+               echo "${command}: $(${command} --version)"
+            fi
+         done
+         exit 0
+         ;;
+
       *)
          ;;
    esac
