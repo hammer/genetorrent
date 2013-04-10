@@ -748,6 +748,10 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    if (_rateLimit > 0)
    {
       torrentHandle.set_upload_limit (_rateLimit);
+
+      libtorrent::session_settings settings = torrentSession->settings ();
+      settings.ignore_limits_on_local_network = false;
+      torrentSession->set_settings (settings);
    }
 
    torrentHandle.resume();

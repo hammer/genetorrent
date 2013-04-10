@@ -855,6 +855,10 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    if (_rateLimit > 0)
    { 
       torrentHandle.set_download_limit (_rateLimit/totalChildren);
+
+      libtorrent::session_settings settings = torrentSession->settings ();
+      settings.ignore_limits_on_local_network = false;
+      torrentSession->set_settings (settings);
    }
 
    // Don't allow upload connections
