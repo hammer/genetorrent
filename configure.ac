@@ -73,44 +73,51 @@ PKG_PROG_PKG_CONFIG
 AS_IF([test -z "$PKG_CONFIG"],
    [AC_MSG_ERROR([pkg-config not found.])])
 
-AS_ECHO
-AS_ECHO "Checking for Boost libraries >= 1.48.0:"
-AX_BOOST_BASE([1.48.0])
-AX_BOOST_REGEX()
-AS_IF([test -z "$BOOST_REGEX_LIB"],
-   [AC_MSG_ERROR([Boost regex library not found.])])
-AX_BOOST_SYSTEM()
-AS_IF([test -z "$BOOST_SYSTEM_LIB"],
-   [AC_MSG_ERROR([Boost system library not found.])])
-AX_BOOST_FILESYSTEM()
-AS_IF([test -z "$BOOST_FILESYSTEM_LIB"],
-   [AC_MSG_ERROR([Boost filesystem library not found.])])
-AX_BOOST_PROGRAM_OPTIONS()
-AS_IF([test -z "$BOOST_PROGRAM_OPTIONS_LIB"],
-   [AC_MSG_ERROR([Boost program_options library not found.])])
+# --enable-src-dist-only doesn't check for dependencies which we need to build
+AC_ARG_ENABLE([src-dist-only],
+   AS_HELP_STRING([--enable-src-dist-only], [Generate Makefile without check on dependencies for building source distribution]))
+AS_IF([test x"$enable_src_dist_only" = x"yes"], [
+    AC_MSG_RESULT([generating Makefiles for building source distributions without dependencies])
+    # must disable boost for libtorrent configure call
+    ac_configure_args="$ac_configure_args --without-boost"
+], [
+   AS_ECHO
+   AS_ECHO "Checking for Boost libraries >= 1.48.0:"
+   AX_BOOST_BASE([1.48.0])
+   AX_BOOST_REGEX()
+   AS_IF([test -z "$BOOST_REGEX_LIB"],
+      [AC_MSG_ERROR([Boost regex library not found.])])
+   AX_BOOST_SYSTEM()
+   AS_IF([test -z "$BOOST_SYSTEM_LIB"],
+      [AC_MSG_ERROR([Boost system library not found.])])
+   AX_BOOST_FILESYSTEM()
+   AS_IF([test -z "$BOOST_FILESYSTEM_LIB"],
+      [AC_MSG_ERROR([Boost filesystem library not found.])])
+   AX_BOOST_PROGRAM_OPTIONS()
+   AS_IF([test -z "$BOOST_PROGRAM_OPTIONS_LIB"],
+      [AC_MSG_ERROR([Boost program_options library not found.])])
 
-AS_ECHO
-AS_ECHO "Checking for Python >= 2.4:"
-AM_PATH_PYTHON(2.4)
+   AS_ECHO
+   AS_ECHO "Checking for Python >= 2.4:"
+   AM_PATH_PYTHON(2.4)
 
-AS_ECHO
-AS_ECHO "Checking for pthread support:"
-AX_PTHREAD()
+   AS_ECHO
+   AS_ECHO "Checking for pthread support:"
+   AX_PTHREAD()
 
-AS_ECHO
-AS_ECHO "Checking for required libraries:"
+   AS_ECHO
+   AS_ECHO "Checking for required libraries:"
 
-AX_LIB_XERCES()
-AS_IF([ test x"$HAVE_XERCES" != xyes ], [AC_MSG_ERROR([xerces library required but not found])], [])
-AC_CHECK_LIB([curl], [curl_easy_init], [],
-   [AC_MSG_ERROR([curl library required but not found])])
-AX_CHECK_XQILLA([],
-   [AC_MSG_ERROR([xqilla library required but not found. Try using --with-xqilla=DIR])
-   ])
-AX_CHECK_OPENSSL([],
-   [AC_MSG_ERROR([openssl library required but not found. Try using --with-openssl=DIR])
-   ])
-
+   AX_LIB_XERCES()
+   AS_IF([ test x"$HAVE_XERCES" != xyes ], [AC_MSG_ERROR([xerces library required but not found])], [])
+   LIBCURL_CHECK_CONFIG()
+   AX_CHECK_XQILLA([],
+      [AC_MSG_ERROR([xqilla library required but not found. Try using --with-xqilla=DIR])
+      ])
+   AX_CHECK_OPENSSL([],
+      [AC_MSG_ERROR([openssl library required but not found. Try using --with-openssl=DIR])
+      ])
+])
 #AC_CHECK_LIB([rt], [main])
 #AC_CHECK_LIB([idn], [main])
 #AC_CHECK_LIB([icule], [main])
@@ -136,9 +143,7 @@ AM_CONDITIONAL([SOLARIS],
 
 # Override pythondir on Mac OS X to install into correct
 # site-packages directory
-if ${DARWIN_TRUE}; then
-    pythondir=/Library/Python/2.7/site-packages
-fi
+${DARWIN_TRUE} pythondir=/Library/Python/2.7/site-packages
 
 # Not necessary because AX_BOOST_*() performs the header check for us
 # AC_CHECK_HEADER([boost/system.hpp])
@@ -185,7 +190,6 @@ AC_CONFIG_FILES(
    [deps/xerces-c/Makefile]
    [macosx/Distribution.xml]
    [solaris/pkginfo]
-   [src/GeneTorrent]
 )
 
 AC_CONFIG_SUBDIRS(

@@ -23,7 +23,9 @@ export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):debian/genetorrent-common/usr/lib/G
 
 override_dh_auto_configure:
 	deps/boost/buildGeneTorrentBoost.sh
-	dh_auto_configure -- --with-boost=$(CURDIR)/deps/boost
+	deps/xerces-c/buildGeneTorrentXerces-C.sh
+	WITH_XERCES=${CURDIR}/deps/xerces-c deps/xqilla/buildGeneTorrentXQilla.sh
+	dh_auto_configure -- --with-boost=$(CURDIR)/deps/boost --with-xerces=$(CURDIR)/deps/xerces-c --with-xqilla=$(CURDIR)/deps/xqilla
 
 override_dh_builddeb:
 	dh_builddeb --destdir=..

@@ -34,6 +34,6 @@ DEP_VER=openssl-1.0.1c
 EXPECTED_MD5=ae412727c8c15b67880aef7bd2999b2e
 CONFIG_CMD="./config --openssldir=${baseDir} shared"
 BUILD_CMD="make install $@"
-TARBALL="/tmp/${DEP_VER}.tar.gz"
+TARBALL="${DEP_VER}.tar.gz"
 
 . ${baseDir}/../builder_common

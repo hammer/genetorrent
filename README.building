@@ -59,7 +59,7 @@ To build XQilla, run::
 
 To configure GeneTorrent to compile with any of these built packages, add::
 
-    --with-[boost|openssl|xerces|xqilla]=$PWD/deps/[boost|openssl|xerces|xqilla]
+    --with-[boost|openssl|xerces|xqilla]=$PWD/deps/[boost|openssl|xerces-c|xqilla]
 
 to the configure command once for each dependency.
  
@@ -350,7 +350,8 @@ GeneTorrent/Installer Build Requirements:
 - Cygwin 1.7.16+ Full Install (or optionally, a base install with the packages below)
 - Nullsoft Scriptable Install System 2.46+ installed to C:\\Program Files\\NSIS or C:\\Program Files (x86)\\NSIS (corresponding to a 32- or 64-bit Installation)
 - XQilla: http://xqilla.sourceforge.net/HomePage
-
+- PyInstaller 2.0+ installed to C:\\PyInstaller 
+- Python 2.7+ for Windows installed with the python.exe binary in the PATH in the build environment
 
 Add to the default Cygwin install (and all dependencies)::
 
@@ -396,6 +397,14 @@ Build instructions
 
   This may not be necessary in future versions of Cygwin.
 
+* Cygwin will download newer versions of DLLs when updating seemingly unrelated packages
+  This may impact the NSIS windows install builder script 
+  (currently hardcoded to specific versions of DLLs).  This manifests as a "cannot find x.dll"
+  when attempting to run gtdownload after installing on a windows machine.
+
+* If Cygwin is updated/or its a different version, the include headers relied upon by GT may change, keep this in mind
+  if you run into compiler errors about undefined symbols.
+
 1. Build XQilla from a Cygwin terminal and install it to /usr::
 
       cd XQilla-2.3.0
@@ -420,25 +429,26 @@ Build instructions
 
    Exit all Cygwin processes and terminals.
 
-   Open a cmd.exe prompt and enter::
+   Open a cmd.exe prompt as Administrator and enter::
 
       C:\cygwin\bin\dash.exe
       /usr/bin/rebaseall -v -T $HOME/rebase.txt
       exit
 
-   The binaries are now rebased.
+   The binaries are now rebased and the DYNAMICBASE flag has been removed.
    
 4. (optional)
 	also run after rebase with the same rebase list of additional dlls (as
 	administrator):
 	/usr/bin/peflagsall -v -T $HOME/rebase.txt
 
-
 5. Generate Windows installer.  From a command terminal, enter::
 	
 	cd \cysgwin\home\build\gentorrent
 	"C:\Program Files\NSIS\makensis.exe" GeneTorrent.nsi
 
+This will package cgquery (python script) into an executable using PyInstaller 
+and then run the Nullsoft install builder.
 The Windows installer is created by the Nullsoft Scritable Install System.  The
 script which generates the installer is in the root of the repository, called
 GeneTorrent.nsi(.in).  Adding or removing built files and/or external Cygwin
@@ -477,9 +487,8 @@ Next, build the GeneTorrent dependencies::
 
 Finally, configure and build using the "make macosx" target::
 
-    ./configure --prefix=/usr --with-boost=$PWD/deps/boost \
+    ./configure --prefix=/usr/local --with-boost=$PWD/deps/boost \
         --with-xerces=$PWD/deps/xerces-c --with-xqilla=$PWD/deps/xqilla
-    sudo mkdir /usr/lib/GeneTorrent
     make clean
     make macosx
 

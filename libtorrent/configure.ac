@@ -103,15 +103,16 @@ CC="$PTHREAD_CC"
 AS_ECHO
 AS_ECHO "Checking for boost libraries:"
 
-AX_BOOST_BASE([1.48])
+# can specify --without-boost for generating Makefile to create source distribution
+AX_BOOST_BASE([1.48], [
 
-AX_BOOST_SYSTEM()
-AS_IF([test -z "$BOOST_SYSTEM_LIB"],
-      [AC_MSG_ERROR(Boost.System library not found. Try using --with-boost-system=lib)])
+    AX_BOOST_SYSTEM()
+    AS_IF([test -z "$BOOST_SYSTEM_LIB"],
+          [AC_MSG_ERROR(Boost.System library not found. Try using --with-boost-system=lib)])
 
-CPPFLAGS="$BOOST_CPPFLAGS $CPPFLAGS"
-LDFLAGS="$BOOST_LDFLAGS $LDFLAGS"
-
+    CPPFLAGS="$BOOST_CPPFLAGS $CPPFLAGS"
+    LDFLAGS="$BOOST_LDFLAGS $LDFLAGS"
+])
 
 ###############################################################################
 # Checking for functions and other stuffs
