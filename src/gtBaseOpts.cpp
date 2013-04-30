@@ -38,7 +38,9 @@
 #include "gtLog.h"
 #include "gtDefs.h"
 #include "gtUtils.h"
+
 #include "accumulator.hpp"
+
 #include "stringTokenizer.h"
 #include "loggingmask.h"
 
@@ -52,8 +54,7 @@ int global_verbosity = 0;    // Work around for boost:program_options
 bool global_gtAgentMode = false;
 
 
-gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr,
-                        std::string version_msg, std::string mode):
+gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr, std::string version_msg, std::string mode):
     m_progName (progName),
     m_vm (),
     m_base_desc ("GeneTorrent Common Options"),
@@ -65,6 +66,7 @@ gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr,
     m_sys_restrict_cfg_file ("/etc/GeneTorrent-restricted.conf"),
     m_haveVerboseOnCli (false),
     m_version_msg (version_msg),
+    m_mode (mode),
     m_all_desc ("All Options"),
     m_cfg_desc ("Config File Options"),
     m_cli_desc ("CLI Only Options"),
@@ -176,7 +178,7 @@ gtBaseOpts::parse (int ac, char **av)
 
     processOptions ();
 
-    log_options_used ();
+//    log_options_used ();
 }
 
 void
@@ -453,7 +455,7 @@ gtBaseOpts::processOptions ()
 {
     // Must set verbosity first.
     processOption_Verbosity ();
-    processOption_Log ();
+    // processOption_Log ();
 
     processOption_ConfDir ();
     processOption_CurlNoVerifySSL ();
@@ -786,7 +788,6 @@ gtBaseOpts::processOption_CurlNoVerifySSL ()
     if (m_vm.count (OPT_CURL_NO_VERIFY_SSL))
         m_curlVerifySSL = false;
 }
-
 
 // Check the cli args for storage flags.
 //

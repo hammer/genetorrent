@@ -182,7 +182,7 @@ gtLogger::~gtLogger()
       GlobalLog = NULL;
 }
 
-void gtLogger::__Log (gtLogLevel priority, const char *file, int line, const char *fmt, ...)
+void gtLogger::__Log (gtLogLevel priority, const char *fmt, ...)
 {
    if (PRIORITY_HIGH == priority && ( m_mode == gtLoggerOutputNone || m_mode == gtLoggerOutputSyslog || m_mode == gtLoggerOutputFile))
    {

@@ -60,7 +60,11 @@
 
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/create_torrent.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
+
 #include "libtorrent/peer_info.hpp"
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
@@ -1232,7 +1236,7 @@ std::string gtBase::makeTimeStamp ()
    return buffer + std::string (secBuff) + tail;
 }
 
-bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int retryCount, int optionalExitCode)
+bool gtBase::processHTTPError (std::string fileWithErrorXML, int retryCount, int optionalExitCode)
 {
    XQilla xqilla;
 
@@ -1377,7 +1381,7 @@ bool gtBase::processCurlResponse (CURL *curl, CURLcode result, std::string fileN
    {
       // returns true if successfully used the XML in the file,
       // otherwise log generic error with GTError
-      if (!processHTTPError (code, fileName, retryCount, ERROR_NO_EXIT))
+      if (!processHTTPError (fileName, retryCount, ERROR_NO_EXIT))
       {
          gtError (defaultMessage + uuid, ERROR_NO_EXIT, gtBase::HTTP_ERROR, code, "URL:  " + url);
       }

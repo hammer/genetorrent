@@ -59,13 +59,16 @@ extern int global_verbosity;
 class gtBaseOpts
 {
 public:
-    gtBaseOpts (std::string progName, std::string usage_msg_hdr,
-                std::string version_msg, std::string mode);
+    gtBaseOpts (std::string progName, std::string usage_msg_hdr, std::string version_msg, std::string mode);
     virtual ~gtBaseOpts () {}
 
     static vectOfStr vmValueToStrings(boost::program_options::variable_value vv);
 
     void parse (int ac, char **av);
+
+    // Make these public so they can be processed after everything else is initialized and the process has daemonized (if applicable).
+    void processOption_Log ();
+    void log_options_used ();
 
     std::string m_progName;
 
@@ -119,15 +122,12 @@ private:
     void processOption_CredentialFile ();
     void processOption_CurlNoVerifySSL ();
     void processOption_InternalPort ();
-    void processOption_Log ();
     void processOption_PeerTimeout ();
     void processOption_StorageFlags ();
     void processOption_Timestamps ();
     void processOption_Verbosity ();
 
     virtual void processOption_GTAgentMode () {}
-
-    void log_options_used ();
 
     bool m_haveVerboseOnCli;
 

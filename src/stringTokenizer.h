@@ -52,9 +52,9 @@ class strTokenize
       strTokenize (const char *toTokenize, const char *separator, separatorTreatment treatment);
 
       const std::string getToken (int index) {return _tokenMap[index-1]; }
-      const unsigned size (void) { return _tokenMap.size(); }
+      unsigned size () { return _tokenMap.size(); }
       void updateToken (const unsigned int index, std::string value) { _tokenMap[index-1] = value; }
-      void display (void);
+      void display ();
 
    protected:
 

@@ -48,6 +48,7 @@ protected:
     boost::program_options::options_description m_server_desc;
 
 private:
+    void processOption_Foreground ();
     void processOption_Queue ();
     void processOption_Server ();
     void processOption_ServerForceDownload ();
@@ -57,6 +58,8 @@ public:
     std::string m_serverDataPath;
     bool m_serverForceDownload;
     std::string m_serverQueuePath;
+    bool m_serverForeground;
+    std::string m_serverPidFile;
 };
 
 #endif  /* GT_SERVER_OPTS_H */

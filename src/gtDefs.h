@@ -49,6 +49,7 @@ const std::string PROGRESS_FILE_EXT = ".progress";
 
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string CONF_DIR_LOCAL = "/usr/local/share/GeneTorrent";
+const std::string DEFAULT_PID_FILE = "/var/run/gtserver/gtserver.pid";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string PYTHON_TRUE = "TRUE";
 const std::string SERVER_STOP_FILE = "GeneTorrent.stop";

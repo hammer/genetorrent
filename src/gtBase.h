@@ -49,7 +49,9 @@
 
 #include <curl/curl.h>
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/session.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
 #include "libtorrent/ip_filter.hpp"
@@ -146,7 +148,7 @@ class gtBase
 
       static int curlCallBackHeadersWriter (char *data, size_t size, size_t nmemb, std::string *buffer);
       bool processCurlResponse (CURL *curl, CURLcode result, std::string fileName, std::string url, std::string uuid, std::string defaultMessage, int retryCount);
-      bool processHTTPError (int errorCode, std::string, int retryCount, int exitCode = HTTP_ERROR_EXIT_CODE);
+      bool processHTTPError (std::string, int retryCount, int exitCode = HTTP_ERROR_EXIT_CODE);
       void curlCleanupOnFailure (std::string fileName, FILE *gtoFile);
 
       std::string getFileName (std::string fileName);

@@ -55,7 +55,11 @@
 
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/create_torrent.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
+
 #include "libtorrent/peer_info.hpp"
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
@@ -147,7 +151,7 @@ void gtUpload::run ()
          makeTorrent (_uploadUUID);
       }
       
-      submitTorrentToGTExecutive (torrentFileName, inResumeMode);
+      submitTorrentToGTExecutive (torrentFileName);
    }
 
    time_t startTime = time(NULL);
@@ -200,7 +204,7 @@ void gtUpload::run ()
    }
 }
 
-void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool resumedUpload)
+void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName)
 {
    screenOutput ("Submitting GTO to GT Executive...", VERBOSE_1);
 
