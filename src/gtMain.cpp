@@ -214,28 +214,21 @@ int main (int argc, char **argv)
              << "********************************************************" << std::endl;
 #endif
 
-(void) argc;
-(void) argv;
-
    GT_OPT_CLASS opts;
    opts.parse (argc, argv);
 
 #ifdef GENETORRENT_SERVER
    if (!opts.m_serverForeground)
    {
-      std::cerr << "Server Mode:  Daemonizing"  << std::endl;
-      daemonize (&opts); // .m_serverPidFile);
+      daemonize (&opts); 
    }
    else
-   {
-      opts.processOption_Log();   // daemonize handles this to get logging hooks in place (when used)
-   }
 #endif
+   {
+      opts.processOption_Log();   // daemonize handles this to get logging hooks in place (for daemonzing errors)
+   }
 
    opts.log_options_used();
-
-sleep (999);
-exit (0);
 
    curl_global_init(CURL_GLOBAL_ALL);
    gtBase *app = NULL;
