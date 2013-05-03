@@ -18,7 +18,7 @@
 
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        4%{?gt_dist}%{?build_version}
+Release:        9%{?gt_dist}%{?CPBuild:.%{?CPBuild}}%{?build_version}
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
@@ -250,7 +250,8 @@ fi
 %{_bindir}/gtserver
 %config(noreplace) %{_sysconfdir}/gnos.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
-%{_sysconfdir}/rc.d/init.d/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/gtserver
+%{_sysconfdir}/rc.d/init.d/gtserver
 %{_sysconfdir}/rc.d/init.d/GTLoadBalancer
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/gtserver*
@@ -266,16 +267,22 @@ fi
 exit 0
 
 %post server
-/sbin/chkconfig --add %{name}
-/sbin/chkconfig --add GTLoadBalancer
+/sbin/chkconfig --list GeneTorrent 2> /dev/null 1>&2 && /sbin/chkconfig --del GeneTorrent
+/sbin/chkconfig --list gtserver 2> /dev/null 1>&2 || /sbin/chkconfig --add gtserver
+/sbin/chkconfig --list GTLoadBalancer 2> /dev/null 1>&2 || /sbin/chkconfig --add GTLoadBalancer
 
 %preun server
-/sbin/service %{name} stop > /dev/null
-/sbin/service GTLoadBalancer stop > /dev/null
-/sbin/chkconfig --del %{name}
-/sbin/chkconfig --del GTLoadBalancer
+if [ $1 -lt 1 ]; then       # $1 = 1 (upgrade) or 0 (uninstall)
+   /sbin/service gtserver stop > /dev/null
+   /sbin/service GTLoadBalancer stop > /dev/null
+   /sbin/chkconfig --del gtserver
+   /sbin/chkconfig --del GTLoadBalancer
+fi
 
 %changelog
+* Wed May  1 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.5-Y
+- Convert gtserver init.d script to gtserver rather than GeneTorrent
+
 * Tue Apr 30 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.5-X
 - Add /var/run dir
 

@@ -32,7 +32,7 @@
 #
 ################################################################################
 
-LIST_OF_SCRIPTS_INIT = GeneTorrent \
+LIST_OF_SCRIPTS_INIT = gtserver \
                GTLoadBalancer
 
 init_ddir = $(sysconfdir)/rc.d/init.d

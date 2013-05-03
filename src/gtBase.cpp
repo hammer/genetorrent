@@ -190,8 +190,7 @@ void gtBase::startUpMessage (std::string app_name)
 
    Log (PRIORITY_NORMAL, "%s (using tmpDir = %s)", msg.str().c_str(), _tmpDir.c_str());
 
-   screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".",
-      VERBOSE_1);
+   screenOutput ("Welcome to " << app_name << "-" << gtBase::version_str << ".", VERBOSE_1);
 }
 
 void gtBase::initSSLattributes ()

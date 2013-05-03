@@ -182,6 +182,7 @@ AC_CONFIG_FILES(
    [scripts/gtoinfo.py]
    [scripts/gtocheck]
    [init.d/Makefile]
+   [sysconfig/Makefile]
    [deps/boost/Makefile]
    [deps/openssl/Makefile]
    [tests/Makefile]

@@ -36,6 +36,7 @@ SUBDIRS = libtorrent     \
           scripts        \
           init.d         \
           tests          \
+          sysconfig      \
           dpkg
 
 EXTRA_DIST =                     \
@@ -59,6 +60,13 @@ DISABLE_RPM_CHECK = no
 BUILD_VERSION =
 WITH_BOOST =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
+
+install-data-local:
+	$(MKDIR_P) $(DESTDIR)$(localstatedir)/run/gtserver
+
+uninstall-local:
+	rm -rf $(DESTDIR)$(localstatedir)/run/gtserver
+
 
 # Some systems don't handle -D for _topdir (AmazonAMI???)
 RPMBUILD_DEFINES = \
