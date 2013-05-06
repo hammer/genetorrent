@@ -35,6 +35,10 @@ gtserver \- transfer genomic data reliably across a network
 .I cred
 .B --security-api 
 .I signing-URI
+.B --foreground 
+|
+.B --pidfile
+.I Pid-File
 .SH DESCRIPTION
 .B GeneTorrent
 is a suite of file transfer applications designed for the optimal
@@ -74,3 +78,13 @@ instance will look for .gto files to begin sharing content.
 Required.  
 .I signing-URI
 is a fully-qualified URI which will sign CSRs for this server instance.
+.TP
+.BI \-\^\-foreground
+Optional.  Run in the foreground (do not deamonize)
+.TP
+.BI \-\^\-pidfile " Pid-File"
+Required (unless
+.I \-\^\-foreground
+is present).
+.I Pid-File
+Full path and filename of the process's pid 
