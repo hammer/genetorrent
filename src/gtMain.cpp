@@ -199,10 +199,6 @@ void daemonize (gtServerOpts *servOpts)
    {
       miniSyslogErrorExit ("write() error attempting to write pid file " + pidFileName, errno); 
    }
-
-   //syslog (LOG_ERR, "%s %d", pidFileName.c_str(), fd);
-   //syslog (LOG_ERR, "fd = %d", fd);
-
 }
 #endif
 
