@@ -84,7 +84,7 @@ enum gtLogLevel {
 class gtLogger 
 {
    public:
-      static bool create_globallog (std::string, std::string, int childID = 0);
+      static bool create_globallog (std::string, std::string, int childID = 0, std::string UUID = "");
       static void delete_globallog();
 
       void __Log (gtLogLevel priority, const char *string, ...);
@@ -103,7 +103,7 @@ class gtLogger
          gtLoggerOutputFile, 
       };
 
-      gtLogger (std::string progName, std::string log, int childID);
+      gtLogger (std::string progName, std::string log, int childID, std::string UUID);
       ~gtLogger();
 
       static int s_global_refcnt;

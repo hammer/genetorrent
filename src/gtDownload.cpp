@@ -752,10 +752,15 @@ void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFi
    }
 }
 
-int gtDownload::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
+int gtDownload::downloadChild (int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
    gtLogger::delete_globallog();
-   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination, childID);
+
+   std::string uuid = torrentName;
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
+
+   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination, childID, uuid);
 
 #if __CYGWIN__
    // Ignore SIGPIPE on Windows to prevent download child from being killed
@@ -775,10 +780,6 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       // Other children notice that they're init orphans and exit in turn
       gtError ("unable to open a libtorrent session", 218, DEFAULT_ERROR);
    }
-
-   std::string uuid = torrentName;
-   uuid = uuid.substr (0, uuid.rfind ('.'));
-   uuid = getFileName (uuid); 
 
    libtorrent::add_torrent_params torrentParams;
    torrentParams.save_path = "./";

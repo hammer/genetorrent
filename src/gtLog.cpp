@@ -64,11 +64,11 @@ inline const char *filebase(const char *file)
    return filebase;
 }
 
-bool gtLogger::create_globallog(std::string progName, std::string log, int childID) 
+bool gtLogger::create_globallog(std::string progName, std::string log, int childID, std::string UUID) 
 {
    if (GlobalLog == NULL)
    {
-      GlobalLog = new gtLogger(progName, log, childID);
+      GlobalLog = new gtLogger(progName, log, childID, UUID);
    }
 
    s_global_refcnt++;
@@ -86,7 +86,7 @@ void gtLogger::delete_globallog()
 }
 
 // priority determines if messages are sent to stderr if logging to a file, syslog, or none
-gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode (gtLoggerOutputNone), m_fd (NULL), m_last_timestamp (0)
+gtLogger::gtLogger (std::string progName, std::string log, int childID, std::string UUID) : m_mode (gtLoggerOutputNone), m_fd (NULL), m_last_timestamp (0)
 {
    m_progname = strdup (progName.c_str());
    m_filename = strdup (log.c_str());
@@ -118,19 +118,36 @@ gtLogger::gtLogger (std::string progName, std::string log, int childID) : m_mode
       // The parent download process sends output to filename
       if (childID > 0)   
       {
+         char timebuf[1024];
+         struct timeval now;
+         struct tm time_tm;
+
+         gettimeofday(&now,  NULL);
+         time_t nowSec = now.tv_sec;
+         localtime_r(&nowSec, &time_tm);
+         strftime(timebuf, sizeof(timebuf), "%Y-%m-%d-%H%M", &time_tm);
+
          std::ostringstream outbuff;
          std::string work=m_filename;
          free (m_filename);
+
+         std::ostringstream midBuff;
+         midBuff << '.' << childID << '.' << timebuf;
+
+         if (UUID.size())
+         {
+            midBuff << '.' << UUID;
+         }
 
          size_t pos = work.rfind ('.');
   
          if (std::string::npos != pos)
          {
-            outbuff << work.substr(0,pos) << '.' << childID << work.substr(pos);
+            outbuff << work.substr(0,pos) << midBuff.str() << work.substr(pos);
          }
          else
          {
-            outbuff << work << '.' << childID;
+            outbuff << work << midBuff.str();
          }
 
          m_filename = strndup (outbuff.str().c_str(), outbuff.str().size());
