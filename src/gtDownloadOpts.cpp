@@ -34,6 +34,8 @@
 #include "gtOptStrings.h"
 #include "gt_scm_rev.h"
 
+#include "gtUtils.h"
+
 static const char usage_msg_hdr[] =
     "Usage:\n"
     "   gtdownload [OPTIONS] -c <cred> <URI|UUID|.xml|.gto>\n"
@@ -59,7 +61,8 @@ gtDownloadOpts::gtDownloadOpts ():
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
     m_downloadModeCsrSigningUrl (),
-    m_gtAgentMode (false)
+    m_gtAgentMode (false),
+    m_downloadModeWsiUrl (REPO_WSI_BASE_URL)
 {
 }
 
@@ -72,7 +75,8 @@ gtDownloadOpts::gtDownloadOpts (std::string progName, std::string usage_hdr,
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
     m_downloadModeCsrSigningUrl (),
-    m_gtAgentMode (false)
+    m_gtAgentMode (false),
+    m_downloadModeWsiUrl (REPO_WSI_BASE_URL)
 {
 }
 
@@ -84,6 +88,7 @@ gtDownloadOpts::add_options ()
         (OPT_DOWNLOAD            ",d", opt_vect_str()->composing(),
                                                      "<URI|UUID|.xml|.gto>")
         (OPT_MAX_CHILDREN,             opt_int(),    "number of download children")
+        (OPT_WEBSERV_URL,           opt_string(),    "Full URL to Repository Web Services Interface")
         ;
     add_desc (m_dl_desc);
 
@@ -120,6 +125,7 @@ gtDownloadOpts::processOptions ()
     processOption_SecurityAPI ();
     processOption_InactiveTimeout ();
     processOption_RateLimit();
+    processOption_WSI_URL();
 
     m_downloadSavePath = processOption_Path ();
 }
@@ -189,6 +195,25 @@ gtDownloadOpts::processOption_GTAgentMode ()
         {
             commandLineError ("The '--gta' option may not be combined with either -v"
                               " or '--verbose' options.");
+        }
+    }
+}
+
+void gtDownloadOpts::processOption_WSI_URL ()
+{
+    // For now this is not mandatory
+    if (m_vm.count (OPT_WEBSERV_URL))
+    {
+        m_downloadModeWsiUrl = sanitizePath (m_vm[OPT_WEBSERV_URL].as<std::string>());
+
+        if (m_downloadModeWsiUrl.size() == 0)
+        {
+            commandLineError ("command line or config file contains no value for '" OPT_WEBSERV_URL "'");
+        }
+
+        if ((std::string::npos == m_downloadModeWsiUrl.find ("http")) || (std::string::npos == m_downloadModeWsiUrl.find ("://")))
+        {
+            commandLineError ("Invalid URI for '--" OPT_WEBSERV_URL "'");
         }
     }
 }

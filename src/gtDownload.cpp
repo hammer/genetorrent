@@ -96,7 +96,8 @@ gtDownload::gtDownload (gtDownloadOpts &opts, bool show_startup_message):
    _maxChildren (opts.m_maxChildren),
    _torrentListToDownload (),
    _uriListToDownload (),
-   _downloadModeCsrSigningUrl (opts.m_csrSigningUrl)
+   _downloadModeCsrSigningUrl (opts.m_csrSigningUrl),
+   _downloadModeWsiUrl (opts.m_downloadModeWsiUrl)
 {
    if (show_startup_message)
    {
@@ -219,13 +220,13 @@ void gtDownload::prepareDownloadList ()
          }
          else // we have a UUID
          {
-            std::string url = CGHUB_WSI_BASE_URL + "download/" + inspect;
+            std::string url = _downloadModeWsiUrl + "/" + inspect;
             _uriListToDownload.push_back (url);
          }
       }
       else
       {
-         gtError ("-d download argument unrecognized.  '" + inspect + "' is too short'", 201);
+         gtError ("download argument unrecognized.  '" + inspect + "' is too short'", 201);
       }
 
       vectIter++;

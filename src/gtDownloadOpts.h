@@ -49,6 +49,7 @@ public:
     vectOfStr m_cliArgsDownloadList;
     std::string m_downloadModeCsrSigningUrl;
     bool m_gtAgentMode;
+    std::string m_downloadModeWsiUrl;
 
 protected:
     virtual void add_options ();
@@ -60,6 +61,7 @@ protected:
 private:
     void processOption_MaxChildren ();
     void processOption_DownloadList ();
+    void processOption_WSI_URL ();
 };
 
 #endif  /* GT_DOWNLOAD_OPTS_H */

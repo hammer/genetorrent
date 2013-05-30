@@ -65,6 +65,7 @@
 #define OPT_DOWNLOAD               "download"
 #define OPT_MAX_CHILDREN           "max-children"
 #define OPT_GTA_MODE               "gta"
+#define OPT_WEBSERV_URL            "webservices-url"
 
 // Options for gtupload:
 #define OPT_UPLOAD                 "upload"

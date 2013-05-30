@@ -67,9 +67,11 @@ const unsigned long PROCESS_MIN = 4096; // preferred minimum user NPROC soft lim
 
 // move to future config file
 const std::string GT_CERT_SIGN_TAIL = "gtsession";
-const std::string DEFAULT_CGHUB_HOSTNAME = "cghub.ucsc.edu";
-const std::string CGHUB_WSI_BASE_URL = "https://"+ DEFAULT_CGHUB_HOSTNAME + "/cghub/data/analysis/";
 const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
+
+// Download only and deprecated
+const std::string DEFAULT_REPO_HOSTNAME = "cghub.ucsc.edu";
+const std::string REPO_WSI_BASE_URL = "https://"+ DEFAULT_REPO_HOSTNAME + "/cghub/data/analysis/download";      // Override with command line argument or config file setting 'webservices-url'
 
 // Work around to disable SSL compression on Centos 5.5
 #ifndef SSL_OP_NO_COMPRESSION

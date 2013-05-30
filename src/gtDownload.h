@@ -57,6 +57,7 @@ class gtDownload : public gtBase
       vectOfStr _torrentListToDownload;
       vectOfStr _uriListToDownload;
       std::string _downloadModeCsrSigningUrl;
+      std::string _downloadModeWsiUrl;
 
       void runDownloadMode (std::string startupDir);
       void prepareDownloadList ();
