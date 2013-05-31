@@ -124,23 +124,19 @@ const char SPACE = ' ';
    }                                                                                         \
 }
 
-#define screenOutputNoNewLine(messStream)     \
-{                                              \
-   std::string timeStamp = "";                 \
-                                               \
-   if (_addTimestamps)                         \
-   {                                           \
-      timeStamp = makeTimeStamp() + + " ";     \
-   }                                           \
-                                               \
-   if (_logToStdErr)                           \
-   {                                           \
-      std::cout << timeStamp << messStream;    \
-   }                                           \
-   else                                        \
-   {                                           \
-      std::cerr << timeStamp << messStream;    \
-   }                                           \
+#define screenOutputNoNewLine(messStream, verbosity)  \
+{                                                     \
+   if (global_verbosity > verbosity)                  \
+   {                                                  \
+      if (_logToStdErr)                               \
+      {                                               \
+         std::cout << messStream;                     \
+      }                                               \
+      else                                            \
+      {                                               \
+         std::cerr << messStream;                     \
+      }                                               \
+   }                                                  \
 }
 
 #endif /* GTDEFS_H_ */

@@ -97,7 +97,8 @@ gtDownload::gtDownload (gtDownloadOpts &opts, bool show_startup_message):
    _torrentListToDownload (),
    _uriListToDownload (),
    _downloadModeCsrSigningUrl (opts.m_csrSigningUrl),
-   _downloadModeWsiUrl (opts.m_downloadModeWsiUrl)
+   _downloadModeWsiUrl (opts.m_downloadModeWsiUrl),
+   _resumedDownload (false)
 {
    if (show_startup_message)
    {
@@ -502,6 +503,15 @@ void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentNa
    int childID=1;
    pid_t pid;
 
+   std::string uuid = torrentName;
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
+
+   if (statDirectory ("./" + uuid) == 0)
+   {
+      _resumedDownload = true;
+   }
+
    while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
    {
       if (pipe (pipes[childID]) < 0)
@@ -599,6 +609,14 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
    int64_t dlRate = 0;
    time_t lastActivity = timeout_update ();  // initialize last activity time for inactvitiy timeout
 
+   bool displayProgress = true;
+
+   if (_resumedDownload)
+   {
+      screenOutputNoNewLine ("Download resumed, validating checksums for existing data.", VERBOSE_1);
+      displayProgress = false;     // Don't display progress during validation
+   }
+
    while (pidList.size() > 0)
    {
       xfer = 0;
@@ -691,10 +709,26 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
          }
       }
 
-      screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s", VERBOSE_1);
+      if (!_resumedDownload || displayProgress || dlRate > 0)
+      {
+         if (!displayProgress)
+         {
+            displayProgress = true;
+            screenOutput (".done!", VERBOSE_1);
+ 
+         }
+
+         screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s", VERBOSE_1);
+      }
+      else
+      {
+         screenOutputNoNewLine (".", VERBOSE_1);
+      }
 
       if (totalDataDownloaded + xfer > totalXfer)
+      {
          timeout_update (&lastActivity);
+      }
       totalXfer = totalDataDownloaded + xfer;
    }
 
@@ -802,7 +836,7 @@ int gtDownload::downloadChild (int childID, int totalChildren, std::string torre
       screenOutput ("Hash checks disabled due to null-storage enabled.", VERBOSE_0);
    }
 
-   if (statDirectory ("./" + uuid) == 0)
+   if (_resumedDownload)
    {
       torrentParams.force_download = false;  // allows resume
    }

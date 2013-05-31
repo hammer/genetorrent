@@ -491,7 +491,7 @@ void gtUpload::makeTorrent (std::string uuid)
    std::string torrentNameBuilding = uuid + GTO_FILE_BUILDING_EXTENSION;
  
    screenOutput ("Preparing " << torrentName << " for upload...", VERBOSE_1);
-   screenOutputNoNewLine ("Computing checksums...");
+   screenOutputNoNewLine ("Computing checksums...", VERBOSE_1);
 
    std::string creator = std::string ("GeneTorrent-") + VERSION;
    std::string dataPath = libtorrent::complete (uuid);

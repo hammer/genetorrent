@@ -58,6 +58,7 @@ class gtDownload : public gtBase
       vectOfStr _uriListToDownload;
       std::string _downloadModeCsrSigningUrl;
       std::string _downloadModeWsiUrl;
+      bool _resumedDownload;
 
       void runDownloadMode (std::string startupDir);
       void prepareDownloadList ();
