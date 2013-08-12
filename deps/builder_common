@@ -26,7 +26,7 @@
 #
 #  Created under contract by Cardinal Peak, LLC.   www.cardinalpeak.com
 
-WGET="$(which wget) --tries 3 -O ${TARBALL}"
+WGET="$(which wget) -nv --tries 3 -O ${TARBALL}"
 CURL="$(which curl) -o ${TARBALL} -L"
 
 function errexit

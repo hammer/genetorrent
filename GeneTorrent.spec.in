@@ -205,8 +205,6 @@ fi
 %{_bindir}/gtoinfo
 %{_bindir}/gtocheck
 %{_bindir}/cgquery
-%{_bindir}/%{name}
-%{_mandir}/man1/%{name}*
 %{_datadir}/%{name}
 %{_libdir}/libgenetorrent.so.0
 %{_libdir}/libgenetorrent.so.0.0.0
