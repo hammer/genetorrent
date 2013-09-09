@@ -18,7 +18,7 @@
 
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        4%{?gt_dist}%{?build_version}
+Release:        5%{?gt_dist}%{?build_version}
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet

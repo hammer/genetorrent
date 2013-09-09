@@ -109,9 +109,13 @@ if LINUX
 
 DEB_CODENAME := $(shell lsb_release -cs)
 DEB_RELEASE := $(shell lsb_release -rs)
-DEB_PACKAGE_VER = 1
+DEB_PACKAGE_VER = 2
 
-.PHONY: deb deb-builder deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
+.PHONY: deb deb-builder deb-raring deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
+
+# Ubuntu raring (12.10)
+deb-raring:
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
 
 # Ubuntu quantal (12.10)
 deb-quantal:

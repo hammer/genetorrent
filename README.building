@@ -165,8 +165,8 @@ Min package set to test::
 
     python-openssl
 
-Ubuntu 12.10 (quantal)
-----------------------
+Ubuntu 12.10 (quantal) and 13.04 (raring)
+-----------------------------------------
 
 All dependencies provided by the distribution.  Must add universe to apt sources for some dependencies.
 
