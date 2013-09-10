@@ -154,7 +154,8 @@ gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
 
 gtupload_LDFLAGS = $(common_ldflags)
 
-gtupload_LDADD = $(common_ldadd)
+gtupload_LDADD = $(common_ldadd) \
+                 $(LIBCURL)
 
 gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
                       $(OPENSSL_INCLUDES) \
@@ -167,7 +168,8 @@ gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
 
 gtdownload_LDFLAGS = $(common_ldflags)
 
-gtdownload_LDADD = $(common_ldadd)
+gtdownload_LDADD = $(common_ldadd) \
+                   $(LIBCURL)
 
 gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
                     $(OPENSSL_INCLUDES) \
