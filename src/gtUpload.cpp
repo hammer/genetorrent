@@ -594,6 +594,11 @@ void gtUpload::processManifestFile ()
    {
       AutoDelete <XQQuery> query (xqilla.parse (X("for $variable in //SUBMISSION return //$variable/(SERVER_INFO/(@server_path|@submission_uri)|FILES/FILE/@filename)")));
       AutoDelete <DynamicContext> context (query->createDynamicContext ());
+      // Disable schema validation. The XML in manifests is validated when it is ingested into GNOS.
+      // There is no need to validate it again here. It is actually harmful since the SRA schema
+      // references in the XML point at an unreliable server which, if it is down, causes validation
+      // and hence the entire program to fail.
+      context->getDocumentCache()->setDoPSVI( false );
       Sequence seq = context->resolveDocument (X(_manifestFile.c_str()));
 
       if (!seq.isEmpty () && seq.first ()->isNode ())

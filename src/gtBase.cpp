@@ -1241,6 +1241,8 @@ bool gtBase::processHTTPError (int errorCode, std::string fileWithErrorXML, int 
       AutoDelete <XQQuery> query (xqilla.parse (X("//CGHUB_error/usermsg/text()|//CGHUB_error/effect/text()|//CGHUB_error/remediation/text()")));
       AutoDelete <DynamicContext> context (query->createDynamicContext ());
 
+      // Disable schema validation. WS results don't contain schema references so validation is ineffective.
+      context->getDocumentCache()->setDoPSVI( false );
       Sequence seq = context->resolveDocument (X(fileWithErrorXML.c_str()));
 
       if (!seq.isEmpty () && seq.first()->isNode ())
