@@ -414,6 +414,11 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    {
       AutoDelete <XQQuery> query (xqilla.parse (X("//ResultSet/Result/analysis_data_uri/text()")));
       AutoDelete <DynamicContext> context (query->createDynamicContext ());
+      // Disable schema validation. The XML in manifests is validated when it is ingested into GNOS.
+      // There is no need to validate it again here. It is actually harmful since the SRA schema
+      // references in the XML point at an unreliable server which, if it is down, causes validation
+      // and hence the entire program to fail.
+      context->getDocumentCache()->setDoPSVI( false );
       Sequence seq = context->resolveDocument (X(xmlFileName.c_str()));
 
       if (!seq.isEmpty () && seq.first ()->isNode ())
