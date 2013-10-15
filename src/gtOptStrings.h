@@ -65,6 +65,7 @@
 #define OPT_DOWNLOAD               "download"
 #define OPT_MAX_CHILDREN           "max-children"
 #define OPT_GTA_MODE               "gta"
+#define OPT_WEBSERV_URL            "webservices-url"
 
 // Options for gtupload:
 #define OPT_UPLOAD                 "upload"
@@ -75,5 +76,7 @@
 #define OPT_SERVER                 "server"
 #define OPT_QUEUE                  "queue"
 #define OPT_FORCE_DL_MODE          "force-download-mode"
+#define OPT_FOREGROUND             "foreground"
+#define OPT_PIDFILE                "pidfile"
 
 #endif  /* GT_OPT_STRINGS_H */

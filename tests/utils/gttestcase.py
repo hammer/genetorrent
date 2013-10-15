@@ -273,6 +273,13 @@ class GTTestCase(unittest.TestCase):
         ssl_cert = False
 
         while not gto_file or (not ssl_cert and ssl):
+            # check for premature exits of GT programs
+            # subprocess.poll() returns return code, nonzero is True
+            if client.poll():
+                self.fail('Client exited prematurely')
+            if server and server.poll():
+                self.fail('Server exited prematurely')
+
             try:
                 os.stat(self.client_gto(uuid))
                 gto_file = True

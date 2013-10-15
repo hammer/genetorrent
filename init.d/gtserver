@@ -1,0 +1,254 @@
+#!/bin/bash
+#
+# LSB-ified SysV-style init script for gtserver
+# Version 1.0
+# Copyright (c) 2013, Annai Systems, Inc.
+
+# To use this as a template for your application (remove these lines)
+#
+#   1)  search for 'gtserver' and change to your applcation's name
+#   2)  Update comments on lines marked with '(CCC)' (CCC)'s may be removed
+#   3)  Verify the path for ${program_BIN} variable
+#   4)  Verify the chkconfig values are satisfactory
+
+# $0 exit codes
+#
+#  0   Success
+#  1   Usage Error
+#  2   ${program_BIN} is not an executable file or does not exist
+#  3   ${program_CONFIG_FILE} is not a file
+#  4   Program is already running
+#  5   Pid-file path does not exist
+#  6   lockfile path does not exist
+#  7   pid file does not exist (but ${program_BIN} is running)
+#  9   Failure from the program before daemonizing
+#
+#  $0 status return codes
+#
+#  0   program is running or service is OK
+#  1   program is dead and /var/run pid file exists
+#  2   program is dead and /var/lock lock file exists
+#  3   program is not running
+#  4   program or service status is unknown
+#   
+
+# TODO List:
+# * change Required Start to include the gpfs service as a pre-requisite
+#
+
+# gtserver  GeneTorrent server applcation
+#
+# chkconfig:    345 85 15
+# description:  gtserver GeneTorrent server applcation
+# processname:  gtserver
+# pidfile:      /var/run/gtserver/gtserver.pid
+#
+
+### BEGIN INIT INFO
+# Provides:          gtserver
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Short-Description: start and stop the gtserver daemon 
+# Description:       GeneTorrent server applcation
+# 
+### END INIT INFO
+
+# Source function library and networking
+. /etc/init.d/functions
+. /etc/sysconfig/network
+
+
+# Installation configuration and override defaults in this init script
+# Variables Supported:  LOCAL_ARGS LOCKFILE CONFIG_FILE
+#
+if [ -f /etc/sysconfig/gtserver ]; then
+        . /etc/sysconfig/gtserver
+fi
+
+# Variables (shouldn't require changes after installation)  (These do require setting if using this script as a template)
+
+program_BIN="/usr/bin/gtserver"
+program_NAME="${program_BIN##*/}"
+program_HOST="`hostname`"
+program_USER="gtorrent"
+program_CONFIG_FILE="${CONFIG_FILE:-"/etc/gnos.d/GeneTorrent.conf"}"  
+program_LOCKFILE="${LOCKFILE:-/var/lock/subsys/${program_NAME}}"
+program_PIDFILE="/var/run/${program_NAME}/${program_NAME}.pid"
+
+program_STOP=/tmp/GeneTorrent.stop
+
+if [ ${#program_CONFIG_FILE} -gt 0 ]
+then
+   program_ARGS="--pidfile=${program_PIDFILE} --config-file ${program_CONFIG_FILE} ${LOCAL_ARGS}"
+else
+   program_ARGS="--pidfile=${program_PIDFILE} ${LOCAL_ARGS}"
+fi
+
+start() 
+{
+   # This should have been cleaned up, but just in case, remove it
+   rm -f ${program_STOP}
+
+   [ -x ${program_BIN} ] || exit 2
+   [ -d ${program_PIDFILE%/*} ] || exit 5
+   [ -d ${program_LOCKFILE%/*} ] || exit 6
+
+   pstat ${program_BIN}     # check if program_BIN is running
+   retVal=$?
+
+   if [[ ! -f ${program_PIDFILE} ]]   # if pid file does not exist
+   then
+      if [[ $retVal -gt 0 ]]    # but the program is running
+      then
+         exit 7                 # bail with an error
+      fi
+   fi
+
+   [ ${#program_CONFIG_FILE} -gt 0 ] && ( [ -f $program_CONFIG_FILE ] || exit 3 )
+
+   echo -n $"Starting ${program_NAME}: "
+   daemon --pidfile=${program_PIDFILE} --user ${program_USER} ${program_BIN} ${program_ARGS}
+   retVal=$?
+   echo
+   if [ $retVal -eq 0 ]; then
+      /bin/touch ${program_LOCKFILE} || retVal=4
+   fi
+   return $retVal
+}
+
+stop() 
+{
+   pstat ${program_BIN}     # check if program_BIN is running
+   retVal=$?
+
+   if [[ ! -f ${program_PIDFILE} ]]   # if pid file does not exist
+   then
+      if [[ $retVal -gt 0 ]]    # but the program is running
+      then
+         exit 7                 # bail with an error
+      fi
+   fi
+
+   echo -n $"Stopping ${program_NAME}: "
+
+   delay=20
+   gtPid=`pidofproc -p ${program_PIDFILE} ${program_NAME}`
+
+   retVal=""
+
+   if [[ -n ${#gtPid} ]]; then
+      # We found the pid for our process, so attempt to
+      # perform graceful exit
+      /bin/touch ${program_STOP}
+
+      # Now, give the process some time to exit cleanly
+      while [[ "${delay}" -gt 0 ]]
+      do
+         checkpid $gtPid 2>&1
+         if [ $? -eq 1 ]; then
+            # No longer running
+            retVal=0
+            success $"${program_NAME} shutdown"
+            rm -f ${program_PIDFILE}
+            break
+         fi
+         # Process is still there.  Keep waiting.
+         delay=$((${delay} -1))
+         sleep 1
+      done
+   fi
+
+   if [ -z "$retVal" ]; then
+       # Graceful exit didn't seem to happen.  Use the
+       # big hammer.
+       killproc -p ${program_PIDFILE} $GT_BIN
+       retVal=$? 
+   fi          
+               
+   [ "${retVal}" -eq 0 ] && success $"stop" || failure $"stop"
+
+   rm -f ${program_STOP}
+
+   echo
+   [ $retVal -eq 0 ] && rm -f ${program_LOCKFILE}
+   return $retVal
+}
+
+restart() 
+{
+    stop
+    start
+}
+
+reload() 
+{
+    restart
+}
+
+force_reload() 
+{
+    restart
+}
+
+rh_status() 
+{
+    # run checks to determine if the service is running or use generic status
+    # -l has an internal path hard coded
+    status -p ${program_PIDFILE} -l ${program_NAME} ${program_NAME}
+}
+
+rh_status_q() 
+{
+    rh_status >/dev/null 2>&1
+}
+
+pstat()
+{
+   count=`/bin/ps -ef | /bin/grep "${1}" | /bin/grep -v "grep" -c`
+
+   return ${count} 
+}
+
+usage="{start|stop|status|restart|condrestart|reload|force-reload|help}"
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        if [[ ! -f ${program_PIDFILE} ]]   # if pid file does not exist
+        then
+            rh_status || exit 0
+        else
+            rh_status_q || exit 0
+        fi
+        $1
+        ;;
+    status)
+        rh_status
+        ;;
+    restart)
+        $1
+        ;;
+    condrestart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    reload)
+        rh_status_q || exit 4
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    help)
+        echo $"Usage: $0 $usage"
+        ;;
+    *)
+        echo $"Usage: $0 $usage"
+        exit 1
+        ;;
+esac
+
+exit $?

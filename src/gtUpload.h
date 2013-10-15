@@ -68,7 +68,7 @@ class gtUpload : public gtBase
       bool _uploadGTOOnly;        // Use upload client to generate GTO only,
                                   // don't start upload
 
-      void submitTorrentToGTExecutive (std::string torrentFileName, bool);
+      void submitTorrentToGTExecutive (std::string torrentFileName);
       void findDataAndSetWorkingDirectory ();
       bool verifyDataFilesExist (vectOfStr &);
       int64_t setPieceSize (unsigned &);

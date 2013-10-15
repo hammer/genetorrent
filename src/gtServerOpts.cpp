@@ -58,7 +58,9 @@ gtServerOpts::gtServerOpts ():
     m_server_desc ("Server Options"),
     m_serverDataPath (""),
     m_serverForceDownload (false),
-    m_serverQueuePath ("")
+    m_serverQueuePath (""),
+    m_serverForeground(false),
+    m_serverPidFile (DEFAULT_PID_FILE)
 {
 }
 
@@ -68,6 +70,8 @@ gtServerOpts::add_options ()
     m_server_desc.add_options ()
         (OPT_SERVER          ",s", opt_string(), "server data path")
         (OPT_QUEUE           ",q", opt_string(), "input GTO directory")
+        (OPT_FOREGROUND,                         "run in the foreground (do not deamonize)")
+        (OPT_PIDFILE,              opt_string(), "full path and filename of the process's pid (ignored when --" OPT_FOREGROUND " is active")
         (OPT_FORCE_DL_MODE,                      "force added GTOs to download mode")
         ;
     add_desc (m_server_desc);
@@ -91,6 +95,7 @@ gtServerOpts::processOptions ()
     processOption_Server ();
     processOption_Queue ();
     processOption_ServerForceDownload ();
+    processOption_Foreground ();
     processOption_SecurityAPI ();
 
     checkCredentials ();
@@ -150,4 +155,14 @@ void gtServerOpts::processOption_ServerForceDownload ()
     {
         m_serverForceDownload = true;
     }
+}
+
+void gtServerOpts::processOption_Foreground ()
+{
+
+    if (m_vm.count (OPT_FOREGROUND) > 0)
+    {
+        m_serverForeground = true;
+    }
+
 }

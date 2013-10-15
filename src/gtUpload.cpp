@@ -55,7 +55,11 @@
 
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/create_torrent.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
+
 #include "libtorrent/peer_info.hpp"
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
@@ -147,7 +151,7 @@ void gtUpload::run ()
          makeTorrent (_uploadUUID);
       }
       
-      submitTorrentToGTExecutive (torrentFileName, inResumeMode);
+      submitTorrentToGTExecutive (torrentFileName);
    }
 
    time_t startTime = time(NULL);
@@ -200,7 +204,7 @@ void gtUpload::run ()
    }
 }
 
-void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName, bool resumedUpload)
+void gtUpload::submitTorrentToGTExecutive (std::string torrentFileName)
 {
    screenOutput ("Submitting GTO to GT Executive...", VERBOSE_1);
 
@@ -487,7 +491,7 @@ void gtUpload::makeTorrent (std::string uuid)
    std::string torrentNameBuilding = uuid + GTO_FILE_BUILDING_EXTENSION;
  
    screenOutput ("Preparing " << torrentName << " for upload...", VERBOSE_1);
-   screenOutputNoNewLine ("Computing checksums...");
+   screenOutputNoNewLine ("Computing checksums...", VERBOSE_1);
 
    std::string creator = std::string ("GeneTorrent-") + VERSION;
    std::string dataPath = libtorrent::complete (uuid);
@@ -753,6 +757,10 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
    if (_rateLimit > 0)
    {
       torrentHandle.set_upload_limit (_rateLimit);
+
+      libtorrent::session_settings settings = torrentSession->settings ();
+      settings.ignore_limits_on_local_network = false;
+      torrentSession->set_settings (settings);
    }
 
    torrentHandle.resume();

@@ -15,6 +15,8 @@
 #include <vector>
 #include <string>
 
+#define UNUSED(x) (void)(x)
+
 /// An accumulating option value to handle multiple incrementing options.
 template <typename T> class accumulator_type : public boost::program_options::value_semantic
 {
@@ -62,6 +64,7 @@ template <typename T> class accumulator_type : public boost::program_options::va
       /// There should never be any tokens.
       virtual void parse(boost::any& value_store, const std::vector<std::string>& new_tokens, bool /*utf8*/) const
       {
+         UNUSED (new_tokens);
          if (value_store.empty()) value_store = T();
           boost::any_cast<T&>(value_store) += _interval;
       }

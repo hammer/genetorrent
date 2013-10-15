@@ -29,7 +29,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([GeneTorrent], [3.8.3], [], [GeneTorrent])
+AC_INIT([GeneTorrent], [3.8.5], [], [GeneTorrent])
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE([1.11 foreign])
 AC_CONFIG_SRCDIR([src/gtBase.cpp])
@@ -182,6 +182,7 @@ AC_CONFIG_FILES(
    [scripts/gtoinfo.py]
    [scripts/gtocheck]
    [init.d/Makefile]
+   [sysconfig/Makefile]
    [deps/boost/Makefile]
    [deps/openssl/Makefile]
    [tests/Makefile]
@@ -190,7 +191,6 @@ AC_CONFIG_FILES(
    [deps/xerces-c/Makefile]
    [macosx/Distribution.xml]
    [solaris/pkginfo]
-   [src/GeneTorrent]
 )
 
 AC_CONFIG_SUBDIRS(

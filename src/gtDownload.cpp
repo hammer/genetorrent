@@ -53,7 +53,11 @@
 
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/create_torrent.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
+
 #include "libtorrent/peer_info.hpp"
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
@@ -92,7 +96,9 @@ gtDownload::gtDownload (gtDownloadOpts &opts, bool show_startup_message):
    _maxChildren (opts.m_maxChildren),
    _torrentListToDownload (),
    _uriListToDownload (),
-   _downloadModeCsrSigningUrl (opts.m_csrSigningUrl)
+   _downloadModeCsrSigningUrl (opts.m_csrSigningUrl),
+   _downloadModeWsiUrl (opts.m_downloadModeWsiUrl),
+   _resumedDownload (false)
 {
    if (show_startup_message)
    {
@@ -215,13 +221,13 @@ void gtDownload::prepareDownloadList ()
          }
          else // we have a UUID
          {
-            std::string url = CGHUB_WSI_BASE_URL + "download/" + inspect;
+            std::string url = _downloadModeWsiUrl + "/" + inspect;
             _uriListToDownload.push_back (url);
          }
       }
       else
       {
-         gtError ("-d download argument unrecognized.  '" + inspect + "' is too short'", 201);
+         gtError ("download argument unrecognized.  '" + inspect + "' is too short'", 201);
       }
 
       vectIter++;
@@ -502,6 +508,15 @@ void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentNa
    int childID=1;
    pid_t pid;
 
+   std::string uuid = torrentName;
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
+
+   if (statDirectory ("./" + uuid) == 0)
+   {
+      _resumedDownload = true;
+   }
+
    while (childID <= childrenThisGTO)      // Spawn Children that will download this GTO
    {
       if (pipe (pipes[childID]) < 0)
@@ -599,6 +614,14 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
    int64_t dlRate = 0;
    time_t lastActivity = timeout_update ();  // initialize last activity time for inactvitiy timeout
 
+   bool displayProgress = true;
+
+   if (_resumedDownload)
+   {
+      screenOutputNoNewLine ("Download resumed, validating checksums for existing data.", VERBOSE_1);
+      displayProgress = false;     // Don't display progress during validation
+   }
+
    while (pidList.size() > 0)
    {
       xfer = 0;
@@ -691,10 +714,26 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
          }
       }
 
-      screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s", VERBOSE_1);
+      if (!_resumedDownload || displayProgress || dlRate > 0)
+      {
+         if (!displayProgress)
+         {
+            displayProgress = true;
+            screenOutput (".done!", VERBOSE_1);
+ 
+         }
+
+         screenOutput ("Status:"  << std::setw(8) << (totalDataDownloaded+xfer > 0 ? add_suffix(totalDataDownloaded+xfer).c_str() : "0 bytes") <<  " downloaded (" << std::fixed << std::setprecision(3) << (100.0*(totalDataDownloaded+xfer)/totalSizeOfDownload) << "% complete) current rate:  " << add_suffix (dlRate).c_str() << "/s", VERBOSE_1);
+      }
+      else
+      {
+         screenOutputNoNewLine (".", VERBOSE_1);
+      }
 
       if (totalDataDownloaded + xfer > totalXfer)
+      {
          timeout_update (&lastActivity);
+      }
       totalXfer = totalDataDownloaded + xfer;
    }
 
@@ -753,10 +792,15 @@ void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFi
    }
 }
 
-int gtDownload::downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd)
+int gtDownload::downloadChild (int childID, int totalChildren, std::string torrentName, FILE *fd)
 {
    gtLogger::delete_globallog();
-   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination, childID);
+
+   std::string uuid = torrentName;
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
+
+   _logToStdErr = gtLogger::create_globallog (_progName, _logDestination, childID, uuid);
 
 #if __CYGWIN__
    // Ignore SIGPIPE on Windows to prevent download child from being killed
@@ -776,10 +820,6 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       // Other children notice that they're init orphans and exit in turn
       gtError ("unable to open a libtorrent session", 218, DEFAULT_ERROR);
    }
-
-   std::string uuid = torrentName;
-   uuid = uuid.substr (0, uuid.rfind ('.'));
-   uuid = getFileName (uuid); 
 
    libtorrent::add_torrent_params torrentParams;
    torrentParams.save_path = "./";
@@ -801,7 +841,7 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
       screenOutput ("Hash checks disabled due to null-storage enabled.", VERBOSE_0);
    }
 
-   if (statDirectory ("./" + uuid) == 0)
+   if (_resumedDownload)
    {
       torrentParams.force_download = false;  // allows resume
    }
@@ -860,6 +900,10 @@ int gtDownload::downloadChild(int childID, int totalChildren, std::string torren
    if (_rateLimit > 0)
    { 
       torrentHandle.set_download_limit (_rateLimit/totalChildren);
+
+      libtorrent::session_settings settings = torrentSession->settings ();
+      settings.ignore_limits_on_local_network = false;
+      torrentSession->set_settings (settings);
    }
 
    // Don't allow upload connections

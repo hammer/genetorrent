@@ -18,7 +18,7 @@
 
 Name:           GeneTorrent
 Version:        @PACKAGE_VERSION@
-Release:        5%{?gt_dist}%{?build_version}
+Release:        9%{?gt_dist}%{?CPBuild:.%{?CPBuild}}%{?build_version}
 Summary:        Transfer genomic data reliably across a network
 
 Group:          Applications/Internet
@@ -30,7 +30,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:       %{name}-common = @PACKAGE_VERSION@
 Requires(pre):  shadow-utils
 
-BuildRequires:	openssl-devel
+BuildRequires:  openssl-devel
 %if "%{dist}" == ".el5.centos"
 BuildRequires:  curl-devel
 %endif
@@ -121,9 +121,6 @@ Requires: %{name}-common = @PACKAGE_VERSION@
 %setup -q
 
 %build
-
-
-
 %if "%{_with_boost}" != "distro"
 %if 0%{!?_with_boost:1}
 if [ -d /usr/local/boost-1.48.0 ]
@@ -156,14 +153,10 @@ deps/xqilla/buildGeneTorrentXQilla.sh
 WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
 %endif
 
-
 %if 0%{?suse_version}
-./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
-    --docdir=%{_usr}/share/doc/packages/%{name} \
-    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
+   ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --docdir=%{_usr}/share/doc/packages/%{name} --localstatedir=%{_localstatedir} ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
 %else
-./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
-    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
+   ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --localstatedir=%{_localstatedir} ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
 %endif
 
 make %{?_smp_mflags}
@@ -263,33 +256,42 @@ fi
 %{_bindir}/gtserver
 %config(noreplace) %{_sysconfdir}/gnos.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
-%{_sysconfdir}/rc.d/init.d/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/gtserver
+%{_sysconfdir}/rc.d/init.d/gtserver
 %{_sysconfdir}/rc.d/init.d/GTLoadBalancer
 %{_bindir}/GTLoadBalancer
 %{_mandir}/man1/gtserver*
+%dir %attr(-,gtorrent,gtorrent) %{_localstatedir}/run/gtserver
 
 %post common -p /sbin/ldconfig
 
 %postun common -p /sbin/ldconfig
 
 %pre server
-/usr/bin/getent group gtorrent >/dev/null || /usr/sbin/groupadd \
-   -r gtorrent >/dev/null
-/usr/bin/getent passwd gtorrent >/dev/null || /usr/sbin/useradd \
-   -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent >/dev/null
+/usr/bin/getent group gtorrent >/dev/null || /usr/sbin/groupadd  -r gtorrent >/dev/null
+/usr/bin/getent passwd gtorrent >/dev/null || /usr/sbin/useradd -r -g gtorrent -d /etc/gnos.d/ -s /bin/nologin gtorrent >/dev/null
 exit 0
 
 %post server
-/sbin/chkconfig --add %{name}
-/sbin/chkconfig --add GTLoadBalancer
+/sbin/chkconfig --list GeneTorrent 2> /dev/null 1>&2 && /sbin/chkconfig --del GeneTorrent
+/sbin/chkconfig --list gtserver 2> /dev/null 1>&2 || /sbin/chkconfig --add gtserver
+/sbin/chkconfig --list GTLoadBalancer 2> /dev/null 1>&2 || /sbin/chkconfig --add GTLoadBalancer
 
 %preun server
-/sbin/service GeneTorrent stop > /dev/null
-/sbin/service GTLoadBalancer stop > /dev/null
-/sbin/chkconfig --del %{name}
-/sbin/chkconfig --del GTLoadBalancer
+if [ $1 -lt 1 ]; then       # $1 = 1 (upgrade) or 0 (uninstall)
+   /sbin/service gtserver stop > /dev/null
+   /sbin/service GTLoadBalancer stop > /dev/null
+   /sbin/chkconfig --del gtserver
+   /sbin/chkconfig --del GTLoadBalancer
+fi
 
 %changelog
+* Wed May  1 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.5-Y
+- Convert gtserver init.d script to gtserver rather than GeneTorrent
+
+* Tue Apr 30 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.5-X
+- Add /var/run dir
+
 * Sat Jan  6 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.1-X
 - Release bumps for various build and changes related to new man page
 
@@ -314,4 +316,3 @@ exit 0
 
 * Sat Jan  6 2012 donavan nelson <dnelson at cardinalpeak dot com> 1.0.x.y-1
 - Prevent binaires from being stripped
-

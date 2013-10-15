@@ -36,6 +36,7 @@ SUBDIRS = libtorrent     \
           scripts        \
           init.d         \
           tests          \
+          sysconfig      \
           dpkg
 
 EXTRA_DIST =                     \
@@ -59,6 +60,13 @@ DISABLE_RPM_CHECK = no
 BUILD_VERSION =
 WITH_BOOST =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
+
+install-data-local:
+	$(MKDIR_P) $(DESTDIR)$(localstatedir)/run/gtserver
+
+uninstall-local:
+	rm -rf $(DESTDIR)$(localstatedir)/run/gtserver
+
 
 # Some systems don't handle -D for _topdir (AmazonAMI???)
 RPMBUILD_DEFINES = \
@@ -200,7 +208,6 @@ macosx:
 	rm -rf $(MACDIR)${prefix}/bin/gtserver
 	rm -rf $(MACDIR)${prefix}/share/man/man1/gtserver.1
 	rm -rf $(MACDIR)${prefix}/bin/cgsubmit
-	rm -rf $(MACDIR)${prefix}/bin/GeneTorrent
 	@echo "  Building package"
 	@set -e; cd macosx; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\

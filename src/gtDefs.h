@@ -49,6 +49,7 @@ const std::string PROGRESS_FILE_EXT = ".progress";
 
 const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string CONF_DIR_LOCAL = "/usr/local/share/GeneTorrent";
+const std::string DEFAULT_PID_FILE = "/var/run/gtserver/gtserver.pid";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string PYTHON_TRUE = "TRUE";
 const std::string SERVER_STOP_FILE = "GeneTorrent.stop";
@@ -66,9 +67,11 @@ const unsigned long PROCESS_MIN = 4096; // preferred minimum user NPROC soft lim
 
 // move to future config file
 const std::string GT_CERT_SIGN_TAIL = "gtsession";
-const std::string DEFAULT_CGHUB_HOSTNAME = "cghub.ucsc.edu";
-const std::string CGHUB_WSI_BASE_URL = "https://"+ DEFAULT_CGHUB_HOSTNAME + "/cghub/data/analysis/";
 const std::string DEFAULT_TRACKER_URL = "https://tracker.example.com/announce";
+
+// Download only and deprecated
+const std::string DEFAULT_REPO_HOSTNAME = "cghub.ucsc.edu";
+const std::string REPO_WSI_BASE_URL = "https://"+ DEFAULT_REPO_HOSTNAME + "/cghub/data/analysis/download";      // Override with command line argument or config file setting 'webservices-url'
 
 // Work around to disable SSL compression on Centos 5.5
 #ifndef SSL_OP_NO_COMPRESSION
@@ -86,57 +89,54 @@ const char SPACE = ' ';
 // This Macro is to be used to display output on the user's screen (in conjunction with the -v option)
 // Since logs can be sent to stderr or stdout at the direction of the user, using this macro avoids
 // send output messages to log files where users may not see them.
-// X is one or more stream manipulters
-#define screenOutput(x, verbosity)                                            \
-{                                                                             \
-   std::ostringstream message_mi_1;                                           \
-   message_mi_1 << x;                                                         \
-   std::string timeStamp = "";                                                \
-                                                                              \
-   if (global_verbosity > verbosity)                                          \
-   {                                                                          \
-      if (_addTimestamps)                                                     \
-      {                                                                       \
-         timeStamp = makeTimeStamp () + + " ";                                \
-      }                                                                       \
-                                                                              \
-      if (_logToStdErr || global_gtAgentMode)                                 \
-      {                                                                       \
-         std::cout << timeStamp << message_mi_1.str() << std::endl;           \
-         std::cout.flush ();                                                  \
-      }                                                                       \
-      else                                                                    \
-      {                                                                       \
-         std::cerr << timeStamp << message_mi_1.str() << std::endl;           \
-         std::cerr.flush ();                                                  \
-      }                                                                       \
-   }                                                                          \
-                                                                              \
-   if (GlobalLog &&                                                           \
-         (GlobalLog->get_fd() == -1 ||                                        \
-          GlobalLog->get_fd() > STDERR_FILENO))                               \
-   {                                                                          \
-      Log(PRIORITY_NORMAL, "%s", message_mi_1.str().c_str());                 \
-   }                                                                          \
+// messStream is one or more stream manipulters
+#define screenOutput(messStream, verbosity)                                                  \
+{                                                                                            \
+   std::ostringstream message_mi_1;                                                          \
+   message_mi_1 << messStream;                                                               \
+   std::string timeStamp = "";                                                               \
+                                                                                             \
+   if (message_mi_1.str().size())                                                            \
+   {                                                                                         \
+      if (global_verbosity > verbosity)                                                      \
+      {                                                                                      \
+         if (_addTimestamps)                                                                 \
+         {                                                                                   \
+            timeStamp = makeTimeStamp() + + " ";                                             \
+         }                                                                                   \
+                                                                                             \
+         if (_logToStdErr || global_gtAgentMode)                                             \
+         {                                                                                   \
+            std::cout << timeStamp << message_mi_1.str() << std::endl;                       \
+            std::cout.flush ();                                                              \
+         }                                                                                   \
+         else                                                                                \
+         {                                                                                   \
+            std::cerr << timeStamp << message_mi_1.str() << std::endl;                       \
+            std::cerr.flush();                                                               \
+         }                                                                                   \
+      }                                                                                      \
+                                                                                             \
+      if (GlobalLog && (GlobalLog->get_fd() == -1 || GlobalLog->get_fd() > STDERR_FILENO))   \
+      {                                                                                      \
+         Log (PRIORITY_NORMAL, "%s", message_mi_1.str().c_str());                            \
+      }                                                                                      \
+   }                                                                                         \
 }
 
-#define screenOutputNoNewLine(x)                                              \
-{                                                                             \
-   std::string timeStamp = "";                                                \
-                                                                              \
-   if (_addTimestamps)                                                        \
-   {                                                                          \
-      timeStamp = makeTimeStamp () + + " ";                                   \
-   }                                                                          \
-                                                                              \
-   if (_logToStdErr)                                                          \
-   {                                                                          \
-      std::cout << timeStamp << x;                                            \
-   }                                                                          \
-   else                                                                       \
-   {                                                                          \
-      std::cerr << timeStamp << x;                                            \
-   }                                                                          \
+#define screenOutputNoNewLine(messStream, verbosity)  \
+{                                                     \
+   if (global_verbosity > verbosity)                  \
+   {                                                  \
+      if (_logToStdErr)                               \
+      {                                               \
+         std::cout << messStream;                     \
+      }                                               \
+      else                                            \
+      {                                               \
+         std::cerr << messStream;                     \
+      }                                               \
+   }                                                  \
 }
 
 #endif /* GTDEFS_H_ */

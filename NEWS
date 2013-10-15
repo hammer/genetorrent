@@ -8,6 +8,38 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
+GeneTorrent 3.8.4
+*****************
+
+March 20, 2013
+
+Enhancements
+------------
+
+* Multiple MS Windows Build Fixes
+
+* Test Suite patches to prevent hanging when libraries are not found
+
+Bug Fixes
+---------
+
+* **[GTXFER-84]** GeneTorrent wrapper script defaults to gtserver if -d, -u, or -s not specified
+
+Known Issues
+------------
+
+* **[GTXFER-67]**  Peers that are banned for sending bad data seem to immediately reconnect and may send the same bad data again.  This may result in excess usage of system resources and bandwidth. *Carried over from previous release.*
+
+Build Information
+-----------------
+
+Unchanged from previous release.
+
+Installation/Upgrade Information
+--------------------------------
+
+Unchanged from previous release.
+
 GeneTorrent 3.8.3
 *****************
 

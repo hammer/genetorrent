@@ -31,7 +31,9 @@
 #ifndef GT_ZERO_STORAGE_H
 #define GT_ZERO_STORAGE_H
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/storage.hpp"
+#pragma GCC diagnostic error "-Wunused-parameter"
 
 TORRENT_EXPORT libtorrent::storage_interface* zero_storage_constructor(libtorrent::file_storage const& fs,
         libtorrent::file_storage const* mapped, std::string const& path, libtorrent::file_pool& fp,

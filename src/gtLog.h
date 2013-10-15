@@ -52,7 +52,7 @@
 // the line is prepended with the time, source file name, and source
 // file number; and (b) the text goes to wherever the log destination
 // is set to
-#define Log(lvl, fmt, ...) GlobalLog->__Log((lvl), __FILE__, __LINE__, (fmt), ## __VA_ARGS__)
+#define Log(lvl, fmt, ...) GlobalLog->__Log((lvl), (fmt), ## __VA_ARGS__)
 
 //  TODO, This is out of date
 // gtLogger parses the program's command line as follows:
@@ -84,10 +84,10 @@ enum gtLogLevel {
 class gtLogger 
 {
    public:
-      static bool create_globallog (std::string, std::string, int childID = 0);
+      static bool create_globallog (std::string, std::string, int childID = 0, std::string UUID = "");
       static void delete_globallog();
 
-      void __Log (gtLogLevel priority, const char *file, int line, const char *string, ...);
+      void __Log (gtLogLevel priority, const char *string, ...);
 
       const char *log_file_name() { return m_filename; }
       bool logToStdErr() { return m_mode == gtLoggerOutputStderr; }
@@ -103,7 +103,7 @@ class gtLogger
          gtLoggerOutputFile, 
       };
 
-      gtLogger (std::string progName, std::string log, int childID);
+      gtLogger (std::string progName, std::string log, int childID, std::string UUID);
       ~gtLogger();
 
       static int s_global_refcnt;
