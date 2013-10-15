@@ -221,16 +221,13 @@ CentOS/RHEL 5.x
 
 Dependencies that must be provided::
 
-    GeneTorrent package provides libboost and openssl libraries.
+    GeneTorrent package provides libboost, xerces, xqilla and openssl libraries.
 
 Min package set to build::
 
     gcc-c++
     pkgconfig
-    xerces-c-devel
     curl-devel
-    xqilla-devel
-    openssl-devel
     make
     rpm-build
     buildsys-macros

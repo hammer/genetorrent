@@ -32,7 +32,7 @@ Requires(pre):  shadow-utils
 
 BuildRequires:	openssl-devel
 %if "%{dist}" == ".el5.centos"
-BuildRequires:  xqilla-devel curl-devel
+BuildRequires:  curl-devel
 %endif
 %if "%{dist}" == ".el6"
 BuildRequires:  xqilla-devel libcurl-devel
@@ -69,19 +69,21 @@ BuildRequires:  libcurl-devel
 Summary:  Libraries and common files for %{name}
 Group:    Applications/Internet
 License:  BSD
-Requires: xerces-c openssl
 %if "%{dist}" == ".el5.centos"
 Requires: curl
-Requires: xqilla
 %global _has_custom_requires 1
 %endif
 %if 0%{?suse_version}
 Requires: libcurl4
+Requires: openssl
+Requires: xerces-c
 %global _has_custom_requires 1
 %endif
 %if 0%{!?_has_custom_requires:1}
+Requires: openssl
 Requires: libcurl
 Requires: xqilla
+Requires: xerces-c
 %endif
 Obsoletes: GeneTorrent
 
@@ -144,27 +146,31 @@ deps/xqilla/buildGeneTorrentXQilla.sh
 WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
 %endif
 
-# if centos5, must get and build openssl first
+# if centos5, must get and build openssl, xqilla and xerces-c first
 %if "%{dist}" == ".el5.centos"
 deps/openssl/buildGeneTorrentOpenSSL.sh
 WITH_OPENSSL="--with-openssl=${PWD}/deps/openssl"
+deps/xerces-c/buildGeneTorrentXerces-C.sh
+WITH_XERCES="--with-xerces=${PWD}/deps/xerces-c"
+deps/xqilla/buildGeneTorrentXQilla.sh
+WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
 %endif
 
 
 %if 0%{?suse_version}
 ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
     --docdir=%{_usr}/share/doc/packages/%{name} \
-    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XQILLA}
+    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
 %else
 ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} \
-    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XQILLA}
+    ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
 %endif
 
 make %{?_smp_mflags}
 
 %check
 %if %{_enable_check}
-LD_LIBRARY_PATH="/usr/local/boost-1.48.0/lib:${PWD}/deps/boost/lib:${PWD}/deps/openssl/lib:${PWD}/deps/xqilla/lib" \
+LD_LIBRARY_PATH="/usr/local/boost-1.48.0/lib:${PWD}/deps/boost/lib:${PWD}/deps/openssl/lib:${PWD}/deps/xerces-c/lib:${PWD}/deps/xqilla/lib" \
     make check
 %endif
 
