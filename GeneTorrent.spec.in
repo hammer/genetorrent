@@ -151,6 +151,8 @@ deps/xerces-c/buildGeneTorrentXerces-C.sh
 WITH_XERCES="--with-xerces=${PWD}/deps/xerces-c"
 WITH_XERCES="--with-xerces=${PWD}/deps/xerces-c" deps/xqilla/buildGeneTorrentXQilla.sh
 WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
+# work around http://cgredmine.cse.ucsc.edu/issues/3163
+%global make_args extra_CXXFLAGS=
 %endif
 
 %if 0%{?suse_version}
@@ -159,7 +161,7 @@ WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
    ./configure --prefix=/usr --sysconfdir=/etc --libdir=%{_libdir} --localstatedir=%{_localstatedir} ${WITH_BOOST} ${WITH_OPENSSL} ${WITH_XERCES} ${WITH_XQILLA}
 %endif
 
-make %{?_smp_mflags}
+make %{?_smp_mflags} %{?make_args}
 
 %check
 %if %{_enable_check}
