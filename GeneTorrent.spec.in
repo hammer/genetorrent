@@ -149,7 +149,7 @@ deps/openssl/buildGeneTorrentOpenSSL.sh
 WITH_OPENSSL="--with-openssl=${PWD}/deps/openssl"
 deps/xerces-c/buildGeneTorrentXerces-C.sh
 WITH_XERCES="--with-xerces=${PWD}/deps/xerces-c"
-WITH_XERCES="--with-xerces=${PWD}/deps/xerces-c" deps/xqilla/buildGeneTorrentXQilla.sh
+WITH_XERCES="${PWD}/deps/xerces-c" deps/xqilla/buildGeneTorrentXQilla.sh
 WITH_XQILLA="--with-xqilla=${PWD}/deps/xqilla"
 %endif
 

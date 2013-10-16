@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #  Copyright (c) 2012, Annai Systems, Inc.
 #  All rights reserved.
 #
