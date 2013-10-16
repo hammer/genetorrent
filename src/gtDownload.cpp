@@ -62,7 +62,11 @@
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wextra"
 #include <xqilla/xqilla-simple.hpp>
+#pragma GCC diagnostic error "-Wunused-parameter"
+#pragma GCC diagnostic error "-Wextra"
 
 #include <curl/curl.h>
 
