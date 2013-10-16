@@ -27,10 +27,6 @@ override_dh_auto_configure:
 	WITH_XERCES=${CURDIR}/deps/xerces-c deps/xqilla/buildGeneTorrentXQilla.sh
 	dh_auto_configure -- --with-boost=$(CURDIR)/deps/boost --with-xerces=$(CURDIR)/deps/xerces-c --with-xqilla=$(CURDIR)/deps/xqilla
 
-# work around http://cgredmine.cse.ucsc.edu/issues/3163
-override_dh_auto_build:
-	make extra_CXXFLAGS=
-
 override_dh_builddeb:
 	dh_builddeb --destdir=..
 
