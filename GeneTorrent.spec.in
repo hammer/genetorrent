@@ -228,6 +228,10 @@ fi
 %{_libdir}/%{name}/libssl.so.1.0.0
 %{_libdir}/%{name}/libcrypto.so
 %{_libdir}/%{name}/libcrypto.so.1.0.0
+%{_libdir}/%{name}/libxerces-c-3.1.so
+%{_libdir}/%{name}/libxerces-c.so
+%{_libdir}/%{name}/libxqilla.so.6
+%{_libdir}/%{name}/libxqilla.so.6.0.0
 %endif
 %if 0%{?suse_version}
 %{_libdir}/%{name}/libxqilla.so.6
