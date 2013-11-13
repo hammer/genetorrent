@@ -64,11 +64,11 @@ class gtDownload : public gtBase
       void prepareDownloadList ();
       void initiateCSR (std::string torrUUID, std::string torrFile, libtorrent::torrent_info &torrentInfo, std::string uri = "");
       void extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToDownload);
-      void spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces);
+      std::string spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces);
       void performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles);
       void performTorrentDownloadsByGTO (int64_t &totalBytes, int &totalFiles, int &totalGtos);
       void performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFiles, int &totalGtos);
-      int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd);
+      int downloadChild(int childID, int totalChildren, std::string torrentName, FILE *fd, std::string tempDlPath);
       int64_t getFreeDiskSpace ();
       bool downloadGTO (std::string uri, std::string fileName, std::string torrUUID, int retryCount, std::string destinationPath, bool exitOnMvError);
 };
