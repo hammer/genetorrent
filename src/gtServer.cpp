@@ -391,7 +391,6 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          }
          else
          {
-            screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".", VERBOSE_1);
             mapIter++;
          }
       }
