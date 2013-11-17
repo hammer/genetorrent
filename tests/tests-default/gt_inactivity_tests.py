@@ -87,7 +87,7 @@ class TestGeneTorrentInactivityTimeout(GTTestCase):
         os.remove(client_bam)
 
         client = GeneTorrentInstance( \
-            '-d %s/cghub/data/analysis/%s -p client -c %s ' \
+            '-d %s/cghub/data/analysis/%s -p client2 -c %s ' \
             '-k 1 -vv -l stdout:full -C . --ssl-no-verify-ca' \
             % (TestConfig.HUB_SERVER, str(uuid), self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)

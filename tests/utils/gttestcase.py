@@ -102,12 +102,14 @@ class GTTestCase(unittest.TestCase):
 
         try:
             rmtree('client')
+            rmtree('client2')
             rmtree('server')
         except OSError, e:
             if e.errno != errno.ENOENT:
                 raise
 
         os.makedirs('client')
+        os.makedirs('client2')
         os.makedirs('server' + os.path.sep + 'workdir')
         os.makedirs('server' + os.path.sep + 'root')
 
@@ -117,6 +119,7 @@ class GTTestCase(unittest.TestCase):
         if self.create_mockhub and TestConfig.MOCKHUB:
             self.mockhub.close()
         rmtree('client')
+        rmtree('client2')
         rmtree('server')
 
     def client_gto(self, uuid):
@@ -129,6 +132,13 @@ class GTTestCase(unittest.TestCase):
     def client_bam(self, uuid):
         return os.path.join(
             'client',
+            str(uuid),
+            str(uuid) + '.bam',
+        )
+
+    def client_bam2(self, uuid):
+        return os.path.join(
+            'client2',
             str(uuid),
             str(uuid) + '.bam',
         )
@@ -346,7 +356,7 @@ class GTTestCase(unittest.TestCase):
 
         # prepare download client
         client = GeneTorrentInstance('-d %s ' \
-            '-p client -c %s %s' \
+            '-p client2 -c %s %s' \
             % (
                 xml_file_name,
                 self.cred_filename,
@@ -369,7 +379,7 @@ class GTTestCase(unittest.TestCase):
         for uuid in uuids:
             if check_sha1 and TestConfig.MOCKHUB:
                 self.assertTrue(self.compare_hashes(
-                    self.client_bam(uuid), self.server_bam(uuid)))
+                    self.client_bam2(uuid), self.server_bam(uuid)))
 
         return client.returncode
 
@@ -410,7 +420,7 @@ class GTTestCase(unittest.TestCase):
 
         # prepare download client
         client = GeneTorrentInstance('-d %s/cghub/data/analysis/download/%s ' \
-            '-p client %s %s' \
+            '-p client2 %s %s' \
             % (
                 TestConfig.HUB_SERVER,
                 str(uuid),
@@ -441,7 +451,7 @@ class GTTestCase(unittest.TestCase):
             # check file hashes on both sides of transfer
             if servers and check_sha1:
                 self.assertTrue(self.compare_hashes(
-                    self.client_bam(uuid), self.server_bam(uuid)))
+                    self.client_bam2(uuid), self.server_bam(uuid)))
 
         return client.returncode
 
@@ -475,7 +485,7 @@ class GTTestCase(unittest.TestCase):
         else:
             self.upload_sleep(3)
 
-        client = GeneTorrentInstance('-d %s -p client -c %s %s' \
+        client = GeneTorrentInstance('-d %s -p client2 -c %s %s' \
             '--security-api %s' \
             % (
                 self.client_gto(uuid),
@@ -500,7 +510,7 @@ class GTTestCase(unittest.TestCase):
         # check file hashes on both sides of transfer
         if check_sha1 and TestConfig.MOCKHUB:
             self.assertTrue(self.compare_hashes(
-                self.client_bam(uuid), self.server_bam(uuid)))
+                self.client_bam2(uuid), self.server_bam(uuid)))
 
         return client.returncode
 
