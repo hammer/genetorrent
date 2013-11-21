@@ -460,6 +460,11 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    {
       gtError ("Encountered an error attempting to process the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
    }
+
+   if (urisToDownload.size() < 1)
+   {
+      gtError ("No valid URI's were found while processing the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
+   }
 }
 
 void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
