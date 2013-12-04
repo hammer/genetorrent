@@ -188,8 +188,6 @@ class gtBase
       void setTempDir ();
       void mkTempDir ();
       
-      void createDhParams();
- 
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);

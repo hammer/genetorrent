@@ -147,7 +147,7 @@ gtBase::gtBase (gtBaseOpts &opts, opMode mode):
    _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
    if (statFile (_dhParamsFile) != 0)
    {
-      createDhParams();
+      gtError ("Failure opening SSL DH Params file:  " + _dhParamsFile, 202, ERRNO_ERROR, errno);
    }
 
    OpenSSL_add_all_algorithms();
@@ -1573,29 +1573,4 @@ void gtBase::loadCredentialFile (std::string credsPathAndFile)
    }
 
    credFile.close ();
-}
-
-void gtBase::createDhParams ()
-{
-   std::ofstream pemFile;
-
-   _dhParamsFile = _tmpDir + "/" + DH_PARAMS_FILE;
-
-   pemFile.open (_dhParamsFile.c_str(), std::ofstream::out);
-
-   if (!pemFile.good ())
-   {
-      gtError ("Failure creating SSL DH Params file:  " + _dhParamsFile, 202, ERRNO_ERROR, errno);
-   }
-
-   try
-   {
-      pemFile << "-----BEGIN DH PARAMETERS-----\nMIGHAoGBAJILj1fhtye/+TpeFD2zyANzALr7kZPvUwBivS/wCB3pPJyzyd6oloH3\nopwVUM9NJoCbY2dUMbfZjFO/ZfPk+OmOdG8GE+Qo6atSk+5hYCtZ+ZpJseoMF6FP\nPPGrHJ4DmYsZOFwPO7mnJQAABqGufSC1AaFbUkrtrOXyX8V1HJzjAgEC\n-----END DH PARAMETERS-----\n";
-   }
-   catch (...)
-   {
-      gtError ("Failure writing to SSL DH Params file:  " + _dhParamsFile, 202);
-   }
-
-   pemFile.close();
 }

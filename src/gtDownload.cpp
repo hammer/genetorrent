@@ -370,7 +370,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
 // Returns the path to the .gto file that was downloaded.
 std::string gtDownload::downloadGtoFileByURI (std::string uri, std::string destinationPath, bool exitOnMoveFailure)
 {
-   screenOutput ("Communicating with GT Executive ...        ", VERBOSE_1);
+   screenOutput ("Communicating with GT Executive ...", VERBOSE_1);
 
    std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
    fileName = fileName.substr (0, fileName.find_first_of ('?'));
