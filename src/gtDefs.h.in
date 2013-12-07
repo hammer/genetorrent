@@ -47,10 +47,10 @@ const std::string GTO_FILE_EXTENSION = ".gto";
 const std::string RESUME_FILE_EXT = ".resume";
 const std::string PROGRESS_FILE_EXT = ".progress";
 
-#ifndef GT_DATADIR
-const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
+#ifndef GT_RESOURCEDIR
+const std::string RESOURCE_DIR_DEFAULT = "/usr/share/GeneTorrent";
 #else
-const std::string CONF_DIR_DEFAULT = GT_DATADIR;
+const std::string RESOURCE_DIR_DEFAULT = GT_REOURCEDIR;
 #endif
 
 const std::string CONF_DIR_LOCAL = "/local/share/GeneTorrent";

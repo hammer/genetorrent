@@ -61,7 +61,7 @@ class TestGeneTorrentInactivityTimeout(GTTestCase):
             'manifest-generated.xml',
         )
         client = GeneTorrentInstance('-u %s -p client -c %s ' \
-            '-k 1 -vv -l stdout:full -C . --ssl-no-verify-ca' \
+            '-k 1 -vv -l stdout:full -R . --ssl-no-verify-ca' \
             % (client_manifest, self.cred_filename), instance_type=InstanceType.GT_UPLOAD,
             add_defaults=False)
 
@@ -88,7 +88,7 @@ class TestGeneTorrentInactivityTimeout(GTTestCase):
 
         client = GeneTorrentInstance( \
             '-d %s/cghub/data/analysis/%s -p client2 -c %s ' \
-            '-k 1 -vv -l stdout:full -C . --ssl-no-verify-ca' \
+            '-k 1 -vv -l stdout:full -R . --ssl-no-verify-ca' \
             % (TestConfig.HUB_SERVER, str(uuid), self.cred_filename),
             instance_type=InstanceType.GT_DOWNLOAD, add_defaults=False)
 

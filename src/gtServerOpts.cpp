@@ -46,6 +46,10 @@ static const char usage_msg_hdr[] =
     "Type 'man gtserver' to view the manual page.\n"
 #endif /* __CYGWIN__ */
     "\n"
+    "Where:\n"
+    "\n"
+    "  <path>  server data path\n"
+    "\n"
     "Options"
     ;
 
@@ -55,7 +59,7 @@ static const char version_msg[] =
 
 gtServerOpts::gtServerOpts ():
     gtBaseOpts ("gtserver", usage_msg_hdr, version_msg, "SERVER"),
-    m_server_desc ("Server Options"),
+    m_server_desc (),
     m_serverDataPath (""),
     m_serverForceDownload (false),
     m_serverQueuePath (""),
@@ -67,8 +71,13 @@ gtServerOpts::gtServerOpts ():
 void
 gtServerOpts::add_options ()
 {
-    m_server_desc.add_options ()
+    boost::program_options::options_description server_desc;
+    server_desc.add_options ()
         (OPT_SERVER          ",s", opt_string(), "server data path")
+        ;
+    add_desc (server_desc, NOT_VISIBLE);
+
+    m_server_desc.add_options ()
         (OPT_QUEUE           ",q", opt_string(), "input GTO directory")
         (OPT_FOREGROUND,                         "run in the foreground (do not deamonize)")
         (OPT_PIDFILE,              opt_string(), "full path and filename of the process's pid (ignored when --" OPT_FOREGROUND " is active")

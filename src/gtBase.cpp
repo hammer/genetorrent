@@ -121,7 +121,7 @@ gtBase::gtBase (gtBaseOpts &opts, opMode mode):
 
    // Private members obtained from CLI or CFG.
    _bindIP (opts.m_bindIP),
-   _confDir (opts.m_confDir),
+   _resourceDir (opts.m_resourceDir),
    _exposedIP (opts.m_exposedIP),
    _logMask (opts.m_logMask),
    _peerTimeout (opts.m_peerTimeout)
@@ -144,7 +144,7 @@ gtBase::gtBase (gtBaseOpts &opts, opMode mode):
 
    _verbosityLevel = global_verbosity;
 
-   _dhParamsFile = _confDir + "/" + DH_PARAMS_FILE;
+   _dhParamsFile = _resourceDir + "/" + DH_PARAMS_FILE;
    if (statFile (_dhParamsFile) != 0)
    {
       gtError ("Failure opening SSL DH Params file:  " + _dhParamsFile, 202, ERRNO_ERROR, errno);

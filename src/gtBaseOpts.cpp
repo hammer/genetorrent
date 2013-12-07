@@ -57,7 +57,7 @@ bool global_gtAgentMode = false;
 gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr, std::string version_msg, std::string mode):
     m_progName (progName),
     m_vm (),
-    m_base_desc ("GeneTorrent Common Options"),
+    m_base_desc (),
     m_pos (),
     m_use_security_api_opt (true),
     m_use_alt_storage_opts (true),
@@ -69,14 +69,14 @@ gtBaseOpts::gtBaseOpts (std::string progName, std::string usage_msg_hdr, std::st
     m_mode (mode),
     m_all_desc ("All Options"),
     m_cfg_desc ("Config File Options"),
-    m_cli_desc ("CLI Only Options"),
+    m_cli_desc ("Command Line Only Options"),
     m_vis_desc (usage_msg_hdr),
 
     // Storage for processed option values
     m_addTimestamps (false),
     m_allowedServersSet (false),
     m_bindIP (""),
-    m_confDir (CONF_DIR_DEFAULT),
+    m_resourceDir (RESOURCE_DIR_DEFAULT),
     m_credentialPath (""),
     m_curlVerifySSL (true),
     m_exposedIP (""),
@@ -340,26 +340,11 @@ gtBaseOpts::add_desc (bpo::options_description &desc, bool is_visible,
 void
 gtBaseOpts::add_options ()
 {
-    m_cli_desc.add_options ()
-        (OPT_CFG_FILE,               opt_string(), "Path/file to optional config file.")
-        (OPT_HELP              ",h",               "Show help and exit.")
-        (OPT_VERBOSE_INCR      ",v", accumulator<int>(&global_verbosity),
-                                                   "Increase on screen verbosity level.")
-        (OPT_VERSION,                              "Show version and exit.")
-        ;
-    if (m_use_alt_storage_opts)
-    {
-        m_cli_desc.add_options ()
-            (OPT_NULL_STORAGE,                     "Enable use of null storage.")
-            (OPT_ZERO_STORAGE,                     "Enable use of zero storage.")
-            ;
-    }
-    add_desc (m_cli_desc, VISIBLE, CLI_ONLY);
-
     m_base_desc.add_options ()
         (OPT_BIND_IP           ",b", opt_string(), "Bind IP.")
         (OPT_CRED_FILE         ",c", opt_string(), "Path/file to credentials file.")
-        (OPT_CFG_DIR           ",C", opt_string(), "Full path to SSL configuration files.")
+        (OPT_CFG_DIR_DEPRECATED  ",C", opt_string(), "Deprecated use " OPT_RESOURCE_DIR ".")
+        (OPT_RESOURCE_DIR      ",R", opt_string(), "Full path to a directory containing static resource files (dhparam.pem).")
         (OPT_ADVERT_IP         ",e", opt_string(), "IP Address advertised.")
         (OPT_ADVERT_PORT       ",f", opt_int(),    "TCP Port advertised.")
         (OPT_INTERNAL_PORT     ",i", opt_string(), "Local IP port to bind on.")
@@ -395,8 +380,23 @@ gtBaseOpts::add_options ()
             (OPT_SECURITY_API,           opt_string(), "SSL Key Signing URL")
             ;
     }
-
     add_desc (m_base_desc);
+
+    m_cli_desc.add_options ()
+        (OPT_CFG_FILE,               opt_string(), "Path/file to optional config file.")
+        (OPT_HELP              ",h",               "Show help and exit.")
+        (OPT_VERBOSE_INCR      ",v", accumulator<int>(&global_verbosity),
+                                                   "Increase on screen verbosity level.")
+        (OPT_VERSION,                              "Show version and exit.")
+        ;
+    if (m_use_alt_storage_opts)
+    {
+        m_cli_desc.add_options ()
+            (OPT_NULL_STORAGE,                     "Enable use of null storage.")
+            (OPT_ZERO_STORAGE,                     "Enable use of zero storage.")
+            ;
+    }
+    add_desc (m_cli_desc, VISIBLE, CLI_ONLY);
 }
 
 /**
@@ -457,7 +457,8 @@ gtBaseOpts::processOptions ()
     processOption_Verbosity ();
     // processOption_Log ();
 
-    processOption_ConfDir ();
+    processOption_ConfDirDeprecated ();
+    processOption_ResourceDir ();
     processOption_CurlNoVerifySSL ();
     processOption_CredentialFile ();
     processOption_BindIP ();
@@ -493,28 +494,45 @@ gtBaseOpts::processOption_Timestamps ()
 }
 
 void
-gtBaseOpts::processOption_ConfDir ()
+gtBaseOpts::processOption_ConfDirDeprecated ()
+{
+    if (m_vm.count (OPT_CFG_DIR_DEPRECATED) == 1)
+    {
+        commandLineError (OPT_CFG_DIR_DEPRECATED " has been deprecated, use " OPT_RESOURCE_DIR " instead.");
+    }
+}
+
+void
+gtBaseOpts::processOption_ResourceDir ()
 {
 #ifdef __CYGWIN__
-    m_confDir = getWinInstallDirectory ();
+    m_resourceDir = getWinInstallDirectory ();
 #endif /* __CYGWIN__ */
 #ifdef __APPLE_CC__
-    m_confDir = CONF_DIR_LOCAL;
+    m_resourceDir = RESOURCE_DIR_OSX;
 #endif
 
-    if (m_vm.count (OPT_CFG_DIR) == 1)
+    if (m_vm.count (OPT_RESOURCE_DIR) == 1)
     {
-        m_confDir = sanitizePath (m_vm[OPT_CFG_DIR].as<std::string>());
+        m_resourceDir = sanitizePath (m_vm[OPT_RESOURCE_DIR].as<std::string>());
     }
-    else   // Option not present
+    else   // command line (or config file) option not present
     {
-        return;    
+        char *envValue = getenv ("GT_RESOURCE_DIR");
+
+        if (envValue != NULL)
+        {
+            m_resourceDir = sanitizePath (envValue) + "/";
+        }
+        else   // No environment variable for the resource path
+        {
+            return;
+        }
     }
 
-    if (statDirectory (m_confDir) != 0)
+    if (statDirectory (m_resourceDir) != 0)
     {
-        commandLineError ("unable to opening configuration directory '"
-                          + m_confDir + "'");
+        commandLineError ("unable to open resource directory '" + m_resourceDir + "'");
     }
 }
 

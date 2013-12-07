@@ -40,8 +40,9 @@
 #define OPT_VERSION                "version"
 #define OPT_CFG_FILE               "config-file"
 #define OPT_BIND_IP                "bind-ip"
-#define OPT_CFG_DIR                "config-dir"
 #define OPT_CRED_FILE              "credential-file"
+#define OPT_CFG_DIR_DEPRECATED     "config-dir"                 // Keep this around to give the user a nice error message
+#define OPT_RESOURCE_DIR           "resource-dir"
 #define OPT_ADVERT_IP              "advertised-ip"
 #define OPT_ADVERT_PORT            "advertised-port"
 #define OPT_INTERNAL_PORT          "internal-port"

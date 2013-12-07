@@ -47,6 +47,10 @@ static const char usage_msg_hdr[] =
     "Type 'man gtdownload' to view the manual page.\n"
 #endif /* __CYGWIN__ */
     "\n"
+    "Where:\n"
+    "\n"
+    "  <URI|UUID|.xml|.gto> Content type specifier (see the man page)\n"
+    "\n"
     "Options"
     ;
 
@@ -56,7 +60,7 @@ static const char version_msg[] =
 
 gtDownloadOpts::gtDownloadOpts ():
     gtBaseOpts ("gtdownload", usage_msg_hdr, version_msg, "DOWNLOAD"),
-    m_dl_desc ("Download Options"),
+    m_dl_desc (),
     m_maxChildren (8),
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
@@ -70,7 +74,7 @@ gtDownloadOpts::gtDownloadOpts ():
 gtDownloadOpts::gtDownloadOpts (std::string progName, std::string usage_hdr,
                                 std::string ver_msg, std::string mode):
     gtBaseOpts (progName, usage_hdr, ver_msg, mode),
-    m_dl_desc ("Download Options"),
+    m_dl_desc (),
     m_maxChildren (8),
     m_downloadSavePath (""),
     m_cliArgsDownloadList (),
@@ -84,9 +88,13 @@ void
 gtDownloadOpts::add_options ()
 {
     // Download options
+    boost::program_options::options_description dl_desc;
+    dl_desc.add_options ()
+        (OPT_DOWNLOAD            ",d", opt_vect_str()->composing())
+        ;
+    add_desc (dl_desc, NOT_VISIBLE, CLI_ONLY);
+
     m_dl_desc.add_options ()
-        (OPT_DOWNLOAD            ",d", opt_vect_str()->composing(),
-                                                     "<URI|UUID|.xml|.gto>")
         (OPT_MAX_CHILDREN,             opt_int(),    "number of download children")
         (OPT_WEBSERV_URL,           opt_string(),    "Full URL to Repository Web Services Interface")
         ;
