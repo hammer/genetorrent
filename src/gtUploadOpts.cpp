@@ -46,6 +46,10 @@ static const char usage_msg_hdr[] =
     "Type 'man gtupload' to view the manual page.\n"
 #endif /* __CYGWIN__ */
     "\n"
+    "Where:\n"
+    "\n"
+    "  <manifest-file>    Path to manifest.xml file.\n"
+    "\n"
     "Options"
     ;
 
@@ -55,7 +59,7 @@ static const char version_msg[] =
 
 gtUploadOpts::gtUploadOpts ():
     gtBaseOpts ("gtupload", usage_msg_hdr, version_msg, "UPLOAD"),
-    m_ul_desc ("Upload Options"),
+    m_ul_desc (),
     m_dataFilePath (""),
     m_manifestFile (""),
     m_uploadGTODir (""),
@@ -66,8 +70,13 @@ gtUploadOpts::gtUploadOpts ():
 void
 gtUploadOpts::add_options ()
 {
-    m_ul_desc.add_options ()
+    boost::program_options::options_description ul_desc;
+    ul_desc.add_options ()
         (OPT_UPLOAD            ",u", opt_string(), "Path to manifest.xml file.")
+        ;
+    add_desc (ul_desc, NOT_VISIBLE, CLI_ONLY);
+
+    m_ul_desc.add_options ()
         (OPT_UPLOAD_GTO_PATH,        opt_string(), "Writable path for .GTO file during"
                                                    " creation and transmission.")
         (OPT_GTO_ONLY,                             "Only generate GTO, don't start upload.")

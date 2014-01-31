@@ -92,6 +92,7 @@ libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
 
 libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                              -I$(top_srcdir)/libtorrent/include \
+                             -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                              $(extra_CXXFLAGS)
 
 libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
@@ -127,9 +128,9 @@ gtserver_SOURCES = gtMain.cpp   \
                    gtServer.cpp \
                    gtServerOpts.cpp
 
-GTdatadir = $(datadir)/GeneTorrent
+GTresourcedir = $(datadir)/GeneTorrent
 
-dist_GTdata_DATA = dhparam.pem
+dist_GTresource_DATA = dhparam.pem
 
 common_ldflags     = $(torrentrasterbar_LIBS) \
                       -Wl,-rpath,$(libdir)/GeneTorrent \
@@ -154,6 +155,7 @@ gtupload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
                     $(extra_CXXFLAGS) \
+                    -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                     -DGENETORRENT_UPLOAD
 
 gtupload_LDFLAGS = $(common_ldflags)
@@ -169,6 +171,7 @@ gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                       -I$(top_srcdir)/libtorrent/include \
                       $(extra_CXXFLAGS) \
+                      -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                       -DGENETORRENT_DOWNLOAD
 
 gtdownload_LDFLAGS = $(common_ldflags)
@@ -184,6 +187,7 @@ gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
                     $(extra_CXXFLAGS) \
+                    -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                     -DGENETORRENT_SERVER
 
 gtserver_LDFLAGS = $(common_ldflags)

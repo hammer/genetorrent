@@ -47,6 +47,7 @@ EXTRA_DIST =                     \
    GeneTorrent.nsi               \
    deps/builder_common		 \
    macosx/Distribution.xml       \
+   README.building               \
    solaris/pkginfo
 
 dist_doc_DATA =                  \

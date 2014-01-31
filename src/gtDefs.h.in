@@ -47,8 +47,13 @@ const std::string GTO_FILE_EXTENSION = ".gto";
 const std::string RESUME_FILE_EXT = ".resume";
 const std::string PROGRESS_FILE_EXT = ".progress";
 
-const std::string CONF_DIR_DEFAULT = "/usr/share/GeneTorrent";
-const std::string CONF_DIR_LOCAL = "/usr/local/share/GeneTorrent";
+#ifndef GT_RESOURCEDIR
+const std::string RESOURCE_DIR_DEFAULT = "/usr/share/GeneTorrent";
+#else
+const std::string RESOURCE_DIR_DEFAULT = GT_REOURCEDIR;
+#endif
+
+const std::string CONF_DIR_LOCAL = "/local/share/GeneTorrent";
 const std::string DEFAULT_PID_FILE = "/var/run/gtserver/gtserver.pid";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string PYTHON_TRUE = "TRUE";

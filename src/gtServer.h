@@ -64,7 +64,7 @@ class gtServer : public gtBase
       void processServerModeAlerts();
       void servedGtosMaintenance (time_t timeNow, std::set <std::string> &activeTorrents, bool shutdownFlag = false);
       bool isDownloadModeGetFromGTO (std::string torrentPathAndFileName);
-      bool addTorrentToServingList (std::string);
+      bool addTorrentToServingList (std::string, bool);
       gtBase::activeSessionRec *findSession ();
       void deleteGTOfromQueue (std::string fileName);
       libtorrent::session *addActiveSession ();

@@ -91,6 +91,8 @@ static char const* download_state_str[] = {
    "checking (r)"             // checking_resume_data
 };
 
+const std::string TEMP_DOWNLOAD_LOCATION = ".partial";
+
 extern void *geneTorrCallBackPtr; 
 
 gtDownload::gtDownload (gtDownloadOpts &opts, bool show_startup_message):
@@ -368,7 +370,7 @@ bool gtDownload::downloadGTO (std::string uri, std::string fileName, std::string
 // Returns the path to the .gto file that was downloaded.
 std::string gtDownload::downloadGtoFileByURI (std::string uri, std::string destinationPath, bool exitOnMoveFailure)
 {
-   screenOutput ("Communicating with GT Executive ...        ", VERBOSE_1);
+   screenOutput ("Communicating with GT Executive ...", VERBOSE_1);
 
    std::string fileName = uri.substr (uri.find_last_of ('/') + 1);
    fileName = fileName.substr (0, fileName.find_first_of ('?'));
@@ -458,6 +460,11 @@ void gtDownload::extractURIsFromXML (std::string xmlFileName, vectOfStr &urisToD
    {
       gtError ("Encountered an error attempting to process the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
    }
+
+   if (urisToDownload.size() < 1)
+   {
+      gtError ("No valid URI's were found while processing the file:  " + xmlFileName + ".  Review the contents of the file.", 97, gtBase::DEFAULT_ERROR, 0);
+   }
 }
 
 void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
@@ -496,7 +503,7 @@ void gtDownload::initiateCSR(std::string torrUUID, std::string torrFile,
    }
 }
 
-void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces)
+std::string gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentName, int num_pieces)
 {
     // TODO: It would be good to use a system call to determine how
     // many cores this machine has.  There shouldn't be more children
@@ -516,7 +523,15 @@ void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentNa
    uuid = uuid.substr (0, uuid.rfind ('.'));
    uuid = getFileName (uuid); 
 
+   std::string tempDownloadPath = "./" + uuid + TEMP_DOWNLOAD_LOCATION;
+
    if (statDirectory ("./" + uuid) == 0)
+   {
+      // The final directory exists, presume the download is complete.
+      return "";  // redmine #3095
+   }
+
+   if (statDirectory (tempDownloadPath) == 0)
    {
       _resumedDownload = true;
    }
@@ -538,9 +553,9 @@ void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentNa
       {
          close (pipes[childID][0]);
 
-         FILE *foo =  fdopen (pipes[childID][1], "w");
+         FILE *ipcFD =  fdopen (pipes[childID][1], "w");
 
-         downloadChild (childID, childrenThisGTO, torrentName, foo);
+         downloadChild (childID, childrenThisGTO, torrentName, ipcFD, tempDownloadPath);
          // Should never return from downloadChild().
       }
       else
@@ -581,6 +596,8 @@ void gtDownload::spawnDownloadChildren (childMap &pidList, std::string torrentNa
          pidListIter++;
       }
    }
+
+   return tempDownloadPath;
 }
 
 void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t &totalBytes, int &totalFiles)
@@ -610,7 +627,7 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
 
    childMap pidList;
 
-   spawnDownloadChildren(pidList, torrentName, torrentInfo.num_pieces());
+   std::string tempStoragePath = spawnDownloadChildren(pidList, torrentName, torrentInfo.num_pieces());
 
    int64_t xfer = 0;
    int64_t childXfer = 0;
@@ -741,6 +758,31 @@ void gtDownload::performSingleTorrentDownload (std::string torrentName, int64_t 
       totalXfer = totalDataDownloaded + xfer;
    }
 
+   std::string uuid = torrentName;
+   uuid = uuid.substr (0, uuid.rfind ('.'));
+   uuid = getFileName (uuid); 
+
+   // If we make it here, the transfer completed (or was previously completed), 
+   // if applicable, move it from the temp download area into the permanent storage area
+
+   if (tempStoragePath.size() > 0)
+   {
+      std::string sourcePath = tempStoragePath + "/" + uuid;
+      std::string destPath =  "./" + uuid;
+
+      if (rename (sourcePath.c_str(), destPath.c_str()) < 0)
+      {
+         gtError ("Unable to move " + sourcePath + " to " + destPath, 88, ERRNO_ERROR, errno);
+      }
+
+      int ret = rmdir (tempStoragePath.c_str());
+   
+      if (ret != 0)
+      {
+         gtError ("Unable to remove " + tempStoragePath, 88, ERRNO_ERROR, errno);
+      }
+   }
+
    totalBytes += totalDataDownloaded;
    totalFiles += numFilesDownloaded;
 }
@@ -796,7 +838,7 @@ void gtDownload::performTorrentDownloadsByURI (int64_t &totalBytes, int &totalFi
    }
 }
 
-int gtDownload::downloadChild (int childID, int totalChildren, std::string torrentName, FILE *fd)
+int gtDownload::downloadChild (int childID, int totalChildren, std::string torrentName, FILE *fd, std::string tempDownloadPath)
 {
    gtLogger::delete_globallog();
 
@@ -826,7 +868,7 @@ int gtDownload::downloadChild (int childID, int totalChildren, std::string torre
    }
 
    libtorrent::add_torrent_params torrentParams;
-   torrentParams.save_path = "./";
+   torrentParams.save_path = tempDownloadPath;
    torrentParams.allow_rfc1918_connections = true;
    torrentParams.auto_managed = false;
 
@@ -862,6 +904,19 @@ int gtDownload::downloadChild (int childID, int totalChildren, std::string torre
    {
       gtError (".gto processing problem", 217, TORRENT_ERROR, torrentError.value (), "", torrentError.message ());
    }
+
+/* This is broken in the current libtorrent (and the genetorrent based libtorrent) as of 11/12/13
+ * so I'm going to use a work around -- torrentParams.save_path
+ * then pull the data out of the temp location after all data is downloaded.  (DJN)
+
+   libtorrent::file_storage fileStorageDest = torrentParams.ti->files(); 
+
+std::cerr << "setting name to: " << (torrentParams.ti->name() + TEMP_DOWNLOAD_LOCATION) << std::endl;
+   fileStorageDest.set_name (torrentParams.ti->name() + TEMP_DOWNLOAD_LOCATION);
+
+   torrentParams.ti->remap_files (fileStorageDest);
+
+*/
 
    libtorrent::torrent_handle torrentHandle = torrentSession->add_torrent (torrentParams, torrentError);
 

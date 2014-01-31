@@ -118,7 +118,8 @@ private:
     void processOption_AllowedMode ();
     void processOption_AllowedServers ();
     void processOption_BindIP ();
-    void processOption_ConfDir ();
+    void processOption_ConfDirDeprecated ();
+    void processOption_ResourceDir ();
     void processOption_CredentialFile ();
     void processOption_CurlNoVerifySSL ();
     void processOption_InternalPort ();
@@ -143,7 +144,7 @@ public:
     bool m_addTimestamps;
     bool m_allowedServersSet;
     std::string m_bindIP;
-    std::string m_confDir;
+    std::string m_resourceDir;
     std::string m_credentialPath;
     std::string m_csrSigningUrl;
     bool m_curlVerifySSL;

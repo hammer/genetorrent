@@ -187,7 +187,7 @@ class gtBase
       void cleanupTmpDir();
       void setTempDir ();
       void mkTempDir ();
- 
+      
       void processUnimplementedAlert (bool haveError, libtorrent::alert *alrt);
       void processPeerNotification (bool haveError, libtorrent::alert *alrt);
       void processDebugNotification (bool haveError, libtorrent::alert *alrt);
@@ -235,7 +235,7 @@ class gtBase
 
    private:
       std::string _bindIP;
-      std::string _confDir;
+      std::string _resourceDir;
       std::string _exposedIP;
       uint32_t _logMask;           // bits are used to control which
                                    // messages classes are logged; bits

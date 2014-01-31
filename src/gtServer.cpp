@@ -196,6 +196,8 @@ void gtServer::run ()
       stopPathAndFile = "/tmp/" + SERVER_STOP_FILE;
    }
 
+   bool isStarting = true;
+
    while (1)
    {
       if (!statFile (stopPathAndFile.c_str())) //statFile returns -1 on error
@@ -216,13 +218,15 @@ void gtServer::run ()
 
          if (actTorrentIter == activeTorrentCollection.end ()) // gto is not in the set of active torrents
          {
-            if (addTorrentToServingList (*vectIter))  // Successfully added to a serving session
+            if (addTorrentToServingList (*vectIter, isStarting))  // Successfully added to a serving session
             {
                activeTorrentCollection.insert (*vectIter);
             }
          } 
          vectIter++;
       }
+
+      isStarting = false;
 
       time_t timeNow = time(NULL);      
 
@@ -391,7 +395,6 @@ void gtServer::servedGtosMaintenance (time_t timeNow, std::set <std::string> &ac
          }
          else
          {
-            screenOutput (std::setw (41) << getFileName (mapIter->first) << " Status: " << server_state_str[torrentStatus.state] << "  expires in approximately:  " <<  durationToStr(mapIter->second->expires - time (NULL)) << ".", VERBOSE_1);
             mapIter++;
          }
       }
@@ -442,7 +445,7 @@ bool gtServer::isDownloadModeGetFromGTO (std::string torrentPathAndFileName)
    return dlMode;       
 }
 
-bool gtServer::addTorrentToServingList (std::string pathAndFileName)
+bool gtServer::addTorrentToServingList (std::string pathAndFileName, bool startUpMode)
 {
    activeSessionRec *workSession = findSession ();
 
@@ -545,11 +548,19 @@ bool gtServer::addTorrentToServingList (std::string pathAndFileName)
    // will effectively DOS the tracker (looks like syn flood if N is
    // large, say 15K). Staggering the announcements with a delay
    // breaks the burstiness down into smaller groups.
-   static unsigned int stagger_announce_step = 0;
-   const boost::int64_t delay_step_ms = 500;
-   const int max_steps = 60; // gives max delay of 30s
-   newTorrRec->torrentHandle.resume (delay_step_ms * (stagger_announce_step % max_steps));
-   stagger_announce_step++;
+   // Nov 2013, update to apply delays only during startup
+   if (startUpMode)
+   {
+      static unsigned int stagger_announce_step = 0;
+      const boost::int64_t delay_step_ms = 500;
+      const int max_steps = 60; // gives max delay of 30s
+      newTorrRec->torrentHandle.resume (delay_step_ms * (stagger_announce_step % max_steps));
+      stagger_announce_step++;
+   }
+   else
+   {
+      newTorrRec->torrentHandle.resume(0);
+   }
 
    screenOutput ("adding " << getFileName (pathAndFileName) << " to files being served", VERBOSE_1);
 
