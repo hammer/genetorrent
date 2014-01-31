@@ -121,7 +121,11 @@ DEB_PACKAGE_VER = 2
 
 .PHONY: deb deb-builder deb-raring deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
 
-# Ubuntu raring (12.10)
+# Ubuntu saucy (13.10)
+deb-saucy:
+	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
+
+# Ubuntu raring (13.04)
 deb-raring:
 	$(MAKE) DEB_DISTRO_TAG=ubuntu${DEB_PACKAGE_VER}-${DEB_RELEASE} deb-builder
 
