@@ -119,9 +119,6 @@ if LINUX
 DEB_CODENAME := $(shell lsb_release -cs)
 DEB_RELEASE := $(shell lsb_release -rs)
 DEB_PACKAGE_VER = 2
-ifdef BUILD_VERSION
-DEB_PACKAGE_VER=$(DEB_PACKAGE_VER).$(BUILD_VERSION)
-endif
 
 .PHONY: deb deb-builder deb-raring deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
 
