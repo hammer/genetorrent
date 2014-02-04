@@ -823,7 +823,7 @@ void gtUpload::performGtoUpload (std::string torrentFileName, long previousProgr
 
       if (gtoFile != NULL)
       {
-         fprintf (gtoFile, "%ld", previousProgress + torrentStatus.total_payload_upload);
+         fprintf (gtoFile, "%" PRId64, previousProgress + torrentStatus.total_payload_upload);
          fclose (gtoFile);
       }
       else // log error and continue
