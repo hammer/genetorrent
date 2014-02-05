@@ -470,7 +470,21 @@ More notes on rebasing in Cygwin: If any of the DLLs used by GT are not rebased 
    Error:  fork() error  Additional Info:  Resource temporarily unavailable (errno = 11).
    
 
-Interestingly, the DLL that fails to load isn't necessarily the one that needs to be rebased in order to resolve the conflict. I guess it depends on the order in which conflicting DLLs are loaded. As of July 2011, Cygwin's rebase and rebaseall have the option to use a global database in which the individual DLL base addresses are recorded. You can display the current base addresses of all DLLs in the database with ``rebase -i -s``
+Interestingly, the DLL that fails to load isn't necessarily the one that needs to be rebased in
+order to resolve the conflict. I guess it depends on the order in which conflicting DLLs are
+loaded. As of July 2011, Cygwin's ``rebase`` and ``rebaseall`` utilities have the option to use a
+global database in which the individual DLL base addresses are recorded. You can display the
+current base addresses of all DLLs in the database with ``rebase -i -s``. If any of the lines end
+in a "*", there is going to be a conflict if the corresponding DLL is loaded into GT. The
+``rebaseall`` utility uses the database by default, so if you followed the instructions above to
+run ``rebaseall``, you will have populated that database. 
+
+Building GT yields GT and libtorrent DLLs that overlap other DLLs in the database. Interestingly,
+running ``rebase -s`` on them as a regular user still rebases those DLLs into a free address space,
+eliminating the conflict. This is surprising because 1) a regular user doesn't have the ability to
+modify the rebase database in ``/etc/rebase.*`` and 2) some DLLs referenced in the database will be
+in-use. Be it as it may, we exploit this effect in continuous integration builds thereby avoiding
+the need to run rebaseall as Administrator and without any cygwin processes running. The CI builds are run as a regular user over ssh and sshd is a cygwin process.
 
 Mac OS X 10.7+
 ==============
