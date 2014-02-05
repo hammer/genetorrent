@@ -346,9 +346,12 @@ GeneTorrent/Installer Build Requirements:
 - Windows 7 (32 or 64 bit)
 - Cygwin 1.7.16+ Full Install (or optionally, a base install with the packages below)
 - Nullsoft Scriptable Install System 2.46+ installed to C:\\Program Files\\NSIS or C:\\Program Files (x86)\\NSIS (corresponding to a 32- or 64-bit Installation)
-- XQilla: http://xqilla.sourceforge.net/HomePage
-- PyInstaller 2.0+ installed to C:\\PyInstaller 
-- Python 2.7+ for Windows installed with the python.exe binary in the PATH in the build environment
+- XQilla: http://xqilla.sourceforge.net/HomePage (built from source, see below)
+- Python 2.7+ for Windows (using the official MSI installer from python.org/getit). Make sure
+  C:\Python27;C:\Python27\Scripts is in PATH.
+- PyWin32 (needed for PyInstaller; install using EXE installer)
+- pip (via "python get_pip.py")
+- PyInstaller 2.1 installed with "pip install PyInstaller"
 
 Add to the default Cygwin install (and all dependencies)::
 
@@ -373,6 +376,11 @@ Add to the default Cygwin install (and all dependencies)::
     pkg-config  (latest)
     vim (latest)
     util-linux (latest)
+    libiconv & libiconv2 (1.14-2)
+
+See cygcheck.txt for a snapshot of the list of packages installed on a reference build host for Windows.
+
+Note: If you follow these instructions, you will end up with two Python's on your system: the cygwin one and the official one in C:\Python27. Both can be invoked from a cygwin shell: the cygwin one can be run as "python", the official one via "python.exe". Also not that running the official Python without any arguments in a Cygwin shell hangs instead of showing the interactive prompt. Get around this using "python.exe -i".
 
 Dependencies::
 
@@ -392,7 +400,8 @@ Build instructions
       mkdir $HOME/la_files
       mv /usr/lib/*.la $HOME/la_files
 
-  This may not be necessary in future versions of Cygwin.
+  This may not be necessary in future versions of Cygwin. But as of 2014/01 and Cygwin 1.7.27 it is
+  still needed.
 
 * Cygwin will download newer versions of DLLs when updating seemingly unrelated packages
   This may impact the NSIS windows install builder script 
@@ -406,6 +415,11 @@ Build instructions
 
       cd XQilla-2.3.0
       ./configure --prefix=/usr --with-xerces=/usr
+      make
+   
+   Run a Cygwin shell as Administrator and do::
+   
+      cd XQilla-2.3.0
       make install
 
 2. Configure and make GeneTorrent::
@@ -441,8 +455,7 @@ Build instructions
 
 5. Generate Windows installer.  From a command terminal, enter::
 	
-	cd \cysgwin\home\build\gentorrent
-	"C:\Program Files\NSIS\makensis.exe" GeneTorrent.nsi
+	make windows-installer
 
 This will package cgquery (python script) into an executable using PyInstaller 
 and then run the Nullsoft install builder.
@@ -450,6 +463,14 @@ The Windows installer is created by the Nullsoft Scritable Install System.  The
 script which generates the installer is in the root of the repository, called
 GeneTorrent.nsi(.in).  Adding or removing built files and/or external Cygwin
 libraries to/from the installer package is accomplished by editing this file.
+
+More notes on rebasing in Cygwin: If any of the DLLs used by GT are not rebased properly, you will get an error like this::
+
+        14 [main] gtdownload 5232 child_info_fork::abort: C:\cygwin\bin\cygasn1-8.dll: Loaded to different address: parent(0x2E0000) != child(0x4D0000)
+   Error:  fork() error  Additional Info:  Resource temporarily unavailable (errno = 11).
+   
+
+Interestingly, the DLL that fails to load isn't necessarily the one that needs to be rebased in order to resolve the conflict. I guess it depends on the order in which conflicting DLLs are loaded. As of July 2011, Cygwin's rebase and rebaseall have the option to use a global database in which the individual DLL base addresses are recorded. You can display the current base addresses of all DLLs in the database with ``rebase -i -s``
 
 Mac OS X 10.7+
 ==============
