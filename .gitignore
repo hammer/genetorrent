@@ -25,14 +25,11 @@ libtool
 /GeneTorrent.nsi
 /GeneTorrent-*.tar.gz
 /obj*
-
-# /autotools/
-/autotools/ltmain.sh
-/autotools/config.sub
-/autotools/py-compile
-/autotools/install-sh
-/autotools/depcomp
-/autotools/missing
+/Install-GeneTorrent-*.exe
+/autotools/
+/build/
+/cgquery.spec
+/dist
 
 # /deps/boost/
 /deps/boost/include
@@ -90,6 +87,14 @@ libtool
 /src/gtupload.1
 /src/stamp-h1
 /src/gt_scm_rev.h
+/src/gtDefs.h
+/src/gtdownload.exe
+/src/gtdownload_manual.txt
+/src/gtserver.exe
+/src/gtserver_manual.txt
+/src/gtupload.exe
+/src/gtupload_manual.txt
+/src/stamp-h2
 
 # /deps/xqilla/
 /deps/xqilla/XQilla-*
