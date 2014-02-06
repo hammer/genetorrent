@@ -53,7 +53,6 @@ const std::string RESOURCE_DIR_DEFAULT = "/usr/share/GeneTorrent";
 const std::string RESOURCE_DIR_DEFAULT = GT_RESOURCEDIR;
 #endif
 
-const std::string CONF_DIR_LOCAL = "/local/share/GeneTorrent";
 const std::string DEFAULT_PID_FILE = "/var/run/gtserver/gtserver.pid";
 const std::string DH_PARAMS_FILE = "dhparam.pem";
 const std::string PYTHON_TRUE = "TRUE";
