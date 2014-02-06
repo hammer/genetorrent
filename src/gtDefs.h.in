@@ -50,7 +50,7 @@ const std::string PROGRESS_FILE_EXT = ".progress";
 #ifndef GT_RESOURCEDIR
 const std::string RESOURCE_DIR_DEFAULT = "/usr/share/GeneTorrent";
 #else
-const std::string RESOURCE_DIR_DEFAULT = GT_REOURCEDIR;
+const std::string RESOURCE_DIR_DEFAULT = GT_RESOURCEDIR;
 #endif
 
 const std::string CONF_DIR_LOCAL = "/local/share/GeneTorrent";
