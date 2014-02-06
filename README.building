@@ -464,7 +464,10 @@ script which generates the installer is in the root of the repository, called
 GeneTorrent.nsi(.in).  Adding or removing built files and/or external Cygwin
 libraries to/from the installer package is accomplished by editing this file.
 
-More notes on rebasing in Cygwin: If any of the DLLs used by GT are not rebased properly, you will get an error like this::
+More notes on rebasing in Cygwin
+--------------------------------
+
+If any of the DLLs used by GT are not rebased properly, you will get an error like this::
 
         14 [main] gtdownload 5232 child_info_fork::abort: C:\cygwin\bin\cygasn1-8.dll: Loaded to different address: parent(0x2E0000) != child(0x4D0000)
    Error:  fork() error  Additional Info:  Resource temporarily unavailable (errno = 11).
@@ -485,6 +488,38 @@ eliminating the conflict. This is surprising because 1) a regular user doesn't h
 modify the rebase database in ``/etc/rebase.*`` and 2) some DLLs referenced in the database will be
 in-use. Be it as it may, we exploit this effect in continuous integration builds thereby avoiding
 the need to run rebaseall as Administrator and without any cygwin processes running. The CI builds are run as a regular user over ssh and sshd is a cygwin process.
+
+Gotchas
+-------
+
+ * Build complains about undefined IPV6_JOIN_GROUP and IPV6_LEAVE_GROUP symbols. This regression
+   seems to have been introduced very recently by [1].
+
+   [1] http://permalink.gmane.org/gmane.os.cygwin.cvs/7187
+
+   The following patch fixes that::
+
+      --- /usr/include/boost/asio/ip/multicast.hpp.orig	2013-01-21 20:29:55.000000000 -0800
+      +++ /usr/include/boost/asio/ip/multicast.hpp	2014-02-05 17:13:55.000000000 -0800
+      @@ -48,7 +48,7 @@
+       typedef implementation_defined join_group;
+       #else
+       typedef boost::asio::ip::detail::socket_option::multicast_request<
+      -  IPPROTO_IP, IP_ADD_MEMBERSHIP, IPPROTO_IPV6, IPV6_JOIN_GROUP> join_group;
+      +  IPPROTO_IP, IP_ADD_MEMBERSHIP, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP> join_group;
+       #endif
+ 
+       /// Socket option to leave a multicast group on a specified interface.
+      @@ -73,7 +73,7 @@
+       typedef implementation_defined leave_group;
+       #else
+       typedef boost::asio::ip::detail::socket_option::multicast_request<
+      -  IPPROTO_IP, IP_DROP_MEMBERSHIP, IPPROTO_IPV6, IPV6_LEAVE_GROUP> leave_group;
+      +  IPPROTO_IP, IP_DROP_MEMBERSHIP, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP> leave_group;
+       #endif
+ 
+       /// Socket option for local interface to use for outgoing multicast packets.
+
 
 Mac OS X 10.7+
 ==============
