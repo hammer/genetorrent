@@ -610,6 +610,8 @@ AM_CONDITIONAL([ENABLE_PYTHON_BINDING], [test "x$ARG_ENABLE_PYTHON_BINDING" = "x
 
 AM_CONDITIONAL([WITH_SHIPPED_GEOIP], [test "x$ARG_WITH_LIBGEOIP" = "xno" ])
 
+AM_CONDITIONAL([DARWIN],
+    [case $host_os in *darwin*) true;; *) false;; esac])
 
 ###############################################################################
 # Other useful stuff

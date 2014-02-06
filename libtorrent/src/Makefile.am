@@ -112,3 +112,7 @@ AM_CPPFLAGS = -ftemplate-depth-100 -I$(top_srcdir)/include @DEBUGFLAGS@ @OPENSSL
 #AM_LDFLAGS = $(LDFLAGS) @BOOST_SYSTEM_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_THREAD_LIB@ @OPENSSL_LDFLAGS@ @OPENSSL_LIBS@
 AM_LDFLAGS = @OPENSSL_LDFLAGS@
 
+if DARWIN
+# Prevent OpenSSL deprecations from spamming the build log
+CXXFLAGS += -Wno-deprecated-declarations
+endif
