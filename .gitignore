@@ -24,6 +24,7 @@ libtool
 /GeneTorrent.spec
 /GeneTorrent.nsi
 /GeneTorrent-*.tar.gz
+/GeneTorrent-*.pkg
 /obj*
 /Install-GeneTorrent-*.exe
 /autotools/
@@ -111,6 +112,7 @@ libtool
 # /macosx/
 /macosx/Distribution.xml
 /macosx/_install
+/macosx/GeneTorrent-*-Internal.pkg
 
 # /solaris/
 /solaris/pkginfo
