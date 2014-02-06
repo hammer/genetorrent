@@ -102,7 +102,8 @@ endif
 
 if CYGWIN
 windows-installer: all
-	find . -name '*.dll' | xargs rebase -s
+	-find . -name '*.dll' | xargs rebase -s -q
+	! ( rebase -s -i | grep '\*' )
 	pyinstaller --onefile ./scripts/cgquery
 	( test -e /cygdrive/c/Program\ Files && /cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi ) \
 	|| ( test -e /cygdrive/c/Program\ Files\ \(x86\) && /cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi )
