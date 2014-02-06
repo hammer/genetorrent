@@ -114,5 +114,5 @@ AM_LDFLAGS = @OPENSSL_LDFLAGS@
 
 if DARWIN
 # Prevent OpenSSL deprecations from spamming the build log
-CXXFLAGS += -Wno-deprecated-declarations
+AM_CPPFLAGS += -Wno-deprecated-declarations
 endif

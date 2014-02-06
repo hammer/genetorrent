@@ -32,30 +32,38 @@
 #
 ################################################################################
 
-noinst_HEADERS =                 \
-   gt_scm_rev.h                  \
-   accumulator.hpp               \
-   geneTorrentUtils.h            \
-   gtBase.h                      \
-   gtBaseOpts.h                  \
-   gtOptStrings.h                \
-   gtDefs.h                      \
-   gtDownload.h                  \
-   gtDownloadOpts.h              \
-   gtLog.h                       \
-   gtServer.h                    \
-   gtServerOpts.h                \
-   gtUpload.h                    \
-   gtUploadOpts.h                \
-   gtUtils.h                     \
-   gtNullStorage.h               \
-   gtZeroStorage.h               \
-   loggingmask.h                 \
+GTresourcedir = $(pkgdatadir)
+EXTRA_CXXFLAGS =
+EXTRA_CPPFLAGS = -DGT_RESOURCEDIR=\"$(GTresourcedir)\"
+
+if DARWIN
+EXTRA_CXXFLAGS += -Wno-deprecated-declarations -Wno-parentheses-equality
+endif
+
+noinst_HEADERS = \
+   gt_scm_rev.h \
+   accumulator.hpp \
+   geneTorrentUtils.h \
+   gtBase.h \
+   gtBaseOpts.h \
+   gtOptStrings.h \
+   gtDefs.h \
+   gtDownload.h \
+   gtDownloadOpts.h \
+   gtLog.h \
+   gtServer.h \
+   gtServerOpts.h \
+   gtUpload.h \
+   gtUploadOpts.h \
+   gtUtils.h \
+   gtNullStorage.h \
+   gtZeroStorage.h \
+   loggingmask.h \
    stringTokenizer.h
 
-boost_LIBS = $(BOOST_SYSTEM_LIB)          \
-             $(BOOST_FILESYSTEM_LIB)      \
-             $(BOOST_REGEX_LIB)           \
+boost_LIBS = $(BOOST_SYSTEM_LIB) \
+             $(BOOST_FILESYSTEM_LIB) \
+             $(BOOST_REGEX_LIB) \
              $(BOOST_PROGRAM_OPTIONS_LIB)
 
 if SOLARIS
@@ -69,10 +77,6 @@ endif
 torrentrasterbar_LIBS = $(torrentrasterbar_only_l) -L../libtorrent/src/.libs
 
 lib_LTLIBRARIES = libgenetorrent.la
-
-if DARWIN
-CXXFLAGS += -Wno-deprecated-declarations -Wno-parentheses-equality
-endif
 
 libgenetorrent_la_SOURCES = gtBase.cpp \
                             gtBaseOpts.cpp \
@@ -90,11 +94,12 @@ libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
                              $(LIBCURL_CPPFLAGS) \
                              $(OPENSSL_INCLUDES) \
                              $(XQILLA_INCLUDES) \
-                             $(XERCES_CPPFLAGS) 
+                             $(XERCES_CPPFLAGS) \
+                             $(EXTRA_CPPFLAGS)
 
 libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                              -I$(top_srcdir)/libtorrent/include \
-                             -DGT_REOURCEDIR=\"$(GTresourcedir)\"
+                             $(EXTRA_CXXFLAGS)
 
 libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -shared \
@@ -106,30 +111,28 @@ libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             $(XQILLA_LDFLAGS) \
                             $(XERCES_LDFLAGS)
 
-libgenetorrent_la_LIBADD = $(boost_LIBS)           \
-                           $(PTHREAD_LIBS)         \
-                           $(LIBCURL)              \
-                           $(OPENSSL_LIBS)         \
-                           $(XQILLA_LIBS)          \
+libgenetorrent_la_LIBADD = $(boost_LIBS) \
+                           $(PTHREAD_LIBS) \
+                           $(LIBCURL) \
+                           $(OPENSSL_LIBS) \
+                           $(XQILLA_LIBS) \
                            $(XERCES_LIBS)
 
 bin_SCRIPTS = 
 
-bin_PROGRAMS = gtupload    \
-               gtdownload  \
+bin_PROGRAMS = gtupload \
+               gtdownload \
                gtserver
 
-gtupload_SOURCES = gtMain.cpp   \
+gtupload_SOURCES = gtMain.cpp \
                    gtUpload.cpp \
                    gtUploadOpts.cpp
 
 gtdownload_SOURCES = gtMain.cpp
 
-gtserver_SOURCES = gtMain.cpp   \
+gtserver_SOURCES = gtMain.cpp \
                    gtServer.cpp \
                    gtServerOpts.cpp
-
-GTresourcedir = $(datadir)/GeneTorrent
 
 dist_GTresource_DATA = dhparam.pem
 
@@ -140,22 +143,23 @@ common_ldflags     = $(torrentrasterbar_LIBS) \
                       $(XQILLA_LDFLAGS) \
                       $(XERCES_LDFLAGS)
 
-common_ldadd      =  $(boost_LIBS)     \
-                     $(PTHREAD_LIBS)   \
-                     -lssl             \
-                     -lcrypto          \
+common_ldadd      =  $(boost_LIBS) \
+                     $(PTHREAD_LIBS) \
+                     -lssl \
+                     -lcrypto \
                      libgenetorrent.la \
-                     $(XQILLA_LIBS)    \
+                     $(XQILLA_LIBS) \
                      $(XERCES_LIBS)
 
-gtupload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+gtupload_CPPFLAGS = $(BOOST_CPPFLAGS) \
                     $(OPENSSL_INCLUDES) \
-                    $(XQILLA_INCLUDES)  \
-                    $(XERCES_CPPFLAGS)
+                    $(XQILLA_INCLUDES) \
+                    $(XERCES_CPPFLAGS) \
+                    $(EXTRA_CPPFLAGS)
 
 gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
-                    -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
+                    $(EXTRA_CXXFLAGS) \
                     -DGENETORRENT_UPLOAD
 
 gtupload_LDFLAGS = $(common_ldflags)
@@ -163,14 +167,15 @@ gtupload_LDFLAGS = $(common_ldflags)
 gtupload_LDADD = $(common_ldadd) \
                  $(LIBCURL)
 
-gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS) \
                       $(OPENSSL_INCLUDES) \
-                      $(XQILLA_INCLUDES)  \
-                      $(XERCES_CPPFLAGS)
+                      $(XQILLA_INCLUDES) \
+                      $(XERCES_CPPFLAGS) \
+                      $(EXTRA_CPPFLAGS)
 
 gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                       -I$(top_srcdir)/libtorrent/include \
-                      -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
+                      $(EXTRA_CXXFLAGS) \
                       -DGENETORRENT_DOWNLOAD
 
 gtdownload_LDFLAGS = $(common_ldflags)
@@ -178,14 +183,15 @@ gtdownload_LDFLAGS = $(common_ldflags)
 gtdownload_LDADD = $(common_ldadd) \
                    $(LIBCURL)
 
-gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
+gtserver_CPPFLAGS = $(BOOST_CPPFLAGS) \
                     $(OPENSSL_INCLUDES) \
-                    $(XQILLA_INCLUDES)  \
-                    $(XERCES_CPPFLAGS)
+                    $(XQILLA_INCLUDES) \
+                    $(XERCES_CPPFLAGS) \
+                    $(EXTRA_CPPFLAGS)
 
 gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
-                    -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
+                    $(EXTRA_CXXFLAGS) \
                     -DGENETORRENT_SERVER
 
 gtserver_LDFLAGS = $(common_ldflags)
@@ -193,21 +199,21 @@ gtserver_LDFLAGS = $(common_ldflags)
 gtserver_LDADD = $(common_ldadd) \
                  $(LIBCURL)
 
-dist_man_MANS = gtdownload.1  \
-                gtserver.1    \
+dist_man_MANS = gtdownload.1 \
+                gtserver.1 \
                 gtupload.1
 
-EXTRA_DIST = man_gtcommon.1         \
-             man_gtdownload.1       \
-             man_gtserver.1         \
-             man_gtupload.1         \
+EXTRA_DIST = man_gtcommon.1 \
+             man_gtdownload.1 \
+             man_gtserver.1 \
+             man_gtupload.1 \
              cacert.pem
 
-CLEANFILES = gtdownload.1           \
-             gtserver.1             \
-             gtupload.1             \
-             gtdownload_manual.txt  \
-             gtserver_manual.txt    \
+CLEANFILES = gtdownload.1 \
+             gtserver.1 \
+             gtupload.1 \
+             gtdownload_manual.txt \
+             gtserver_manual.txt \
              gtupload_manual.txt
 
 DISTCLEANFILES = GeneTorrent
