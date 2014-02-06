@@ -71,7 +71,7 @@ torrentrasterbar_LIBS = $(torrentrasterbar_only_l) -L../libtorrent/src/.libs
 lib_LTLIBRARIES = libgenetorrent.la
 
 if DARWIN
-extra_CXXFLAGS = -Wextra -Werror -Wno-deprecated-declarations
+extra_CXXFLAGS = -Wextra -Werror -Wno-deprecated-declarations -Wno-parentheses-equality
 else
 extra_CXXFLAGS = -Wextra -Werror
 endif
