@@ -54,19 +54,13 @@
 #include "libtorrent/entry.hpp"
 #include "libtorrent/bencode.hpp"
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/create_torrent.hpp"
-#pragma GCC diagnostic error "-Wunused-parameter"
 
 #include "libtorrent/peer_info.hpp"
 #include "libtorrent/ip_filter.hpp"
 #include "libtorrent/alert_types.hpp"
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wextra"
 #include <xqilla/xqilla-simple.hpp>
-#pragma GCC diagnostic error "-Wunused-parameter"
-#pragma GCC diagnostic error "-Wextra"
 
 #include <curl/curl.h>
 

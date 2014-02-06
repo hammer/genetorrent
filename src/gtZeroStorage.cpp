@@ -33,7 +33,6 @@
 using namespace libtorrent;
 
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 class zero_storage : public storage_interface
 {
 public:
@@ -92,4 +91,3 @@ storage_interface* zero_storage_constructor(file_storage const& fs,
   return new zero_storage;
 }
 
-#pragma GCC diagnostic error "-Wunused-parameter"

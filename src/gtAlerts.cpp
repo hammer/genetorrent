@@ -39,9 +39,7 @@
 
 #include "gt_config.h"
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <libtorrent/alert_types.hpp>
-#pragma GCC diagnostic error "-Wunused-parameter"
 
 #include "gtBase.h"
 #include "gtLog.h"

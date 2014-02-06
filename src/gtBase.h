@@ -49,9 +49,7 @@
 
 #include <curl/curl.h>
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "libtorrent/session.hpp"
-#pragma GCC diagnostic error "-Wunused-parameter"
 #include "libtorrent/fingerprint.hpp"
 #include "libtorrent/alert_types.hpp"
 #include "libtorrent/ip_filter.hpp"

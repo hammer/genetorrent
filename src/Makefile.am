@@ -71,9 +71,7 @@ torrentrasterbar_LIBS = $(torrentrasterbar_only_l) -L../libtorrent/src/.libs
 lib_LTLIBRARIES = libgenetorrent.la
 
 if DARWIN
-extra_CXXFLAGS = -Wextra -Werror -Wno-deprecated-declarations -Wno-parentheses-equality
-else
-extra_CXXFLAGS = -Wextra -Werror
+CXXFLAGS += -Wno-deprecated-declarations -Wno-parentheses-equality
 endif
 
 libgenetorrent_la_SOURCES = gtBase.cpp \
@@ -96,8 +94,7 @@ libgenetorrent_la_CPPFLAGS = $(BOOST_CPPFLAGS) \
 
 libgenetorrent_la_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                              -I$(top_srcdir)/libtorrent/include \
-                             -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
-                             $(extra_CXXFLAGS)
+                             -DGT_REOURCEDIR=\"$(GTresourcedir)\"
 
 libgenetorrent_la_LDFLAGS = -version-info 0:0:0 \
                             -shared \
@@ -158,7 +155,6 @@ gtupload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 
 gtupload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
-                    $(extra_CXXFLAGS) \
                     -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                     -DGENETORRENT_UPLOAD
 
@@ -174,7 +170,6 @@ gtdownload_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 
 gtdownload_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                       -I$(top_srcdir)/libtorrent/include \
-                      $(extra_CXXFLAGS) \
                       -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                       -DGENETORRENT_DOWNLOAD
 
@@ -190,7 +185,6 @@ gtserver_CPPFLAGS = $(BOOST_CPPFLAGS)   \
 
 gtserver_CXXFLAGS = $(torrentrasterbar_CXXFLAGS) \
                     -I$(top_srcdir)/libtorrent/include \
-                    $(extra_CXXFLAGS) \
                     -DGT_REOURCEDIR=\"$(GTresourcedir)\" \
                     -DGENETORRENT_SERVER
 
