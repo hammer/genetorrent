@@ -508,9 +508,6 @@ gtBaseOpts::processOption_ResourceDir ()
 #ifdef __CYGWIN__
     m_resourceDir = getWinInstallDirectory ();
 #endif /* __CYGWIN__ */
-#ifdef __APPLE_CC__
-    m_resourceDir = RESOURCE_DIR_OSX;
-#endif
 
     if (m_vm.count (OPT_RESOURCE_DIR) == 1)
     {
