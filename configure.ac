@@ -198,5 +198,7 @@ AC_CONFIG_SUBDIRS(
    [libtorrent]
 )
 
+AC_CONFIG_COMMANDS([gt_scm_rev.h], [scripts/scm-rev-update])
+
 AC_OUTPUT
 

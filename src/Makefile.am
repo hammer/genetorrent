@@ -242,9 +242,6 @@ if CYGWIN
 	MANWIDTH=80 man -P cat ./$@ | col -b | unix2dos > GeneTorrent_manual.txt
 endif
 
-gt_scm_rev.h:
-	@cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
-
 .PHONY: mkdir_darwin_rpath
 mkdir_darwin_rpath:
 if DARWIN
@@ -252,9 +249,4 @@ if DARWIN
 	$(MKDIR_P) $(libdir)/GeneTorrent
 endif
 
-.PHONY: check_scm_revision
-check_scm_revision:
-	@echo "  CHECK  gt_scm_rev.h"
-	@cd $(abs_top_srcdir) && $(abs_top_srcdir)/scripts/scm-rev-update
-
-all: mkdir_darwin_rpath check_scm_revision
+all: mkdir_darwin_rpath
