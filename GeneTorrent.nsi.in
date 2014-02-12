@@ -9,7 +9,7 @@
 Name "GeneTorrent @PACKAGE_VERSION@"
 
 ; The file to write
-OutFile "Install-GeneTorrent-@PACKAGE_VERSION@.exe"
+OutFile ${NSIS_OUTFILE}
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\GeneTorrent

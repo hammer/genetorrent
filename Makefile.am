@@ -102,11 +102,15 @@ endif
 
 if CYGWIN
 windows-installer: all
-	-find . -name '*.dll' | xargs rebase -s -q
-	! ( rebase -s -i | grep '\*' )
+	find . -name '*.dll' | xargs rebase -s
 	pyinstaller --onefile ./scripts/cgquery
-	( test -e /cygdrive/c/Program\ Files && /cygdrive/c/Program\ Files/NSIS/makensis.exe GeneTorrent.nsi ) \
-	|| ( test -e /cygdrive/c/Program\ Files\ \(x86\) && /cygdrive/c/Program\ Files\ \(x86\)/NSIS/makensis.exe GeneTorrent.nsi )
+	IFS=$$'\n'; \
+		makensis="$$(echo /cygdrive/c/Program\ Files*/NSIS/makensis.exe)"; \
+		test -f "$$makensis" && test -x "$$makensis"; \
+		nsis_outfile="Install-GeneTorrent-$(PACKAGE_VERSION)"; \
+		test -n "$(BUILD_VERSION)" && nsis_outfile="$${nsis_outfile}-$(BUILD_VERSION)"; \
+		nsis_outfile="$${nsis_outfile}.exe"; \
+		"$$makensis" /DNSIS_OUTFILE=$${nsis_outfile} GeneTorrent.nsi
 endif
 
 if LINUX
