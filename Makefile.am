@@ -58,7 +58,7 @@ dist_doc_DATA =                  \
 if LINUX
 # These can be overridden on the make command line.
 DISABLE_RPM_CHECK = no
-BUILD_VERSION =
+BUILD_NUMBER =
 WITH_BOOST =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
 
@@ -89,8 +89,8 @@ rpmbuild-internal:
 	$(MKDIR_P) $(RPMBUILDDIR)/BUILD
 	$(MKDIR_P) $(RPMBUILDDIR)/SOURCES
 	IFS=$$'\n'; \
-		if [ -n "$(BUILD_VERSION)" ]; then \
-			DEF_BLD_VER=--define='build_version $(BUILD_VERSION)'; fi; \
+		if [ -n "$(BUILD_NUMBER)" ]; then \
+			DEF_BLD_VER=--define='build_version $(BUILD_NUMBER)'; fi; \
 		if [ -n "$(WITH_BOOST)" ]; then \
 			DEF_WITH_BOOST=--define='_with_boost $(WITH_BOOST)'; fi; \
 		set -x; \
@@ -108,7 +108,7 @@ windows-installer: all
 		makensis="$$(echo /cygdrive/c/Program\ Files*/NSIS/makensis.exe)"; \
 		test -f "$$makensis" && test -x "$$makensis"; \
 		nsis_outfile="$(PACKAGE)-$(VERSION)"; \
-		test -n "$(BUILD_VERSION)" && nsis_outfile="$${nsis_outfile}-$(BUILD_VERSION)"; \
+		test -n "$(BUILD_NUMBER)" && nsis_outfile="$${nsis_outfile}-$(BUILD_NUMBER)"; \
 		nsis_outfile="$${nsis_outfile}-installer.exe"; \
 		"$$makensis" /DNSIS_OUTFILE=$${nsis_outfile} GeneTorrent.nsi
 endif
@@ -124,7 +124,7 @@ if LINUX
 
 DEB_CODENAME := $(shell lsb_release -cs)
 DEB_RELEASE := $(shell lsb_release -rs)
-DEB_PACKAGE_VER = 2$(if $(BUILD_VERSION),.$(BUILD_VERSION),)
+DEB_PACKAGE_VER = 2$(if $(BUILD_NUMBER),.$(BUILD_NUMBER),)
 
 .PHONY: deb deb-builder deb-saucy deb-raring deb-precise deb-quantal deb-oneiric deb-lucid deb-squeeze
 
@@ -222,7 +222,7 @@ macosx:
 	@echo "  Building package"
 	set -e; cd macosx; \
 		pkgname="$(PACKAGE)-$(VERSION)"; \
-		test -n "$(BUILD_VERSION)" && pkgname="$${pkgname}-$(BUILD_VERSION)"; \
+		test -n "$(BUILD_NUMBER)" && pkgname="$${pkgname}-$(BUILD_NUMBER)"; \
 		pkgname="$${pkgname}.pkg"; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
 			--root $(MACDIR) "$${pkgname}"; \
