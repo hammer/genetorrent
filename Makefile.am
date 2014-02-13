@@ -104,10 +104,10 @@ if CYGWIN
 windows-installer: all
 	find . -name '*.dll' | xargs rebase -s
 	pyinstaller --onefile ./scripts/cgquery
-	IFS=$$'\n'; \
+	set -e ; \
 		makensis="$$(echo /cygdrive/c/Program\ Files*/NSIS/makensis.exe)"; \
 		test -f "$$makensis" && test -x "$$makensis"; \
-		nsis_outfile="Install-GeneTorrent-$(PACKAGE_VERSION)"; \
+		nsis_outfile="$(PACKAGE)-$(VERSION)"; \
 		test -n "$(BUILD_VERSION)" && nsis_outfile="$${nsis_outfile}-$(BUILD_VERSION)"; \
 		nsis_outfile="$${nsis_outfile}.exe"; \
 		"$$makensis" /DNSIS_OUTFILE=$${nsis_outfile} GeneTorrent.nsi
