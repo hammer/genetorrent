@@ -88,7 +88,7 @@ rpmbuild-internal:
 	$(MKDIR_P) $(RPMBUILDDIR)/SPECS
 	$(MKDIR_P) $(RPMBUILDDIR)/BUILD
 	$(MKDIR_P) $(RPMBUILDDIR)/SOURCES
-	IFS=$$'\n'; \
+	set -e; IFS=$$'\n'; \
 		if [ -n "$(BUILD_NUMBER)" ]; then \
 			DEF_BLD_VER=--define='build_version $(BUILD_NUMBER)'; fi; \
 		if [ -n "$(WITH_BOOST)" ]; then \
