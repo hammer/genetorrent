@@ -17,7 +17,7 @@ then
 #ifndef GT_SCM_REV_H
 #define GT_SCM_REV_H
 
-#define GT_SCM_REV_STR "git ref: $SHA1"
+#define GT_SCM_REV_STR "git ref: $SHA1, build: ${BUILD_NUMBER:-undefined}"
 
 #endif /* GT_SCM_REV_H */
 EOF
