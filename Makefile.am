@@ -58,7 +58,6 @@ dist_doc_DATA =                  \
 if LINUX
 # These can be overridden on the make command line.
 DISABLE_RPM_CHECK = no
-BUILD_NUMBER =
 WITH_BOOST =
 RPMBUILDDIR = $(abs_top_builddir)/rpmbuild
 
