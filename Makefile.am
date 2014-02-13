@@ -220,13 +220,15 @@ macosx:
 	rm -rf $(MACDIR)${prefix}/share/man/man1/gtserver.1
 	rm -rf $(MACDIR)${prefix}/bin/cgsubmit
 	@echo "  Building package"
-	@set -e; cd macosx; \
+	set -e; cd macosx; \
+		pkgname="$(PACKAGE)-$(VERSION)"; \
+		test -n "$(BUILD_VERSION)" && pkgname="$${pkgname}-$(BUILD_VERSION)"; \
+		pkgname="$${pkgname}.exe"; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
-		--root $(MACDIR) "$(PACKAGE)-$(VERSION)-Internal.pkg";	\
+			--root $(MACDIR) "$${pkgname}"; \
 	productbuild --distribution Distribution.xml 			\
 		--resources=_install/usr/local/share/doc/GeneTorrent 		\
-		$(PACKAGE)-$(VERSION).pkg;				\
-	mv $(PACKAGE)-$(VERSION).pkg ..;				\
+			"../$${pkgname}"; \
 	cd -
 endif
 
