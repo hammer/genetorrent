@@ -223,7 +223,7 @@ macosx:
 	set -e; cd macosx; \
 		pkgname="$(PACKAGE)-$(VERSION)"; \
 		test -n "$(BUILD_VERSION)" && pkgname="$${pkgname}-$(BUILD_VERSION)"; \
-		pkgname="$${pkgname}.exe"; \
+		pkgname="$${pkgname}.pkg"; \
 	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
 			--root $(MACDIR) "$${pkgname}"; \
 	productbuild --distribution Distribution.xml 			\
