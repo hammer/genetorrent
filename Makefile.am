@@ -109,7 +109,7 @@ windows-installer: all
 		test -f "$$makensis" && test -x "$$makensis"; \
 		nsis_outfile="$(PACKAGE)-$(VERSION)"; \
 		test -n "$(BUILD_VERSION)" && nsis_outfile="$${nsis_outfile}-$(BUILD_VERSION)"; \
-		nsis_outfile="$${nsis_outfile}.exe"; \
+		nsis_outfile="$${nsis_outfile}-installer.exe"; \
 		"$$makensis" /DNSIS_OUTFILE=$${nsis_outfile} GeneTorrent.nsi
 endif
 
