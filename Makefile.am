@@ -27,32 +27,32 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = libtorrent     \
-          src            \
-          deps/boost     \
-          deps/openssl   \
-          deps/xqilla    \
-          deps/xerces-c  \
-          scripts        \
-          init.d         \
-          tests          \
-          sysconfig      \
+SUBDIRS = libtorrent \
+          src \
+          deps/boost \
+          deps/openssl \
+          deps/xqilla \
+          deps/xerces-c \
+          scripts \
+          init.d \
+          tests \
+          sysconfig \
           dpkg
 
-EXTRA_DIST =                     \
-   LICENSE                       \
-   libtorrent/configure.gnu      \
-   GeneTorrent.spec              \
-   autogen.sh                    \
-   GeneTorrent.nsi               \
-   deps/builder_common		 \
-   macosx/Distribution.xml       \
-   README.building               \
+EXTRA_DIST = \
+   LICENSE \
+   libtorrent/configure.gnu \
+   GeneTorrent.spec \
+   autogen.sh \
+   GeneTorrent.nsi \
+   deps/builder_common \
+   macosx/Distribution.xml \
+   README.building \
    solaris/pkginfo
 
-dist_doc_DATA =                  \
-   LICENSE                       \
-   README                        \
+dist_doc_DATA = \
+   LICENSE \
+   README \
    NEWS
 
 if LINUX
@@ -103,7 +103,7 @@ if CYGWIN
 windows-installer: all
 	find . -name '*.dll' | xargs rebase -s
 	pyinstaller --onefile ./scripts/cgquery
-	set -e ; \
+	set -e; IFS=$$'\n'; \
 		makensis="$$(echo /cygdrive/c/Program\ Files*/NSIS/makensis.exe)"; \
 		test -f "$$makensis" && test -x "$$makensis"; \
 		nsis_outfile="$(PACKAGE)-$(VERSION)"; \
@@ -179,31 +179,31 @@ endif
 
 if DARWIN
 MACDIR = $(PWD)/macosx/_install
-MACDEPLIBS :=	libboost_filesystem.dylib	\
-		libboost_program_options.dylib	\
-		libboost_regex.dylib		\
-		libboost_system.dylib		\
-		libboost_thread.dylib		\
-		libxerces-c-3.1.dylib		\
+MACDEPLIBS :=	libboost_filesystem.dylib \
+		libboost_program_options.dylib \
+		libboost_regex.dylib \
+		libboost_system.dylib \
+		libboost_thread.dylib \
+		libxerces-c-3.1.dylib \
 		libxqilla.6.dylib
 
 .PHONY: macosx
 macosx:
 	test "${prefix}" = "/usr/local" || (echo "Prefix must be /usr/local" && exit 1)
 	@echo "  Fixing library install names"
-	@set -e; for lib in $(MACDEPLIBS) 					\
-		; do								\
-		libpath=`find $(top_srcdir)/deps/*/lib -name $${lib} -type f`;	\
-		install_name_tool -id @rpath/$${lib} $${libpath}; 		\
-	done
+	set -e; IFS=$$'\n'; \
+		for lib in $(MACDEPLIBS); do \
+			libpath=`find $(top_srcdir)/deps/*/lib -name $${lib} -type f`; \
+			install_name_tool -id @rpath/$${lib} $${libpath}; \
+		done
 	install_name_tool -change libboost_system.dylib @rpath/libboost_system.dylib \
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib
 	install_name_tool -add_rpath /usr/local/lib/GeneTorrent \
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib || true
-	@set -e; \
+	set -e; IFS=$$'\n'; \
 		xerces_install_name=$$(otool -L $(top_srcdir)/deps/xqilla/lib/libxqilla.dylib | \
-			$(GREP) xerces | cut -d' ' -f1 | head -1); 				\
-		install_name_tool -change $${xerces_install_name} @rpath/libxerces-c-3.1.dylib 	\
+			$(GREP) xerces | cut -d' ' -f1 | head -1); \
+		install_name_tool -change $${xerces_install_name} @rpath/libxerces-c-3.1.dylib \
 			$(top_srcdir)/deps/xqilla/lib/libxqilla.dylib
 	@echo "  Building for Mac OS X"
 	rm -rf $(MACDIR)
@@ -219,14 +219,15 @@ macosx:
 	rm -rf $(MACDIR)${prefix}/share/man/man1/gtserver.1
 	rm -rf $(MACDIR)${prefix}/bin/cgsubmit
 	@echo "  Building package"
-	set -e; cd macosx; \
+	set -e; IFS=$$'\n'; \
+		cd macosx; \
 		pkgname="$(PACKAGE)-$(VERSION)"; \
 		test -n "$(BUILD_NUMBER)" && pkgname="$${pkgname}-$(BUILD_NUMBER)"; \
 		pkgname="$${pkgname}.pkg"; \
-	pkgbuild --identifier edu.ucsc.cghub.genetorrent 		\
+	pkgbuild --identifier edu.ucsc.cghub.genetorrent \
 			--root $(MACDIR) "$${pkgname}"; \
-	productbuild --distribution Distribution.xml 			\
-		--resources=_install/usr/local/share/doc/GeneTorrent 		\
+	productbuild --distribution Distribution.xml \
+		--resources=_install/usr/local/share/doc/GeneTorrent \
 			"../$${pkgname}"; \
 	cd -
 endif
@@ -244,9 +245,10 @@ solaris-pkg:
 	@echo "  Removing previous package"
 	rm -rf solaris/genetorrent
 	@echo "  Building package"
-	@set -e; cd solaris; \
-		pkgmk -o -r $(SOLARISDIR) -a $(SOLARISARCH) -d . -f Prototype; \
-		tar -cfz $(PACKAGE)-$(VERSION).solaris11.$(SOLARISARCH).pkg.tgz genetorrent; \
-		cd -
+	set -e; IFS=$$'\n'; \
+		 cd solaris; \
+		 pkgmk -o -r $(SOLARISDIR) -a $(SOLARISARCH) -d . -f Prototype; \
+		 tar -cfz $(PACKAGE)-$(VERSION).solaris11.$(SOLARISARCH).pkg.tgz genetorrent; \
+		 cd -
 endif
 
