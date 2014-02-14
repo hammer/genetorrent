@@ -222,13 +222,12 @@ macosx:
 	set -e; IFS=$$'\n'; \
 		cd macosx; \
 		pkgname="$(PACKAGE)-$(VERSION)"; \
+		pkgbuild --identifier edu.ucsc.cghub.genetorrent \
+			--root $(MACDIR) $${pkgname}-Internal.pkg; \
 		test -n "$(BUILD_NUMBER)" && pkgname="$${pkgname}-$(BUILD_NUMBER)"; \
-		pkgname="$${pkgname}.pkg"; \
-	pkgbuild --identifier edu.ucsc.cghub.genetorrent \
-			--root $(MACDIR) "$${pkgname}"; \
-	productbuild --distribution Distribution.xml \
-		--resources=_install/usr/local/share/doc/GeneTorrent \
-			"../$${pkgname}"; \
+		productbuild --distribution Distribution.xml \
+			--resources=_install/usr/local/share/doc/GeneTorrent \
+			"../$${pkgname}.pkg"; \
 	cd -
 endif
 
