@@ -43,6 +43,9 @@ BuildRequires:  xqilla-devel libcurl-devel
 %if 0%{?suse_version}
 BuildRequires:  libcurl-devel
 %endif
+%if 0%{?fedora} >= 17
+BuildRequires:  boost-devel
+%endif
 
 # This prevents binaries from being stripped of their debug bits by rpmbuild
 %define __spec_install_post /usr/lib/rpm/brp-compress
@@ -85,6 +88,9 @@ Requires: libcurl
 Requires: xqilla
 Requires: xerces-c
 %endif
+%if "%{?_with_boost}" == "distro"
+Requires: boost-system, boost-filesystem, boost-regex, boost-program-options, boost-thread
+%endif
 Obsoletes: GeneTorrent
 
 %description common
@@ -121,7 +127,7 @@ Requires: %{name}-common = @PACKAGE_VERSION@
 %setup -q
 
 %build
-%if "%{_with_boost}" != "distro"
+%if "%{?_with_boost}" != "distro"
 %if 0%{!?_with_boost:1}
 if [ -d /usr/local/boost-1.48.0 ]
 then
@@ -290,6 +296,11 @@ if [ $1 -lt 1 ]; then       # $1 = 1 (upgrade) or 0 (uninstall)
 fi
 
 %changelog
+* Wed Feb 19 2014 Hannes Schmidt <hannes@ucsc.edu> 3.8.5-Z
+- Add Boost dependencies
+- Include build numbers in package file names
+- Centos 5 RPM needs to use bundled xqilla, xerces and openssl in addition to boost
+
 * Wed May  1 2013 donavan nelson <dnelson at cardinalpeak dot com> 3.8.5-Y
 - Convert gtserver init.d script to gtserver rather than GeneTorrent
 
