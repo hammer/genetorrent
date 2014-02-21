@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 #
 # Copyright (c) 2012, Regents of the University of California
 # All rights reserved.
