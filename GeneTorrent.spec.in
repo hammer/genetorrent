@@ -262,11 +262,8 @@ fi
 %defattr(-,root,root,-)
 %{_bindir}/gtserver
 %config(noreplace) %{_sysconfdir}/gnos.d/%{name}.conf
-%config(noreplace) %{_sysconfdir}/gnos.d/GTLoadBalancer.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/gtserver
 %{_sysconfdir}/rc.d/init.d/gtserver
-%{_sysconfdir}/rc.d/init.d/GTLoadBalancer
-%{_bindir}/GTLoadBalancer
 %{_mandir}/man1/gtserver*
 %dir %attr(-,gtorrent,gtorrent) %{_localstatedir}/run/gtserver
 
@@ -282,18 +279,16 @@ exit 0
 %post server
 /sbin/chkconfig --list GeneTorrent 2> /dev/null 1>&2 && /sbin/chkconfig --del GeneTorrent
 /sbin/chkconfig --list gtserver 2> /dev/null 1>&2 || /sbin/chkconfig --add gtserver
-/sbin/chkconfig --list GTLoadBalancer 2> /dev/null 1>&2 || /sbin/chkconfig --add GTLoadBalancer
 
 %preun server
 if [ $1 -lt 1 ]; then       # $1 = 1 (upgrade) or 0 (uninstall)
    /sbin/service gtserver stop > /dev/null
-   /sbin/service GTLoadBalancer stop > /dev/null
    /sbin/chkconfig --del gtserver
-   /sbin/chkconfig --del GTLoadBalancer
 fi
 
 %changelog
 * Wed Feb 19 2014 Hannes Schmidt <hannes@ucsc.edu> 3.8.5-Z
+- removed load balancer
 - Add Boost dependencies
 - Include build numbers in package file names
 - Centos 5 RPM needs to use bundled xqilla, xerces and openssl in addition to boost

@@ -212,7 +212,6 @@ macosx:
 	$(MAKE) DESTDIR=$(MACDIR) install
 	@echo "  Removing server components"
 	rm -rf $(MACDIR)${prefix}/etc
-	rm -rf $(MACDIR)${prefix}/bin/GTLoadBalancer
 	rm -rf $(MACDIR)${prefix}/bin/gtupload
 	rm -rf $(MACDIR)${prefix}/share/man/man1/gtupload.1
 	rm -rf $(MACDIR)${prefix}/bin/gtserver

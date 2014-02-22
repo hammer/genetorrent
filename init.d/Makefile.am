@@ -32,13 +32,12 @@
 #
 ################################################################################
 
-LIST_OF_SCRIPTS_INIT = gtserver \
-               GTLoadBalancer
+LIST_OF_SCRIPTS_INIT = gtserver
 
 init_ddir = $(sysconfdir)/rc.d/init.d
 
 dist_init_d_SCRIPTS = ${LIST_OF_SCRIPTS_INIT}
 
 gnosdir = $(sysconfdir)/gnos.d
-dist_gnos_SCRIPTS =  GeneTorrent.conf GTLoadBalancer.conf
+dist_gnos_SCRIPTS =  GeneTorrent.conf
 
