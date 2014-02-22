@@ -243,9 +243,6 @@ fi
 %{_libdir}/%{name}/libxqilla.so.6
 %{_libdir}/%{name}/libxqilla.so.6.0.0
 %endif
-%{gt_python_sitelib}/gtoinfo.py
-%{gt_python_sitelib}/gtoinfo.pyc
-%{gt_python_sitelib}/gtoinfo.pyo
 %{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/README
 %{_docdir}/%{name}/NEWS
