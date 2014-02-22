@@ -99,8 +99,11 @@ AS_IF([test x"$enable_src_dist_only" = x"yes"], [
       [AC_MSG_ERROR([Boost program_options library not found.])])
 
    AS_ECHO
-   AS_ECHO "Checking for Python >= 2.4:"
-   AM_PATH_PYTHON(2.4)
+   AS_ECHO "Checking for Python >= 2.6:"
+   AM_PATH_PYTHON(2.6)
+   AS_IF([test -z "PYTHON_SHEBANG"],[
+      PYTHON_SHEBANG="$PYTHON"])
+   AC_SUBST([PYTHON_SHEBANG])
 
    AS_ECHO
    AS_ECHO "Checking for pthread support:"
@@ -178,10 +181,11 @@ AC_CONFIG_FILES(
    [src/Makefile]
    [GeneTorrent.spec]
    [GeneTorrent.nsi]
-   [scripts/Makefile]
-   [scripts/GTLoadBalancer]
-   [scripts/gtoinfo.py]
+   [scripts/cgquery]
+   [scripts/cgsubmit]
    [scripts/gtocheck]
+   [scripts/gtoinfo]
+   [scripts/Makefile]
    [init.d/Makefile]
    [sysconfig/Makefile]
    [deps/boost/Makefile]

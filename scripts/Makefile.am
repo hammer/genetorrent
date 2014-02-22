@@ -32,25 +32,8 @@
 #
 ################################################################################
 
-bin_SCRIPTS =     \
-	GTLoadBalancer \
+bin_SCRIPTS =      \
 	gtocheck       \
+	gtoinfo        \
 	cgquery        \
 	cgsubmit
-
-python_PYTHON = \
-	gtoinfo.py
-
-gtoinfo:
-	cp $(srcdir)/gtoinfo_wrapper $@
-
-BUILT_SOURCES = gtoinfo
-CLEANFILES = gtoinfo gtoinfo.pyc
-bin_SCRIPTS += gtoinfo
-
-EXTRA_DIST =      \
-	scm-rev-update \
-	cgquery        \
-	cgsubmit       \
-	gtoinfo_wrapper\
-	gtperftest

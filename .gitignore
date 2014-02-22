@@ -71,10 +71,9 @@ libtool
 
 # /scripts/
 /scripts/gtocheck
-/scripts/gtoinfo.py
-/scripts/GTLoadBalancer
 /scripts/gtoinfo
-/scripts/python_wrapper
+/scripts/cgquery
+/scripts/cgsubmit
 
 # /src/
 /src/gt_config.h
