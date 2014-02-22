@@ -182,10 +182,6 @@ AC_CONFIG_FILES(
    [src/Makefile]
    [GeneTorrent.spec]
    [GeneTorrent.nsi]
-   [scripts/cgquery]
-   [scripts/cgsubmit]
-   [scripts/gtocheck]
-   [scripts/gtoinfo]
    [scripts/Makefile]
    [init.d/Makefile]
    [sysconfig/Makefile]
@@ -198,6 +194,11 @@ AC_CONFIG_FILES(
    [macosx/Distribution.xml]
    [solaris/pkginfo]
 )
+
+AC_CONFIG_FILES( [scripts/cgquery], [chmod +x scripts/cgquery] )
+AC_CONFIG_FILES( [scripts/cgsubmit], [chmod +x scripts/cgsubmit] )
+AC_CONFIG_FILES( [scripts/gtocheck], [chmod +x scripts/gtocheck] )
+AC_CONFIG_FILES( [scripts/gtoinfo], [chmod +x scripts/gtoinfo] )
 
 AC_CONFIG_SUBDIRS(
    [libtorrent]

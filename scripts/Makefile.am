@@ -37,3 +37,5 @@ bin_SCRIPTS =      \
 	gtoinfo        \
 	cgquery        \
 	cgsubmit
+
+CLEANFILES = $(bin_SCRIPTS)
