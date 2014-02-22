@@ -100,6 +100,7 @@ AS_IF([test x"$enable_src_dist_only" = x"yes"], [
 
    AS_ECHO
    AS_ECHO "Checking for Python >= 2.6:"
+   define([_AM_PYTHON_INTERPRETER_LIST], [python python2 python2.7 python2.6])
    AM_PATH_PYTHON(2.6)
    AS_IF([test -z "PYTHON_SHEBANG"],[
       PYTHON_SHEBANG="$PYTHON"])
