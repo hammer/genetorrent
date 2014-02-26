@@ -200,9 +200,9 @@ macosx:
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib
 	install_name_tool -add_rpath /usr/local/lib/GeneTorrent \
 		$(top_srcdir)/deps/boost/lib/libboost_filesystem.dylib || true
-	set -e; IFS=$$'\n'; \
+	set -ex; IFS=$$'\n'; \
 		xerces_install_name=$$(otool -L $(top_srcdir)/deps/xqilla/lib/libxqilla.dylib | \
-			$(GREP) xerces | cut -d' ' -f1 | head -1); \
+			$(GREP) xerces | awk '{print $$1}' | head -1); \
 		install_name_tool -change $${xerces_install_name} @rpath/libxerces-c-3.1.dylib \
 			$(top_srcdir)/deps/xqilla/lib/libxqilla.dylib
 	@echo "  Building for Mac OS X"
