@@ -8,6 +8,45 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
+GeneTorrent 3.8.5
+*****************
+
+March 4, 2014
+
+ * Download to a temporary location. This is a fundamental and benefitial change in the behavior of
+   GeneTorrent download clients. It eliminates the need to recheck the integrity of completed
+   downloads when resuming a manifest download.
+
+ * Renamed --config-dir command line option to --resource-dir, added GT_RESOURCE_DIR environment
+   variable. These changes eliminate the need to pass -C or --config-dir to gtdownload and gtupload
+   when installed from binary tar.gz distributions.
+
+ * Removed GTLoadBalancer from distribution
+
+ * Many build-time fixes/improvements on various platforms
+
+ * Shebang in Python scripts points to default Python installation for the respective platform
+   instead of using PATH via /usr/bin/env python
+
+ * Include CI build number in output of gtdownload --version and package file names
+
+ * Renamed Windows installer executable file 
+
+ * Generate gt_scm_rev.h during configure instead of make. That way it is included in the source
+   distribution, make clean doesn't remove it, make install doesn't skip its creation.
+
+ * Added support for Ubuntu Saucy and Raring, Fedora 19 and 20, removed support for Fedora 16 to 18.
+
+ * Display a calculating checksums message when a download is resumed. Also, forced download only
+   mode when the download is not resumed.
+
+ * Added new command line option: webservices-url, allowing the hard-coded default to be overridden
+   at run time.
+
+ * Include the UUID and a timestamp in log file names.
+
+ * The --rate-limit option now also works on local networks.
+
 GeneTorrent 3.8.4
 *****************
 
