@@ -362,8 +362,8 @@ Add to the default Cygwin install (and all dependencies)::
     git
     libboost (1.48+)
     libboost-devel (1.48+)
-    openssl (1.01c-2+)
-    openssl-devel (1.01c-2+)
+    openssl (1.0.1g-1+)
+    openssl-devel (1.0.1g-1+)
     libxerces-c30 (3.0.1-10+)
     xerces-devel (3.0.1-10+)
     g++ (latest)
@@ -378,7 +378,7 @@ Add to the default Cygwin install (and all dependencies)::
     util-linux (latest)
     libiconv & libiconv2 (1.14-2)
 
-See cygcheck.txt for a snapshot of the list of packages installed on a reference build host for Windows.
+See cygcheck.txt for a snapshot of the list of packages installed on a reference build host for Windows. Make sure you use OpenSSL 1.0.1g (see CVE-2014-0160).
 
 Note: If you follow these instructions, you will end up with two Python's on your system: the cygwin one and the official one in C:\Python27. Both can be invoked from a cygwin shell: the cygwin one can be run as "python", the official one via "python.exe". Also not that running the official Python without any arguments in a Cygwin shell hangs instead of showing the interactive prompt. Get around this using "python.exe -i".
 
