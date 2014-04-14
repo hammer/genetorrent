@@ -1,11 +1,15 @@
 Cygwin Package Information
-Last downloaded files to: C:\Users\hannes\Desktop\cygwin
-Last downloaded files from: http://www.gtlib.gatech.edu/pub/cygwin/
+Last downloaded files to: C:\Users\cghub\Desktop\cygwin
+Last downloaded files from: http://mirror.mcs.anl.gov/cygwin/
 
 Package               Version              Status
-_autorebase           000487-1             OK
+_autorebase           000491-1             OK
 _update-info-dir      01208-1              OK
 alternatives          1.3.30c-10           OK
+Empty package apr1
+apr1                  1.4.8-1              OK
+Empty package aprutil1
+aprutil1              1.5.2-4              OK
 autoconf              13-1                 OK
 autoconf2.1           2.13-12              OK
 autoconf2.5           2.69-2               OK
@@ -38,7 +42,7 @@ cvs                   1.12.13-10           OK
 cvsps                 2.2b1-1              OK
 cygrunsrv             1.50-1               OK
 cygutils              1.4.14-1             OK
-cygwin                1.7.27-2             OK
+cygwin                1.7.28-1             OK
 dash                  0.5.7-1              OK
 diffutils             3.2-1                OK
 dos2unix              6.0.4-1              OK
@@ -69,14 +73,18 @@ gzip                  1.4-1                OK
 icu                   4.8.1-1              OK
 ipc-utils             1.0-1                OK
 less                  444-1                OK
+libapr1               1.4.8-1              OK
+libapr1-devel         1.4.8-1              OK
+libaprutil1           1.5.2-4              OK
+libaprutil1-devel     1.5.2-4              OK
 libasn1_8             1.5.2-4              OK
 libatomic1            4.8.2-2              OK
 libattr1              2.4.46-1             OK
 libblkid1             2.21.2-1             OK
-libboost-devel        1.53.0-2             OK
+libboost-devel        1.50.0-1             OK
 libboost1.50          1.50.0-1             OK
 libboost1.53          1.53.0-2             OK
-libboost_python-devel 1.53.0-2             OK
+libboost_python-devel 1.50.0-1             OK
 libboost_python1.50   1.50.0-1             OK
 libboost_python1.53   1.53.0-2             OK
 libbz2_1              1.0.6-2              OK
@@ -87,9 +95,12 @@ libcurl-devel         7.34.0-1             OK
 libcurl4              7.34.0-1             OK
 libdb4.5              4.5.20.2-3           OK
 libdb4.8              4.8.30-1             OK
+libdb4.8-devel        4.8.30-1             OK
 libedit0              20130712-1           OK
+libexpat-devel        2.1.0-3              OK
 libexpat1             2.1.0-3              OK
 libffi4               4.5.3-3              OK
+libffi6               3.0.13-1             OK
 libgcc1               4.8.2-2              OK
 libgdbm4              1.8.3-20             OK
 libgmp10              5.1.3-1              OK
@@ -106,6 +117,8 @@ libicu38              3.8-7                OK
 libicu48              4.8.1-1              OK
 libidn11              1.26-1               OK
 libintl8              0.18.1.1-2           OK
+libiodbc-devel        3.52.8-2             OK
+libiodbc2             3.52.8-2             OK
 libisl10              0.11.1-2             OK
 libkafs0              1.5.2-4              OK
 libkrb5_26            1.5.2-4              OK
@@ -114,18 +127,21 @@ liblzma5              5.0.2_20110517-1     OK
 libmetalink3          0.1.2-1              OK
 libmpc3               1.0.1-2              OK
 libmpfr4              3.1.2-1              OK
+libmysqlclient18      5.5.35-1             OK
 libncurses10          5.7-18               OK
 libncursesw10         5.7-18               OK
 libopenldap2_4_2      2.4.35-2             OK
 libopenssl098         0.9.8y-1             OK
-libopenssl100         1.0.1f-2             OK
+libopenssl100         1.0.1g-1             OK
 libp11-kit0           0.18.7-1             OK
 libpcre0              8.21-2               OK
 libpcre1              8.33-1               OK
 Empty package libpopt0
 libpopt0              1.16-1               OK
+libpq5                9.3.2-2              OK
 libreadline7          6.1.2-3              OK
 libroken18            1.5.2-4              OK
+libsasl2-devel        2.1.26-6             OK
 Missing file: /usr/lib/sasl2_3/libanonymous.la from package libsasl2_3
 Missing file: /usr/lib/sasl2_3/libcrammd5.la from package libsasl2_3
 Missing file: /usr/lib/sasl2_3/libdigestmd5.la from package libsasl2_3
@@ -137,7 +153,7 @@ Missing file: /usr/lib/sasl2_3/libsasldb.la from package libsasl2_3
 Missing file: /usr/lib/sasl2_3/libscram.la from package libsasl2_3
 libsasl2_3            2.1.26-6             Incomplete
 libsigsegv2           2.10-1               OK
-libsqlite3_0          3.8.2-3              OK
+libsqlite3_0          3.8.3-2              OK
 Missing file: /usr/lib/libssh2.la from package libssh2-devel
 libssh2-devel         1.4.2-1              Incomplete
 libssh2_1             1.4.2-1              OK
@@ -148,6 +164,7 @@ libstdc++6-devel      4.8.2-2              OK
 libtasn1_6            3.3-1                OK
 Missing file: /usr/lib/libltdl.la from package libtool
 libtool               2.4-1                Incomplete
+libuuid-devel         2.21.2-1             OK
 libuuid1              2.21.2-1             OK
 libwind0              1.5.2-4              OK
 libwrap0              7.6-22               OK
@@ -160,9 +177,10 @@ m4                    1.4.17-1             OK
 make                  4.0-2                OK
 man                   1.6g-2               OK
 mintty                1.1.3-1              OK
+openldap-devel        2.4.35-2             OK
 openssh               6.5p1-1              OK
-openssl               1.0.1f-2             OK
-openssl-devel         1.0.1f-2             OK
+openssl               1.0.1g-1             OK
+openssl-devel         1.0.1g-1             OK
 p11-kit               0.18.7-1             OK
 p11-kit-trust         0.18.7-1             OK
 perl                  5.14.2-3             OK
