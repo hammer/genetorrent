@@ -8,12 +8,21 @@ Release Notes for GeneTorrent
    other formats. Process this file with `rst2pdf -o NEWS.pdf NEWS` to
    generate a pdf or with `rst2html NEWS NEWS.html` to generate html.
 
+GeneTorrent 3.8.5a
+******************
+
+April 14, 2014
+
+ * Bundle OpenSSL 1.0.1g in response to CVE-2014-0160. OpenSSL is only bundled in the binary
+   distributions (.tar.gz and .rpm) for CentOS6 and in the installer for Windows. For all other
+   platforms, this release does not change anything and can be skipped.
+
 GeneTorrent 3.8.5
 *****************
 
 March 4, 2014
 
- * Download to a temporary location. This is a fundamental and benefitial change in the behavior of
+ * Download to a temporary location. This is a fundamental and beneficial change in the behavior of
    GeneTorrent download clients. It eliminates the need to recheck the integrity of completed
    downloads when resuming a manifest download.
 
@@ -124,7 +133,7 @@ Bug Fixes
 
 * **[GTXFER-89]** gtupload & gtdownload: Specifying the rate (-r) on the command line causes errors.
 
-* Numberous changes to the bulid process for Windows and a newer cygwin release.
+* Numerous changes to the build process for Windows and a newer cygwin release.
 
 Known Issues
 ------------

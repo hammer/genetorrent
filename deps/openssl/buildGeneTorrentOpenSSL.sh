@@ -29,9 +29,9 @@
 baseDir=$(pushd $(dirname $0) > /dev/null; pwd -P; popd > /dev/null)
 
 DEP_NAME=openssl
-SRC_URL=http://www.openssl.org/source/openssl-1.0.1c.tar.gz
-DEP_VER=openssl-1.0.1c
-EXPECTED_MD5=ae412727c8c15b67880aef7bd2999b2e
+SRC_URL=http://www.openssl.org/source/openssl-1.0.1g.tar.gz
+DEP_VER=openssl-1.0.1g
+EXPECTED_MD5=de62b43dfcd858e66a74bee1c834e959
 CONFIG_CMD="./config --openssldir=${baseDir} shared"
 BUILD_CMD="make install $@"
 TARBALL="${DEP_VER}.tar.gz"
