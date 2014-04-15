@@ -14,7 +14,7 @@ GeneTorrent 3.8.5a
 April 14, 2014
 
  * Bundle OpenSSL 1.0.1g in response to CVE-2014-0160. OpenSSL is only bundled in the binary
-   distributions (.tar.gz and .rpm) for CentOS6 and in the installer for Windows. For all other
+   distributions (.tar.gz and .rpm) for CentOS 5 and in the installer for Windows. For all other
    platforms, this release does not change anything and can be skipped.
 
 GeneTorrent 3.8.5
