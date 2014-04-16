@@ -287,6 +287,9 @@ if [ $1 -lt 1 ]; then       # $1 = 1 (upgrade) or 0 (uninstall)
 fi
 
 %changelog
+* Mon Apr 14 2014 Hannes Schmidt <hannes@ucsc.edu> 3.8.6-11
+- 
+
 * Mon Apr 14 2014 Hannes Schmidt <hannes@ucsc.edu> 3.8.5a-11
 - security fix release (CVE-2014-0160)
 
